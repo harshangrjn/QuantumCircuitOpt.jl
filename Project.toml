@@ -1,0 +1,7 @@
+name = "QuantumCircuitOptimization"
+uuid = "88128e30-b60a-4e54-ab02-1050a5f92a36"
+authors = ["harshangrjn <harsha.ngrjn@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
