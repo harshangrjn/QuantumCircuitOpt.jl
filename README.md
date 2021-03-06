@@ -1,5 +1,5 @@
-# QuantumCircuitOptimization
-Discrete Optimization Algorithms for Optimal Quantum Circuit Design
+# QuantumCircuitOptimization.jl
+This is a Julia package which implements discrete optimization algorithms for optimization of Quantum circuits architecture. Given a desired target quantum gate and a set of elemental one and two qubit gates, this package provides a decomposition with minimum number of elemental gates.   
 
 ## Usage
 - Clone the repository.
