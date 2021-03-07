@@ -1,4 +1,4 @@
-function get_bounds(v) 
+function get_auxiliary_var_bounds(v) 
     v_l = [lower_bound(v[1]), upper_bound(v[1])]
     v_u = [lower_bound(v[2]), upper_bound(v[2])]
     M = v_l * v_u'
@@ -77,10 +77,9 @@ end
 function complex_to_real_matrix(M)
     @assert ((typeof(M) == Array{Complex{Int64},2}) || (typeof(M) == Array{Complex{Float64},2}))
     n = size(M)[1]
-    M_real = zeros(2 * n, 2 * n)
+    M_real = zeros(2*n, 2*n)
   
     ii = 1; jj = 1;
-
     for i = collect(1:2:2 * n)
         for j = collect(1:2:2 * n)
             M_real[i,j] = real(M[ii,jj])
@@ -105,10 +104,9 @@ function real_to_complex_matrix(M)
     @assert ((typeof(M) == Array{Int64,2}) || (typeof(M) == Array{Float64,2}))
     n = size(M)[1]
     @assert iseven(n)
-    M_complex = zeros(Complex{Float64}, (Int(n / 2), Int(n / 2)))
+    M_complex = zeros(Complex{Float64}, (Int(n/2), Int(n/2)))
   
     ii = 1; jj = 1;
-
     for i = collect(1:2:n)
         for j = collect(1:2:n)
             @assert M[i,j] == M[i + 1,j + 1]

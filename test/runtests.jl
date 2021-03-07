@@ -1,6 +1,6 @@
 using QuantumCircuitOptimization
 import Memento
-import JuMP
+using JuMP
 import LinearAlgebra
 
 const QCO = QuantumCircuitOptimization

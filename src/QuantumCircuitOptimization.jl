@@ -1,5 +1,6 @@
 module QuantumCircuitOptimization
 
+using JuMP
 import LinearAlgebra
 import Random
 import Memento
