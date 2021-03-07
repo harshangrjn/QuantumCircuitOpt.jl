@@ -83,13 +83,13 @@ function complex_to_real_matrix(M)
     for i = collect(1:2:2 * n)
         for j = collect(1:2:2 * n)
             M_real[i,j] = real(M[ii,jj])
-            M_real[i + 1,j + 1] = real(M[ii,jj])
+            M_real[i+1,j+1] = real(M[ii,jj])
             if imag(M[ii,jj]) == 0
-                M_real[i,j + 1] = 0
-                M_real[i + 1,j] = 0
+                M_real[i,j+1] = 0
+                M_real[i+1,j] = 0
             else
-                M_real[i,j + 1] = -imag(M[ii,jj])
-                M_real[i + 1,j] = imag(M[ii,jj])
+                M_real[i,j+1] = -imag(M[ii,jj])
+                M_real[i+1,j] = imag(M[ii,jj])
             end
             jj += 1
         end
@@ -109,9 +109,9 @@ function real_to_complex_matrix(M)
     ii = 1; jj = 1;
     for i = collect(1:2:n)
         for j = collect(1:2:n)
-            @assert M[i,j] == M[i + 1,j + 1]
-            @assert M[i + 1,j] == -M[i,j + 1]
-            M_complex[ii,jj] = complex(M[i,j], M[i + 1,j])
+            @assert M[i,j] == M[i+1,j+1]
+            @assert M[i+1,j] == -M[i,j+1]
+            M_complex[ii,jj] = complex(M[i,j], M[i+1,j])
             jj += 1
         end
         jj = 1
