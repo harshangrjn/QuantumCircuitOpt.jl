@@ -5,6 +5,9 @@ import LinearAlgebra
 import Random
 import Memento
 
+using MathOptInterface
+const MOI = MathOptInterface
+
 # Create our module level logger (this will get precompiled)
 const _LOGGER = Memento.getlogger(@__MODULE__)
 
@@ -23,7 +26,9 @@ function logger_config!(level)
     Memento.config!(Memento.getlogger("PowerModels"), level)
 end
 
+include("types.jl")
 include("utility.jl")
+include("relaxations.jl")
 include("log.jl")
 
 end # module
