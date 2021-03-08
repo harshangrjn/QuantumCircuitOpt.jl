@@ -27,8 +27,9 @@ function get_default_options()
                             mip_gap, mip_solver, nlp_solver, minlp_solver)
 end
 
-mutable struct QCOProblem
-    model :: MOI.AbstractOptimizer
+mutable struct QCOoptimizer <: MOI.AbstractOptimizer
+    options::OptimizerOptions    
+    Qmodel :: JuMP.Model
     objval :: Float64
     best_bound :: Float64
     objective :: Union{Nothing, MOI.ScalarAffineFunction{Float64}, MOI.ScalarQuadraticFunction{Float64}}
@@ -37,12 +38,24 @@ mutable struct QCOProblem
 
     mip_solver :: Any 
     nlp_solver :: Any 
-    minlp_solver :: Any
+    minlp_solver :: Any 
 
-    # QCOProblem() = new()
+    Qmodel_status::MOI.TerminationStatusCode
+
+    # constructor
+    function QCOoptimizer()
+        m = new()
+        m.options = get_default_options()
+        MOI.empty!(m)
+        return m
+    end
 end
 
-mutable struct SolutionObj
-    solution :: Vector{Float64}
-    objval :: Float64
+mutable struct QCOdata 
+    Q_gates :: Array{Complex,3}
+    target_gate :: Array{Complex,2}
+    n_r :: Int
+    n_c :: Int
+    Q_gates_lb :: Array{Complex,2}
+    Q_gates_ub :: Array{Complex,2}
 end

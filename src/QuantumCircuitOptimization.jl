@@ -1,7 +1,7 @@
 module QuantumCircuitOptimization
 
 using JuMP
-import LinearAlgebra
+using  LinearAlgebra
 import Random
 import Memento
 
@@ -26,9 +26,12 @@ function logger_config!(level)
     Memento.config!(Memento.getlogger("PowerModels"), level)
 end
 
+include("data.jl")
 include("types.jl")
 include("utility.jl")
 include("relaxations.jl")
+include("variables.jl")
+include("constraints.jl")
 include("log.jl")
 
 end # module

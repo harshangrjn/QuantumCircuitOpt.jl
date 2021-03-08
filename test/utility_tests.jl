@@ -1,3 +1,5 @@
+# Unit tests for functions in utility.jl
+
 M_c = [complex(1,0)       complex(0,-1)
        complex(-0.5,0.5)  complex(0,0)]
 
@@ -40,3 +42,5 @@ end
     @test QCO.get_auxiliary_var_bounds([x[4], x[1], x[3], x[2]]) == (-24, 12)
     @test QCO.get_auxiliary_var_bounds([x[4], x[3], x[2], x[1]]) == (-24, 12)
 end
+
+#TODO: Add test to verify verify_tolerances_complex_matrix function
