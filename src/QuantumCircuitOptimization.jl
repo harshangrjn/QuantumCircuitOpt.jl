@@ -1,12 +1,13 @@
 module QuantumCircuitOptimization
 
-using JuMP
-using  LinearAlgebra
+import JuMP
+import LinearAlgebra
 import Random
 import Memento
+import MathOptInterface
 
-using MathOptInterface
 const MOI = MathOptInterface
+const LA = LinearAlgebra
 
 # Create our module level logger (this will get precompiled)
 const _LOGGER = Memento.getlogger(@__MODULE__)
@@ -30,6 +31,7 @@ include("data.jl")
 include("types.jl")
 include("utility.jl")
 include("relaxations.jl")
+include("solve.jl")
 include("variables.jl")
 include("constraints.jl")
 include("log.jl")

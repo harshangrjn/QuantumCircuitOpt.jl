@@ -1,8 +1,9 @@
-function get_gates(n_qubits)
+function get_gates_(n_qubits)
 
    elementary_gates = zeros(n_qubits,n_qubits,3)
 
-   elementary_gates[:,:,1] = Array{Complex{Float64},1}([])
+
+#    elementary_gates[:,:,1] = 
 
 end
 
@@ -22,16 +23,16 @@ function get_elementary_gates()
     cnot_21 = Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]) 
     
     # 2-qubit gates 
-    I_3 = Array{Complex{Float64},2}(Matrix(I, 2^3, 2^3)) 
+    I_3 = Array{Complex{Float64},2}(Matrix(LA.I, 2^3, 2^3)) 
 
-    toffoli = Array{Complex{Float64},2}([ 1  0  0  0  0  0  0  0
-                                          0  1  0  0  0  0  0  0
-                                          0  0  1  0  0  0  0  0
-                                          0  0  0  1  0  0  0  0
-                                          0  0  0  0  1  0  0  0
-                                          0  0  0  0  0  1  0  0
-                                          0  0  0  0  0  0  0  1
-                                          0  0  0  0  0  0  1  0])
+    toffoli = Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                         0  1  0  0  0  0  0  0
+                                         0  0  1  0  0  0  0  0
+                                         0  0  0  1  0  0  0  0
+                                         0  0  0  0  1  0  0  0
+                                         0  0  0  0  0  1  0  0
+                                         0  0  0  0  0  0  0  1
+                                         0  0  0  0  0  0  1  0])
     
     cnot_13 = Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
                                          0	1	0	0	0	0	0	0

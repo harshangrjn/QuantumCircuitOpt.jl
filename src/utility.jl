@@ -1,6 +1,6 @@
 function get_auxiliary_var_bounds(v) 
-    v_l = [lower_bound(v[1]), upper_bound(v[1])]
-    v_u = [lower_bound(v[2]), upper_bound(v[2])]
+    v_l = [JuMP.lower_bound(v[1]), JuMP.upper_bound(v[1])]
+    v_u = [JuMP.lower_bound(v[2]), JuMP.upper_bound(v[2])]
     M = v_l * v_u'
  
     if length(v) == 2 
@@ -9,16 +9,16 @@ function get_auxiliary_var_bounds(v)
  
     elseif (length(v) == 3) || (length(v) == 4) 
        M1 = zeros(Float64, (2, 2, 2))
-       M1[:,:,1] = M * lower_bound(v[3])
-       M1[:,:,2] = M * upper_bound(v[3])
+       M1[:,:,1] = M * JuMP.lower_bound(v[3])
+       M1[:,:,2] = M * JuMP.upper_bound(v[3])
        if length(v) == 3
           # Trilinear
           return minimum(M1), maximum(M1)
        elseif length(v) == 4
           # Quadrilinear
           M2 = zeros(Float64, (2, 2, 4))
-          M2[:,:,1:2] = M1 * lower_bound(v[4])
-          M2[:,:,3:4] = M1 * upper_bound(v[4])
+          M2[:,:,1:2] = M1 * JuMP.lower_bound(v[4])
+          M2[:,:,3:4] = M1 * JuMP.upper_bound(v[4])
           return minimum(M2), maximum(M2)
        end
     end

@@ -32,7 +32,8 @@ mutable struct QCOoptimizer <: MOI.AbstractOptimizer
     Qmodel :: JuMP.Model
     objval :: Float64
     best_bound :: Float64
-    objective :: Union{Nothing, MOI.ScalarAffineFunction{Float64}, MOI.ScalarQuadraticFunction{Float64}}
+    # objective :: Union{Nothing, MOI.ScalarAffineFunction{Float64}, MOI.ScalarQuadraticFunction{Float64}}
+    objective_value :: Float64
     solution :: Any
     sol_time :: Float64
 
