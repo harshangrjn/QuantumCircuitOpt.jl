@@ -1,31 +1,27 @@
+using QuantumCircuitOptimization
 using JuMP
 using CPLEX
-using QuantumCircuitOptimization
-using Ipopt
-using Juniper
+using Cbc
 
-# MIP solvers
-const cplex = optimizer_with_attributes(CPLEX.Optimizer, 
-                                        MOI.Silent() => true, 
-                                        "CPX_PARAM_PREIND" => false) 
+include("solver.jl")
 
-# Local solvers
-const ipopt = optimizer_with_attributes(Ipopt.Optimizer, 
-                                        MOI.Silent() => true, 
-                                        "sb" => "yes", 
-                                        "max_iter" => 9999)
+# All the user 
+params = Dict{String, Any}(
+"n" => 2, # Number of qubits
+"D" => 3, # Minimum depth of the decomposition (>= 2)
+"instance" => "ibm", 
 
-const juniper = optimizer_with_attributes(Juniper.Optimizer, 
-                                          MOI.Silent() => true, 
-                                          "mip_solver" => cplex, 
-                                          "nl_solver" => ipopt)
+"optimizer" => "cplex",
+"presolve" => true,
+"optimizer_log" => true,                           
+"lp_relax" => false,
+                            
+# Valid inequalities
+"valid_1" => false, #commutative matrices
+)
 
-const qco = optimizer_with_attributes(QuantumCircuitOptimization.QCOoptimizer, 
-                                        "nlp_solver" => ipopt,
-                                        "minlp_solver" => juniper,  
-                                        "mip_solver" => cplex)
-                                        
-m = Model(qco)
-JuMP.optimize!(m)
-@show objective_value(m)                                        
-            
+qcm_optimizer = get_solver(params)
+model_qc = build_QCModel(data,params)
+results = run_QCModel(model_qc, optimizer = cplex)
+
+

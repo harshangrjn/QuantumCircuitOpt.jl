@@ -1,62 +1,54 @@
-mutable struct OptimizerOptions
-    log_level :: Int
-    time_limit :: Float64
-    tol :: Float64
-    silent :: Bool
-    binary_relax :: Bool
-    mip_gap :: Float64
+export QuantumCircuitModel
 
-    mip_solver :: Any 
-    nlp_solver :: Any 
-    minlp_solver :: Any
+"""
+The composite mutable struct, `QuantumCircuitModel`, holds dictionaries for input data, abstract JuMP model for optimization,
+variable references and result from solving the JuMP model.
+"""
+mutable struct QuantumCircuitModel 
+    data::Dict{String,Any}
+    model::JuMP.Model
+    variables::Dict{Symbol,Any}
+    #constraints::Dict{Symbol,Any}
+    result::Dict{String,Any}
 end
 
-function get_default_options()
-    log_level = 1
-    time_limit = 10800
-    tol = 1E-6
-    silent = true
-    binary_relax = false
-    mip_gap = 1E-4
-
-    mip_solver = nothing
-    nlp_solver = nothing 
-    minlp_solver = nothing
-
-    return OptimizerOptions(log_level, time_limit, tol, silent, binary_relax, 
-                            mip_gap, mip_solver, nlp_solver, minlp_solver)
+"Contructor for struct `QuantumCircuitModel`"
+function QuantumCircuitModel(data)
+    qcm = new(data)
+    qcm.data = data
+    qcm.model = JuMP.Model() 
+    qcm.variables = Dict{Symbol,Any}()
+    qcm.result = Dict{String,Any}()
+    return qcm
 end
 
-mutable struct QCOoptimizer <: MOI.AbstractOptimizer
-    options::OptimizerOptions    
-    Qmodel :: JuMP.Model
-    objval :: Float64
-    best_bound :: Float64
-    # objective :: Union{Nothing, MOI.ScalarAffineFunction{Float64}, MOI.ScalarQuadraticFunction{Float64}}
-    objective_value :: Float64
-    solution :: Any
-    sol_time :: Float64
 
-    mip_solver :: Any 
-    nlp_solver :: Any 
-    minlp_solver :: Any 
 
-    Qmodel_status::MOI.TerminationStatusCode
+# mutable struct OptimizerOptions
+#     log_level :: Int
+#     time_limit :: Float64
+#     tol :: Float64
+#     silent :: Bool
+#     binary_relax :: Bool
+#     mip_gap :: Float64
 
-    # constructor
-    function QCOoptimizer()
-        m = new()
-        m.options = get_default_options()
-        MOI.empty!(m)
-        return m
-    end
-end
+#     mip_solver :: Any 
+#     nlp_solver :: Any 
+#     minlp_solver :: Any
+# end
 
-mutable struct QCOdata 
-    Q_gates :: Array{Complex,3}
-    target_gate :: Array{Complex,2}
-    n_r :: Int
-    n_c :: Int
-    Q_gates_lb :: Array{Complex,2}
-    Q_gates_ub :: Array{Complex,2}
-end
+# function get_default_options()
+#     log_level = 1
+#     time_limit = 10800
+#     tol = 1E-6
+#     silent = true
+#     binary_relax = false
+#     mip_gap = 1E-4
+
+#     mip_solver = nothing
+#     nlp_solver = nothing 
+#     minlp_solver = nothing
+
+#     return OptimizerOptions(log_level, time_limit, tol, silent, binary_relax, 
+#                             mip_gap, mip_solver, nlp_solver, minlp_solver)
+# end
