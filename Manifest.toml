@@ -6,6 +6,12 @@ git-tree-sha1 = "fc1716d806dd345db9fd82e93f2186771fe6df13"
 uuid = "ae81ac8f-d209-56e5-92de-9978fef736f9"
 version = "0.1.1+4"
 
+[[Alpine]]
+deps = ["Distributed", "JuMP", "LinearAlgebra", "MathOptInterface", "Printf", "Random", "SparseArrays", "Statistics"]
+git-tree-sha1 = "b69a73723730a2f72dc1b9024ff3cf72765bfe1c"
+uuid = "07493b3f-dabb-5b16-a503-4139292d7dd4"
+version = "0.2.1"
+
 [[Artifacts]]
 deps = ["Pkg"]
 git-tree-sha1 = "c30985d8821e0cd73870b17b0ed0ce6dc44cb744"
@@ -187,9 +193,9 @@ version = "0.6.5"
 
 [[Ipopt_jll]]
 deps = ["ASL_jll", "Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "MUMPS_seq_jll", "OpenBLAS32_jll", "Pkg"]
-git-tree-sha1 = "91c4f42e86e4c18d9399f962045513e1ec29abad"
+git-tree-sha1 = "610e03d6ff38a70c2a5eca351d83638309f4afb5"
 uuid = "9cc047cb-c261-5740-88fc-0cf96f7bdcc7"
-version = "3.13.2+1"
+version = "3.13.4+0"
 
 [[JLLWrappers]]
 git-tree-sha1 = "a431f5f2ca3f4feef3bd7a5e94b8b8d4f2f647a0"
