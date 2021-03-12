@@ -5,7 +5,7 @@ using CPLEX
 
 include("solver.jl")
 
-# All the user 
+# User-defined inputs
 params = Dict{String, Any}(
 "n_qubits" => 2, # Number of qubits
 "D" => 5, # Maximum depth of the decomposition (>= 2)
@@ -23,7 +23,7 @@ params = Dict{String, Any}(
 "optimizer_log" => true,                           
 "lp_relax" => false,
                             
-# Valid inequalities
+# Valid inequalities which may speed up the model run time
 "cuts_1" => false, #commutative matrices
 )
 

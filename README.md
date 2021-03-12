@@ -13,7 +13,7 @@ Check the "examples" folder on how to use this package.
 Please report any issues via the Github **[issue tracker]**. All types of issues are welcome and encouraged; this includes bug reports, documentation typos, feature requests, etc.
 
 ## Acknowledgement
-This work was supported by Los Alamos National Laboratory's LDRD Early Career Research Award, *"20190590ECR: Discrete Optimization Algorithms for Provable Optimal Quantum Circuit Design"*. The primary developer of this package is Harsha Nagarajan (@harshangrjn). 
+This work was supported by Los Alamos National Laboratory's LDRD Early Career Research Award, *"20190590ECR: Discrete Optimization Algorithms for Provable Optimal Quantum Circuit Design"*. The primary developer of this package is [Harsha Nagarajan](http://harshanagarajan.com) (@harshangrjn). 
 
 ## Citation
 If you find QuantumCircuitOpt.jl useful in your work, we request you to cite the following paper: 

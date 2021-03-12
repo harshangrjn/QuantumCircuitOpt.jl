@@ -7,28 +7,70 @@ function get_quantum_gates(params::Dict{String, Any})
     input = params["elementary_gates"]
     M = zeros(Complex{Float64}, 2^n_qubits, 2^n_qubits, length(input))
     for i=1:length(input)
-        M[:,:,i] = get_full_sized_gate(input[i])
+        M[:,:,i] = get_full_sized_gate(input[i], n_qubits)
     end
-    T = get_full_sized_gate(params["target_gate"])
+    T = get_full_sized_gate(params["target_gate"], n_qubits)
 
+    if ((size(M[:,:,1])[1] != size(T)[1]) || (size(M[:,:,1])[2] != size(T)[2]))
+        Memento.error(_LOGGER, "Dimension mis-match for input elementary gates vs. the target gate.")
+    end
     return M, T
 end
 
-function get_full_sized_gate(input::String)
-    gates = get_elementary_gates()
-    if input == "H1"
-        return kron(gates["hadamard_H"], gates["I_2"])
-    elseif input == "H2"
-        return kron(gates["I_2"], gates["hadamard_H"])
-    elseif input == "cnot_12"
-        return gates["cnot_12"]
-    elseif input == "cnot_21"
-        return gates["cnot_21"]
-    elseif input == "H⊗H"
-        return kron(gates["hadamard_H"], gates["hadamard_H"])
-    # Add here the other gates from get_elementary_gates
-    else
-        Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
+function get_full_sized_gate(input::String, n_qubits::Int64)
+    gates = get_elementary_gates(n_qubits)
+    # All 2-qubit full-sized gates
+    if n_qubits == 2
+        if input == "H1"
+            return kron(gates["hadamard_H"], gates["I_2"])
+        elseif input == "H2"
+            return kron(gates["I_2"], gates["hadamard_H"])
+        elseif input == "cnot_12"
+            return gates["cnot_12"]
+        elseif input == "cnot_21"
+            return gates["cnot_21"]
+        elseif input == "H⊗H"
+            return kron(gates["hadamard_H"], gates["hadamard_H"])
+        elseif input == "Z1"
+            return kron(gates["ph_shift_Z"], gates[I_2]) 
+        elseif input == "Z2"
+            return kron(gates[I_2], gates["ph_shift_Z"])        
+        elseif input == "T1"
+            return kron(gates["ph_shift_T"], gates[I_2]) 
+        elseif input == "T2"
+            return kron(gates[I_2], gates["ph_shift_T"])   
+        elseif input == "T1_conjugate"
+            return kron(gates["ph_shift_T_conj"], gates[I_2]) 
+        elseif input == "T2_conjugate"
+            return kron(gates[I_2], gates["ph_shift_T_conj"])   
+        elseif input == "S1"
+            return kron(gates["ph_shift_S"], gates[I_2]) 
+        elseif input == "S2"
+            return kron(gates[I_2], gates["ph_shift_S"])  
+        elseif input == "X1"
+            return kron(gates["pauli_X"], gates[I_2]) 
+        elseif input == "X2"
+            return kron(gates[I_2], gates["pauli_X"])   
+        elseif input == "Y1"
+            return kron(gates["pauli_Y"], gates[I_2]) 
+        elseif input == "Y2"
+            return kron(gates[I_2], gates["pauli_Y"])   
+        # Add here the other gates from get_elementary_gates
+        else
+            Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
+        end
+    end
+    # All 3-qubit full-sized gates
+    if n_qubits == 3
+        if input == "toffoli"
+            return gates["toffoli"]
+        elseif input == "cnot_13"
+            return gates["cnot_13"]
+        elseif input == "cnot_31"
+            return gates["cnot_31"]
+        else
+            Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
+        end
     end
 end
 
@@ -37,17 +79,23 @@ function get_data(params::Dict{String, Any})
     data = Dict{String, Any}("n_qubits" => params["n_qubits"],
                              "depth" => params["D"],
                              "M_complex" => M,
-                             "T_complex" => T,
+                             "Target_complex" => T,
                              "elementary_gates" => params["elementary_gates"],
                              "optimizer" => params["optimizer"],
                              "presolve" => params["presolve"],
                              "optimizer_log" => params["optimizer_log"],                           
-                             "lp_relax" => params["lp_relax"])
+                             "lp_relax" => params["lp_relax"]
+                             )
     return data
 end
 
-function get_elementary_gates()
-    # 1-qubit gates 
+"""
+Given the number of qubits (`n_qubits`), `get_elementary_gates` function 
+returns all the elementary gates in the basic `2⨉2` form, without applying 
+kronecker tensor product operations. 
+""" 
+function get_elementary_gates(n_qubits::Int64)
+    # 1 and 2-qubit gates 
     I_2 = Array{Complex{Float64},2}([1 0; 0 1])
     pauli_X = Array{Complex{Float64},2}([0 1; 1 0])
     pauli_Y = Array{Complex{Float64},2}([0 -im; im 0])  
@@ -60,37 +108,6 @@ function get_elementary_gates()
  
     cnot_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]) 
     cnot_21 = Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]) 
-    
-    # 2-qubit gates 
-    I_3 = Array{Complex{Float64},2}(Matrix(LA.I, 2^3, 2^3)) 
-
-    toffoli = Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                         0  1  0  0  0  0  0  0
-                                         0  0  1  0  0  0  0  0
-                                         0  0  0  1  0  0  0  0
-                                         0  0  0  0  1  0  0  0
-                                         0  0  0  0  0  1  0  0
-                                         0  0  0  0  0  0  0  1
-                                         0  0  0  0  0  0  1  0])
-    
-    cnot_13 = Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
-                                         0	1	0	0	0	0	0	0
-                                         0	0	1	0	0	0	0	0
-                                         0	0	0	1	0	0	0	0
-                                         0	0	0	0	0	1	0	0
-                                         0	0	0	0	1	0	0	0
-                                         0	0	0	0	0	0	0	1
-                                         0	0	0	0	0	0	1	0]) 
-    
-    cnot_31 = Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
-                                         0	0	0	0	0	1	0	0
-                                         0	0	1	0	0	0	0	0
-                                         0	0	0	0	0	0	0	1
-                                         0	0	0	0	1	0	0	0
-                                         0	1	0	0	0	0	0	0
-                                         0	0	0	0	0	0	1	0
-                                         0	0	0	1	0	0	0	0]) 
-
     elementary_gates = Dict{String, Any}("I_2" => I_2,
                                          "pauli_X" => pauli_X, 
                                          "pauli_Y" => pauli_Y,
@@ -98,12 +115,45 @@ function get_elementary_gates()
                                          "ph_shift_Z" => ph_shift_Z,
                                          "ph_shift_T" => ph_shift_T,
                                          "cnot_12" => cnot_12,
-                                         "cnot_21" => cnot_21,
-                                         "I_3" => I_3,
-                                         "toffoli" => toffoli,
-                                         "cnot_13" => cnot_13,
-                                         "cnot_31" => cnot_31
-                                        )
+                                         "cnot_21" => cnot_21
+                                         )
+    
+    # 3-qubit gates 
+    if n_qubits == 3
+        I_3 = sparse(Array{Complex{Float64},2}(Matrix(LA.I, 2^3, 2^3)))
+
+        toffoli = sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                                    0  1  0  0  0  0  0  0
+                                                    0  0  1  0  0  0  0  0
+                                                    0  0  0  1  0  0  0  0
+                                                    0  0  0  0  1  0  0  0
+                                                    0  0  0  0  0  1  0  0
+                                                    0  0  0  0  0  0  0  1
+                                                    0  0  0  0  0  0  1  0]))
+        
+        cnot_13 = sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
+                                                    0	1	0	0	0	0	0	0
+                                                    0	0	1	0	0	0	0	0
+                                                    0	0	0	1	0	0	0	0
+                                                    0	0	0	0	0	1	0	0
+                                                    0	0	0	0	1	0	0	0
+                                                    0	0	0	0	0	0	0	1
+                                                    0	0	0	0	0	0	1	0]))
+        
+        cnot_31 = sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
+                                                    0	0	0	0	0	1	0	0
+                                                    0	0	1	0	0	0	0	0
+                                                    0	0	0	0	0	0	0	1
+                                                    0	0	0	0	1	0	0	0
+                                                    0	1	0	0	0	0	0	0
+                                                    0	0	0	0	0	0	1	0
+                                                    0	0	0	1	0	0	0	0]))
+
+        elementary_gates["I_3"] = I_3
+        elementary_gates["toffoli"] = toffoli
+        elementary_gates["cnot_13"] = cnot_13
+        elementary_gates["cnot_31"] = cnot_31
+    end
     return elementary_gates
 end
 

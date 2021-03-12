@@ -1,4 +1,4 @@
-function get_auxiliary_var_bounds(v) 
+function get_auxiliary_var_bounds(v::Array{JuMP.VariableRef,1}) 
     v_l = [JuMP.lower_bound(v[1]), JuMP.upper_bound(v[1])]
     v_u = [JuMP.lower_bound(v[2]), JuMP.upper_bound(v[2])]
     M = v_l * v_u'
@@ -121,7 +121,7 @@ function real_to_complex_matrix(M)
     return M_complex
 end
 
-function verify_tolerances_complex_values(M)
+function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
     # round values close to 0 and 1 (within toleranes) for both real and imaginary values
     # Input can be a vector (>= 1 element) or a matrix of complex values
     @assert size(M)[1] != 0
