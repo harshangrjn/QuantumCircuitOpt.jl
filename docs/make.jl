@@ -1,10 +1,10 @@
 using Documenter
-using QuantumCircuitOptimization
+using QuantumCircuitOpt
 
 makedocs(
-    sitename = "QuantumCircuitOptimization",
+    sitename = "QuantumCircuitOpt",
     format = Documenter.HTML(),
-    modules = [QuantumCircuitOptimization]
+    modules = [QuantumCircuitOpt]
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.

@@ -1,3 +1,3 @@
-# QuantumCircuitOptimization.jl
+# QuantumCircuitOpt.jl
 
-Documentation for QuantumCircuitOptimization.jl
+Documentation for QuantumCircuitOpt.jl

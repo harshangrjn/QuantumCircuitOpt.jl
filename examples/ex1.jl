@@ -1,7 +1,7 @@
-using QuantumCircuitOptimization
+using QuantumCircuitOpt
 using JuMP
 using CPLEX
-using Cbc
+#using Cbc
 
 include("solver.jl")
 
@@ -21,7 +21,7 @@ params = Dict{String, Any}(
 )
 
 qcm_optimizer = get_solver(params)
-model_qc = build_QCModel(data,params)
-results = run_QCModel(model_qc, optimizer = cplex)
+# model_qc = build_QCModel(data,params)
+# results = run_QCModel(model_qc, optimizer = cplex)
 
 
