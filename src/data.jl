@@ -84,7 +84,7 @@ function get_data(params::Dict{String, Any})
                              "optimizer" => params["optimizer"],
                              "presolve" => params["presolve"],
                              "optimizer_log" => params["optimizer_log"],                           
-                             "lp_relax" => params["lp_relax"]
+                             "binary_relax" => params["binary_relax"]
                              )
     return data
 end
@@ -157,7 +157,7 @@ function get_elementary_gates(n_qubits::Int64)
     return elementary_gates
 end
 
-function get_pauli_rotation_gates(θ::Float64)
+function get_pauli_rotation_gates(θ::Number)
     #input angles in radians
     @assert 0 <= θ <= π
     R_x = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
@@ -171,7 +171,7 @@ function get_pauli_rotation_gates(θ::Float64)
     return pauli_rotation_gates
 end
 
-function get_universal_gate(θ::Float64, ϕ::Float64, λ::Float64)
+function get_universal_gate(θ::Number, ϕ::Number, λ::Number)
     #input angles in radians
     @assert 0 <= θ <= π
     @assert 0 <= ϕ <= 2*π

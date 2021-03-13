@@ -21,7 +21,7 @@ params = Dict{String, Any}(
 "optimizer" => "cplex",
 "presolve" => true,
 "optimizer_log" => true,                           
-"lp_relax" => false,
+"binary_relax" => false,
                             
 # Valid inequalities which may speed up the model run time
 "cuts_1" => false, #commutative matrices

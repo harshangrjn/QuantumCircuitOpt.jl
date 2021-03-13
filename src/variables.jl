@@ -2,4 +2,49 @@
 # Initialize all variables of the formulation here  #
 #---------------------------------------------------#
 
+function variable_matrix_per_depth(qcm::QuantumCircuitModel)
+    tol_0 = 1E-6
+    n_r     = 2*size(qcm.data["M_complex"])[1]
+    n_c     = 2*size(qcm.data["M_complex"])[2]
+    n_gates =   size(qcm.data["M_complex"])[3]
 
+    if n_r != n_c
+        Memento.warn(_LOGGER, "number of rows and columns have to be equal for unitary quantum gates")
+    end
+
+    M_real = zeros(n_r, n_c, n_gates)
+    for d=1:n_gates
+        M_real = QCO.get_complex_to_real_matrix(qcm.data["M_complex"][:,:,d])
+    end
+    M_real_l, M_real_u = QCO.get_gate_element_bounds(M_real)
+
+    qcm.variables[:M_var] = JuMP.@variable(qcm.model, M_real_l[i,j] <= M_var[i=1:n_r, j=1:n_c, 1:qcm.data["depth"]] <= M_real_u[i,j])
+
+    num_vars_fixed = 0
+    for i=1:n_r
+        for j=1:n_c
+            if (abs(M_l[i,j] - M_u[i,j])) <= tol_0
+                for d=1:qcm.data["depth"]
+                    JuMP.fix(M_var[i,j,d], M_l[i,j]; force=true)
+                end
+                num_vars_fixed += 1
+            end
+        end
+    end
+    if num_vars_fixed > 1 
+        Memento.info(_LOGGER, "$num_vars_fixed of $(n_r * n_c) number of entries in the given set of gates (in real form) have equal lower and upper bounds.")
+    end
+    return
+end
+
+function variable_gates_onoff(qcm::QuantumCircuitModel)
+    n_gates = size(qcm.data["M_complex"])[3]
+    depth = 1:qcm.data["depth"]
+
+    if !qcm.data["binary_relax"]
+        qcm.variables[:z_onoff] = JuMP.@variable(qcm.model, z_onoff[1:n_gates,1:depth], Bin)
+    else 
+        qcm.variables[:z_onoff] = JuMP.@variable(qcm.model, 0 <= z_onoff[1:n_gates,1:depth] <= 1)
+    end
+    return
+end

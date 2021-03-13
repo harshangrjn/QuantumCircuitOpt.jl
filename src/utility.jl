@@ -24,32 +24,31 @@ function get_auxiliary_var_bounds(v::Array{JuMP.VariableRef,1})
     end
 end
  
-function get_matrix_bounds(M) 
+"""
+Given a set of elementary gates, {G_1, G_2, ... G_n}, `get_gate_element_bounds` function evaluates 
+the range of every co-ordinate of the superimposed gates, over all possible gates.  
+"""
+function get_gate_element_bounds(M::Array{Float64,3}) 
     tol_0 = 1E-6
-    n_r = length(M[:,1,1])
-    n_c = length(M[1,:,1])
-    M_l = zeros(n_r, n_c)
-    M_u = zeros(n_r, n_c)
-    for i = 1:n_r
-        for j = 1:n_c
+
+    M_l = zeros(size(M)[1], size(M)[2])
+    M_u = zeros(size(M)[1], size(M)[2])
+    for i = 1:size(M)[1]
+        for j = 1:size(M)[2]
             M_l[i,j] = minimum(M[i,j,:])
             M_u[i,j] = maximum(M[i,j,:])
+            if M_l[i,j] > M_u[i,j]
+                Memento.error(_LOGGER, "lower bound cannot be greater than upper bound in the elements of input elementary gates")
+            end
+            if (M_l[i,j] in [-Inf, Inf]) || (M_u[i,j] in [-Inf, Inf])
+                Memento.error(_LOGGER, "one of the input elementary gates has at least one unbounded entry, which is invalid")
+            end
         end
     end
-    
-    k = 0
-    for i = 1:n_c
-        for j = 1:n_r
-            @assert M_l[i,j] <= M_u[i,j]
-            ((abs(M_l[i,j] - M_u[i,j])) <= tol_0) && (k += 1)
-        end
-    end
-    (k >= 1) && (println(">>> $k (of $(n_c * n_r)) number of entries in the given set of matrices have equal lower and upper bounds."))
     return M_l, M_u
-    
 end
 
-function get_commutative_matrices(M)
+function get_commutative_gates(M::Array{Float64,3})
     tol_0 = 1E-6
     n_r = length(M[:,1,1])
     n_c = length(M[1,:,1])
@@ -74,8 +73,8 @@ function get_commutative_matrices(M)
     return M_commute, Id_idx
 end
 
-function complex_to_real_matrix(M)
-    @assert ((typeof(M) == Array{Complex{Int64},2}) || (typeof(M) == Array{Complex{Float64},2}))
+function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
+    # @assert ((typeof(M) == Array{Complex{Int64},2}) || (typeof(M) == Array{Complex{Float64},2}))
     n = size(M)[1]
     M_real = zeros(2*n, 2*n)
   
@@ -100,7 +99,7 @@ function complex_to_real_matrix(M)
     return M_real
 end
 
-function real_to_complex_matrix(M)
+function get_real_to_complex_matrix(M)
     @assert ((typeof(M) == Array{Int64,2}) || (typeof(M) == Array{Float64,2}))
     n = size(M)[1]
     @assert iseven(n)

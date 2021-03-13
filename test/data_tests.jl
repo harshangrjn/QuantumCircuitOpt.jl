@@ -8,6 +8,6 @@
     @test ceil.(imag(U3_1), digits=6) == ceil.(imag(test_U3_1), digits=6)
 
     test_U3_2 = QCO.get_universal_gate(π,π/2,π/2)
-    G = QCO.get_elementary_gates()
+    G = QCO.get_elementary_gates(2)
     @test test_U3_2 == G["pauli_Y"]
 end 
