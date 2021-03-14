@@ -23,7 +23,9 @@ function get_full_sized_gate(input::String, n_qubits::Int64)
     gates = get_elementary_gates(n_qubits)
     # All 2-qubit full-sized gates
     if n_qubits == 2
-        if input == "H1"
+        if input == "Identity"
+            return kron(gates["I_2"], gates["I_2"])
+        elseif input == "H1"
             return kron(gates["hadamard_H"], gates["I_2"])
         elseif input == "H2"
             return kron(gates["I_2"], gates["hadamard_H"])
@@ -96,6 +98,7 @@ function get_data(params::Dict{String, Any})
                              "M_initial" => M_initial,
                              "Target_real" => get_complex_to_real_matrix(T_complex),
                              "elementary_gates" => params["elementary_gates"],
+                             "objective" => params["objective"],
                              "optimizer" => params["optimizer"],
                              "presolve" => params["presolve"],
                              "optimizer_log" => params["optimizer_log"],                           

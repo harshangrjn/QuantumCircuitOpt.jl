@@ -28,6 +28,15 @@ function constraint_QCModel(qcm::QuantumCircuitModel)
     return
 end
 
+function objective_QCModel(qcm::QuantumCircuitModel)
+    if qcm.data["objective"] == "depth"
+        objective_minimize_total_depth(qcm)
+    elseif qcm.data["objective"][1:4] == "cnot"
+        objective_minimize_cnot_gates(qcm)
+    end
+    return
+end
+
 function run_QCModel(qcm::QuantumCircuitModel; optimizer=nothing)
     JuMP.set_optimizer(qcm.model, optimizer)
     # start_time = time()
