@@ -4,17 +4,19 @@ returns the corresponding elementary gates in the three-dimensional complex matr
 """ 
 function get_quantum_gates(params::Dict{String, Any})
     n_qubits = params["n_qubits"]
-    input = params["elementary_gates"]
-    M = zeros(Complex{Float64}, 2^n_qubits, 2^n_qubits, length(input))
-    for i=1:length(input)
-        M[:,:,i] = get_full_sized_gate(input[i], n_qubits)
-    end
-    T = get_full_sized_gate(params["target_gate"], n_qubits)
+    n_gates = params["elementary_gates"]
 
-    if ((size(M[:,:,1])[1] != size(T)[1]) || (size(M[:,:,1])[2] != size(T)[2]))
-        Memento.error(_LOGGER, "Dimension mis-match for input elementary gates vs. the target gate.")
+    M_complex = Array{Complex{Float64},3}(zeros(2^n_qubits, 2^n_qubits, length(n_gates)))
+    for i=1:length(n_gates)
+        M_complex[:,:,i] = get_full_sized_gate(n_gates[i], n_qubits)
     end
-    return M, T
+    T_complex = get_full_sized_gate(params["target_gate"], n_qubits)
+
+    if ((size(M_complex[:,:,1])[1] != size(T_complex)[1]) || (size(M_complex[:,:,1])[2] != size(T_complex)[2]))
+        Memento.error(_LOGGER, "Dimension mis-match for n_gates elementary gates vs. the target gate.")
+    end
+
+    return M_complex, T_complex
 end
 
 function get_full_sized_gate(input::String, n_qubits::Int64)
@@ -75,11 +77,24 @@ function get_full_sized_gate(input::String, n_qubits::Int64)
 end
 
 function get_data(params::Dict{String, Any})
-    M, T = get_quantum_gates(params)
+    n_gates = length(params["elementary_gates"])
+
+    M_complex, T_complex = get_quantum_gates(params)
+    M_real = zeros(2*size(M_complex)[1], 2*size(M_complex)[2], size(M_complex)[3])
+    for d=1:n_gates
+        M_real[:,:,d] = get_complex_to_real_matrix(M_complex[:,:,d])
+    end
+
+    if params["initial_gate"] == "Identity"
+        M_initial = Matrix(LA.I, 2^(params["n_qubits"]+1), 2^(params["n_qubits"]+1))
+    end
+    # Add code here to support non-identity as an initial condition gate. 
+    
     data = Dict{String, Any}("n_qubits" => params["n_qubits"],
                              "depth" => params["D"],
-                             "M_complex" => M,
-                             "Target_complex" => T,
+                             "M_real" => M_real,
+                             "M_initial" => M_initial,
+                             "Target_real" => get_complex_to_real_matrix(T_complex),
                              "elementary_gates" => params["elementary_gates"],
                              "optimizer" => params["optimizer"],
                              "presolve" => params["presolve"],

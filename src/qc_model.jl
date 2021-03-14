@@ -8,6 +8,26 @@ function build_QCModel(data)
     return m_qc
 end
 
+function variable_QCModel(qcm::QuantumCircuitModel)
+    variable_matrix_per_depth(qcm)
+    variable_gates_onoff(qcm)
+    variable_sequential_gate_products(qcm)
+    variable_gate_products_copy(qcm)
+    variable_gate_products_linearization(qcm)
+    return
+end
+
+function constraint_QCModel(qcm::QuantumCircuitModel)
+    constraint_single_gate_per_depth(qcm)
+    constraint_disjunction_of_gates_per_depth(qcm)
+    constraint_gate_initial_condition(qcm)
+    constraint_gate_intermediate_products(qcm)
+    constraint_gate_product_linearization(qcm)
+    constraint_gate_target_condition(qcm)
+    constraint_complex_to_real_symmetry(qcm)
+    return
+end
+
 function run_QCModel(qcm::QuantumCircuitModel; optimizer=nothing)
     JuMP.set_optimizer(qcm.model, optimizer)
     # start_time = time()
@@ -20,7 +40,7 @@ function run_QCModel(qcm::QuantumCircuitModel; optimizer=nothing)
         "objective" => JuMP.objective_value(qcm.model),
         "objective_lb" => JuMP.objective_bound(qcm.model),
         "solve_time" => JuMP.solve_time(qcm.model),
-        "solution" => JuMP.value.(qcm.variables[:x])
+        "solution" => JuMP.value.(qcm.variables[:z_onoff])
     )
     return qcm.result
 end

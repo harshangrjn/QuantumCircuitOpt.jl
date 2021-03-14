@@ -79,8 +79,8 @@ function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
     M_real = zeros(2*n, 2*n)
   
     ii = 1; jj = 1;
-    for i = collect(1:2:2 * n)
-        for j = collect(1:2:2 * n)
+    for i = collect(1:2:2*n)
+        for j = collect(1:2:2*n)
             M_real[i,j] = real(M[ii,jj])
             M_real[i+1,j+1] = real(M[ii,jj])
             if imag(M[ii,jj]) == 0
@@ -127,7 +127,7 @@ function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
     tol = 1E-6
     n_r = size(M)[1]
     if (length(size(M)) == 1)
-        M_round = zeros(Complex, n_r)
+        M_round = Array{Complex{Float64},2}(zeros(n_r))
         for i=1:n_r
             M_r = 0.0; M_i = 0.0;
             if abs(real(M[i])) > tol
@@ -143,7 +143,7 @@ function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
     end
     if (length(size(M)) == 2)
         n_c = size(M)[2]
-        M_round = zeros(Complex, n_r, n_c)
+        M_round = Array{Complex{Float64},2}(zeros(n_r,n_c))
         for i=1:n_r
             for j=1:n_c 
                 Mij_r = 0.0; Mij_i = 0.0;
@@ -162,7 +162,7 @@ function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
     if (length(size(M)) == 3)
         n_c = size(M)[2]
         n_d = size(M)[3]
-        M_round = zeros(Complex, n_r, n_c, n_d)
+        M_round = Array{Complex{Float64},3}(zeros(n_r, n_c, n_d))
         for i=1:n_r
             for j=1:n_c 
                 for k=1:n_d

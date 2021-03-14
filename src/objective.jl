@@ -1,9 +1,9 @@
-#-------------------------------------------------------#
-# Build the objective function of the formulation here  #
-#-------------------------------------------------------#
+#------------------------------------------------------------#
+# Build the objective function for QuantumCircuitModel here  #
+#------------------------------------------------------------#
 
-function objective_QCOModel(m::QCOoptimizer)
-    JuMP.@objective(m.Qmodel, Min, x[1] + x[2])
+function objective_QCModel(qcm::QuantumCircuitModel)
+    JuMP.@objective(qcm.model, Min, 1)
     return
 end
 
