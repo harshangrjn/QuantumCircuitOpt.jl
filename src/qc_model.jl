@@ -37,19 +37,37 @@ function objective_QCModel(qcm::QuantumCircuitModel)
     return
 end
 
-function run_QCModel(qcm::QuantumCircuitModel; optimizer=nothing)
-    JuMP.set_optimizer(qcm.model, optimizer)
-    # start_time = time()
-    JuMP.optimize!(qcm.model)    
-    qcm.result = Dict{String,Any}(
-        "optimizer" => JuMP.solver_name(qcm.model),
-        "termination_status" => JuMP.termination_status(qcm.model),
-        "primal_status" => JuMP.primal_status(qcm.model),
-        "dual_status" => JuMP.dual_status(qcm.model),
-        "objective" => JuMP.objective_value(qcm.model),
-        "objective_lb" => JuMP.objective_bound(qcm.model),
-        "solve_time" => JuMP.solve_time(qcm.model),
-        "solution" => JuMP.value.(qcm.variables[:z_onoff])
-    )
+""
+function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
+    if qcm.data["relax_integrality"]
+        JuMP.relax_integrality(qcm.model)
+    end
+
+    if JuMP.mode(qcm.model) != JuMP.DIRECT && optimizer !== nothing
+        if qcm.model.moi_backend.state == MOI.Utilities.NO_OPTIMIZER
+            JuMP.set_optimizer(qcm.model, optimizer)
+        else
+            Memento.warn(_LOGGER, "Model already contains optimizer, cannot use optimizer specified in `optimize_QCModel!`")
+        end
+    end
+
+    if JuMP.mode(qcm.model) != JuMP.DIRECT && qcm.model.moi_backend.state == MOI.Utilities.NO_OPTIMIZER
+        Memento.error(_LOGGER, "No optimizer specified in `optimize_QCModel!` or the given JuMP model.")
+    end
+    
+    start_time = time()
+
+    _, solve_time, solve_bytes_alloc, sec_in_gc = @timed JuMP.optimize!(qcm.model)
+
+    try
+        solve_time = JuMP.solve_time(qcm.model)
+    catch
+        Memento.warn(_LOGGER, "The given optimizer does not provide the SolveTime() attribute, falling back on @timed.  This is not a rigorous timing value.");
+    end
+    
+    Memento.debug(_LOGGER, "JuMP model optimize time: $(time() - start_time)")
+    
+    qcm.result = build_QCModel_result(qcm, solve_time) 
+
     return qcm.result
 end

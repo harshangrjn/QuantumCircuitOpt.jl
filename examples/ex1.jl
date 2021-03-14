@@ -28,7 +28,7 @@ params = Dict{String, Any}(
 "optimizer" => "cplex",
 "presolve" => true,
 "optimizer_log" => true,                           
-"binary_relax" => false,
+"relax_integrality" => false,
                             
 # Valid inequalities which may speed up the model run time
 "cuts_1" => false, #commutative matrices
@@ -38,6 +38,6 @@ qcm_optimizer = get_solver(params)
 data = QuantumCircuitOpt.get_data(params)
 
 model_qc = QuantumCircuitOpt.build_QCModel(data)
-results = QuantumCircuitOpt.run_QCModel(model_qc, optimizer = qcm_optimizer)
+result_qc = QuantumCircuitOpt.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
 
 

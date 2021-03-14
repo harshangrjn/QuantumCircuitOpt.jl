@@ -102,7 +102,7 @@ function get_data(params::Dict{String, Any})
                              "optimizer" => params["optimizer"],
                              "presolve" => params["presolve"],
                              "optimizer_log" => params["optimizer_log"],                           
-                             "binary_relax" => params["binary_relax"]
+                             "relax_integrality" => params["relax_integrality"]
                              )
     return data
 end

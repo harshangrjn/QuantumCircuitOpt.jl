@@ -38,11 +38,7 @@ function variable_gates_onoff(qcm::QuantumCircuitModel)
     n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]
 
-    if !qcm.data["binary_relax"]
-        qcm.variables[:z_onoff] = JuMP.@variable(qcm.model, z_onoff[1:n_gates,1:depth], Bin)
-    else 
-        qcm.variables[:z_onoff] = JuMP.@variable(qcm.model, 0 <= z_onoff[1:n_gates,1:depth] <= 1)
-    end
+    qcm.variables[:z_onoff] = JuMP.@variable(qcm.model, z_onoff[1:n_gates,1:depth], Bin)
     return
 end
 
