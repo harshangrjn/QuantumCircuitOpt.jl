@@ -16,5 +16,6 @@ const CBC = JuMP.optimizer_with_attributes(Cbc.Optimizer, "logLevel" => 0)
 
     include("utility_tests.jl")
     include("data_tests.jl")
+    include("qc_model_tests.jl")
 
 end

@@ -2,20 +2,21 @@
 Given a vector of input with the names of gates (see examples folder), `get_quantum_gates` function 
 returns the corresponding elementary gates in the three-dimensional complex matrix form. 
 """ 
-function get_quantum_gates(params::Dict{String, Any})
+function get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary_gates::Array{String,1})
     n_qubits = params["n_qubits"]
-    n_gates = params["elementary_gates"]
 
-    M_complex = Array{Complex{Float64},3}(zeros(2^n_qubits, 2^n_qubits, length(n_gates)))
-    for i=1:length(n_gates)
-        M_complex[:,:,i] = get_full_sized_gate(n_gates[i], n_qubits)
+    M_complex = Array{Complex{Float64},3}(zeros(2^n_qubits, 2^n_qubits, n_gates))
+
+    for i=1:n_gates
+        M_complex[:,:,i] = get_full_sized_gate(elementary_gates[i], n_qubits)
     end
+
     T_complex = get_full_sized_gate(params["target_gate"], n_qubits)
 
     if ((size(M_complex[:,:,1])[1] != size(T_complex)[1]) || (size(M_complex[:,:,1])[2] != size(T_complex)[2]))
         Memento.error(_LOGGER, "Dimension mis-match for n_gates elementary gates vs. the target gate.")
     end
-
+ 
     return M_complex, T_complex
 end
 
@@ -23,40 +24,61 @@ function get_full_sized_gate(input::String, n_qubits::Int64)
     gates = get_elementary_gates(n_qubits)
     # All 2-qubit full-sized gates
     if n_qubits == 2
+        
         if input == "Identity"
             return kron(gates["I_2"], gates["I_2"])
+
         elseif input == "H1"
             return kron(gates["hadamard_H"], gates["I_2"])
+
         elseif input == "H2"
             return kron(gates["I_2"], gates["hadamard_H"])
+
         elseif input == "cnot_12"
             return gates["cnot_12"]
+
         elseif input == "cnot_21"
             return gates["cnot_21"]
+
+        elseif input == "cnot_swap"
+            return gates["cnot_12"] * gates["cnot_21"]
+
         elseif input == "H⊗H"
             return kron(gates["hadamard_H"], gates["hadamard_H"])
+
         elseif input == "Z1"
             return kron(gates["ph_shift_Z"], gates[I_2]) 
+
         elseif input == "Z2"
             return kron(gates[I_2], gates["ph_shift_Z"])        
+
         elseif input == "T1"
             return kron(gates["ph_shift_T"], gates[I_2]) 
+
         elseif input == "T2"
             return kron(gates[I_2], gates["ph_shift_T"])   
+
         elseif input == "T1_conjugate"
             return kron(gates["ph_shift_T_conj"], gates[I_2]) 
+
         elseif input == "T2_conjugate"
             return kron(gates[I_2], gates["ph_shift_T_conj"])   
+
         elseif input == "S1"
             return kron(gates["ph_shift_S"], gates[I_2]) 
+
         elseif input == "S2"
             return kron(gates[I_2], gates["ph_shift_S"])  
+
         elseif input == "X1"
             return kron(gates["pauli_X"], gates[I_2]) 
+
         elseif input == "X2"
             return kron(gates[I_2], gates["pauli_X"])   
+
         elseif input == "Y1"
             return kron(gates["pauli_Y"], gates[I_2]) 
+
         elseif input == "Y2"
             return kron(gates[I_2], gates["pauli_Y"])   
         # Add here the other gates from get_elementary_gates
@@ -68,21 +90,67 @@ function get_full_sized_gate(input::String, n_qubits::Int64)
     if n_qubits == 3
         if input == "toffoli"
             return gates["toffoli"]
+
         elseif input == "cnot_13"
             return gates["cnot_13"]
+
         elseif input == "cnot_31"
             return gates["cnot_31"]
+
         else
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
         end
     end
 end
 
-function get_data(params::Dict{String, Any})
-    n_gates = length(params["elementary_gates"])
+function get_total_number_of_input_gates(gates::Array{String,1})
 
-    M_complex, T_complex = get_quantum_gates(params)
+    if length(gates) == 1
+        Memento.error(_LOGGER, "Only one input elementary gates is specified. Enter at least two unique gates for non-trivial solutions")
+    end
+
+    R_gates = findall(x -> startswith(x, "R"), gates)
+    U_gates = findall(x -> startswith(x, "U") || startswith(x, "u"), gates)
+
+    n_gates = 0
+    
+    if isempty(R_gates) && isempty(U_gates)
+        n_gates = length(gates)
+    elseif !isempty(R_gates)
+        num_R_x = length(params["R_x_discretization"])
+        num_R_y = length(params["R_y_discretization"])
+        num_R_z = length(params["R_z_discretization"])
+        n_gates = length(gates) - length(R_gates) + num_R_x + num_R_y + num_R_z
+    elseif !isempty(U_gates)
+        num_U_θ = length(params["U_θ_discretization"])
+        num_U_ϕ = length(params["U_ϕ_discretization"])
+        num_U_λ = length(params["U_λ_discretization"])
+        if (num_U_θ == 0) || (num_U_ϕ == 0) || (num_U_λ == 0) 
+            Memento.error(_LOGGER, "At least one value for all angles (θ,ϕ,λ) need to be specified for the U gate")
+        else
+            n_gates = length(gates) - length(U_gates) + (num_U_θ * num_U_ϕ * num_U_λ)
+        end
+    end
+    return n_gates
+end
+
+function get_data(params::Dict{String, Any})
+    if isempty(params["elementary_gates"])
+        Memento.error(_LOGGER, "Input elementary gates are empty. Enter at least two unique unitary gates")
+    end
+
+    elementary_gates = unique(params["elementary_gates"])
+    
+    if length(elementary_gates) < length(params["elementary_gates"])
+        Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
+    end
+    
+    n_gates = get_total_number_of_input_gates(elementary_gates)
+
+    M_complex, T_complex = get_quantum_gates(params, n_gates, elementary_gates)
+   
     M_real = zeros(2*size(M_complex)[1], 2*size(M_complex)[2], size(M_complex)[3])
+
     for d=1:n_gates
         M_real[:,:,d] = get_complex_to_real_matrix(M_complex[:,:,d])
     end
@@ -97,7 +165,7 @@ function get_data(params::Dict{String, Any})
                              "M_real" => M_real,
                              "M_initial" => M_initial,
                              "Target_real" => get_complex_to_real_matrix(T_complex),
-                             "elementary_gates" => params["elementary_gates"],
+                             "elementary_gates" => elementary_gates,
                              "target_gate" => params["target_gate"],
                              "objective" => params["objective"],
                              "optimizer" => params["optimizer"],
@@ -127,6 +195,9 @@ function get_elementary_gates(n_qubits::Int64)
  
     cnot_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]) 
     cnot_21 = Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]) 
+    controlled_Z = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1])
+    controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 0 1/sqrt(2); 0 0 1 0; 0 1/sqrt(2) 0 -1/sqrt(2)])
+
     elementary_gates = Dict{String, Any}("I_2" => I_2,
                                          "pauli_X" => pauli_X, 
                                          "pauli_Y" => pauli_Y,
@@ -134,7 +205,9 @@ function get_elementary_gates(n_qubits::Int64)
                                          "ph_shift_Z" => ph_shift_Z,
                                          "ph_shift_T" => ph_shift_T,
                                          "cnot_12" => cnot_12,
-                                         "cnot_21" => cnot_21
+                                         "cnot_21" => cnot_21,
+                                         "controlled_Z" => controlled_Z,
+                                         "controlled_H_12" => controlled_H_12
                                          )
     
     # 3-qubit gates 
@@ -176,9 +249,18 @@ function get_elementary_gates(n_qubits::Int64)
     return elementary_gates
 end
 
+"""
+    get_pauli_rotation_gates
+
+For a given angle in radiaons, this function returns standard rotation gates those define rotations around the Pauli axis {X,Y,Z}.
+Note that R_x(θ) = u3(θ, -π/2, π/2), R_y(θ) = u3(θ, 0, 0), R_z(λ) = exp((-λ/2)im)*u1(λ). 
+"""
 function get_pauli_rotation_gates(θ::Number)
     #input angles in radians
-    @assert 0 <= θ <= π
+    if !(-π <= θ <= π)
+        Memento.error(_LOGGER, "θ angle in Pauli rotation gate is not within valid bounds")
+    end
+
     R_x = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
     R_y = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
     R_z = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
@@ -190,17 +272,54 @@ function get_pauli_rotation_gates(θ::Number)
     return pauli_rotation_gates
 end
 
-function get_universal_gate(θ::Number, ϕ::Number, λ::Number)
+function get_u1_gate(λ::Number)
     #input angles in radians
-    @assert 0 <= θ <= π
-    @assert 0 <= ϕ <= 2*π
-    @assert 0 <= λ <= 2*π
+    θ = 0
+    ϕ = 0
 
-    U3_11 = cos(θ/2)   
-    U3_12 = (cos(λ) - (sin(λ))im)*sin(θ/2)
-    U3_21 = (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)
-    U3_22 = (cos(λ + ϕ) + (sin(λ + ϕ))im)*cos(θ/2)
-    U3 = Array{Complex{Float64},2}([U3_11 U3_12; U3_21 U3_22])
+    if !(-2*π <= λ <= 2*π)
+        Memento.error(_LOGGER, "λ angle in universal u1 gate is not within valid bounds")
+    end
 
-    return verify_tolerances_complex_values(U3)
+    u1 = get_u3_gate(θ, ϕ, λ)
+    return u1
+end
+
+function get_u2_gate(ϕ::Number, λ::Number)
+    #input angles in radians
+    θ = π/2
+
+    if !(-2*π <= λ <= 2*π)
+        Memento.error(_LOGGER, "λ angle in universal u2 gate is not within valid bounds")
+    end
+    if !(-2*π <= ϕ <= 2*π)
+        Memento.error(_LOGGER, "ϕ angle in universal u2 gate is not within valid bounds")
+    end
+
+    u2 = get_u3_gate(θ, ϕ, λ)
+    return u2
+end
+
+"""
+    get_u3_gate
+
+Given three angles (θ,ϕ,λ),  this function returns the most general form of a single qubit unitar gate.
+"""
+function get_u3_gate(θ::Number, ϕ::Number, λ::Number)
+    #input angles in radians
+
+    if !(-π <= θ <= π)
+        Memento.error(_LOGGER, "θ angle in universal u3 gate is not within valid bounds")
+    end
+    if !(-2*π <= ϕ <= 2*π)
+        Memento.error(_LOGGER, "ϕ angle in universal u3 gate is not within valid bounds")
+    end
+    if !(-2*π <= λ <= 2*π)
+        Memento.error(_LOGGER, "λ angle in universal u3 gate is not within valid bounds")
+    end
+
+    u3 = Array{Complex{Float64},2}([           cos(θ/2)               -(cos(λ) + (sin(λ))im)*sin(θ/2) 
+                                    (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)])
+
+    return verify_tolerances_complex_values(u3)
 end

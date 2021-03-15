@@ -1,4 +1,4 @@
-function visualize_QCModel_solution(results::Dict, data::Dict)
+function visualize_QCModel_solution(results::Dict, data::Dict; gate_sequence = false)
     if results["primal_status"] != MOI.FEASIBLE_POINT
         Memento.warn(_LOGGER, "Non-feasible primal status. Gate decomposition may not be exact!")
     end
@@ -22,5 +22,8 @@ function visualize_QCModel_solution(results::Dict, data::Dict)
             end
         end
         printstyled("\n","========================================================================","\n"; color = :cyan)
+    end
+    if gate_sequence
+        return gates_sol
     end
 end
