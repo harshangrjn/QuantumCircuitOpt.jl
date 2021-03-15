@@ -5,7 +5,7 @@ function constraint_single_gate_per_depth(qcm::QuantumCircuitModel)
     n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]
     
-    JuMP.@constraint(qcm.model, [d=1:depth], sum(qcm.variables[:z_onoff][n,d] for n=1:n_gates) == 1)
+    JuMP.@constraint(qcm.model, [d=1:depth], sum(qcm.variables[:z_onoff_var][n,d] for n=1:n_gates) == 1)
     return
 end
 
@@ -14,7 +14,7 @@ function constraint_disjunction_of_gates_per_depth(qcm::QuantumCircuitModel)
     depth   = qcm.data["depth"]
 
     JuMP.@constraint(qcm.model, [d=1:depth], qcm.variables[:M_var][:,:,d] .== 
-                                    sum(qcm.variables[:z_onoff][n,d] * qcm.data["M_real"][:,:,n] for n=1:n_gates))
+                                    sum(qcm.variables[:z_onoff_var][n,d] * qcm.data["M_real"][:,:,n] for n=1:n_gates))
     return
 end
 
@@ -22,7 +22,7 @@ function constraint_gate_initial_condition(qcm::QuantumCircuitModel)
     n_gates = size(qcm.data["M_real"])[3]
 
     JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,1] for n=1:n_gates) .== qcm.data["M_initial"])
-    JuMP.@constraint(qcm.model, [n=1:n_gates], qcm.variables[:V_var][:,:,n,1] .== (qcm.variables[:z_onoff][n,1] .* qcm.data["M_initial"]))
+    JuMP.@constraint(qcm.model, [n=1:n_gates], qcm.variables[:V_var][:,:,n,1] .== (qcm.variables[:z_onoff_var][n,1] .* qcm.data["M_initial"]))
     return
 end
 
@@ -51,7 +51,7 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
         for j=1:2:n_c
             for n=1:n_gates
                 for d=1:(depth-1)
-                    QCO.get_mccormick_relaxation(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff][n,(d+1)])
+                    QCO.get_mccormick_relaxation(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff_var][n,(d+1)])
                     JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i+1,j+1,n,d] ==  qcm.variables[:zU_var][i,j,n,d])
                     JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d]   == -qcm.variables[:zU_var][i+1,j,n,d])
                 end

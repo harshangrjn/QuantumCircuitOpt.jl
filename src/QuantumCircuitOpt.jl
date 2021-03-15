@@ -23,7 +23,7 @@ function silence()
     Memento.setlevel!(Memento.getlogger(QuantumCircuitOpt), "error")
 end
 
-"alows the user to set the logging level without the need to add Memento"
+"allows the user to set the logging level without the need to add Memento"
 function logger_config!(level)
     Memento.config!(Memento.getlogger("QuantumCircuitOpt"), level)
 end
@@ -36,7 +36,7 @@ include("qc_model.jl")
 include("variables.jl")
 include("constraints.jl")
 include("objective.jl")
-include("solution.jl")
 include("log.jl")
+include("solution.jl")
 
 end # module

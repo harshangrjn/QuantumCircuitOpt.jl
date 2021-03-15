@@ -6,7 +6,9 @@ using LinearAlgebra
 
 include("solver.jl")
 
-# User-defined inputs
+#-------------------------------#
+#      User-defined inputs      #
+#-------------------------------#
 params = Dict{String, Any}(
 "n_qubits" => 2, # Number of qubits
 "D" => 5, # Maximum depth of the decomposition (>= 2)
@@ -34,10 +36,14 @@ params = Dict{String, Any}(
 "cuts_1" => false, #commutative matrices
 )
 
+#------------------------------#
+#      Optimization model      #
+#------------------------------#
 qcm_optimizer = get_solver(params)
 data = QuantumCircuitOpt.get_data(params)
 
 model_qc = QuantumCircuitOpt.build_QCModel(data)
 result_qc = QuantumCircuitOpt.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
+QuantumCircuitOpt.visualize_QCModel_solution(result_qc, data)
 
 

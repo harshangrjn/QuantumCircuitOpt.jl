@@ -98,6 +98,7 @@ function get_data(params::Dict{String, Any})
                              "M_initial" => M_initial,
                              "Target_real" => get_complex_to_real_matrix(T_complex),
                              "elementary_gates" => params["elementary_gates"],
+                             "target_gate" => params["target_gate"],
                              "objective" => params["objective"],
                              "optimizer" => params["optimizer"],
                              "presolve" => params["presolve"],
