@@ -58,6 +58,7 @@ function variable_gate_products_copy(qcm::QuantumCircuitModel)
     n_gates = size(qcm.data["M_real"])[3]
 
     qcm.variables[:V_var] = JuMP.@variable(qcm.model, -1 <= V_var[1:n_r, 1:n_c, 1:n_gates, 1:depth] <= 1)
+    
     return
 end
 
@@ -68,5 +69,6 @@ function variable_gate_products_linearization(qcm::QuantumCircuitModel)
     n_gates = size(qcm.data["M_real"])[3]
 
     qcm.variables[:zU_var] = JuMP.@variable(qcm.model, -1 <= zU_var[1:n_r, 1:n_c, 1:n_gates, 1:(depth-1)] <= 1)
+    
     return
 end

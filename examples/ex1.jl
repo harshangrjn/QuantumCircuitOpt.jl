@@ -15,13 +15,17 @@ params = Dict{String, Any}(
 
 # Note that, for a given input gate, say H (hadamard), user input should include the gates representations on every qubit, such as H1 and H2. 
 # If you prefer to include the kronecker form of gates appearing on adjacent qubits, you can do so by mentioning H⊗H
-"elementary_gates" => ["H1", "H2", "H⊗H", "cnot_12", "Identity","cnot_12"],  
-# "elementary_gates" => ["R_x", "R_z", "cnot_12", "Identity"], 
-"target_gate" => "cnot_21",
 
-"R_x_discretization" => π/2,
-"R_y_discretization" => [],
-"R_z_discretization" => -π:π/4:π,
+# "elementary_gates" => ["H1", "H2", "H⊗H", "Identity", "cnot_21"],  
+# "target_gate" => "controlled_Z",
+
+# "elementary_gates" => ["R_x", "R_z", "cnot_12", "Identity"], 
+"elementary_gates" => ["R_x", "Identity"], 
+"target_gate" => "X1",
+
+"R_x_discretization" => [π/2],
+"R_y_discretization" => [-π/4, π/4],
+"R_z_discretization" => [π/4, π/2, π, 5*π/4, 3*π/2, 2*π],
 "U_θ_discretization" => [],
 "U_ϕ_discretization" => [],
 "U_λ_discretization" => [],
