@@ -1,4 +1,5 @@
 function visualize_QCModel_solution(results::Dict, data::Dict; gate_sequence = false)
+
     if results["primal_status"] != MOI.FEASIBLE_POINT
         Memento.error(_LOGGER, "Non-feasible primal status. Gate decomposition may not be exact!")
     end
@@ -6,6 +7,7 @@ function visualize_QCModel_solution(results::Dict, data::Dict; gate_sequence = f
     gates_sol = get_postprocessed_solutions(results, data)
 
     if !isempty(gates_sol)
+
         printstyled("\n","========================================================================","\n"; color = :cyan)
         printstyled("Optimal decomposition of the target gate using elementary gates:","\n"; color = :cyan)
         for i=1:length(gates_sol)
@@ -16,6 +18,7 @@ function visualize_QCModel_solution(results::Dict, data::Dict; gate_sequence = f
             end
         end
         printstyled("\n","========================================================================","\n"; color = :cyan)
+
     else
         Memento.warn(_LOGGER, "Valid integral feasible solutions could not be found to visualize the solution")
     end
@@ -23,9 +26,11 @@ function visualize_QCModel_solution(results::Dict, data::Dict; gate_sequence = f
     if gate_sequence
         return gates_sol
     end
+
 end
 
 function get_postprocessed_solutions(results::Dict, data::Dict)
+
     gates_sol = Array{String,1}()
     id_sequence = Array{Int64,1}()
 
@@ -46,7 +51,7 @@ function get_postprocessed_solutions(results::Dict, data::Dict)
                     s2 = "2"
                 end
                 s3 = "$(rad2deg(data["M_complex_dict"]["$id"]["angle"]))"
-                push!(gates_sol, string(s1,"-",s2," (",s3,")"))
+                push!(gates_sol, string(s1," (",s2,", ",s3,")"))
             end
 
         end
@@ -59,13 +64,18 @@ function get_postprocessed_solutions(results::Dict, data::Dict)
 end
 
 function validate_solutions(data::Dict, id_sequence::Array{Int64,1})
-    M = Matrix(LA.I, 2^(data["n_qubits"]+1), 2^(data["n_qubits"]+1))
+    
+    M = Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["n_qubits"]), 2^(data["n_qubits"])))
     
     for i in id_sequence
-        M *= QCO.get_complex_to_real_matrix(data["M_complex_dict"]["$i"]["matrix"])
+        M *= data["M_complex_dict"]["$i"]["matrix"]
     end
 
-    if !isapprox(M, data["Target_real"])
+    # @show M 
+    # @show QCO.get_real_to_complex_matrix(data["Target_real"])
+
+    # This tolerance is important for the final feasiblity check
+    if !isapprox(M, QCO.get_real_to_complex_matrix(data["Target_real"]), atol = 1E-4)
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     

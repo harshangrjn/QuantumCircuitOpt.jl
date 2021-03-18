@@ -1,8 +1,20 @@
-function build_QCModel(data)
+function build_QCModel(data; model_type = "compact_formulation")
     m_qc = QuantumCircuitModel(data, JuMP.Model(), Dict{Symbol,Any}(), Dict{String,Any}())
 
-    variable_QCModel(m_qc)
-    constraint_QCModel(m_qc)
+    # convex-hull formulation per depth, but larger number of variables and constraints
+    if model_type == "balas_formulation" 
+
+        variable_QCModel(m_qc)
+        constraint_QCModel(m_qc)
+
+    # minimal variables and constraints, but not a convex-hull formulation per depth
+    elseif model_type == "compact_formulation" 
+        
+        variable_QCModel_compact(m_qc)
+        constraint_QCModel_compact(m_qc)
+
+    end
+
     objective_QCModel(m_qc)
 
     return m_qc
@@ -14,6 +26,11 @@ function variable_QCModel(qcm::QuantumCircuitModel)
     variable_sequential_gate_products(qcm)
     variable_gate_products_copy(qcm)
     variable_gate_products_linearization(qcm)
+
+    if qcm.data["decomposition_type"] == "approximate"
+        variable_slack_for_feasibility(qcm)
+    end
+
     return
 end
 
@@ -25,15 +42,44 @@ function constraint_QCModel(qcm::QuantumCircuitModel)
     constraint_gate_product_linearization(qcm)
     constraint_gate_target_condition(qcm)
     constraint_complex_to_real_symmetry(qcm)
+
+    return
+end
+
+function variable_QCModel_compact(qcm::QuantumCircuitModel)
+
+    variable_gates_onoff(qcm)
+    variable_sequential_gate_products(qcm)
+    variable_gate_products_linearization(qcm)
+
+    if qcm.data["decomposition_type"] == "approximate"
+        variable_slack_for_feasibility(qcm)
+    end
+
+    return
+end
+
+function constraint_QCModel_compact(qcm::QuantumCircuitModel)
+
+    constraint_single_gate_per_depth(qcm)
+    constraint_gate_initial_condition_compact(qcm)
+    constraint_gate_intermediate_products_compact(qcm)
+    constraint_gate_product_linearization(qcm)
+    constraint_gate_target_condition_compact(qcm)
+    constraint_complex_to_real_symmetry_compact(qcm)
+
     return
 end
 
 function objective_QCModel(qcm::QuantumCircuitModel)
-    if qcm.data["objective"] == "depth"
+    
+    if qcm.data["objective"] == "minimize_depth"
         objective_minimize_total_depth(qcm)
-    elseif qcm.data["objective"][1:4] == "cnot"
+        
+    elseif qcm.data["objective"] == "minimize_cnot"
         objective_minimize_cnot_gates(qcm)
     end
+
     return
 end
 

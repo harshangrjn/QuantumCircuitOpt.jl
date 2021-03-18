@@ -75,6 +75,7 @@ end
 
 function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
     # @assert ((typeof(M) == Array{Complex{Int64},2}) || (typeof(M) == Array{Complex{Float64},2}))
+
     n = size(M)[1]
     M_real = zeros(2*n, 2*n)
   
@@ -87,8 +88,8 @@ function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
                 M_real[i,j+1] = 0
                 M_real[i+1,j] = 0
             else
-                M_real[i,j+1] = -imag(M[ii,jj])
-                M_real[i+1,j] = imag(M[ii,jj])
+                M_real[i,j+1] = imag(M[ii,jj])
+                M_real[i+1,j] = -imag(M[ii,jj])
             end
             jj += 1
         end
@@ -99,18 +100,23 @@ function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
     return M_real
 end
 
-function get_real_to_complex_matrix(M)
-    @assert ((typeof(M) == Array{Int64,2}) || (typeof(M) == Array{Float64,2}))
+function get_real_to_complex_matrix(M::Array{Float64,2})
+    # @assert ((typeof(M) == Array{Int64,2}) || (typeof(M) == Array{Float64,2}))
+    
     n = size(M)[1]
     @assert iseven(n)
+    
     M_complex = zeros(Complex{Float64}, (Int(n/2), Int(n/2)))
   
     ii = 1; jj = 1;
     for i = collect(1:2:n)
         for j = collect(1:2:n)
-            @assert M[i,j] == M[i+1,j+1]
-            @assert M[i+1,j] == -M[i,j+1]
-            M_complex[ii,jj] = complex(M[i,j], M[i+1,j])
+
+            if !isapprox(M[i,j], M[i+1, j+1], atol = 1E-4) || !isapprox(M[i+1,j], -M[i,j+1], atol = 1E-4)
+                Memento.error(_LOGGER, "The real matrix cannot be converted into a valid complex matrix form")
+            end
+
+            M_complex[ii,jj] = complex(M[i,j], M[i,j+1])
             jj += 1
         end
         jj = 1

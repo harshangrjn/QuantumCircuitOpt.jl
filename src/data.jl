@@ -207,6 +207,24 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
         elseif input == "controlled_H_12"
             return gates["controlled_H_12"]
 
+        elseif input == "test_R_x_1"
+            return kron(gates["test_R_x"], gates["I_2"])
+
+        elseif input == "test_R_x_2"
+            return kron(gates["I_2"], gates["test_R_x"])
+
+        elseif input == "test_R_y_1"
+            return kron(gates["test_R_y"], gates["I_2"])
+
+        elseif input == "test_R_y_2"
+            return kron(gates["I_2"], gates["test_R_y"])
+
+        elseif input == "test_R_z_1"
+            return kron(gates["test_R_z"], gates["I_2"])
+
+        elseif input == "test_R_z_2"
+            return kron(gates["I_2"], gates["test_R_z"])
+
         elseif input in ["R_x", "R_y", "R_z"] 
 
             if qubit_location == "qubit_1"
@@ -238,10 +256,6 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
 end
 
 function get_total_number_of_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
-
-    if length(elementary_gates) == 1
-        Memento.error(_LOGGER, "Input at least two unique elementary gates for non-trivial solutions")
-    end
 
     R_gates = findall(x -> startswith(x, "R"), (elementary_gates))
     U_gates = findall(x -> startswith(x, "U") || startswith(x, "u"), (elementary_gates))
@@ -354,7 +368,11 @@ function get_total_number_of_input_gates(params::Dict{String, Any}, elementary_g
 
     end
     
-    return n_gates
+    if n_gates == 1
+        Memento.error(_LOGGER, "Input at least two unique elementary gates for non-trivial solutions")
+    else
+        return n_gates
+    end
 end
 
 function get_data(params::Dict{String, Any})
@@ -394,6 +412,7 @@ function get_data(params::Dict{String, Any})
                              "elementary_gates" => elementary_gates,
                              "target_gate" => params["target_gate"],
                              "objective" => params["objective"],
+                             "decomposition_type" => params["decomposition_type"],
                              "optimizer" => params["optimizer"],
                              "presolve" => params["presolve"],
                              "optimizer_log" => params["optimizer_log"],                           
@@ -424,16 +443,29 @@ function get_elementary_gates(n_qubits::Int64)
     controlled_Z = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1])
     controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 0 1/sqrt(2); 0 0 1 0; 0 1/sqrt(2) 0 -1/sqrt(2)])
 
+    test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im           0.0-0.382683im
+                                            0.0-0.382683im  0.92388+0.0im])
+
+    test_R_y = Array{Complex{Float64}, 2}([  0.92388+0.0im  -0.382683+0.0im
+                                            0.382683+0.0im    0.92388+0.0im
+                                        ])
+    test_R_z = Array{Complex{Float64}, 2}([  0.92388-0.382683im      0.0+0.0im
+                                                0.0+0.0im       0.92388+0.382683im])
+
     elementary_gates = Dict{String, Any}("I_2" => I_2,
                                          "pauli_X" => pauli_X, 
                                          "pauli_Y" => pauli_Y,
                                          "hadamard_H" => hadamard_H,
+                                         "ph_shift_S" => ph_shift_S,
                                          "ph_shift_Z" => ph_shift_Z,
                                          "ph_shift_T" => ph_shift_T,
                                          "cnot_12" => cnot_12,
                                          "cnot_21" => cnot_21,
                                          "controlled_Z" => controlled_Z,
-                                         "controlled_H_12" => controlled_H_12
+                                         "controlled_H_12" => controlled_H_12,
+                                         "test_R_x" => test_R_x,
+                                         "test_R_y" => test_R_y,
+                                         "test_R_z" => test_R_z
                                          )
     
     # 3-qubit gates 
