@@ -1,6 +1,6 @@
-#------------------------------------------------#
-# Initialize all variables of the QC_model here  #
-#------------------------------------------------#
+#-----------------------------------------------------------#
+# Initialize all variables of the QuantumCircuitModel here  #
+#-----------------------------------------------------------#
 
 function variable_matrix_per_depth(qcm::QuantumCircuitModel)
     

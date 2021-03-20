@@ -1,6 +1,7 @@
-#---------------------------------------------#
-# Build all constraints of the QC_model here  #
-#---------------------------------------------#
+#--------------------------------------------------------#
+# Build all constraints of the QuantumCircuitModel here  #
+#--------------------------------------------------------#
+
 function constraint_single_gate_per_depth(qcm::QuantumCircuitModel)
     n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]

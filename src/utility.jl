@@ -1,4 +1,5 @@
-function get_auxiliary_var_bounds(v::Array{JuMP.VariableRef,1}) 
+function get_auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1}) 
+
     v_l = [JuMP.lower_bound(v[1]), JuMP.upper_bound(v[1])]
     v_u = [JuMP.lower_bound(v[2]), JuMP.upper_bound(v[2])]
     M = v_l * v_u'
@@ -49,6 +50,7 @@ function get_gate_element_bounds(M::Array{Float64,3})
 end
 
 function get_commutative_gates(M::Array{Float64,3})
+
     tol_0 = 1E-6
     n_r = length(M[:,1,1])
     n_c = length(M[1,:,1])
@@ -74,7 +76,6 @@ function get_commutative_gates(M::Array{Float64,3})
 end
 
 function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
-    # @assert ((typeof(M) == Array{Complex{Int64},2}) || (typeof(M) == Array{Complex{Float64},2}))
 
     n = size(M)[1]
     M_real = zeros(2*n, 2*n)
@@ -101,10 +102,11 @@ function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
 end
 
 function get_real_to_complex_matrix(M::Array{Float64,2})
-    # @assert ((typeof(M) == Array{Int64,2}) || (typeof(M) == Array{Float64,2}))
     
     n = size(M)[1]
-    @assert iseven(n)
+    if !iseven(n)
+        Memento.error(_LOGGER, "Input real matrix can admit only even numbered columns and rows")
+    end
     
     M_complex = zeros(Complex{Float64}, (Int(n/2), Int(n/2)))
   
@@ -113,7 +115,7 @@ function get_real_to_complex_matrix(M::Array{Float64,2})
         for j = collect(1:2:n)
 
             if !isapprox(M[i,j], M[i+1, j+1], atol = 1E-4) || !isapprox(M[i+1,j], -M[i,j+1], atol = 1E-4)
-                Memento.error(_LOGGER, "The real matrix cannot be converted into a valid complex matrix form")
+                Memento.error(_LOGGER, "Input real matrix cannot be converted into a valid complex matrix form")
             end
 
             M_complex[ii,jj] = complex(M[i,j], M[i,j+1])
@@ -129,9 +131,14 @@ end
 function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
     # round values close to 0 and 1 (within toleranes) for both real and imaginary values
     # Input can be a vector (>= 1 element) or a matrix of complex values
-    @assert size(M)[1] != 0
+   
+    if size(M)[1] == 0
+        Memento.error(_LOGGER, "Input cannot be a scalar")
+    end
+
     tol = 1E-6
     n_r = size(M)[1]
+
     if (length(size(M)) == 1)
         M_round = Array{Complex{Float64},2}(zeros(n_r))
         for i=1:n_r
@@ -147,6 +154,7 @@ function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
             end    
         end
     end
+
     if (length(size(M)) == 2)
         n_c = size(M)[2]
         M_round = Array{Complex{Float64},2}(zeros(n_r,n_c))
@@ -165,6 +173,7 @@ function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
             end
         end
     end
+
     if (length(size(M)) == 3)
         n_c = size(M)[2]
         n_d = size(M)[3]

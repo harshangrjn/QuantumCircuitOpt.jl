@@ -162,7 +162,7 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
         elseif input == "cnot_swap"
             return gates["cnot_12"] * gates["cnot_21"]
 
-        elseif input == "H⊗H"
+        elseif input == "H1⊗H2"
             return kron(gates["hadamard_H"], gates["hadamard_H"])
 
         elseif input == "Z1"
@@ -206,6 +206,18 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
 
         elseif input == "controlled_H_12"
             return gates["controlled_H_12"]
+
+        elseif input == "controlled_V"
+            return gates["controlled_V"]
+
+        elseif input == "swap"
+            return gates["swap"]
+
+        elseif input == "magic_M"
+            return gates["magic_M"]
+
+        elseif input == "qft2"
+            return gates["qft2"]
 
         elseif input == "test_R_x_1"
             return kron(gates["test_R_x"], gates["I_2"])
@@ -318,7 +330,6 @@ function get_total_number_of_input_gates(params::Dict{String, Any}, elementary_g
 
         n_gates = length(elementary_gates) - length(U_gates) + (num_U_θ * num_U_ϕ * num_U_λ)
 
-
     elseif !isempty(R_gates) && !isempty(U_gates)
         num_R_x = 0; num_R_y = 0; num_R_z = 0;
         
@@ -413,9 +424,7 @@ function get_data(params::Dict{String, Any})
                              "target_gate" => params["target_gate"],
                              "objective" => params["objective"],
                              "decomposition_type" => params["decomposition_type"],
-                             "optimizer" => params["optimizer"],
-                             "presolve" => params["presolve"],
-                             "optimizer_log" => params["optimizer_log"],                           
+                             "optimizer" => params["optimizer"],                         
                              "relax_integrality" => params["relax_integrality"]
                              )
     return data
@@ -441,9 +450,14 @@ function get_elementary_gates(n_qubits::Int64)
     cnot_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]) 
     cnot_21 = Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]) 
     controlled_Z = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1])
-    controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 0 1/sqrt(2); 0 0 1 0; 0 1/sqrt(2) 0 -1/sqrt(2)])
+    # controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 0 1/sqrt(2); 0 0 1 0; 0 1/sqrt(2) 0 -1/sqrt(2)])
+    controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1/sqrt(2) 1/sqrt(2); 0  0 1/sqrt(2) -1/sqrt(2)])
+    controlled_V = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5+(0.5)im 0.5-(0.5)im; 0 0 0.5-(0.5)im 0.5+(0.5)im])  #Also called sqrt(CNOT) gate
+    swap = Array{Complex{Float64},2}([1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1])
+    magic_M = Array{Complex{Float64},2}(1/sqrt(2)*[1 im 0 0; 0 0 im 1; 0 0 im -1; 1 -im 0 0])
+    qft2 = Array{Complex{Float64},2}(0.5*[1 1 1 1; 1 im -1 -im; 1 -1 1 -1; 1 -im -1 im])
 
-    test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im           0.0-0.382683im
+    test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im   0.0-0.382683im
                                             0.0-0.382683im  0.92388+0.0im])
 
     test_R_y = Array{Complex{Float64}, 2}([  0.92388+0.0im  -0.382683+0.0im
@@ -459,10 +473,15 @@ function get_elementary_gates(n_qubits::Int64)
                                          "ph_shift_S" => ph_shift_S,
                                          "ph_shift_Z" => ph_shift_Z,
                                          "ph_shift_T" => ph_shift_T,
+                                         "ph_shift_T_conj" => ph_shift_T_conj,
                                          "cnot_12" => cnot_12,
                                          "cnot_21" => cnot_21,
                                          "controlled_Z" => controlled_Z,
                                          "controlled_H_12" => controlled_H_12,
+                                         "controlled_V" => controlled_V,
+                                         "swap" => swap,
+                                         "magic_M" => magic_M,
+                                         "qft2" => qft2,
                                          "test_R_x" => test_R_x,
                                          "test_R_y" => test_R_y,
                                          "test_R_z" => test_R_z
