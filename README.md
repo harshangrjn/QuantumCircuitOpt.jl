@@ -1,9 +1,9 @@
 <p align="center">
-<img width="300px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.png"/>
+<img width="320px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.png"/>
 </p>
 
-# QuantumCircuitOpt.jl
-This is a Julia package which implements discrete optimization algorithms for optimization of Quantum circuits architecture. Given a desired target quantum gate and a set of elemental one and two qubit gates, this package provides an exact (and approximate) decomposition with minimum number of elemental gates and  CNOT gates.   
+<!-- # QuantumCircuitOpt.jl -->
+**QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization algorithms for optimization of Quantum circuits architecture. Given a desired target quantum gate and a set of elemental one and two qubit gates, this package provides an exact (and approximate) decomposition with minimum number of elemental gates and  CNOT gates.   
 
 ## Usage
 - Clone the repository.
