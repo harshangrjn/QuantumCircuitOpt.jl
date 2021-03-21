@@ -1,5 +1,5 @@
 <p align="center">
-<img width="320px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.png"/>
+<img width="320px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.pdf"/>
 </p>
 
 <!-- # QuantumCircuitOpt.jl -->
