@@ -11,7 +11,7 @@ include("solver.jl")
 #-------------------------------#
 params = Dict{String, Any}(
 "n_qubits" => 2, # Number of qubits
-"D" => 7,        # Maximum depth of the decomposition (>= 2)
+"D" => 5,        # Maximum depth of the decomposition (>= 2)
 
 # Note that, for a given input gate, say H (hadamard), user input should include the gates representations on every qubit, such as H1 and H2. 
 # If you prefer to include the kronecker form of gates appearing on adjacent qubits, you can do so by mentioning H1⊗H2
@@ -47,7 +47,7 @@ params = Dict{String, Any}(
 "R_z_discretization" => [-π/2, -π/4, π/4, π/2], 
 "U_θ_discretization" => [0],
 "U_ϕ_discretization" => [0],
-"U_λ_discretization" => [-π/2, -π/4, π/4, π/2, π],
+"U_λ_discretization" => [-π/2, π/2, π],
 
 "initial_gate" => "Identity", 
 

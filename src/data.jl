@@ -468,6 +468,36 @@ function get_data(params::Dict{String, Any})
                              "optimizer" => params["optimizer"],                         
                              "relax_integrality" => params["relax_integrality"]
                              )
+
+    R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
+    U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
+    
+    if !isempty(R_gates_ids) || !isempty(U_gates_ids)
+        data["discretization"] = Dict{String, Any}()
+    end
+
+    if !isempty(R_gates_ids) 
+        for i in R_gates_ids
+            if data["elementary_gates"][i] == "R_x"
+                data["discretization"]["R_x"] = params["R_x_discretization"]
+            elseif data["elementary_gates"][i] == "R_y"
+                data["discretization"]["R_y"] = params["R_y_discretization"]
+            elseif data["elementary_gates"][i] == "R_z"
+                data["discretization"]["R_z"] = params["R_z_discretization"]
+            end
+        end
+    end
+
+    if !isempty(U_gates_ids)
+        for i in U_gates_ids
+            if data["elementary_gates"][i] == "U3"
+                data["discretization"]["U3_θ"] = params["U_θ_discretization"]
+                data["discretization"]["U3_ϕ"] = params["U_ϕ_discretization"]
+                data["discretization"]["U3_λ"] = params["U_λ_discretization"]
+            end
+        end
+    end
+                         
     return data
 end
 

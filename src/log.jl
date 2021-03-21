@@ -26,6 +26,28 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
         printstyled("  ","Maximum depth of decomposition: ", data["depth"],"\n"; color = :cyan)
         
         printstyled("  ","Input elementary gates: ", data["elementary_gates"],"\n"; color = :cyan)
+
+        if !isempty(R_gates_ids) 
+            for i in R_gates_ids
+                if data["elementary_gates"][i] == "R_x"
+                    printstyled("  ","R_x gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_x"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i] == "R_y"
+                    printstyled("  ","R_y gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_y"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i] == "R_z"
+                    printstyled("  ","R_z gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_z"]), digits = 1),"\n"; color = :cyan)
+                end
+            end
+        end
+
+        if !isempty(U_gates_ids)
+            for i in U_gates_ids
+                if data["elementary_gates"][i] == "U3"
+                    printstyled("  ","U3 gate - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("  ","U3 gate - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("  ","U3 gate - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
+                end
+            end
+        end
         
         printstyled("  ","Input target gate: ", data["target_gate"],"\n"; color = :cyan)
         
