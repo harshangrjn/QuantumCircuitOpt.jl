@@ -7,16 +7,24 @@ function get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary
     n_qubits = params["n_qubits"]
     
     R_gates_ids = findall(x -> startswith(x, "R"), elementary_gates)
+    U_gates_ids = findall(x -> startswith(x, "U"), elementary_gates)
 
     R_complex_dict = Dict{}
     if !isempty(R_gates_ids)
         R_complex_dict = get_all_R_gates(params, elementary_gates)
     end
     
+    U_complex_dict = Dict{}
+    if !isempty(U_gates_ids)
+        U_complex_dict = get_all_U_gates(params, elementary_gates)
+    end
+
     M_complex_dict = Dict{String, Any}()
 
     counter = 1
     for i=1:length(elementary_gates)
+
+        # Build the dictionary for R_x, R_y, R_z rotation gates
         if startswith(elementary_gates[i], "R")
             for j in keys(R_complex_dict)
                 if (j == elementary_gates[i])
@@ -33,6 +41,29 @@ function get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary
                     end
                 end
             end
+        
+        # Build the dictionary for U1, U2 and U3 universal gates
+        elseif startswith(elementary_gates[i], "U")
+
+            for j in keys(U_complex_dict)
+                if (j == elementary_gates[i])
+                    for k in keys(U_complex_dict[j])
+                        for l in keys(U_complex_dict[j][k]["2qubit_rep"])
+                                
+                            M_complex_dict["$counter"] = Dict{String, Any}("type" => j,
+                                                                           "θ" => U_complex_dict[j][k]["θ"],
+                                                                           "ϕ" => U_complex_dict[j][k]["ϕ"],
+                                                                           "λ" => U_complex_dict[j][k]["λ"],
+                                                                           "qubit_location" => l,
+                                                                           "matrix" => U_complex_dict[j][k]["2qubit_rep"][l]
+                                                                           )
+                            counter += 1
+    
+                        end
+                    end
+                end
+            end
+    
         else     
     
             M_complex_dict["$counter"] = Dict{String, Any}("type" => elementary_gates[i],
@@ -119,16 +150,46 @@ function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretiz
     return R 
 end
 
-function get_discretized_U3_gates(θ_dicretization::Array{Number,1}, ϕ_dicretization::Array{Number,1}, λ_dicretization::Array{Number,1}, n_qubits::Int64)
-    n_gates_U = length(θ_dicretization) * length(ϕ_dicretization) * length(λ_dicretization)
-    
-    U = Array{Complex{Float64},3}(zeros(2^n_qubits, 2^n_qubits, n_gates_U))
+function get_all_U_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
-    counter = 1
-    for i=1:length(θ_dicretization)
-        for j=1:length(ϕ_dicretization)
-            for k=1:length(λ_dicretization)
-                U[:,:,counter] = get_u3_gate(θ_dicretization[i], ϕ_dicretization[j], λ_dicretization[k])
+    U_gates_ids = findall(x -> startswith(x, "U"), elementary_gates)
+
+    U_complex = Dict{String, Any}()
+
+    if length(U_gates_ids) >= 1 
+        for i=1:length(U_gates_ids)
+
+            if (elementary_gates[U_gates_ids[i]] == "U3")        
+                U_complex["U3"] = Dict{String, Any}()    
+                U_complex["U3"] = get_discretized_U3_gates("U3", U_complex["U3"], collect(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["n_qubits"])
+            end
+
+            # Add support for U1 and U2 universal gates here
+
+        end
+    end
+    
+    return U_complex    
+end
+
+function get_discretized_U3_gates(U_type::String, U::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, λ_discretization::Array{Float64,1}, n_qubits::Int64)
+    
+    counter = 1 
+
+    for i=1:length(θ_discretization)
+        for j=1:length(ϕ_discretization)
+            for k=1:length(λ_discretization)
+                
+                U_discrete = get_u3_gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                
+                U["angle_$(counter)"] = Dict{String, Any}("θ" => θ_discretization[i],
+                                                          "ϕ" => ϕ_discretization[j],
+                                                          "λ" => λ_discretization[k],
+                                                          "1qubit_rep" => U_discrete,
+                                                          "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(U_type, n_qubits, M = U_discrete, qubit_location = "qubit_1"),
+                                                                                            "qubit_2" => get_full_sized_gate(U_type, n_qubits, M = U_discrete, qubit_location = "qubit_2")
+                                                                                           ) 
+                                                         )
                 counter += 1
             end
         end
@@ -219,6 +280,7 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
         elseif input == "qft2"
             return gates["qft2"]
 
+        # Gates added for testing purposes --------------
         elseif input == "test_R_x_1"
             return kron(gates["test_R_x"], gates["I_2"])
 
@@ -237,7 +299,15 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
         elseif input == "test_R_z_2"
             return kron(gates["I_2"], gates["test_R_z"])
 
-        elseif input in ["R_x", "R_y", "R_z"] 
+        elseif input == "test_U3_1"
+            return kron(gates["test_U3"], gates["I_2"])
+
+        elseif input == "test_U3_2"
+            return kron(gates["I_2"], gates["test_U3"])
+        #-------------------------------------------------
+        
+        # Gates with continuous angle parameters
+        elseif input in ["R_x", "R_y", "R_z", "U3"] 
 
             if qubit_location == "qubit_1"
                 return kron(M, gates["I_2"])
@@ -269,113 +339,35 @@ end
 
 function get_total_number_of_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
+    # Update this if the naming convention for gates changes
     R_gates = findall(x -> startswith(x, "R"), (elementary_gates))
-    U_gates = findall(x -> startswith(x, "U") || startswith(x, "u"), (elementary_gates))
+    U_gates = findall(x -> startswith(x, "U"), (elementary_gates))
 
     n_gates = 0
     
     if isempty(R_gates) && isempty(U_gates)
+
         n_gates = length(elementary_gates)
 
-    elseif !isempty(R_gates)
-        # Twice to handle R_x gates on both qubits
+    elseif !isempty(R_gates) && isempty(U_gates)
+       
+        n_discretized_R_gates = get_number_of_R_gates(params, elementary_gates)
 
-        num_R_x = 0; num_R_y = 0; num_R_z = 0;
+        n_gates = length(elementary_gates) - length(R_gates) + n_discretized_R_gates
+
+    elseif !isempty(U_gates) && isempty(R_gates)
         
-        if ("R_x" in elementary_gates)
-            num_R_x = 2*length(params["R_x_discretization"])
-            if num_R_x == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for R_x gate")
-            end
-        end
-        
-        if ("R_y" in elementary_gates)
-            num_R_y = 2*length(params["R_y_discretization"])
-            if num_R_y == 0 
-                Memento.error(_LOGGER, "Dicsretization not specified for R_y gate")
-            end 
-        end
+        n_discretized_U_gates = get_number_of_U3_gates(params, elementary_gates)
 
-        if ("R_z" in elementary_gates)
-            num_R_z = 2*length(params["R_z_discretization"])
-            if num_R_z == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for R_z gate")
-            end
-        end
-
-        n_gates = length(elementary_gates) - length(R_gates) + num_R_x + num_R_y + num_R_z
-
-    elseif !isempty(U_gates)
-        # Twice to handle U gates on both qubits
-        num_U_θ = 0; num_U_ϕ = 0; num_U_λ = 0;
-        
-        if ("U_θ" in elementary_gates)
-            num_U_θ = 2*length(params["U_θ_discretization"])
-            if num_U_θ == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for U_θ gate")
-            end
-        end
-        if ("U_ϕ" in elementary_gates)
-            num_U_ϕ = 2*length(params["U_ϕ_discretization"])
-            if num_U_ϕ == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for U_ϕ gate")
-            end
-        end
-        if ("U_λ" in elementary_gates)
-            num_U_λ = 2*length(params["U_λ_discretization"])
-            if num_U_λ == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for U_λ gate")
-            end
-        end
-
-        n_gates = length(elementary_gates) - length(U_gates) + (num_U_θ * num_U_ϕ * num_U_λ)
+        n_gates = length(elementary_gates) - length(U_gates) + n_discretized_U_gates
 
     elseif !isempty(R_gates) && !isempty(U_gates)
-        num_R_x = 0; num_R_y = 0; num_R_z = 0;
         
-        if ("R_x" in elementary_gates)
-            num_R_x = 2*length(params["R_x_discretization"])
-            if (num_R_x == 0 )
-                Memento.error(_LOGGER, "Dicsretization not specified for R_x gate")
-            end
-        end
-        
-        if ("R_y" in elementary_gates)
-            num_R_y = 2*length(params["R_y_discretization"])
-            if (num_R_y == 0 )
-                Memento.error(_LOGGER, "Dicsretization not specified for R_y gate")
-            end
-        end
+        n_discretized_R_gates = get_number_of_R_gates(params, elementary_gates)
 
-        if ("R_z" in elementary_gates)
-            num_R_z = 2*length(params["R_z_discretization"])
-            if (num_R_z == 0 )
-                Memento.error(_LOGGER, "Dicsretization not specified for R_z gate")
-            end
-        end
+        n_discretized_U_gates = get_number_of_U3_gates(params, elementary_gates)
 
-        num_U_θ = 0; num_U_ϕ = 0; num_U_λ = 0;
-        
-        if ("U_θ" in elementary_gates)
-            num_U_θ = 2*length(params["U_θ_discretization"])
-            if num_U_θ == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for U_θ gate")
-            end
-        end
-        if ("U_ϕ" in elementary_gates)
-            num_U_ϕ = 2*length(params["U_ϕ_discretization"])
-            if num_U_ϕ == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for U_ϕ gate")
-            end
-        end
-        if ("U_λ" in elementary_gates)
-            num_U_λ = 2*length(params["U_λ_discretization"])
-            if num_U_λ == 0
-                Memento.error(_LOGGER, "Dicsretization not specified for U_λ gate")
-            end
-        end
-
-        n_gates = length(elementary_gates) - length(R_gates) - length(U_gates) + num_R_x + num_R_y + num_R_z + (num_U_θ * num_U_ϕ * num_U_λ)
+        n_gates = length(elementary_gates) - length(R_gates) - length(U_gates) + n_discretized_R_gates + n_discretized_U_gates
 
     end
     
@@ -384,6 +376,55 @@ function get_total_number_of_input_gates(params::Dict{String, Any}, elementary_g
     else
         return n_gates
     end
+
+end
+
+function get_number_of_R_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+    
+    num_R_x = 0; num_R_y = 0; num_R_z = 0;
+    
+    # A factor of two to account for R gates on both qubits
+    if ("R_x" in elementary_gates)
+        num_R_x = 2*length(params["R_x_discretization"])
+        if num_R_x == 0
+            Memento.error(_LOGGER, "Dicsretization not specified for R_x gate")
+        end
+    end
+    
+    if ("R_y" in elementary_gates)
+        num_R_y = 2*length(params["R_y_discretization"])
+        if num_R_y == 0 
+            Memento.error(_LOGGER, "Dicsretization not specified for R_y gate")
+        end 
+    end
+
+    if ("R_z" in elementary_gates)
+        num_R_z = 2*length(params["R_z_discretization"])
+        if num_R_z == 0
+            Memento.error(_LOGGER, "Dicsretization not specified for R_z gate")
+        end
+    end
+
+    return (num_R_x + num_R_y + num_R_z)
+end
+
+function get_number_of_U3_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+
+    num_U3 = 0
+
+        if ("U3" in elementary_gates)    
+            if (isempty(params["U_θ_discretization"])) || (isempty(params["U_ϕ_discretization"])) || (isempty(params["U_λ_discretization"]))
+                
+                Memento.error(_LOGGER, "Input atleast one discretization angle for every angle (θ,ϕ,λ)")
+
+            else
+                # A factor of two to account for U gates on both qubits                
+                num_U3 = 2 * length(params["U_θ_discretization"]) * length(params["U_θ_discretization"]) * length(params["U_λ_discretization"])
+
+            end
+        end
+
+    return num_U3
 end
 
 function get_data(params::Dict{String, Any})
@@ -466,6 +507,10 @@ function get_elementary_gates(n_qubits::Int64)
     test_R_z = Array{Complex{Float64}, 2}([  0.92388-0.382683im      0.0+0.0im
                                                 0.0+0.0im       0.92388+0.382683im])
 
+    # U3 (θ=0, ϕ=0, λ=π/4)
+    test_U3 = Array{Complex{Float64}, 2}([ 1.0+0.0im       0.0+0.0im
+                                           0.0+0.0im  0.707107+0.707107im])
+
     elementary_gates = Dict{String, Any}("I_2" => I_2,
                                          "pauli_X" => pauli_X, 
                                          "pauli_Y" => pauli_Y,
@@ -484,7 +529,8 @@ function get_elementary_gates(n_qubits::Int64)
                                          "qft2" => qft2,
                                          "test_R_x" => test_R_x,
                                          "test_R_y" => test_R_y,
-                                         "test_R_z" => test_R_z
+                                         "test_R_z" => test_R_z,
+                                         "test_U3"  => test_U3
                                          )
     
     # 3-qubit gates 

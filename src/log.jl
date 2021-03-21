@@ -4,17 +4,24 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
         Memento.error(_LOGGER, "Non-feasible primal status. Gate decomposition may not be exact!")
     end
 
+    R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
+    U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
+
     gates_sol, gates_sol_compressed = get_postprocessed_solutions(results, data)
 
     if !isempty(gates_sol_compressed)
 
         printstyled("\n","=============================================================================","\n"; color = :cyan)
         
-        printstyled("Problem statistics","\n"; color = :red)
+        printstyled("Input Quantum Circuit Data","\n"; color = :red)
         
         printstyled("\n","  ","Number of qubits: ", data["n_qubits"], "\n"; color = :cyan)
         
-        printstyled("  ","Total number of elementary gates (including discretization): ",size(data["M_real"])[3],"\n"; color = :cyan)
+        if isempty(R_gates_ids) && isempty(U_gates_ids)
+            printstyled("  ","Total number of elementary gates: ",size(data["M_real"])[3],"\n"; color = :cyan)
+        else
+            printstyled("  ","Total number of elementary gates (including discretization): ",size(data["M_real"])[3],"\n"; color = :cyan)
+        end
         
         printstyled("  ","Maximum depth of decomposition: ", data["depth"],"\n"; color = :cyan)
         
@@ -24,7 +31,7 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
         
         printstyled("  ","Type of decomposition: ", data["decomposition_type"],"\n"; color = :cyan)
 
-        printstyled("\n","Optimal decomposition","\n","\n"; color = :red)
+        printstyled("\n","Optimal Decomposition","\n","\n"; color = :red)
         
         print("  ")
         
@@ -71,20 +78,40 @@ function get_postprocessed_solutions(results::Dict{String, Any}, data::Dict{Stri
         id = findall(isone.(round.(abs.(results["solution"]["z_onoff_var"][:,d]), digits=3)))[1]
         push!(id_sequence, id)
 
-        if data["M_complex_dict"]["$id"]["type"] != "Identity"
-            s1 = data["M_complex_dict"]["$id"]["type"]
+        gate_id = data["M_complex_dict"]["$id"]
 
-            if data["M_complex_dict"]["$id"]["angle"] == "na"
+        if gate_id["type"] != "Identity"
+            
+            s1 = gate_id["type"]
+
+            if !(startswith(s1, "R") || startswith(s1, "U"))
+            
                 push!(gates_sol, s1)
+            
             else
+                
                 s2 = String[]
-                if data["M_complex_dict"]["$id"]["qubit_location"] == "qubit_1"
+                
+                if gate_id["qubit_location"] == "qubit_1"
                     s2 = "1"
-                elseif data["M_complex_dict"]["$id"]["qubit_location"] == "qubit_2"
+                elseif gate_id["qubit_location"] == "qubit_2"
                     s2 = "2"
                 end
-                s3 = "$(rad2deg(data["M_complex_dict"]["$id"]["angle"]))"
-                push!(gates_sol, string(s1," (",s2,", ",s3,")"))
+
+                if startswith(s1, "R")
+                    θ = rad2deg(gate_id["angle"])
+                    s3 = "$(θ)"
+                    push!(gates_sol, string(s1," (",s2,", ",s3,")"))
+
+                elseif startswith(s1, "U")
+                    
+                    θ = rad2deg(gate_id["θ"])
+                    ϕ = rad2deg(gate_id["ϕ"])
+                    λ = rad2deg(gate_id["λ"])
+                    s3 = string("(","$(θ)",",","$(ϕ)", ",","$(λ)",")")
+                    push!(gates_sol, string(s1," (",s2,", ",s3,")"))
+
+                end
             end
 
         end
