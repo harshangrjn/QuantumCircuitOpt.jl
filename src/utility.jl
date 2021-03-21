@@ -52,27 +52,56 @@ end
 function get_commutative_gates(M::Array{Float64,3})
 
     tol_0 = 1E-6
-    n_r = length(M[:,1,1])
-    n_c = length(M[1,:,1])
-    n = length(M[1,1,:])
-    Id = Matrix(I, n_r, n_c)
-    Id_idx = [];
-    for i = 1:n
-        (all(isapprox.(M[:,:,i], Id))) && (push!(Id_idx, i))
-    end
-    M_idx = setdiff(1:n, Id_idx)
-    M_commute = Any[];
-    # Check for pairs of commutative matrices
-    for i in M_idx
-        for j in M_idx
-            if (i < j) && (i != j)
-             # Evaluate the commutator 
-                (all(isapprox.(M[:,:,i] * M[:,:,j], M[:,:,j] * M[:,:,i]))) && push!(M_commute, (i, j))
+    
+    n_r   = size(M)[1]
+    n_c   = size(M)[2]
+    depth = size(M)[3]
+
+    M_commute_2 = Array{Tuple{Int64,Int64},1}()
+    M_commute_3 = Array{Tuple{Int64,Int64,Int64},1}()
+
+    # Check for commutative matrix pairs
+    for d1 = 1:depth
+        for d2 = (d1+1):depth
+            M_d1 = get_real_to_complex_matrix(M[:,:,d1])
+            M_d2 = get_real_to_complex_matrix(M[:,:,d2])
+
+            if isapprox(M_d1*M_d2, M_d2*M_d1, atol = 1E-4)
+                push!(M_commute_2, (d1, d2))
+            end
+
+            for d3 = (d2+1):depth
+                M_d3 = get_real_to_complex_matrix(M[:,:,d3])
+
+                M_product = Array{Complex{Float64},3}(zeros(size(M_d3)[1], size(M_d3)[2], 6))
+
+                # All commuting permutations
+                M_product[:,:,1] = M_d1 * M_d2 * M_d3
+                M_product[:,:,2] = M_d2 * M_d1 * M_d3
+                M_product[:,:,3] = M_d1 * M_d3 * M_d2
+                M_product[:,:,4] = M_d3 * M_d1 * M_d2
+                M_product[:,:,5] = M_d2 * M_d3 * M_d1
+                M_product[:,:,6] = M_d3 * M_d2 * M_d1
+                
+                triplet_commutes = true
+
+                for i=1:6
+                    for j=(i+1):6
+                        if !isapprox(M_product[:,:,i], M_product[:,:,j], atol = 1E-4)
+                            triplet_commutes = false
+                        end
+                    end
+                end
+
+                if triplet_commutes
+                    push!(M_commute_3, (d1, d2, d3))
+                end
+
             end
         end
     end
  
-    return M_commute, Id_idx
+    return M_commute_2, M_commute_3
 end
 
 function get_complex_to_real_matrix(M::Array{Complex{Float64},2})

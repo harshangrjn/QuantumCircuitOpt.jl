@@ -164,6 +164,8 @@ function get_compressed_solutions(data::Dict{String, Any}, gates_sol::Array{Stri
             end
         end 
 
+    else 
+        return gates_sol
     end
 
     if isempty(gates_sol_compressed)

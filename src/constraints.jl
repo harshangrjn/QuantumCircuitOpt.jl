@@ -93,13 +93,15 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
     n_c     = size(qcm.data["M_real"])[2]
     n_gates = size(qcm.data["M_real"])[3]
 
-    for i=1:n_r
+    for i=1:2:n_r
         for j=1:n_c
             for n=1:n_gates
                 for d=1:(depth-1)
                     QCO.get_mccormick_relaxation(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff_var][n,(d+1)])
-                    # JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i+1,j+1,n,d] ==  qcm.variables[:zU_var][i,j,n,d])
-                    # JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d]   == -qcm.variables[:zU_var][i+1,j,n,d])
+                    if isodd(j)
+                        JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j,n,d]   ==  qcm.variables[:zU_var][i+1,j+1,n,d])
+                        JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d] == -qcm.variables[:zU_var][i+1,j,n,d])
+                    end
                 end
             end
         end
@@ -167,5 +169,33 @@ function constraint_complex_to_real_symmetry_compact(qcm::QuantumCircuitModel)
         end
     end
     
+    return
+end
+
+function constraint_commutative_gates(qcm::QuantumCircuitModel)
+    
+    depth  = qcm.data["depth"]
+
+    commute_pairs, commute_triplets = QCO.get_commutative_gates(qcm.data["M_real"])
+    z = qcm.variables[:z_onoff_var]
+
+    if !isempty(commute_pairs)
+        Memento.info(_LOGGER, "Detected $(length(commute_pairs)) input elementary gate pairs which commute")
+
+        for i = 1:length(commute_pairs)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(z[commute_pairs[i][k], d] for k=1:2)  + sum(z[commute_pairs[i][k], (d+1)] for k=1:2) <= 2)
+        end
+
+    end
+
+    if !isempty(commute_triplets)
+        Memento.info(_LOGGER, "Detected $(length(commute_triplets)) input elementary gate triplets which commute")
+
+        for i = 1:length(commute_triplets)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(z[commute_triplets[i][k], d] for k=1:3)  + sum(z[commute_triplets[i][k], (d+1)] for k=1:3) <= 3)
+        end
+
+    end
+
     return
 end

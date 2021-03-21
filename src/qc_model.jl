@@ -1,4 +1,6 @@
-function build_QCModel(data::Dict{String, Any}; model_type = "compact_formulation")
+function build_QCModel(data::Dict{String, Any}; 
+                       model_type = "compact_formulation", 
+                       commute_matrix_cuts = false)
     
     m_qc = QuantumCircuitModel(data, JuMP.Model(), Dict{Symbol,Any}(), Dict{String,Any}())
 
@@ -6,13 +8,13 @@ function build_QCModel(data::Dict{String, Any}; model_type = "compact_formulatio
     if model_type == "balas_formulation" 
 
         variable_QCModel(m_qc)
-        constraint_QCModel(m_qc)
+        constraint_QCModel(m_qc, commute_matrix_cuts)
 
     # minimal variables and constraints, but not a convex-hull formulation per depth
     elseif model_type == "compact_formulation" 
         
         variable_QCModel_compact(m_qc)
-        constraint_QCModel_compact(m_qc)
+        constraint_QCModel_compact(m_qc, commute_matrix_cuts)
 
     end
 
@@ -35,7 +37,7 @@ function variable_QCModel(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_QCModel(qcm::QuantumCircuitModel)
+function constraint_QCModel(qcm::QuantumCircuitModel, commute_matrix_cuts::Bool)
     constraint_single_gate_per_depth(qcm)
     constraint_disjunction_of_gates_per_depth(qcm)
     constraint_gate_initial_condition(qcm)
@@ -43,6 +45,10 @@ function constraint_QCModel(qcm::QuantumCircuitModel)
     constraint_gate_product_linearization(qcm)
     constraint_gate_target_condition(qcm)
     constraint_complex_to_real_symmetry(qcm)
+
+    if commute_matrix_cuts
+        constraint_commutative_gates(qcm)
+    end
 
     return
 end
@@ -60,7 +66,7 @@ function variable_QCModel_compact(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_QCModel_compact(qcm::QuantumCircuitModel)
+function constraint_QCModel_compact(qcm::QuantumCircuitModel, commute_matrix_cuts::Bool)
 
     constraint_single_gate_per_depth(qcm)
     constraint_gate_initial_condition_compact(qcm)
@@ -68,6 +74,10 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel)
     constraint_gate_product_linearization(qcm)
     constraint_gate_target_condition_compact(qcm)
     constraint_complex_to_real_symmetry_compact(qcm)
+
+    if commute_matrix_cuts
+        constraint_commutative_gates(qcm)
+    end
 
     return
 end

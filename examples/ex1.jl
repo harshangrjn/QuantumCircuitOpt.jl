@@ -11,23 +11,23 @@ include("solver.jl")
 #-------------------------------#
 params = Dict{String, Any}(
 "n_qubits" => 2, # Number of qubits
-"D" => 5, # Maximum depth of the decomposition (>= 2)
+"D" => 5,        # Maximum depth of the decomposition (>= 2)
 
 # Note that, for a given input gate, say H (hadamard), user input should include the gates representations on every qubit, such as H1 and H2. 
 # If you prefer to include the kronecker form of gates appearing on adjacent qubits, you can do so by mentioning H1⊗H2
 
-"elementary_gates" => ["H1", "H2", "H1⊗H2", "Identity", "cnot_12"],  
-# "elementary_gates" => ["H2", "T1", "T2", "T1_conjugate", "cnot_12", "cnot_21"],
+# "elementary_gates" => ["H1", "H2", "H1⊗H2", "Identity", "cnot_12"],  
+# "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_conjugate", "cnot_12", "Identity"],
 # "elementary_gates" => ["T1", "Identity", "cnot_12"],  
-"target_gate" => "cnot_21",
+# "target_gate" => "cnot_21",
 
 # "elementary_gates" => ["H1", "H2", "Identity", "cnot_21", "S1", "S2", "cnot_12"],
 # "target_gate" => "magic_M",
 
 # "elementary_gates" => ["R_z", "Identity"], 
-# "elementary_gates" => ["R_x", "cnot_12", "cnot_21", "Identity"], 
+# "elementary_gates" => ["R_x", "R_y", "cnot_12", "cnot_21"], 
 # "target_gate" => "test_R_x_1",
-# "target_gate" => "T1",
+# "target_gate" => "controlled_V",
 
 # Enter discretization angles for each of the matrices which are part of the elementary_gates above. 
 "R_x_discretization" => [-π/4, -π/2, π/4, π/2], 
@@ -55,8 +55,6 @@ params = Dict{String, Any}(
 "optimizer_log" => true, 
 "relax_integrality" => false,
                             
-# Valid inequalities which may speed up the model run time
-"cuts_1" => false, #commutative matrices
 )
 
 #------------------------------#
@@ -65,8 +63,6 @@ params = Dict{String, Any}(
 qcm_optimizer = get_solver(params)
 data = QuantumCircuitOpt.get_data(params)
 
-model_qc = QuantumCircuitOpt.build_QCModel(data, model_type = "balas_formulation")
+model_qc  = QuantumCircuitOpt.build_QCModel(data, model_type = "balas_formulation", commute_matrix_cuts = false)
 result_qc = QuantumCircuitOpt.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
 QuantumCircuitOpt.visualize_QCModel_solution(result_qc, data)
-
-
