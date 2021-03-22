@@ -11,7 +11,7 @@ include("solver.jl")
 #-------------------------------#
 params = Dict{String, Any}(
 "n_qubits" => 2, # Number of qubits
-"D" => 5,        # Maximum depth of the decomposition (>= 2)
+"D" => 10,        # Maximum depth of the decomposition (>= 2)
 
 # Note that, for a given input gate, say H (hadamard), user input should include the gates representations on every qubit, such as H1 and H2. 
 # If you prefer to include the kronecker form of gates appearing on adjacent qubits, you can do so by mentioning H1⊗H2
@@ -38,8 +38,9 @@ params = Dict{String, Any}(
 # "elementary_gates" => ["U3", "Identity"],
 # "target_gate" => "test_U3_1",
 
-"elementary_gates" => ["R_x", "U3", "Identity", "cnot_12"],
-"target_gate" => "controlled_Z",
+"elementary_gates" => ["R_x", "U3", "Identity", "cnot_12", "cnot_21"],
+"target_gate" => "qft2",
+# "target_gate" => "controlled_H_12",
 
 # Enter discretization angles for each of the matrices which are part of the elementary_gates above. 
 "R_x_discretization" => [π/2], 
@@ -47,14 +48,14 @@ params = Dict{String, Any}(
 "R_z_discretization" => [-π/2, -π/4, π/4, π/2], 
 "U_θ_discretization" => [0],
 "U_ϕ_discretization" => [0],
-"U_λ_discretization" => [-π/2, π/2, π],
+"U_λ_discretization" => [3*π/4, 7*π/4, -π/4, π/2, π],
 
 "initial_gate" => "Identity", 
 
 # Choose the objective function from one of these options:  
 # "minimize_depth": Minimizes the total depth of decomposition. For this option, include "Identity" matrix in the "elementary_gates" above. 
 # "minimize_cnot" : Minimizes the number of CNOT gates in the decomposition. 
-"objective" => "minimize_cnot", 
+"objective" => "minimize_depth", 
 
 # Choose the type of decomposition from one of these options:
 # "exact": QuantumCircuitOpt finds an exact decomposition if it exists
@@ -75,6 +76,6 @@ params = Dict{String, Any}(
 qcm_optimizer = get_solver(params)
 data = QuantumCircuitOpt.get_data(params)
 
-model_qc  = QuantumCircuitOpt.build_QCModel(data, model_type = "balas_formulation", commute_matrix_cuts = false)
+model_qc  = QuantumCircuitOpt.build_QCModel(data, model_type = "compact_formulation", commute_matrix_cuts = false)
 result_qc = QuantumCircuitOpt.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
 QuantumCircuitOpt.visualize_QCModel_solution(result_qc, data)

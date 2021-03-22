@@ -13,7 +13,7 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
 
         printstyled("\n","=============================================================================","\n"; color = :cyan)
         
-        printstyled("Input Quantum Circuit Data","\n"; color = :red)
+        printstyled("Quantum Circuit Model Data","\n"; color = :red)
         
         printstyled("\n","  ","Number of qubits: ", data["n_qubits"], "\n"; color = :cyan)
         
