@@ -84,7 +84,7 @@ function get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary
     if !("target_gate" in keys(params)) || isempty(params["target_gate"])
         Memento.error(_LOGGER, "Target gate not found in the input data")
     end
-    
+
     T_complex = get_full_sized_gate(params["target_gate"], n_qubits)
 
     if ((size(M_complex[:,:,1])[1] != size(T_complex)[1]) || (size(M_complex[:,:,1])[2] != size(T_complex)[2]))

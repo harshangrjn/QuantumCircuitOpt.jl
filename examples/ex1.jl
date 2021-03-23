@@ -11,7 +11,7 @@ include("solver.jl")
 #-------------------------------#
 params = Dict{String, Any}(
 "n_qubits" => 2, # Number of qubits
-"D" => 5,        # Maximum depth of the decomposition (>= 2)
+"D" => 8,        # Maximum depth of the decomposition (>= 2)
 
 # Note that, for a given input gate, say H (hadamard), user input should include the gates representations on every qubit, such as H1 and H2. 
 # If you prefer to include the kronecker form of gates appearing on adjacent qubits, you can do so by mentioning H1⊗H2
@@ -45,13 +45,13 @@ params = Dict{String, Any}(
 # "target_gate" => "cnot_21",
 
 # Enter discretization angles for each of the matrices which are part of the elementary_gates above.  
-"R_x_discretization" => [π/2, 0], 
-"R_y_discretization" => [-π/4, π/4, π/2, -π/2], 
-"R_z_discretization" => [-π/2, π/2, π/8, -π/8], 
+# "R_x_discretization" => [π/2, 0], 
+# "R_y_discretization" => [-π/4, π/4, π/2, -π/2], 
+# "R_z_discretization" => [-π/2, π/2, π/4, -π/4], 
 "U_θ_discretization" => [π/2, -π/2],
 "U_ϕ_discretization" => [-π/2, π/2],
 # "U_λ_discretization" => [-π/4, π/4, π/8, -π/8, π/2, π],
-"U_λ_discretization" => [π/2, π, -π/2, π/8],
+"U_λ_discretization" => [π/2, π, π/8],
 
 "initial_gate" => "Identity", 
 

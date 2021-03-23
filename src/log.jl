@@ -7,7 +7,12 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
     U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
 
-    gates_sol, gates_sol_compressed = get_postprocessed_solutions(results, data)
+    if !data["relax_integrality"]
+        gates_sol, gates_sol_compressed = get_postprocessed_solutions(results, data)
+    else 
+        Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
+        return
+    end
 
     if !isempty(gates_sol_compressed)
 
@@ -32,11 +37,11 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
             for i in R_gates_ids
 
                 if data["elementary_gates"][i] == "R_x"
-                    printstyled("  ","R_x gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_x"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("    ","R_x gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_x"]), digits = 1),"\n"; color = :cyan)
                 elseif data["elementary_gates"][i] == "R_y"
-                    printstyled("  ","R_y gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_y"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("    ","R_y gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_y"]), digits = 1),"\n"; color = :cyan)
                 elseif data["elementary_gates"][i] == "R_z"
-                    printstyled("  ","R_z gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_z"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("    ","R_z gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_z"]), digits = 1),"\n"; color = :cyan)
                 end
 
             end
@@ -48,11 +53,11 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
             for i in U_gates_ids
 
                 if data["elementary_gates"][i] == "U3"
-                    printstyled("  ","U3 gate - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
-                    printstyled("  ","U3 gate - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
-                    printstyled("  ","U3 gate - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("    ","U3 gate - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("    ","U3 gate - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
+                    printstyled("    ","U3 gate - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
                 end
-                
+
             end
 
         end
