@@ -28,7 +28,9 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
         printstyled("  ","Input elementary gates: ", data["elementary_gates"],"\n"; color = :cyan)
 
         if !isempty(R_gates_ids) 
+
             for i in R_gates_ids
+
                 if data["elementary_gates"][i] == "R_x"
                     printstyled("  ","R_x gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_x"]), digits = 1),"\n"; color = :cyan)
                 elseif data["elementary_gates"][i] == "R_y"
@@ -36,24 +38,30 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
                 elseif data["elementary_gates"][i] == "R_z"
                     printstyled("  ","R_z gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_z"]), digits = 1),"\n"; color = :cyan)
                 end
+
             end
+
         end
 
         if !isempty(U_gates_ids)
+
             for i in U_gates_ids
+
                 if data["elementary_gates"][i] == "U3"
                     printstyled("  ","U3 gate - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
                     printstyled("  ","U3 gate - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
                     printstyled("  ","U3 gate - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
                 end
+                
             end
+
         end
         
         printstyled("  ","Input target gate: ", data["target_gate"],"\n"; color = :cyan)
         
         printstyled("  ","Type of decomposition: ", data["decomposition_type"],"\n"; color = :cyan)
 
-        printstyled("\n","Optimal Decomposition","\n","\n"; color = :red)
+        printstyled("\n","Optimal Circuit Decomposition","\n","\n"; color = :red)
         
         print("  ")
         
@@ -61,10 +69,18 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
             
             if i != length(gates_sol_compressed)
                 printstyled(gates_sol_compressed[i], " * "; color = :cyan)
-            else
-                printstyled(gates_sol_compressed[i], " = ", data["target_gate"],"\n"; color = :cyan)
+            else    
+                if data["decomposition_type"] == "exact"
+                    printstyled(gates_sol_compressed[i], " = ", data["target_gate"],"\n"; color = :cyan)
+                elseif data["decomposition_type"] == "approximate"
+                    printstyled(gates_sol_compressed[i], " ≈ ", data["target_gate"],"\n"; color = :cyan)
+                end
             end
 
+        end
+
+        if data["decomposition_type"] == "approximate"
+            printstyled("  ","||Decomposition error||₂: ", ceil(LA.norm(results["solution"]["slack_var"]), digits = 2),"\n"; color = :cyan)
         end
 
         if data["objective"] == "minimize_depth"
@@ -147,6 +163,9 @@ function get_postprocessed_solutions(results::Dict{String, Any}, data::Dict{Stri
     return gates_sol, gates_sol_compressed
 end
 
+"""
+validate_solutions validates the decomposition if it is indeed exact with respect to the specified target gate. 
+"""
 function validate_solutions(data::Dict{String, Any}, id_sequence::Array{Int64,1})
     
     M_sol = Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["n_qubits"]), 2^(data["n_qubits"])))
@@ -159,7 +178,7 @@ function validate_solutions(data::Dict{String, Any}, id_sequence::Array{Int64,1}
     # @show QCO.get_real_to_complex_matrix(data["Target_real"])
 
     # This tolerance is very important for the final feasiblity check
-    if !isapprox(M_sol, QCO.get_real_to_complex_matrix(data["Target_real"]), atol = 1E-4)
+    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.get_real_to_complex_matrix(data["Target_real"]), atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     
@@ -176,7 +195,7 @@ function get_compressed_solutions(data::Dict{String, Any}, gates_sol::Array{Stri
         return gates_sol
     end
 
-    # This part of the code is a bit ad-hoc. This needs to be updated once the input format for elementary gates gets cleaned up. 
+    # This part of the code is a bit ad-hoc. This needs to be updated once the input format gets cleaned up for elementary gates with U and R gates. 
     if isempty(findall(x -> startswith(x, "R") || startswith(x, "U"), data["elementary_gates"]))
         
         status = false

@@ -81,6 +81,10 @@ function get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary
         M_complex[:,:,i] = M_complex_dict["$i"]["matrix"]
     end
 
+    if !("target_gate" in keys(params)) || isempty(params["target_gate"])
+        Memento.error(_LOGGER, "Target gate not found in the input data")
+    end
+    
     T_complex = get_full_sized_gate(params["target_gate"], n_qubits)
 
     if ((size(M_complex[:,:,1])[1] != size(T_complex)[1]) || (size(M_complex[:,:,1])[2] != size(T_complex)[2]))
@@ -271,6 +275,9 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
         elseif input == "controlled_V"
             return gates["controlled_V"]
 
+        elseif input == "controlled_R2"
+            return gates["controlled_R2"]
+
         elseif input == "swap"
             return gates["swap"]
 
@@ -350,7 +357,7 @@ function get_total_number_of_input_gates(params::Dict{String, Any}, elementary_g
         n_gates = length(elementary_gates)
 
     elseif !isempty(R_gates) && isempty(U_gates)
-       
+        
         n_discretized_R_gates = get_number_of_R_gates(params, elementary_gates)
 
         n_gates = length(elementary_gates) - length(R_gates) + n_discretized_R_gates
@@ -419,7 +426,7 @@ function get_number_of_U3_gates(params::Dict{String, Any}, elementary_gates::Arr
 
             else
                 # A factor of two to account for U gates on both qubits                
-                num_U3 = 2 * length(params["U_θ_discretization"]) * length(params["U_θ_discretization"]) * length(params["U_λ_discretization"])
+                num_U3 = 2 * length(params["U_θ_discretization"]) * length(params["U_ϕ_discretization"]) * length(params["U_λ_discretization"])
 
             end
         end
@@ -527,13 +534,14 @@ function get_elementary_gates(n_qubits::Int64)
     swap = Array{Complex{Float64},2}([1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1])
     magic_M = Array{Complex{Float64},2}(1/sqrt(2)*[1 im 0 0; 0 0 im 1; 0 0 im -1; 1 -im 0 0])
     qft2 = Array{Complex{Float64},2}(0.5*[1 1 1 1; 1 im -1 -im; 1 -1 1 -1; 1 -im -1 im])
+    controlled_R2 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 im]) # Useful for qft2's decomposition
 
     test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im   0.0-0.382683im
                                             0.0-0.382683im  0.92388+0.0im])
 
     test_R_y = Array{Complex{Float64}, 2}([  0.92388+0.0im  -0.382683+0.0im
-                                            0.382683+0.0im    0.92388+0.0im
-                                        ])
+                                            0.382683+0.0im    0.92388+0.0im ])
+
     test_R_z = Array{Complex{Float64}, 2}([  0.92388-0.382683im      0.0+0.0im
                                                 0.0+0.0im       0.92388+0.382683im])
 
@@ -554,6 +562,7 @@ function get_elementary_gates(n_qubits::Int64)
                                          "controlled_Z" => controlled_Z,
                                          "controlled_H_12" => controlled_H_12,
                                          "controlled_V" => controlled_V,
+                                         "controlled_R2" => controlled_R2,
                                          "swap" => swap,
                                          "magic_M" => magic_M,
                                          "qft2" => qft2,
