@@ -89,7 +89,11 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
         end
 
         if data["objective"] == "minimize_depth"
-            printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+            if "Identity" in data["elementary_gates"]
+                printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+            else 
+                printstyled("  ","Compressed depth for the feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
+            end
 
         elseif data["objective"] == "minimize_cnot"
             printstyled("  ","Minimum number of CNOT gates: ", results["objective"],"\n"; color = :cyan)
@@ -148,9 +152,9 @@ function get_postprocessed_solutions(results::Dict{String, Any}, data::Dict{Stri
 
                 elseif startswith(s1, "U")
                     
-                    θ = rad2deg(gate_id["θ"])
-                    ϕ = rad2deg(gate_id["ϕ"])
-                    λ = rad2deg(gate_id["λ"])
+                    θ = rad2deg(gate_id["angle"]["θ"])
+                    ϕ = rad2deg(gate_id["angle"]["ϕ"])
+                    λ = rad2deg(gate_id["angle"]["λ"])
                     s3 = string("(","$(θ)",",","$(ϕ)", ",","$(λ)",")")
                     push!(gates_sol, string(s1," (",s2,", ",s3,")"))
 

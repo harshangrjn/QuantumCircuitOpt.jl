@@ -5,75 +5,8 @@ returns the corresponding elementary gates in the three-dimensional complex matr
 function get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary_gates::Array{String,1})
 
     n_qubits = params["n_qubits"]
-    
-    R_gates_ids = findall(x -> startswith(x, "R"), elementary_gates)
-    U_gates_ids = findall(x -> startswith(x, "U"), elementary_gates)
 
-    R_complex_dict = Dict{}
-    if !isempty(R_gates_ids)
-        R_complex_dict = get_all_R_gates(params, elementary_gates)
-    end
-    
-    U_complex_dict = Dict{}
-    if !isempty(U_gates_ids)
-        U_complex_dict = get_all_U_gates(params, elementary_gates)
-    end
-
-    M_complex_dict = Dict{String, Any}()
-
-    counter = 1
-    for i=1:length(elementary_gates)
-
-        # Build the dictionary for R_x, R_y, R_z rotation gates
-        if startswith(elementary_gates[i], "R")
-            for j in keys(R_complex_dict)
-                if (j == elementary_gates[i])
-                    for k in keys(R_complex_dict[j])
-                        for l in keys(R_complex_dict[j][k]["2qubit_rep"])
-                            
-                            M_complex_dict["$counter"] = Dict{String, Any}("type" => j,
-                                                                           "angle" => R_complex_dict[j][k]["angle"],
-                                                                           "qubit_location" => l,
-                                                                           "matrix" => R_complex_dict[j][k]["2qubit_rep"][l])
-                            counter += 1
-
-                        end
-                    end
-                end
-            end
-        
-        # Build the dictionary for U1, U2 and U3 universal gates
-        elseif startswith(elementary_gates[i], "U")
-
-            for j in keys(U_complex_dict)
-                if (j == elementary_gates[i])
-                    for k in keys(U_complex_dict[j])
-                        for l in keys(U_complex_dict[j][k]["2qubit_rep"])
-                                
-                            M_complex_dict["$counter"] = Dict{String, Any}("type" => j,
-                                                                           "θ" => U_complex_dict[j][k]["θ"],
-                                                                           "ϕ" => U_complex_dict[j][k]["ϕ"],
-                                                                           "λ" => U_complex_dict[j][k]["λ"],
-                                                                           "qubit_location" => l,
-                                                                           "matrix" => U_complex_dict[j][k]["2qubit_rep"][l]
-                                                                           )
-                            counter += 1
-    
-                        end
-                    end
-                end
-            end
-    
-        else     
-    
-            M_complex_dict["$counter"] = Dict{String, Any}("type" => elementary_gates[i],
-                                                           "angle" => "na",
-                                                           "qubit_location" => "na",
-                                                           "matrix" => get_full_sized_gate(elementary_gates[i], n_qubits))
-            counter += 1
-
-        end
-    end
+    M_complex_dict = get_all_gates_dictionary(params, elementary_gates)
     
     M_complex = Array{Complex{Float64},3}(zeros(2^n_qubits, 2^n_qubits, n_gates))
     
@@ -92,6 +25,78 @@ function get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary
     end
  
     return M_complex_dict, M_complex, T_complex
+end
+
+function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::Array{String,1})
+
+    n_qubits = params["n_qubits"]
+
+    R_gates_ids = findall(x -> startswith(x, "R"), elementary_gates)
+    U_gates_ids = findall(x -> startswith(x, "U"), elementary_gates)
+
+    R_complex_dict = Dict{}
+    if !isempty(R_gates_ids)
+        R_complex_dict = get_all_R_gates(params, elementary_gates)
+    end
+    
+    U_complex_dict = Dict{}
+    if !isempty(U_gates_ids)
+        U_complex_dict = get_all_U_gates(params, elementary_gates)
+    end
+
+    M_complex_dict = Dict{String, Any}()
+
+    counter = 1
+
+    for i=1:length(elementary_gates)
+
+        if startswith(elementary_gates[i], "R") || startswith(elementary_gates[i], "U")
+            M_elementary_dict = Dict{}
+
+            if startswith(elementary_gates[i], "R")
+                M_elementary_dict = R_complex_dict
+            elseif startswith(elementary_gates[i], "U")
+                M_elementary_dict = U_complex_dict
+            end
+
+            for j in keys(M_elementary_dict)
+                if (j == elementary_gates[i])
+                    for k in keys(M_elementary_dict[j])
+                        for l in keys(M_elementary_dict[j][k]["2qubit_rep"])
+                            
+                            M_complex_dict["$counter"] = Dict{String, Any}("type" => j,
+                                                                        "angle" => Any,
+                                                                        "qubit_location" => l,
+                                                                        "matrix" => M_elementary_dict[j][k]["2qubit_rep"][l])
+
+                            if startswith(elementary_gates[i], "R")
+                                M_complex_dict["$counter"]["angle"] = M_elementary_dict[j][k]["angle"]
+
+                            elseif startswith(elementary_gates[i], "U")
+                                M_complex_dict["$counter"]["angle"] = Dict{String, Any}("θ" => U_complex_dict[j][k]["θ"],
+                                                                                        "ϕ" => U_complex_dict[j][k]["ϕ"],
+                                                                                        "λ" => U_complex_dict[j][k]["λ"],)
+                            end
+
+                            counter += 1
+
+                        end
+                    end
+                end
+            end
+            
+        else 
+
+            M_complex_dict["$counter"] = Dict{String, Any}("type" => elementary_gates[i],
+                                                           "matrix" => get_full_sized_gate(elementary_gates[i], n_qubits))
+            counter += 1
+
+        end
+
+    end
+
+    return M_complex_dict
+    
 end
 
 function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
@@ -286,6 +291,9 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
 
         elseif input == "qft2"
             return gates["qft2"]
+        
+        elseif input == "W_hermitian"
+            return gates["W_hermitian"]
 
         # Gates added for testing purposes --------------
         elseif input == "test_R_x_1"
@@ -392,6 +400,10 @@ function get_number_of_R_gates(params::Dict{String, Any}, elementary_gates::Arra
     
     # A factor of two to account for R gates on both qubits
     if ("R_x" in elementary_gates)
+        if !("R_x_discretization" in keys(params))
+            Memento.error(_LOGGER, "Discretization angles for the R_x gate are unspecified")
+        end
+
         num_R_x = 2*length(params["R_x_discretization"])
         if num_R_x == 0
             Memento.error(_LOGGER, "Dicsretization not specified for R_x gate")
@@ -399,6 +411,10 @@ function get_number_of_R_gates(params::Dict{String, Any}, elementary_gates::Arra
     end
     
     if ("R_y" in elementary_gates)
+        if !("R_y_discretization" in keys(params))
+            Memento.error(_LOGGER, "Discretization angles for the R_y gate are unspecified")
+        end
+
         num_R_y = 2*length(params["R_y_discretization"])
         if num_R_y == 0 
             Memento.error(_LOGGER, "Dicsretization not specified for R_y gate")
@@ -406,6 +422,10 @@ function get_number_of_R_gates(params::Dict{String, Any}, elementary_gates::Arra
     end
 
     if ("R_z" in elementary_gates)
+        if !("R_z_discretization" in keys(params))
+            Memento.error(_LOGGER, "Discretization angles for the R_z gate are unspecified")
+        end
+
         num_R_z = 2*length(params["R_z_discretization"])
         if num_R_z == 0
             Memento.error(_LOGGER, "Dicsretization not specified for R_z gate")
@@ -420,6 +440,11 @@ function get_number_of_U3_gates(params::Dict{String, Any}, elementary_gates::Arr
     num_U3 = 0
 
         if ("U3" in elementary_gates)    
+            
+            if !("U_θ_discretization" in keys(params)) || !("U_ϕ_discretization" in keys(params)) || !("U_λ_discretization" in keys(params))
+                Memento.error(_LOGGER, "Discretization angles for the U3 gate are unspecified")
+            end
+
             if (isempty(params["U_θ_discretization"])) || (isempty(params["U_ϕ_discretization"])) || (isempty(params["U_λ_discretization"]))
                 
                 Memento.error(_LOGGER, "Input atleast one discretization angle for every angle (θ,ϕ,λ)")
@@ -463,7 +488,7 @@ function get_data(params::Dict{String, Any})
     # Add code here to support non-identity as an initial condition gate. 
     
     data = Dict{String, Any}("n_qubits" => params["n_qubits"],
-                             "depth" => params["D"],
+                             "depth" => params["depth"],
                              "M_complex_dict" => M_complex_dict,
                              "M_real" => M_real,
                              "M_initial" => M_initial,
@@ -514,27 +539,45 @@ returns all the elementary gates in the basic `2⨉2` form, without applying
 kronecker tensor product operations. 
 """ 
 function get_elementary_gates(n_qubits::Int64)
-    # 1 and 2-qubit gates 
+    
+    # 1-qubit gates 
     I_2 = Array{Complex{Float64},2}([1 0; 0 1])
+
     pauli_X = Array{Complex{Float64},2}([0 1; 1 0])
+
     pauli_Y = Array{Complex{Float64},2}([0 -im; im 0])  
     
     hadamard_H = Array{Complex{Float64},2}(1/sqrt(2)*[1 1; 1 -1])
+
     ph_shift_Z = Array{Complex{Float64},2}([1 0; 0 -1]) # Also called pauli-Z gate (π/8 gate)
+
     ph_shift_S = Array{Complex{Float64},2}([1 0; 0 im])
+
     ph_shift_T = Array{Complex{Float64},2}([1 0; 0 (1/sqrt(2)) + (1/sqrt(2))im])
+
     ph_shift_T_conj = Array{Complex{Float64},2}([1 0; 0 (1/sqrt(2)) - (1/sqrt(2))im])
  
+    # 2-qubit gates 
     cnot_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]) 
+
     cnot_21 = Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]) 
+
     controlled_Z = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1])
+
     # controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 0 1/sqrt(2); 0 0 1 0; 0 1/sqrt(2) 0 -1/sqrt(2)])
     controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1/sqrt(2) 1/sqrt(2); 0  0 1/sqrt(2) -1/sqrt(2)])
+
     controlled_V = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5+(0.5)im 0.5-(0.5)im; 0 0 0.5-(0.5)im 0.5+(0.5)im])  #Also called sqrt(CNOT) gate
+
     swap = Array{Complex{Float64},2}([1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1])
+
     magic_M = Array{Complex{Float64},2}(1/sqrt(2)*[1 im 0 0; 0 0 im 1; 0 0 im -1; 1 -im 0 0])
+
     qft2 = Array{Complex{Float64},2}(0.5*[1 1 1 1; 1 im -1 -im; 1 -1 1 -1; 1 -im -1 im])
+
     controlled_R2 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 im]) # Useful for qft2's decomposition
+
+    W_hermitian = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1]) # Useful to diagonlize the swap gate
 
     test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im   0.0-0.382683im
                                             0.0-0.382683im  0.92388+0.0im])
@@ -566,6 +609,7 @@ function get_elementary_gates(n_qubits::Int64)
                                          "swap" => swap,
                                          "magic_M" => magic_M,
                                          "qft2" => qft2,
+                                         "W_hermitian" => W_hermitian,
                                          "test_R_x" => test_R_x,
                                          "test_R_y" => test_R_y,
                                          "test_R_z" => test_R_z,
@@ -607,7 +651,9 @@ function get_elementary_gates(n_qubits::Int64)
         elementary_gates["toffoli"] = toffoli
         elementary_gates["cnot_13"] = cnot_13
         elementary_gates["cnot_31"] = cnot_31
+        
     end
+
     return elementary_gates
 end
 
