@@ -74,7 +74,7 @@ gate_params = [test_hadamard(),
 #      Optimization model      #
 #------------------------------#
 function run_QuantumCircuitOpt(params)
-
+    
     qcm_optimizer = get_solver(params)
     data = QuantumCircuitOpt.get_data(params)
 

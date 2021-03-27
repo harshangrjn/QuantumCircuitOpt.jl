@@ -15,8 +15,8 @@ params = Dict{String, Any}(
 # "elementary_gates" => ["R_x", "Identity"], 
 # "target_gate" => "test_R_x_1",
 
-# "elementary_gates" => ["U3", "Identity"],
-# "target_gate" => "test_U3_1",
+"elementary_gates" => ["U3", "Identity"],
+"target_gate" => "test_U3_1",
 
 "R_x_discretization" => [π/4], 
 "R_y_discretization" => [-π/4, π/4, π/2, -π/2, -π], 
