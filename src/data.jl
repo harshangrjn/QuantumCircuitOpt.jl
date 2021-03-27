@@ -352,7 +352,7 @@ function get_full_sized_gate(input::String, n_qubits::Int64; M = nothing, qubit_
     end
 end
 
-function get_total_number_of_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+function get_number_of_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
     # Update this if the naming convention for gates changes
     R_gates = findall(x -> startswith(x, "R"), (elementary_gates))
@@ -470,7 +470,7 @@ function get_data(params::Dict{String, Any})
         Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
     end
     
-    n_gates = get_total_number_of_input_gates(params, elementary_gates)
+    n_gates = get_number_of_input_gates(params, elementary_gates)
 
     M_complex_dict, M_complex, T_complex = get_quantum_gates(params, n_gates, elementary_gates)
    
@@ -492,7 +492,7 @@ function get_data(params::Dict{String, Any})
                              "M_complex_dict" => M_complex_dict,
                              "M_real" => M_real,
                              "M_initial" => M_initial,
-                             "Target_real" => get_complex_to_real_matrix(T_complex),
+                             "target_real" => get_complex_to_real_matrix(T_complex),
                              "elementary_gates" => elementary_gates,
                              "target_gate" => params["target_gate"],
                              "objective" => params["objective"],

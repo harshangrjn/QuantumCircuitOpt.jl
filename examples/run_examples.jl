@@ -70,6 +70,7 @@ gate_params = [test_hadamard(),
                test_W(),
                test_W_using_HCnot()]
 
+gate_params = [test_cnot_21()]
 #------------------------------#
 #      Optimization model      #
 #------------------------------#
@@ -82,9 +83,11 @@ function run_QuantumCircuitOpt(params)
     result_qc = QuantumCircuitOpt.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
     QuantumCircuitOpt.visualize_QCModel_solution(result_qc, data)
 
+    return result_qc
 end
 
+result_qcm = Dict{}
 for params in gate_params 
-    run_QuantumCircuitOpt(params)
+    global result_qcm = run_QuantumCircuitOpt(params)
 end
 

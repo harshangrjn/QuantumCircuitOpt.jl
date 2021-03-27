@@ -3,10 +3,10 @@
 M_c = [complex(1,0)       complex(0,-1)
        complex(-0.5,0.5)  complex(0,0)]
 
-M_r = [1.0   0.0   0.0  1.0
-       0.0   1.0  -1.0  0.0
-      -0.5  -0.5   0.0  0.0
-       0.5  -0.5   0.0  0.0]
+M_r = [1.0   0.0   0.0  -1.0
+       0.0   1.0   1.0  0.0
+      -0.5  0.5    0.0  0.0
+      -0.5  -0.5   0.0  0.0]
 
 # Variable bounds to test get_auxiliary_variable_bounds function
 l = [-2, -1, 0, 2]

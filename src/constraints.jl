@@ -55,11 +55,11 @@ function constraint_gate_target_condition(qcm::QuantumCircuitModel)
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
     if decomposition_type == "exact"
     
-        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["Target_real"])  
+        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["target_real"])  
     
     elseif decomposition_type == "approximate"
 
-        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["Target_real"][:,:] + qcm.variables[:slack_var][:,:])  
+        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["target_real"][:,:] + qcm.variables[:slack_var][:,:])  
         
     end
 
@@ -144,11 +144,11 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
     if decomposition_type == "exact"
         
-        JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["Target_real"][:,:])  
+        JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["target_real"][:,:])  
     
     elseif decomposition_type == "approximate"
 
-        JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["Target_real"][:,:] + qcm.variables[:slack_var][:,:])    
+        JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["M_real"][:,:,n] for n=1:n_gates) .== qcm.data["target_real"][:,:] + qcm.variables[:slack_var][:,:])    
     
     end
     

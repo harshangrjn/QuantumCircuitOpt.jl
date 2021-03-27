@@ -184,10 +184,10 @@ function validate_solutions(data::Dict{String, Any}, id_sequence::Array{Int64,1}
     end
 
     # @show M_sol 
-    # @show QCO.get_real_to_complex_matrix(data["Target_real"])
+    # @show QCO.get_real_to_complex_matrix(data["target_real"])
 
     # This tolerance is very important for the final feasiblity check
-    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.get_real_to_complex_matrix(data["Target_real"]), atol = 1E-4))
+    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.get_real_to_complex_matrix(data["target_real"]), atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     
