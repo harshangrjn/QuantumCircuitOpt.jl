@@ -70,7 +70,8 @@ gate_params = [test_hadamard(),
                test_W(),
                test_W_using_HCnot()]
 
-gate_params = [test_cnot_21()]
+# gate_params = [test_cnot_21()]
+
 #------------------------------#
 #      Optimization model      #
 #------------------------------#

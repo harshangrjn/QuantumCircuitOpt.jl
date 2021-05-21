@@ -3,6 +3,7 @@
 #--------------------------------------------------------#
 
 function constraint_single_gate_per_depth(qcm::QuantumCircuitModel)
+
     n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]
     
@@ -12,6 +13,7 @@ function constraint_single_gate_per_depth(qcm::QuantumCircuitModel)
 end
 
 function constraint_disjunction_of_gates_per_depth(qcm::QuantumCircuitModel)
+
     n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]
 
@@ -22,6 +24,7 @@ function constraint_disjunction_of_gates_per_depth(qcm::QuantumCircuitModel)
 end
 
 function constraint_gate_initial_condition(qcm::QuantumCircuitModel)
+
     n_gates = size(qcm.data["M_real"])[3]
 
     JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,1] for n=1:n_gates) .== qcm.data["M_initial"])
@@ -31,6 +34,7 @@ function constraint_gate_initial_condition(qcm::QuantumCircuitModel)
 end
 
 function constraint_gate_intermediate_products(qcm::QuantumCircuitModel)
+
     n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]
 
@@ -67,6 +71,7 @@ function constraint_gate_target_condition(qcm::QuantumCircuitModel)
 end
 
 function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
+
     depth  = qcm.data["depth"]
     n_r    = size(qcm.data["M_real"])[1]
     n_c    = size(qcm.data["M_real"])[2]
@@ -88,6 +93,7 @@ function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
 end
 
 function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
+
     depth   = qcm.data["depth"]
     n_r     = size(qcm.data["M_real"])[1]
     n_c     = size(qcm.data["M_real"])[2]
@@ -97,7 +103,7 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
         for j=1:n_c
             for n=1:n_gates
                 for d=1:(depth-1)
-                    QCO.get_mccormick_relaxation(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff_var][n,(d+1)])
+                    QCO.relaxation_bilinear(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff_var][n,(d+1)])
                     if isodd(j)
                         JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j,n,d]   ==  qcm.variables[:zU_var][i+1,j+1,n,d])
                         JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d] == -qcm.variables[:zU_var][i+1,j,n,d])
@@ -111,8 +117,8 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
 end
 
 function constraint_gate_initial_condition_compact(qcm::QuantumCircuitModel)
+
     n_gates = size(qcm.data["M_real"])[3]
-    depth   = qcm.data["depth"]
     
     JuMP.@constraint(qcm.model, qcm.variables[:U_var][:,:,1] .== 
                                             qcm.data["M_initial"] * sum(qcm.variables[:z_onoff_var][n,1] * qcm.data["M_real"][:,:,n] for n=1:n_gates))
@@ -121,6 +127,7 @@ function constraint_gate_initial_condition_compact(qcm::QuantumCircuitModel)
 end
 
 function constraint_gate_intermediate_products_compact(qcm::QuantumCircuitModel)
+
     n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]
     
@@ -133,8 +140,7 @@ function constraint_gate_intermediate_products_compact(qcm::QuantumCircuitModel)
 end
 
 function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
-    n_r     = size(qcm.data["M_real"])[1]
-    n_c     = size(qcm.data["M_real"])[2]
+
     depth   = qcm.data["depth"]
     n_gates = size(qcm.data["M_real"])[3]
     decomposition_type = qcm.data["decomposition_type"]
@@ -156,6 +162,7 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
 end
 
 function constraint_complex_to_real_symmetry_compact(qcm::QuantumCircuitModel)
+
     depth  = qcm.data["depth"]
     n_r    = size(qcm.data["M_real"])[1]
     n_c    = size(qcm.data["M_real"])[2]

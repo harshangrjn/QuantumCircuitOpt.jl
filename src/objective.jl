@@ -6,7 +6,6 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
     
     n_r     = size(qcm.data["M_real"])[1]
     n_c     = size(qcm.data["M_real"])[2]
-    n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"]
 
     decomposition_type = qcm.data["decomposition_type"]
@@ -65,7 +64,6 @@ function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
     
     n_r     = size(qcm.data["M_real"])[1]
     n_c     = size(qcm.data["M_real"])[2]
-    n_gates = size(qcm.data["M_real"])[3]
     depth   = qcm.data["depth"] 
 
     decomposition_type = qcm.data["decomposition_type"]

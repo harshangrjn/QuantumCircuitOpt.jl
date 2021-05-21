@@ -26,6 +26,8 @@ function get_auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1})
 end
  
 """
+    get_gate_element_bounds(M::Array{Float64,3})
+
 Given a set of elementary gates, {G_1, G_2, ... G_n}, `get_gate_element_bounds` function evaluates 
 the range of every co-ordinate of the superimposed gates, over all possible gates.  
 """

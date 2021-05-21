@@ -1,4 +1,6 @@
 """
+    get_quantum_gates(params::Dict{String, Any}, n_gates::Int64, elementary_gates::Array{String,1})
+
 Given a vector of input with the names of gates (see examples folder), `get_quantum_gates` function 
 returns the corresponding elementary gates in the three-dimensional complex matrix form. 
 """ 
@@ -534,6 +536,8 @@ function get_data(params::Dict{String, Any})
 end
 
 """
+    get_elementary_gates(n_qubits::Int64)
+
 Given the number of qubits (`n_qubits`), `get_elementary_gates` function 
 returns all the elementary gates in the basic `2⨉2` form, without applying 
 kronecker tensor product operations. 
@@ -618,9 +622,9 @@ function get_elementary_gates(n_qubits::Int64)
     
     # 3-qubit gates 
     if n_qubits == 3
-        I_3 = sparse(Array{Complex{Float64},2}(Matrix(LA.I, 2^3, 2^3)))
+        I_3 = SA.sparse(Array{Complex{Float64},2}(Matrix(LA.I, 2^3, 2^3)))
 
-        toffoli = sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+        toffoli = SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
                                                     0  1  0  0  0  0  0  0
                                                     0  0  1  0  0  0  0  0
                                                     0  0  0  1  0  0  0  0
@@ -629,7 +633,7 @@ function get_elementary_gates(n_qubits::Int64)
                                                     0  0  0  0  0  0  0  1
                                                     0  0  0  0  0  0  1  0]))
         
-        cnot_13 = sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
+        cnot_13 = SA.sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
                                                     0	1	0	0	0	0	0	0
                                                     0	0	1	0	0	0	0	0
                                                     0	0	0	1	0	0	0	0
@@ -638,7 +642,7 @@ function get_elementary_gates(n_qubits::Int64)
                                                     0	0	0	0	0	0	0	1
                                                     0	0	0	0	0	0	1	0]))
         
-        cnot_31 = sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
+        cnot_31 = SA.sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
                                                     0	0	0	0	0	1	0	0
                                                     0	0	1	0	0	0	0	0
                                                     0	0	0	0	0	0	0	1
@@ -658,7 +662,7 @@ function get_elementary_gates(n_qubits::Int64)
 end
 
 """
-    get_pauli_rotation_gates
+    get_pauli_rotation_gates(θ::Number)
 
 For a given angle in radiaons, this function returns standard rotation gates those define rotations around the Pauli axis {X,Y,Z}.
 Note that R_x(θ) = u3(θ, -π/2, π/2), R_y(θ) = u3(θ, 0, 0), R_z(λ) = exp((-λ/2)im)*u1(λ). 
@@ -709,7 +713,7 @@ function get_u2_gate(ϕ::Number, λ::Number)
 end
 
 """
-    get_u3_gate
+    get_u3_gate(θ::Number, ϕ::Number, λ::Number)
 
 Given three angles (θ,ϕ,λ),  this function returns the most general form of a single qubit unitar gate.
 """

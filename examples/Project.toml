@@ -1,0 +1,10 @@
+[deps]
+CPLEX = "a076750e-1247-5638-91d2-ce28b192dca0"
+Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+QuantumCircuitOpt = "88128e30-b60a-4e54-ab02-1050a5f92a36"
+
+[compat]
+JuMP = "^0.21.0"
+julia = "1"

@@ -1,4 +1,6 @@
 """
+    variable_domain(var::JuMP.VariableRef)
+
 Computes the valid domain of a given JuMP variable taking into account bounds
 and the varaible's implicit bounds (e.g. binary).
 """
@@ -17,6 +19,8 @@ function variable_domain(var::JuMP.VariableRef)
 end
 
 """
+    relaxation_bilinear(m::JuMP.Model, xy::JuMP.VariableRef, x::JuMP.VariableRef, y::JuMP.VariableRef)
+
 general relaxation of binlinear term (McCormick), which can be used to obtain specific variants in partiuclar cases of variables (like binary)
 ```
 z >= JuMP.lower_bound(x)*y + JuMP.lower_bound(y)*x - JuMP.lower_bound(x)*JuMP.lower_bound(y)
@@ -25,18 +29,18 @@ z <= JuMP.lower_bound(x)*y + JuMP.upper_bound(y)*x - JuMP.lower_bound(x)*JuMP.up
 z <= JuMP.upper_bound(x)*y + JuMP.lower_bound(y)*x - JuMP.upper_bound(x)*JuMP.lower_bound(y)
 ```
 """
-function get_mccormick_relaxation(m::JuMP.Model, xy::JuMP.VariableRef, x::JuMP.VariableRef, y::JuMP.VariableRef)
+function relaxation_bilinear(m::JuMP.Model, xy::JuMP.VariableRef, x::JuMP.VariableRef, y::JuMP.VariableRef)
     lb_x, ub_x = variable_domain(x)
     lb_y, ub_y = variable_domain(y)
     
-    if (lb_x == 0) && (ub_x == 1)
+    if (lb_x == 0) && (ub_x == 1) && ((lb_y != 0) || (ub_y != 1))
       
       JuMP.@constraint(m, xy >= lb_y*x)
       JuMP.@constraint(m, xy >= y + ub_y*x - ub_y)
       JuMP.@constraint(m, xy <= ub_y*x)
       JuMP.@constraint(m, xy <= y + lb_y*x - lb_y)
 
-    elseif (lb_y == 0) && (ub_y == 1)
+    elseif (lb_y == 0) && (ub_y == 1) && ((lb_x != 0) || (ub_x != 1))
       
       JuMP.@constraint(m, xy >= lb_x*y)
       JuMP.@constraint(m, xy >= ub_x*y + x - ub_x)

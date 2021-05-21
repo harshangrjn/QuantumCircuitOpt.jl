@@ -92,7 +92,7 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
             if "Identity" in data["elementary_gates"]
                 printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
             else 
-                printstyled("  ","Compressed depth for the feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
+                printstyled("  ","Compressed depth for a feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
             end
 
         elseif data["objective"] == "minimize_cnot"
