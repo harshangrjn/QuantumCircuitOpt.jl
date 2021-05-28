@@ -1,4 +1,4 @@
-function get_auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1}) 
+function auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1}) 
 
     v_l = [JuMP.lower_bound(v[1]), JuMP.upper_bound(v[1])]
     v_u = [JuMP.lower_bound(v[2]), JuMP.upper_bound(v[2])]
@@ -32,7 +32,6 @@ Given a set of elementary gates, {G_1, G_2, ... G_n}, `get_gate_element_bounds` 
 the range of every co-ordinate of the superimposed gates, over all possible gates.  
 """
 function get_gate_element_bounds(M::Array{Float64,3}) 
-    tol_0 = 1E-6
 
     M_l = zeros(size(M)[1], size(M)[2])
     M_u = zeros(size(M)[1], size(M)[2])
@@ -53,10 +52,6 @@ end
 
 function get_commutative_gates(M::Array{Float64,3})
 
-    tol_0 = 1E-6
-    
-    n_r   = size(M)[1]
-    n_c   = size(M)[2]
     depth = size(M)[3]
 
     M_commute_2 = Array{Tuple{Int64,Int64},1}()
@@ -159,7 +154,7 @@ function get_real_to_complex_matrix(M::Array{Float64,2})
     return M_complex
 end
 
-function verify_tolerances_complex_values(M::Array{Complex{Float64},2})
+function round_complex_values(M::Array{Complex{Float64},2})
     # round values close to 0 and 1 (within toleranes) for both real and imaginary values
     # Input can be a vector (>= 1 element) or a matrix of complex values
    

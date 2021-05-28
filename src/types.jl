@@ -1,6 +1,7 @@
 export QuantumCircuitModel
 
 """
+    QuantumCircuitModel
 The composite mutable struct, `QuantumCircuitModel`, holds dictionaries for input data, abstract JuMP model for optimization,
 variable references and result from solving the JuMP model.
 """
@@ -10,19 +11,45 @@ mutable struct QuantumCircuitModel
     variables::Dict{Symbol,Any}
     #constraints::Dict{Symbol,Any}
     result::Dict{String,Any}
+
+    "Contructor for struct `QuantumCircuitModel`"
+    function QuantumCircuitModel(data::Dict{String,Any})
+        
+        data = data
+        model = JuMP.Model() 
+        variables = Dict{Symbol,Any}()
+        result = Dict{String,Any}()
+        qcm = new(data, model, variables, result)
+
+        return qcm
+    end
+
 end
 
-"Contructor for struct `QuantumCircuitModel`"
-function QuantumCircuitModel(data)
-    qcm = new(data)
-    qcm.data = data
-    qcm.model = JuMP.Model() 
-    qcm.variables = Dict{Symbol,Any}()
-    qcm.result = Dict{String,Any}()
-    return qcm
+"""
+    GateData
+"""
+mutable struct GateData 
+    type::String
+    complex::Array{Complex{Float64},2}
+    real::Array{Float64,2}
+    inverse::Array{Float64,2}
+    isallreal::Bool
+
+    "Contructor for struct `Gate`"
+    function Gate(gate_type::String, n_qubits::Int64)
+        type = gate_type
+
+        complex  = getfield(Main, Symbol(gate_type))(n_qubits) # String to function name 
+        real = QCO.get_complex_to_real_matrix(complex)
+        inverse = inv(real)
+        isallreal = false
+        gate = new(type, complex, real, inverse, isallreal)
+
+        return gate
+    end
+
 end
-
-
 
 # mutable struct OptimizerOptions
 #     log_level :: Int

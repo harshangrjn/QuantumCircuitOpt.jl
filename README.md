@@ -21,3 +21,10 @@ This work was supported by Los Alamos National Laboratory's LDRD Early Career Re
 
 ## Citation
 If you find QuantumCircuitOpt.jl useful in your work, we request you to cite the following paper: 
+```bibtex
+@inproceedings{NagarajanHijaziCoffrin2021,
+  title={Optimal Quantum Circuit Decompositions using Discrete Optimization Approach},
+  author={Nagarajan, Harsha and Hijazi, Hassan and Coffrin, Carleton},
+  booktitle={arXiv},
+  year={2021}
+}

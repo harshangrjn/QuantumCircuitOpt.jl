@@ -30,6 +30,7 @@ function logger_config!(level)
 end
 
 include("data.jl")
+include("gates.jl")
 include("types.jl")
 include("utility.jl")
 include("relaxations.jl")

@@ -676,9 +676,9 @@ function get_pauli_rotation_gates(θ::Number)
     R_x = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
     R_y = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
     R_z = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
-    pauli_rotation_gates = Dict{String, Any}("R_x" => verify_tolerances_complex_values(R_x), 
-                                             "R_y" => verify_tolerances_complex_values(R_y), 
-                                             "R_z" => verify_tolerances_complex_values(R_z)
+    pauli_rotation_gates = Dict{String, Any}("R_x" => round_complex_values(R_x), 
+                                             "R_y" => round_complex_values(R_y), 
+                                             "R_z" => round_complex_values(R_z)
                                             )
 
     return pauli_rotation_gates
@@ -715,7 +715,7 @@ end
 """
     get_u3_gate(θ::Number, ϕ::Number, λ::Number)
 
-Given three angles (θ,ϕ,λ),  this function returns the most general form of a single qubit unitar gate.
+Given three angles (θ,ϕ,λ),  this function returns the most general form of a single qubit unitary gate.
 """
 function get_u3_gate(θ::Number, ϕ::Number, λ::Number)
     #input angles in radians
@@ -733,5 +733,5 @@ function get_u3_gate(θ::Number, ϕ::Number, λ::Number)
     u3 = Array{Complex{Float64},2}([           cos(θ/2)               -(cos(λ) + (sin(λ))im)*sin(θ/2) 
                                     (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)])
 
-    return verify_tolerances_complex_values(u3)
+    return round_complex_values(u3)
 end

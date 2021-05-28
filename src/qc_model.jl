@@ -2,7 +2,7 @@ function build_QCModel(data::Dict{String, Any};
                        model_type = "compact_formulation", 
                        commute_matrix_cuts = false)
     
-    m_qc = QuantumCircuitModel(data, JuMP.Model(), Dict{Symbol,Any}(), Dict{String,Any}())
+    m_qc = QuantumCircuitModel(data)
 
     # convex-hull formulation per depth, but larger number of variables and constraints
     if model_type == "balas_formulation" 
