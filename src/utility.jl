@@ -101,7 +101,7 @@ function get_commutative_gates(M::Array{Float64,3})
     return M_commute_2, M_commute_3
 end
 
-function get_complex_to_real_matrix(M::Array{Complex{Float64},2})
+function complex_to_real_matrix(M::Array{Complex{Float64},2})
 
     n = size(M)[1]
     M_real = zeros(2*n, 2*n)

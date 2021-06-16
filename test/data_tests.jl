@@ -4,7 +4,7 @@
     test_angle = π/3
     pauli_Y = QCO.get_elementary_gates(2)["pauli_Y"]
     H = QCO.get_elementary_gates(2)["hadamard_H"]
-    R_gates = QCO.get_pauli_rotation_gates(test_angle)
+    R_gates = QCO.get_pauli_rotationum_gates(test_angle)
     U3_1 = [(1/sqrt(2))+0.0im     0.0-(1/sqrt(2))im
              0.0+(1/sqrt(2))im   -(1/sqrt(2))+0.0im]
 

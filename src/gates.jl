@@ -3,11 +3,11 @@
 #----------------------------------------#
 
 @doc raw"""
-    IGate(n_qubits::Int64)
+    IGate(num_qubits::Int64)
 
 Identity gate corresponds to the regular identity matrix for a given number of qubits.
 
-**Matrix Representation (n_qubits = 1)**
+**Matrix Representation (num_qubits = 1)**
 
 ```math
 I = \begin{pmatrix}
@@ -16,9 +16,9 @@ I = \begin{pmatrix}
     \end{pmatrix}
 ```
 """
-function IGate(n_qubits::Int64)
+function IGate(num_qubits::Int64)
 
-    return Array{Complex{Float64},2}(Matrix(LA.I, 2^n_qubits, 2^n_qubits))
+    return Array{Complex{Float64},2}(Matrix(LA.I, 2^num_qubits, 2^num_qubits))
 
 end
 
@@ -203,7 +203,7 @@ function RZGate(θ::Number)
 end
 
 @doc raw"""
-    HGate(n_qubits::Int64)
+    HGate(num_qubits::Int64)
 
 Single-qubit Hadamard gate, which is a ``\pi`` rotation about the X+Z axis, thus equivalent to [U3Gate](@ref)(``\frac{\pi}{2},0,\pi``)
 
@@ -500,6 +500,36 @@ function CXGate()
 end
 
 @doc raw"""
+    CYGate()
+
+Two-qubit controlled Y gate. 
+
+**Circuit Representation**
+```
+q_0: ──■──
+     ┌─┴─┐
+q_1: ┤ Y ├
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+CX = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & -i \\
+    0 & 0 & i & 0
+    \end{pmatrix}
+```
+"""
+function CYGate()
+
+    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 -im; 0 0 im 0]) 
+
+end
+
+@doc raw"""
     CZGate()
 
 Two-qubit, symmetric, controlled-Z gate. 
@@ -560,6 +590,177 @@ function CHGate()
 end
 
 @doc raw"""
+    CRXGate(θ::Number)
+
+Two-qubit controlled version of the [RXGate](@ref). 
+
+**Circuit Representation**
+```
+q_0: ────■────
+     ┌───┴───┐
+q_1: ┤ RX(ϴ) ├
+     └───────┘
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CRX(\theta)\ q_1, q_0 =
+|0\rangle\langle0| \otimes I + |1\rangle\langle1| \otimes RX(\theta) =
+    \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & \cos{\th}   & -i\sin{\th} \\
+        0 & 0 & -i\sin{\th} & \cos{\th}
+    \end{pmatrix}
+```
+"""
+function CRXGate(θ::Number)
+
+    CRX = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 1 0 0       
+                                      0 0  cos(θ/2)  -(sin(θ/2))im 
+                                      0 0  -(sin(θ/2))im  cos(θ/2)])
+
+    return round_complex_values(CRX)
+end
+
+@doc raw"""
+    CRYGate(θ::Number)
+
+Two-qubit controlled version of the [RYGate](@ref). 
+
+**Circuit Representation**
+```
+q_0: ────■────
+     ┌───┴───┐
+q_1: ┤ RY(ϴ) ├
+     └───────┘
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CRY(\theta)\ q_1, q_0 =
+|0\rangle\langle0| \otimes I + |1\rangle\langle1| \otimes RY(\theta) =
+    \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & \cos{\th}   & -\sin{\th} \\
+        0 & 0 & \sin{\th} & \cos{\th}
+    \end{pmatrix}
+```
+"""
+function CRYGate(θ::Number)
+    
+    if !(-2*π <= θ <= 2*π)
+        Memento.error(_LOGGER, "θ angle in CRYGate is not within valid bounds")
+    end
+
+    CRY = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 1 0 0       
+                                      0 0  cos(θ/2)  -(sin(θ/2)) 
+                                      0 0  (sin(θ/2))  cos(θ/2)])
+
+    return round_complex_values(CRY)
+end
+
+@doc raw"""
+    CRZGate(θ::Number)
+
+Two-qubit controlled version of the [RZGate](@ref). 
+
+**Circuit Representation**
+```
+q_0: ────■────
+     ┌───┴───┐
+q_1: ┤ RZ(ϴ) ├
+     └───────┘
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CRZ(\theta)\ q_1, q_0 =
+|0\rangle\langle0| \otimes I + |1\rangle\langle1| \otimes RZ(\theta) =
+    \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & e^{-i\th}  &  0 \\
+        0 & 0 & 0 & e^{i\th}
+    \end{pmatrix}
+```
+"""
+function CRZGate(θ::Number)
+    
+    if !(-2*π <= θ <= 2*π)
+        Memento.error(_LOGGER, "θ angle in CRZGate is not within valid bounds")
+    end
+
+    CRZ = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 1 0 0       
+                                      0 0  (cos(θ/2) - (sin(θ/2))im)  0 
+                                      0 0  0  (cos(θ/2) + (sin(θ/2))im)])
+
+    return round_complex_values(CRZ)
+end
+
+@doc raw"""
+    CU3Gate(θ::Number, ϕ::Number, λ::Number)
+
+Two-qubit controlled version of the universal rotation gate with three Euler angles ([U3Gate](@ref)). 
+
+**Circuit Representation**
+```
+q_0: ──────■──────
+     ┌─────┴─────┐
+q_1: ┤ U3(ϴ,φ,λ) ├
+     └───────────┘
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CU3(\theta, \phi, \lambda)\ q_1, q_0 =
+                |0\rangle\langle 0| \otimes I +
+                |1\rangle\langle 1| \otimes U3(\theta,\phi,\lambda) =
+                \begin{pmatrix}
+                    1 & 0   & 0                  & 0 \\
+                    0 & 1   & 0                  & 0 \\
+                    0 & 0   & \cos(\th)          & -e^{i\lambda}\sin(\th) \\
+                    0 & 0   & e^{i\phi}\sin(\th) & e^{i(\phi+\lambda)}\cos(\th)
+                \end{pmatrix}
+```
+"""
+function CU3Gate(θ::Number, ϕ::Number, λ::Number)
+
+    if !(-π <= θ <= π)
+        Memento.error(_LOGGER, "θ angle in CU3Gate is not within valid bounds")
+    end
+    if !(-2*π <= ϕ <= 2*π)
+        Memento.error(_LOGGER, "ϕ angle in CU3Gate is not within valid bounds")
+    end
+    if !(-2*π <= λ <= 2*π)
+        Memento.error(_LOGGER, "λ angle in CU3Gate is not within valid bounds")
+    end
+
+    CU3 = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 1 0 0       
+                                      0 0  cos(θ/2)  -(cos(λ)+(sin(λ))im)*sin(θ/2) 
+                                      0 0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
+
+    return round_complex_values(CU3)
+end
+
+@doc raw"""
     SwapGate()
 
 Two-qubit, symmetric, SWAP gate. 
@@ -589,11 +790,40 @@ function SwapGate()
 end
 
 @doc raw"""
+    iSwapGate()
+
+Two-qubit, symmetric and clifford, iSWAP gate.
+
+**Circuit Representation**
+```
+q_0: ─⨂─
+      │     
+q_1: ─⨂─
+```
+
+**Matrix Representation**
+
+```math
+iSWAP = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & i & 0 \\
+0 & i & 0 & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+```
+"""
+function iSwapGate()
+
+    return Array{Complex{Float64},2}([1 0 0 0; 0 0 im 0; 0 im 0 0; 0 0 0 1])
+
+end
+
+@doc raw"""
     MGate()
 
 Two-qubit Magic gate, also known as the Ising coupling or the XX gate.
 
-Reference: [https://arxiv.org/pdf/quant-ph/0308006.pdf](https://arxiv.org/pdf/quant-ph/0308006.pdf)
+Reference: [https://doi.org/10.1103/PhysRevA.69.032315](https://doi.org/10.1103/PhysRevA.69.032315)
 
 **Circuit Representation**
 ```
@@ -619,6 +849,40 @@ M = \frac{1}{\sqrt{2}} \begin{pmatrix}
 function MGate()
 
     return Array{Complex{Float64},2}(1/sqrt(2)*[1 im 0 0; 0 0 im 1; 0 0 im -1; 1 -im 0 0])
+
+end
+
+@doc raw"""
+    QFT2Gate()
+
+Two-qubit Quantum Fourier Transform (QFT) gate, where the QFT operation on n-qubits is given by: 
+```math
+|j\rangle \mapsto \frac{1}{2^{n/2}} \sum_{k=0}^{2^n - 1} e^{2\pi ijk / 2^n} |k\rangle
+```
+
+**Circuit Representation**
+```
+     ┌──────┐
+q_0: ┤      ├
+     │ QFT2 │   
+q_1: ┤      ├ 
+     └──────┘ 
+```
+
+**Matrix Representation**
+
+```math
+M = \frac{1}{2} \begin{pmatrix}
+1 & 1 & 1 & 1 \\
+1 & i & -1 & -i \\
+1 & -1 & 1 & -1 \\
+1 & -i & -1 & i
+\end{pmatrix}
+```
+"""
+function QFT2Gate()
+
+    return Array{Complex{Float64},2}(0.5*[1 1 1 1; 1 im -1 -im; 1 -1 1 -1; 1 -im -1 im])
 
 end
 

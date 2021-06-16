@@ -9,7 +9,6 @@ mutable struct QuantumCircuitModel
     data::Dict{String,Any}
     model::JuMP.Model
     variables::Dict{Symbol,Any}
-    #constraints::Dict{Symbol,Any}
     result::Dict{String,Any}
 
     "Contructor for struct `QuantumCircuitModel`"
@@ -28,6 +27,9 @@ end
 
 """
     GateData
+The composite mutable struct, `GateData`, type of the gate, the complex matrix form 
+    of the gate, full sized real form of the gate, inverse of the gate and a boolean which
+    states if the gate has all real entries.
 """
 mutable struct GateData 
     type::String
@@ -37,11 +39,11 @@ mutable struct GateData
     isallreal::Bool
 
     "Contructor for struct `Gate`"
-    function Gate(gate_type::String, n_qubits::Int64)
+    function Gate(gate_type::String, num_qubits::Int64)
         type = gate_type
 
-        complex  = getfield(Main, Symbol(gate_type))(n_qubits) # String to function name 
-        real = QCO.get_complex_to_real_matrix(complex)
+        complex  = getfield(Main, Symbol(gate_type))(num_qubits) # String to function name 
+        real = QCO.complex_to_real_matrix(complex)
         inverse = inv(real)
         isallreal = false
         gate = new(type, complex, real, inverse, isallreal)

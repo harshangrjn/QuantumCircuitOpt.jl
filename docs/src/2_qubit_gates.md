@@ -20,6 +20,10 @@ DCNotGate
 ```@docs
 CXGate
 ```
+## CYGate
+```@docs
+CYGate
+```
 ## CZGate
 ```@docs
 CZGate
@@ -28,11 +32,35 @@ CZGate
 ```@docs
 CHGate
 ```
+## CRXGate
+```@docs
+CRXGate
+```
+## CRYGate
+```@docs
+CRYGate
+```
+## CRZGate
+```@docs
+CRZGate
+```
+## CU3Gate
+```@docs
+CU3Gate
+```
 ## SwapGate
 ```@docs
 SwapGate
 ```
+## iSwapGate
+```@docs
+iSwapGate
+```
 ## MGate
 ```@docs
 MGate
+```
+## QFT2Gate
+```@docs
+QFT2Gate
 ```

@@ -3,7 +3,7 @@
     include("../examples/solver.jl")
 
     params = Dict{String, Any}(
-    "n_qubits" => 2, 
+    "num_qubits" => 2, 
     "depth" => 5,    
 
     "elementary_gates" => ["H1", "H2", "Identity", "cnot_12"],  
@@ -14,7 +14,7 @@
     "decomposition_type" => "exact",
     
     "optimizer" => "cbc",
-    "presolve" => true,
+    "optimizer_presolve" => true,
     "optimizer_log" => false, 
     "relax_integrality" => false,                                
     )

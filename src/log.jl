@@ -1,4 +1,4 @@
-function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
+function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
     if results["primal_status"] != MOI.FEASIBLE_POINT
         Memento.error(_LOGGER, "Non-feasible primal status. Gate decomposition may not be exact!")
@@ -20,7 +20,7 @@ function visualize_QCModel_solution(results::Dict{String, Any}, data::Dict{Strin
         
         printstyled("Quantum Circuit Model Data","\n"; color = :red)
         
-        printstyled("\n","  ","Number of qubits: ", data["n_qubits"], "\n"; color = :cyan)
+        printstyled("\n","  ","Number of qubits: ", data["num_qubits"], "\n"; color = :cyan)
         
         if isempty(R_gates_ids) && isempty(U_gates_ids)
             printstyled("  ","Total number of elementary gates: ",size(data["M_real"])[3],"\n"; color = :cyan)
@@ -177,7 +177,7 @@ validate_solutions validates the decomposition if it is indeed exact with respec
 """
 function validate_solutions(data::Dict{String, Any}, id_sequence::Array{Int64,1})
     
-    M_sol = Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["n_qubits"]), 2^(data["n_qubits"])))
+    M_sol = Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["num_qubits"]), 2^(data["num_qubits"])))
     
     for i in id_sequence
         M_sol *= data["M_complex_dict"]["$i"]["matrix"]

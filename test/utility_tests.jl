@@ -13,7 +13,7 @@ l = [-2, -1, 0, 2]
 u = [-1,  2, 3, 2]
 
 @testset "complex to real matrix function tests" begin
-    test_M_r = QCO.get_complex_to_real_matrix(M_c)
+    test_M_r = QCO.complex_to_real_matrix(M_c)
     @test test_M_r == M_r
 end
 

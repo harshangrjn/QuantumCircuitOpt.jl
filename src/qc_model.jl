@@ -38,6 +38,7 @@ function variable_QCModel(qcm::QuantumCircuitModel)
 end
 
 function constraint_QCModel(qcm::QuantumCircuitModel, commute_matrix_cuts::Bool)
+    
     constraint_single_gate_per_depth(qcm)
     constraint_disjunction_of_gates_per_depth(qcm)
     constraint_gate_initial_condition(qcm)
@@ -127,4 +128,19 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
     qcm.result = build_QCModel_result(qcm, solve_time) 
 
     return qcm.result
+end
+
+function run_QCModel(params::Dict{String, Any}, qcm_optimizer::MOI.OptimizerWithAttributes; model_type = "compact_formulation", commute_matrix_cuts = false, visualize_solution=true)
+
+    data = QuantumCircuitOpt.get_data(params)
+
+    model_qc  = QuantumCircuitOpt.build_QCModel(data, model_type = model_type, commute_matrix_cuts = commute_matrix_cuts)
+
+    result_qc = QuantumCircuitOpt.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
+
+    if visualize_solution
+        QuantumCircuitOpt.visualize_solution(result_qc, data)
+    end
+
+    return result_qc
 end
