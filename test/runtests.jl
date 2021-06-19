@@ -6,6 +6,7 @@ using Test
 using Cbc
 
 const QCO = QuantumCircuitOpt
+const LA = LinearAlgebra
 
 # Suppress warnings during testing
 QCO.logger_config!("error")

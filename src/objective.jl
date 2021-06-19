@@ -4,29 +4,23 @@
 
 function objective_minimize_total_depth(qcm::QuantumCircuitModel)
     
-    n_r     = size(qcm.data["M_real"])[1]
-    n_c     = size(qcm.data["M_real"])[2]
-    depth   = qcm.data["depth"]
+    n_r          = size(qcm.data["gates_real"])[1]
+    n_c          = size(qcm.data["gates_real"])[2]
+    depth        = qcm.data["depth"]
+    M            = qcm.data["gates_real"]
+    identity_idx = qcm.data["identity_idx"]
 
     decomposition_type = qcm.data["decomposition_type"]
-    
-    if !isempty(findall(x -> startswith(x, "Identity"), qcm.data["elementary_gates"]))
-        
-        identity_id = Int64[]
 
-        for i in keys(qcm.data["M_complex_dict"])
-            if qcm.data["M_complex_dict"][i]["type"] == "Identity"
-                push!(identity_id , parse(Int64, i))
-            end
-        end
+    if !isempty(identity_idx)
 
         if decomposition_type == "exact"
 
-            JuMP.@objective(qcm.model, Max, sum(qcm.variables[:z_onoff_var][n,d] for n in identity_id, d=1:depth))
+            JuMP.@objective(qcm.model, Max, sum(qcm.variables[:z_onoff_var][n,d] for n in identity_idx, d=1:depth))
 
         elseif decomposition_type == "approximate"
 
-            JuMP.@objective(qcm.model, Max, sum(qcm.variables[:z_onoff_var][n,d] for n in identity_id, d=1:depth) - sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c))
+            JuMP.@objective(qcm.model, Max, sum(qcm.variables[:z_onoff_var][n,d] for n in identity_idx, d=1:depth) - sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c))
 
         end
 
@@ -40,12 +34,12 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
 end
 
 function objective_feasibility(qcm::QuantumCircuitModel)
-    n_r     = size(qcm.data["M_real"])[1]
-    n_c     = size(qcm.data["M_real"])[2]
+    n_r     = size(qcm.data["gates_real"])[1]
+    n_c     = size(qcm.data["gates_real"])[2]
 
     decomposition_type = qcm.data["decomposition_type"]
     
-    Memento.warn(_LOGGER, "Switching to a feasibility problem since Identity gate is not part of the input elementary gates")
+    Memento.warn(_LOGGER, "Switching to a feasibility problem since Identity gate is not identified to be part of input elementary gates")
 
     if decomposition_type == "exact"
 
@@ -62,8 +56,8 @@ end
 
 function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
     
-    n_r     = size(qcm.data["M_real"])[1]
-    n_c     = size(qcm.data["M_real"])[2]
+    n_r     = size(qcm.data["gates_real"])[1]
+    n_c     = size(qcm.data["gates_real"])[2]
     depth   = qcm.data["depth"] 
 
     decomposition_type = qcm.data["decomposition_type"]
@@ -72,11 +66,11 @@ function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
     if !isempty(findall(x -> startswith(x, "cnot"), qcm.data["elementary_gates"]))
         cnot_id = Int64[]
 
-        for i in keys(qcm.data["M_complex_dict"])
-            if qcm.data["M_complex_dict"][i]["type"] == "cnot_12"
+        for i in keys(qcm.data["gates_dict"])
+            if qcm.data["gates_dict"][i]["type"] == "cnot_12"
                 push!(cnot_id, parse(Int64, i))
             end
-            if qcm.data["M_complex_dict"][i]["type"] == "cnot_21"
+            if qcm.data["gates_dict"][i]["type"] == "cnot_21"
                 push!(cnot_id, parse(Int64, i))
             end
         end
@@ -86,7 +80,7 @@ function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n in cnot_id, d=1:depth))
 
         elseif decomposition_type == "approximate"
-            @show cnot_id
+            
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n in cnot_id, d=1:depth) + sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c))
 
         end

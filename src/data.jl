@@ -1,32 +1,175 @@
+import LinearAlgebra: I
+
+function get_data(params::Dict{String, Any})
+    if isempty(params["elementary_gates"])
+        Memento.error(_LOGGER, "Input elementary gates are empty. Enter at least two unique unitary gates")
+    end
+
+    # Initial gate
+    if "initial_gate" in keys(params)
+        initial_gate = params["initial_gate"]
+    else
+        initial_gate = "Identity"
+    end
+
+    if initial_gate == "Identity"
+        M_initial = Matrix(I, 2^(params["num_qubits"]+1), 2^(params["num_qubits"]+1))
+    else
+        Memento.error(_LOGGER, "Currently, non-identity gate is not supported as the initial condition")
+    end
+    # Add code here to support non-identity as an initial condition gate. 
+
+    # Depth
+    if params["depth"] < 2 
+        Memento.error(_LOGGER, "Minimum depth of 2 is necessary")
+    end
+
+    # Decomposition type 
+    if "decomposition_type" in keys(params)
+        decomposition_type = params["decomposition_type"]
+    else
+        decomposition_type = "exact"
+    end
+    
+    # Optimizer
+    if "optimizer" in keys(params)
+        optimizer = params["optimizer"]
+    else
+        Memento.error(_LOGGER, "Input a valid MIP optimizer")
+    end
+    
+    # Relax Integrality 
+    if "relax_integrality" in keys(params)
+        relax_integrality = params["relax_integrality"]
+    else
+        # default value
+        relax_integrality = false
+    end
+
+    elementary_gates = unique(params["elementary_gates"])
+    
+    if length(elementary_gates) < length(params["elementary_gates"])
+        Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
+    end
+
+    gates_dict, target_real = get_quantum_gates(params, elementary_gates)
+
+    gates_dict_unique, M_real_unique, identity_idx = eliminate_nonunique_gates(gates_dict)
+    
+    data = Dict{String, Any}("num_qubits" => params["num_qubits"],
+                             "depth" => params["depth"],
+                             "gates_dict" => gates_dict_unique,
+                             "gates_real" => M_real_unique,
+                             "initial_gate" => M_initial,
+                             "identity_idx" => identity_idx,
+                             "elementary_gates" => elementary_gates,
+                             "target_gate" => Dict{String, Any}("type" => params["target_gate"], "matrix" => target_real),
+                             "objective" => params["objective"],
+                             "decomposition_type" => decomposition_type,                         
+                             "relax_integrality" => relax_integrality
+                             )
+
+    R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
+    U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
+    
+    if !isempty(R_gates_ids) || !isempty(U_gates_ids)
+        data["discretization"] = Dict{String, Any}()
+    end
+
+    if !isempty(R_gates_ids) 
+        for i in R_gates_ids
+            if data["elementary_gates"][i] == "R_x"
+                data["discretization"]["R_x"] = params["R_x_discretization"]
+            elseif data["elementary_gates"][i] == "R_y"
+                data["discretization"]["R_y"] = params["R_y_discretization"]
+            elseif data["elementary_gates"][i] == "R_z"
+                data["discretization"]["R_z"] = params["R_z_discretization"]
+            end
+        end
+    end
+
+    if !isempty(U_gates_ids)
+        for i in U_gates_ids
+            if data["elementary_gates"][i] == "U3"
+                data["discretization"]["U3_θ"] = params["U_θ_discretization"]
+                data["discretization"]["U3_ϕ"] = params["U_ϕ_discretization"]
+                data["discretization"]["U3_λ"] = params["U_λ_discretization"]
+            end
+        end
+    end
+                         
+    return data
+end
+
 """
-    get_quantum_gates(params::Dict{String, Any}, num_gates::Int64, elementary_gates::Array{String,1})
+    eliminate_nonunique_gates(gates_dict::Dict{String, Any})
+
+"""
+function eliminate_nonunique_gates(gates_dict::Dict{String, Any})
+
+    num_gates = length(keys(gates_dict))
+
+    M_real = zeros(2*size(gates_dict["1"]["matrix"])[1], 2*size(gates_dict["1"]["matrix"])[2], num_gates)
+    
+    for i=1:num_gates
+        M_real[:,:,i] = complex_to_real_matrix(gates_dict["$i"]["matrix"])
+    end
+
+    M_real_unique, M_real_idx = QCO.unique_matrices(M_real)
+    
+    gates_dict_unique = Dict{String, Any}()
+    
+    identity_idx = Int64[]
+    
+    for i=1:size(M_real_unique)[3]
+        if isapprox(M_real_unique[:,:,i], Matrix(I, size(M_real_unique)[1], size(M_real_unique)[2]), atol=1E-5)   
+            push!(identity_idx, i)
+        end
+    end
+
+    if length(identity_idx) >= 2
+        Memento.error(_LOGGER, "Detected more than one Identity matrix in the input set of gates (possibly due to discretization)")
+    end
+
+    if size(M_real_unique)[3] < size(M_real)[3]
+
+        Memento.info(_LOGGER, "Eliminating $(size(M_real)[3]-size(M_real_unique)[3]) non-unique gates (after discretization)")
+
+        for i = 1:length(M_real_idx)
+            gates_dict_unique["$i"] = gates_dict["$(M_real_idx[i])"]
+        end
+    
+    else
+        gates_dict_unique = gates_dict
+    end
+
+    if !("Identity" in gates_dict_unique["$(identity_idx[1])"]["type"])
+        push!(gates_dict_unique["$(identity_idx[1])"]["type"], "Identity")
+    end
+
+    return gates_dict_unique, M_real_unique, identity_idx
+
+end
+
+"""
+    get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
 Given a vector of input with the names of gates (see examples folder), `get_quantum_gates` function 
 returns the corresponding elementary gates in the three-dimensional complex matrix form. 
 """ 
-function get_quantum_gates(params::Dict{String, Any}, num_gates::Int64, elementary_gates::Array{String,1})
+function get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
     num_qubits = params["num_qubits"]
 
-    M_complex_dict = get_all_gates_dictionary(params, elementary_gates)
-    
-    M_complex = Array{Complex{Float64},3}(zeros(2^num_qubits, 2^num_qubits, num_gates))
-    
-    for i=1:num_gates
-        M_complex[:,:,i] = M_complex_dict["$i"]["matrix"]
-    end
+    gates_dict = get_all_gates_dictionary(params, elementary_gates)
 
     if !("target_gate" in keys(params)) || isempty(params["target_gate"])
         Memento.error(_LOGGER, "Target gate not found in the input data")
     end
 
     T_complex = get_full_sized_gate(params["target_gate"], num_qubits)
-
-    if ((size(M_complex[:,:,1])[1] != size(T_complex)[1]) || (size(M_complex[:,:,1])[2] != size(T_complex)[2]))
-        Memento.error(_LOGGER, "Dimension mis-match for num_gates elementary gates vs. the target gate.")
-    end
  
-    return M_complex_dict, M_complex, T_complex
+    return gates_dict, complex_to_real_matrix(T_complex)
 end
 
 function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::Array{String,1})
@@ -46,7 +189,7 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
         U_complex_dict = get_all_U_gates(params, elementary_gates)
     end
 
-    M_complex_dict = Dict{String, Any}()
+    gates_dict = Dict{String, Any}()
 
     counter = 1
 
@@ -66,18 +209,18 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
                     for k in keys(M_elementary_dict[j])
                         for l in keys(M_elementary_dict[j][k]["2qubit_rep"])
                             
-                            M_complex_dict["$counter"] = Dict{String, Any}("type" => j,
-                                                                        "angle" => Any,
-                                                                        "qubit_location" => l,
-                                                                        "matrix" => M_elementary_dict[j][k]["2qubit_rep"][l])
+                            gates_dict["$counter"] = Dict{String, Any}("type" => [j],
+                                                                       "angle" => Any,
+                                                                       "qubit_location" => l,
+                                                                       "matrix" => M_elementary_dict[j][k]["2qubit_rep"][l])
 
                             if startswith(elementary_gates[i], "R")
-                                M_complex_dict["$counter"]["angle"] = M_elementary_dict[j][k]["angle"]
+                                gates_dict["$counter"]["angle"] = M_elementary_dict[j][k]["angle"]
 
                             elseif startswith(elementary_gates[i], "U")
-                                M_complex_dict["$counter"]["angle"] = Dict{String, Any}("θ" => U_complex_dict[j][k]["θ"],
-                                                                                        "ϕ" => U_complex_dict[j][k]["ϕ"],
-                                                                                        "λ" => U_complex_dict[j][k]["λ"],)
+                                gates_dict["$counter"]["angle"] = Dict{String, Any}("θ" => U_complex_dict[j][k]["θ"],
+                                                                                    "ϕ" => U_complex_dict[j][k]["ϕ"],
+                                                                                    "λ" => U_complex_dict[j][k]["λ"],)
                             end
 
                             counter += 1
@@ -89,15 +232,15 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
             
         else 
 
-            M_complex_dict["$counter"] = Dict{String, Any}("type" => elementary_gates[i],
-                                                           "matrix" => get_full_sized_gate(elementary_gates[i], num_qubits))
+            gates_dict["$counter"] = Dict{String, Any}("type" => [elementary_gates[i]],
+                                                       "matrix" => get_full_sized_gate(elementary_gates[i], num_qubits))
             counter += 1
 
         end
 
     end
 
-    return M_complex_dict
+    return gates_dict
     
 end
 
@@ -148,7 +291,7 @@ function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretiz
     if length(discretization) >= 1
 
         for i=1:length(discretization)
-            R_discrete = get_pauli_rotationum_gates(discretization[i])[R_type]
+            R_discrete = get_pauli_rotation_gates(discretization[i])[R_type]
             R["angle_$i"] = Dict{String, Any}("angle" => discretization[i],
                                              "1qubit_rep" => R_discrete,
                                              "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(R_type, num_qubits, M=R_discrete, qubit_location = "qubit_1"),
@@ -354,7 +497,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; M = nothing, qubi
     end
 end
 
-function get_number_of_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+function num_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
     # Update this if the naming convention for gates changes
     R_gates = findall(x -> startswith(x, "R"), (elementary_gates))
@@ -461,114 +604,6 @@ function get_number_of_U3_gates(params::Dict{String, Any}, elementary_gates::Arr
     return num_U3
 end
 
-function get_data(params::Dict{String, Any})
-    if isempty(params["elementary_gates"])
-        Memento.error(_LOGGER, "Input elementary gates are empty. Enter at least two unique unitary gates")
-    end
-
-    elementary_gates = unique(params["elementary_gates"])
-    
-    if length(elementary_gates) < length(params["elementary_gates"])
-        Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
-    end
-    
-    num_gates = get_number_of_input_gates(params, elementary_gates)
-
-    M_complex_dict, M_complex, T_complex = get_quantum_gates(params, num_gates, elementary_gates)
-   
-    M_real = zeros(2*size(M_complex)[1], 2*size(M_complex)[2], size(M_complex)[3])
-
-    for d=1:num_gates
-        M_real[:,:,d] = complex_to_real_matrix(M_complex[:,:,d])
-    end
-
-    # Initial gate
-    if "initial_gate" in keys(params)
-        initial_gate = params["initial_gate"]
-    else
-        initial_gate = "Identity"
-    end
-
-    if initial_gate == "Identity"
-        M_initial = Matrix(LA.I, 2^(params["num_qubits"]+1), 2^(params["num_qubits"]+1))
-    else
-        Memento.error(_LOGGER, "Currently, non-identity gate is not supported as the initial condition")
-    end
-    # Add code here to support non-identity as an initial condition gate. 
-
-    # Depth
-    if params["depth"] < 2 
-        Memento.error(_LOGGER, "A minimum of depth = 2 is necessary")
-    end
-
-    # Decomposition type 
-    if "decomposition_type" in keys(params)
-        decomposition_type = params["decomposition_type"]
-    else
-        decomposition_type = "exact"
-    end
-    
-    # Optimizer
-    if "optimizer" in keys(params)
-        optimizer = params["optimizer"]
-    else
-        Memento.error(_LOGGER, "Input a valid MIP optimizer")
-    end
-    
-    # Relax Integrality 
-    if "relax_integrality" in keys(params)
-        relax_integrality = params["relax_integrality"]
-    else
-        # default value
-        relax_integrality = false
-    end
-    
-    data = Dict{String, Any}("num_qubits" => params["num_qubits"],
-                             "depth" => params["depth"],
-                             "M_complex_dict" => M_complex_dict,
-                             "M_real" => M_real,
-                             "M_initial" => M_initial,
-                             "target_real" => complex_to_real_matrix(T_complex),
-                             "elementary_gates" => elementary_gates,
-                             "target_gate" => params["target_gate"],
-                             "objective" => params["objective"],
-                             "decomposition_type" => decomposition_type,
-                             "optimizer" => optimizer,                         
-                             "relax_integrality" => relax_integrality
-                             )
-
-    R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
-    U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
-    
-    if !isempty(R_gates_ids) || !isempty(U_gates_ids)
-        data["discretization"] = Dict{String, Any}()
-    end
-
-    if !isempty(R_gates_ids) 
-        for i in R_gates_ids
-            if data["elementary_gates"][i] == "R_x"
-                data["discretization"]["R_x"] = params["R_x_discretization"]
-            elseif data["elementary_gates"][i] == "R_y"
-                data["discretization"]["R_y"] = params["R_y_discretization"]
-            elseif data["elementary_gates"][i] == "R_z"
-                data["discretization"]["R_z"] = params["R_z_discretization"]
-            end
-        end
-    end
-
-    if !isempty(U_gates_ids)
-        for i in U_gates_ids
-            if data["elementary_gates"][i] == "U3"
-                data["discretization"]["U3_θ"] = params["U_θ_discretization"]
-                data["discretization"]["U3_ϕ"] = params["U_ϕ_discretization"]
-                data["discretization"]["U3_λ"] = params["U_λ_discretization"]
-            end
-        end
-    end
-                         
-    return data
-end
-
 """
     get_elementary_gates(num_qubits::Int64)
 
@@ -656,7 +691,7 @@ function get_elementary_gates(num_qubits::Int64)
     
     # 3-qubit gates 
     if num_qubits == 3
-        I_3 = SA.sparse(Array{Complex{Float64},2}(Matrix(LA.I, 2^3, 2^3)))
+        I_3 = SA.sparse(Array{Complex{Float64},2}(Matrix(I, 2^3, 2^3)))
 
         toffoli = SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
                                                     0  1  0  0  0  0  0  0
@@ -696,12 +731,12 @@ function get_elementary_gates(num_qubits::Int64)
 end
 
 """
-    get_pauli_rotationum_gates(θ::Number)
+    get_pauli_rotation_gates(θ::Number)
 
 For a given angle in radiaons, this function returns standard rotation gates those define rotations around the Pauli axis {X,Y,Z}.
 Note that R_x(θ) = u3(θ, -π/2, π/2), R_y(θ) = u3(θ, 0, 0), R_z(λ) = exp((-λ/2)im)*u1(λ). 
 """
-function get_pauli_rotationum_gates(θ::Number)
+function get_pauli_rotation_gates(θ::Number)
     #input angles in radians
     if !(-2*π <= θ <= 2*π)
         Memento.error(_LOGGER, "θ angle in Pauli rotation gate is not within valid bounds")

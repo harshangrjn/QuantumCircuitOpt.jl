@@ -26,12 +26,12 @@ function auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1})
 end
  
 """
-    get_gate_element_bounds(M::Array{Float64,3})
+    gate_element_bounds(M::Array{Float64,3})
 
-Given a set of elementary gates, {G_1, G_2, ... G_n}, `get_gate_element_bounds` function evaluates 
+Given a set of elementary gates, {G_1, G_2, ... G_n}, `gate_element_bounds` function evaluates 
 the range of every co-ordinate of the superimposed gates, over all possible gates.  
 """
-function get_gate_element_bounds(M::Array{Float64,3}) 
+function gate_element_bounds(M::Array{Float64,3}) 
 
     M_l = zeros(size(M)[1], size(M)[2])
     M_u = zeros(size(M)[1], size(M)[2])
@@ -60,15 +60,15 @@ function get_commutative_gates(M::Array{Float64,3})
     # Check for commutative matrix pairs
     for d1 = 1:depth
         for d2 = (d1+1):depth
-            M_d1 = get_real_to_complex_matrix(M[:,:,d1])
-            M_d2 = get_real_to_complex_matrix(M[:,:,d2])
+            M_d1 = real_to_complex_matrix(M[:,:,d1])
+            M_d2 = real_to_complex_matrix(M[:,:,d2])
 
             if isapprox(M_d1*M_d2, M_d2*M_d1, atol = 1E-4)
                 push!(M_commute_2, (d1, d2))
             end
 
             for d3 = (d2+1):depth
-                M_d3 = get_real_to_complex_matrix(M[:,:,d3])
+                M_d3 = real_to_complex_matrix(M[:,:,d3])
 
                 M_product = Array{Complex{Float64},3}(zeros(size(M_d3)[1], size(M_d3)[2], 6))
 
@@ -127,7 +127,7 @@ function complex_to_real_matrix(M::Array{Complex{Float64},2})
     return M_real
 end
 
-function get_real_to_complex_matrix(M::Array{Float64,2})
+function real_to_complex_matrix(M::Array{Float64,2})
     
     n = size(M)[1]
     if !iseven(n)
@@ -223,4 +223,42 @@ function round_complex_values(M::Array{Complex{Float64},2})
     end
     
     return M_round
+end
+
+"""
+    unique_idx(x::AbstractArray{T})
+
+unique_idx returns the indices of unique elements in a given array of scalar or vector inputs. Overall, 
+this function computes faster than Julia's built-in `findfirst` command. 
+"""
+function unique_idx(x::AbstractArray{T}) where T
+    uniqueset = Set{T}()
+    ex = eachindex(x)
+    idxs = Vector{eltype(ex)}()
+    for i in ex
+        xi = x[i]
+        if !(xi in uniqueset)
+            push!(idxs, i)
+            push!(uniqueset, xi)
+        end
+    end
+    idxs
+end
+
+"""
+    unique_matrices(M::Array{Float64, 3})
+
+unique_matrices returns the unique set of matrices and the corresponding indices of unique matrices from the given set of matrices.  
+"""
+function unique_matrices(M::Array{Float64, 3})
+    M[isapprox.(M, 0, atol=1E-6)] .= 0
+
+    M_reshape = [];
+    for i=1:size(M)[3]
+        push!(M_reshape, round.(reshape(M[:,:,i], size(M)[1]*size(M)[2]), digits=5))
+    end
+
+    idx = QCO.unique_idx(M_reshape)
+
+    return M[:,:,idx], idx
 end

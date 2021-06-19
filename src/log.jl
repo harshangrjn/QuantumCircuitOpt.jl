@@ -23,9 +23,9 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("\n","  ","Number of qubits: ", data["num_qubits"], "\n"; color = :cyan)
         
         if isempty(R_gates_ids) && isempty(U_gates_ids)
-            printstyled("  ","Total number of elementary gates: ",size(data["M_real"])[3],"\n"; color = :cyan)
+            printstyled("  ","Total number of elementary gates: ",size(data["gates_real"])[3],"\n"; color = :cyan)
         else
-            printstyled("  ","Total number of elementary gates (including discretization): ",size(data["M_real"])[3],"\n"; color = :cyan)
+            printstyled("  ","Total number of elementary gates (including discretization): ",size(data["gates_real"])[3],"\n"; color = :cyan)
         end
         
         printstyled("  ","Maximum depth of decomposition: ", data["depth"],"\n"; color = :cyan)
@@ -62,7 +62,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         end
         
-        printstyled("  ","Input target gate: ", data["target_gate"],"\n"; color = :cyan)
+        printstyled("  ","Input target gate: ", data["target_gate"]["type"],"\n"; color = :cyan)
         
         printstyled("  ","Type of decomposition: ", data["decomposition_type"],"\n"; color = :cyan)
 
@@ -76,9 +76,9 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                 printstyled(gates_sol_compressed[i], " * "; color = :cyan)
             else    
                 if data["decomposition_type"] == "exact"
-                    printstyled(gates_sol_compressed[i], " = ", data["target_gate"],"\n"; color = :cyan)
+                    printstyled(gates_sol_compressed[i], " = ", data["target_gate"]["type"],"\n"; color = :cyan)
                 elseif data["decomposition_type"] == "approximate"
-                    printstyled(gates_sol_compressed[i], " ≈ ", data["target_gate"],"\n"; color = :cyan)
+                    printstyled(gates_sol_compressed[i], " ≈ ", data["target_gate"]["type"],"\n"; color = :cyan)
                 end
             end
 
@@ -89,7 +89,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         end
 
         if data["objective"] == "minimize_depth"
-            if "Identity" in data["elementary_gates"]
+            if length(data["identity_idx"]) >= 1
                 printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
             else 
                 printstyled("  ","Compressed depth for a feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
@@ -104,7 +104,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         printstyled("=============================================================================","\n"; color = :cyan)
         
-        @show gates_sol
+        # @show gates_sol
 
     else
         Memento.warn(_LOGGER, "Valid integral feasible solutions could not be found to visualize the solution")
@@ -125,11 +125,11 @@ function get_postprocessed_solutions(results::Dict{String, Any}, data::Dict{Stri
         id = findall(isone.(round.(abs.(results["solution"]["z_onoff_var"][:,d]), digits=3)))[1]
         push!(id_sequence, id)
 
-        gate_id = data["M_complex_dict"]["$id"]
+        gate_id = data["gates_dict"]["$id"]
 
-        if gate_id["type"] != "Identity"
+        if !("Identity" in gate_id["type"])
             
-            s1 = gate_id["type"]
+            s1 = gate_id["type"][1]
 
             if !(startswith(s1, "R") || startswith(s1, "U"))
             
@@ -180,14 +180,14 @@ function validate_solutions(data::Dict{String, Any}, id_sequence::Array{Int64,1}
     M_sol = Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["num_qubits"]), 2^(data["num_qubits"])))
     
     for i in id_sequence
-        M_sol *= data["M_complex_dict"]["$i"]["matrix"]
+        M_sol *= data["gates_dict"]["$i"]["matrix"]
     end
 
     # @show M_sol 
-    # @show QCO.get_real_to_complex_matrix(data["target_real"])
+    # @show QCO.get_real_to_complex_matrix(data["target_gate"]["matrix"])
 
     # This tolerance is very important for the final feasiblity check
-    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.get_real_to_complex_matrix(data["target_real"]), atol = 1E-4))
+    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.real_to_complex_matrix(data["target_gate"]["matrix"]), atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     
