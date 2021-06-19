@@ -54,6 +54,10 @@ function get_data(params::Dict{String, Any})
 
     gates_dict, target_real = get_quantum_gates(params, elementary_gates)
 
+    for i in keys(data["gates_dict"])
+        @show data["gates_dict"]["$i"]["type"]
+    end
+
     gates_dict_unique, M_real_unique, identity_idx = eliminate_nonunique_gates(gates_dict)
     
     data = Dict{String, Any}("num_qubits" => params["num_qubits"],

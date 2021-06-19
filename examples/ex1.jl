@@ -2,7 +2,6 @@ using QuantumCircuitOpt
 using JuMP
 using CPLEX
 using Cbc
-using LinearAlgebra
 
 const QCO = QuantumCircuitOpt
 
@@ -32,7 +31,7 @@ params = Dict{String, Any}(
 "U_ϕ_discretization" => [0, π/2],
 "U_λ_discretization" => [0, π/4],
 
-"objective" => "minimize_depth", 
+"objective" => "minimize_cnot", 
 "decomposition_type" => "exact",
 "optimizer" => "cplex"
                             
