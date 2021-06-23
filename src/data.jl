@@ -46,6 +46,13 @@ function get_data(params::Dict{String, Any})
         relax_integrality = false
     end
 
+    if "slack_penalty" in keys(params)
+        slack_penalty = params["relax_integrality"]
+    else
+        # default value
+        slack_penalty = 1E3
+    end
+
     elementary_gates = unique(params["elementary_gates"])
     
     if length(elementary_gates) < length(params["elementary_gates"])
@@ -54,11 +61,7 @@ function get_data(params::Dict{String, Any})
 
     gates_dict, target_real = get_quantum_gates(params, elementary_gates)
 
-    for i in keys(data["gates_dict"])
-        @show data["gates_dict"]["$i"]["type"]
-    end
-
-    gates_dict_unique, M_real_unique, identity_idx = eliminate_nonunique_gates(gates_dict)
+    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = eliminate_nonunique_gates(gates_dict)
     
     data = Dict{String, Any}("num_qubits" => params["num_qubits"],
                              "depth" => params["depth"],
@@ -66,9 +69,11 @@ function get_data(params::Dict{String, Any})
                              "gates_real" => M_real_unique,
                              "initial_gate" => M_initial,
                              "identity_idx" => identity_idx,
+                             "cnot_idx" => cnot_idx,
                              "elementary_gates" => elementary_gates,
                              "target_gate" => Dict{String, Any}("type" => params["target_gate"], "matrix" => target_real),
                              "objective" => params["objective"],
+                             "slack_penalty" => slack_penalty,
                              "decomposition_type" => decomposition_type,                         
                              "relax_integrality" => relax_integrality
                              )
@@ -122,18 +127,6 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any})
     M_real_unique, M_real_idx = QCO.unique_matrices(M_real)
     
     gates_dict_unique = Dict{String, Any}()
-    
-    identity_idx = Int64[]
-    
-    for i=1:size(M_real_unique)[3]
-        if isapprox(M_real_unique[:,:,i], Matrix(I, size(M_real_unique)[1], size(M_real_unique)[2]), atol=1E-5)   
-            push!(identity_idx, i)
-        end
-    end
-
-    if length(identity_idx) >= 2
-        Memento.error(_LOGGER, "Detected more than one Identity matrix in the input set of gates (possibly due to discretization)")
-    end
 
     if size(M_real_unique)[3] < size(M_real)[3]
 
@@ -147,12 +140,49 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any})
         gates_dict_unique = gates_dict
     end
 
-    if !("Identity" in gates_dict_unique["$(identity_idx[1])"]["type"])
-        push!(gates_dict_unique["$(identity_idx[1])"]["type"], "Identity")
+    identity_idx = _get_identity_idx(M_real_unique)
+
+    if length(identity_idx) > 0
+        if !("Identity" in gates_dict_unique["$(identity_idx[1])"]["type"])
+            push!(gates_dict_unique["$(identity_idx[1])"]["type"], "Identity")
+        end
     end
 
-    return gates_dict_unique, M_real_unique, identity_idx
+    cnot_idx = _get_cnot_idx(gates_dict_unique)
 
+    return gates_dict_unique, M_real_unique, identity_idx, cnot_idx
+
+end
+
+function _get_identity_idx(M::Array{Float64,3})
+    
+    identity_idx = Int64[]
+    
+    for i=1:size(M)[3]
+        if isapprox(M[:,:,i], Matrix(I, size(M)[1], size(M)[2]), atol=1E-5)   
+            push!(identity_idx, i)
+        end
+    end
+
+    if length(identity_idx) >= 2
+        Memento.error(_LOGGER, "Detected more than one Identity matrix in the input set of gates (possibly due to discretization)")
+    end
+
+    return identity_idx
+end
+
+function _get_cnot_idx(gates_dict::Dict{String, Any})
+    
+    cnot_idx = Int64[]
+
+    # Note: The below objective minimizes both cnot_12 and cnot_21 in the decomposition
+    for i in keys(gates_dict)
+        if !isempty(findall(x -> startswith(x, "cnot"), gates_dict[i]["type"]))
+            push!(cnot_idx, parse(Int64, i))
+        end
+    end
+    
+    return cnot_idx
 end
 
 """
@@ -656,8 +686,9 @@ function get_elementary_gates(num_qubits::Int64)
 
     W_hermitian = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1]) # Useful to diagonlize the swap gate
 
-    test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im   0.0-0.382683im
-                                            0.0-0.382683im  0.92388+0.0im])
+    # test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im   0.0-0.382683im
+    #                                         0.0-0.382683im  0.92388+0.0im])
+    test_R_x = QCO.RXGate(π/4)                                            
 
     test_R_y = Array{Complex{Float64}, 2}([  0.92388+0.0im  -0.382683+0.0im
                                             0.382683+0.0im    0.92388+0.0im ])

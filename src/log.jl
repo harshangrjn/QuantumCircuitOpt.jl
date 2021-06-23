@@ -1,7 +1,7 @@
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
     if results["primal_status"] != MOI.FEASIBLE_POINT
-        Memento.error(_LOGGER, "Non-feasible primal status. Gate decomposition may not be exact!")
+        Memento.error(_LOGGER, "Non-feasible primal status. Gate decomposition may not be accurate!")
     end
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
@@ -23,7 +23,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("\n","  ","Number of qubits: ", data["num_qubits"], "\n"; color = :cyan)
         
         if isempty(R_gates_ids) && isempty(U_gates_ids)
-            printstyled("  ","Total number of elementary gates: ",size(data["gates_real"])[3],"\n"; color = :cyan)
+            printstyled("  ","Total number of elementary gates: ", size(data["gates_real"])[3],"\n"; color = :cyan)
         else
             printstyled("  ","Total number of elementary gates (including discretization): ",size(data["gates_real"])[3],"\n"; color = :cyan)
         end
@@ -85,7 +85,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         end
 
         if data["decomposition_type"] == "approximate"
-            printstyled("  ","||Decomposition error||₂: ", ceil(LA.norm(results["solution"]["slack_var"]), digits = 2),"\n"; color = :cyan)
+            printstyled("  ","||Decomposition error||₂: ", round(LA.norm(results["solution"]["slack_var"]), digits = 10),"\n"; color = :cyan)
         end
 
         if data["objective"] == "minimize_depth"
@@ -96,7 +96,29 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             end
 
         elseif data["objective"] == "minimize_cnot"
-            printstyled("  ","Minimum number of CNOT gates: ", results["objective"],"\n"; color = :cyan)
+
+            if !isempty(data["cnot_idx"])
+                
+                if data["decomposition_type"] == "exact"
+                    
+                    printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
+                
+                elseif data["decomposition_type"] == "approximate"
+                    
+                    printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - data["slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = :cyan)
+                end
+            
+            elseif !isempty(data["identity_idx"])
+               
+                printstyled("  ","Objective function changed to minimize_depth (CNOT gate not found in input)", "\n"; color = :cyan) 
+                printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+            
+            else
+
+                printstyled("  ","Objective function changed to feasiblity (CNOT and Identity gates not found in input)", "\n"; color = :cyan) 
+                printstyled("  ","Compressed depth for a feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
+
+            end
 
         end
 

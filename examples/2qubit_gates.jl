@@ -1,4 +1,5 @@
 function test_hadamard()
+    println(">>>>> Decomposing Hadamard Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -24,6 +25,7 @@ function test_hadamard()
 end
 
 function test_controlled_Z()
+    println(">>>>> Decomposing Controlled-Z Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -50,6 +52,8 @@ end
 
 function test_controlled_V()
 
+    println(">>>>> Decomposing Controlled-V Gate <<<<<")
+
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
@@ -70,6 +74,8 @@ function test_controlled_V()
 end
 
 function test_controlled_H()
+
+    println(">>>>> Decomposing Controlled-H Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -96,6 +102,8 @@ end
 
 function test_controlled_H_with_R()
 
+    println(">>>>> Decomposing Controlled-H with R Gate <<<<<")
+
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
@@ -120,6 +128,8 @@ function test_controlled_H_with_R()
 end
 
 function test_controlled_R2()
+
+    println(">>>>> Decomposing Controlled-R2 Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -146,7 +156,7 @@ end
 
 function test_magic_M()
     
-    # source: https://doi.org/10.1103/PhysRevA.69.032315
+    println(">>>>> Decomposing M Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -173,7 +183,7 @@ end
 
 function test_magic_M_using_SHCnot()
     
-    # source: https://doi.org/10.1103/PhysRevA.69.032315
+    println(">>>>> Decomposing M gate using S, H and CNOT Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -195,6 +205,8 @@ function test_magic_M_using_SHCnot()
 end
 
 function test_S()
+
+    println(">>>>> Decomposing S Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -220,6 +232,8 @@ function test_S()
 end
 
 function test_cnot_21()
+
+    println(">>>>> Decomposing CNOT_21 Gate <<<<<")
 
     params = Dict{String, Any}(
     

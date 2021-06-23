@@ -6,5 +6,4 @@ QuantumCircuitOpt = "88128e30-b60a-4e54-ab02-1050a5f92a36"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
-JuMP = "^0.21.0"
 julia = "1"

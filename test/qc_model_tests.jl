@@ -28,8 +28,5 @@
     @test result_qc["solution"]["z_onoff_var"][4,3] == 1
     @test (result_qc["solution"]["z_onoff_var"][1,4] == 1) || (result_qc["solution"]["z_onoff_var"][2,4] == 1)
     @test (result_qc["solution"]["z_onoff_var"][1,5] == 1) || (result_qc["solution"]["z_onoff_var"][2,5] == 1)
-
-    data = QCO.get_data(params)
-    @show data
     
 end
