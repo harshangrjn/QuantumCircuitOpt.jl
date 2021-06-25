@@ -7,7 +7,7 @@
     "depth" => 5,    
 
     "elementary_gates" => ["H1", "H2", "Identity", "cnot_12"],  
-    "target_gate" => "cnot_21",
+    "target_gate" => QCO.CNotRevGate(),
 
     "initial_gate" => "Identity",
     "objective" => "minimize_depth", 

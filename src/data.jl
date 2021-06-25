@@ -71,7 +71,7 @@ function get_data(params::Dict{String, Any})
                              "identity_idx" => identity_idx,
                              "cnot_idx" => cnot_idx,
                              "elementary_gates" => elementary_gates,
-                             "target_gate" => Dict{String, Any}("type" => params["target_gate"], "matrix" => target_real),
+                             "target_gate" => target_real,
                              "objective" => params["objective"],
                              "slack_penalty" => slack_penalty,
                              "decomposition_type" => decomposition_type,                         
@@ -114,7 +114,7 @@ end
     eliminate_nonunique_gates(gates_dict::Dict{String, Any})
 
 """
-function eliminate_nonunique_gates(gates_dict::Dict{String, Any})
+function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_gates = false)
 
     num_gates = length(keys(gates_dict))
 
@@ -124,7 +124,12 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any})
         M_real[:,:,i] = complex_to_real_matrix(gates_dict["$i"]["matrix"])
     end
 
-    M_real_unique, M_real_idx = QCO.unique_matrices(M_real)
+    M_real_unique = M_real
+    M_real_idx = collect(1:size(M_real)[3]) 
+
+    if eliminate_gates
+        M_real_unique, M_real_idx = QCO.unique_matrices(M_real)
+    end
     
     gates_dict_unique = Dict{String, Any}()
 
@@ -164,9 +169,9 @@ function _get_identity_idx(M::Array{Float64,3})
         end
     end
 
-    if length(identity_idx) >= 2
-        Memento.error(_LOGGER, "Detected more than one Identity matrix in the input set of gates (possibly due to discretization)")
-    end
+    # if length(identity_idx) >= 2
+    #     Memento.error(_LOGGER, "Detected more than one Identity matrix in the input set of gates (possibly due to discretization)")
+    # end
 
     return identity_idx
 end
@@ -199,11 +204,13 @@ function get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{St
 
     if !("target_gate" in keys(params)) || isempty(params["target_gate"])
         Memento.error(_LOGGER, "Target gate not found in the input data")
-    end
+    end 
 
-    T_complex = get_full_sized_gate(params["target_gate"], num_qubits)
+    if (size(params["target_gate"])[1] != size(params["target_gate"])[2]) || (size(params["target_gate"])[1] != 2^params["num_qubits"])
+        Memento.error(_LOGGER, "Dimensions of target gate are incorrect")
+    end
  
-    return gates_dict, complex_to_real_matrix(T_complex)
+    return gates_dict, complex_to_real_matrix(params["target_gate"])
 end
 
 function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::Array{String,1})
@@ -470,6 +477,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; M = nothing, qubi
 
         elseif input == "qft2"
             return gates["qft2"]
+
+        elseif input == "C2SXGate"
+            return QCO.C2SXGate()
         
         elseif input == "W_hermitian"
             return gates["W_hermitian"]

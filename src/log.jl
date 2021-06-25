@@ -62,7 +62,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         end
         
-        printstyled("  ","Input target gate: ", data["target_gate"]["type"],"\n"; color = :cyan)
+        # printstyled("  ","Input target gate: ", data["target_gate"]["type"],"\n"; color = :cyan)
         
         printstyled("  ","Type of decomposition: ", data["decomposition_type"],"\n"; color = :cyan)
 
@@ -76,9 +76,9 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                 printstyled(gates_sol_compressed[i], " * "; color = :cyan)
             else    
                 if data["decomposition_type"] == "exact"
-                    printstyled(gates_sol_compressed[i], " = ", data["target_gate"]["type"],"\n"; color = :cyan)
+                    printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = :cyan)
                 elseif data["decomposition_type"] == "approximate"
-                    printstyled(gates_sol_compressed[i], " ≈ ", data["target_gate"]["type"],"\n"; color = :cyan)
+                    printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = :cyan)
                 end
             end
 
@@ -206,10 +206,10 @@ function validate_solutions(data::Dict{String, Any}, id_sequence::Array{Int64,1}
     end
 
     # @show M_sol 
-    # @show QCO.get_real_to_complex_matrix(data["target_gate"]["matrix"])
+    # @show QCO.get_real_to_complex_matrix(data["target_gate"])
 
     # This tolerance is very important for the final feasiblity check
-    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.real_to_complex_matrix(data["target_gate"]["matrix"]), atol = 1E-4))
+    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.real_to_complex_matrix(data["target_gate"]), atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     

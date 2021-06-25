@@ -32,6 +32,14 @@ CZGate
 ```@docs
 CHGate
 ```
+## CVGate
+```@docs
+CVGate
+```
+## WGate
+```@docs
+WGate
+```
 ## CRXGate
 ```@docs
 CRXGate
@@ -55,6 +63,10 @@ SwapGate
 ## iSwapGate
 ```@docs
 iSwapGate
+```
+## C2SXGate
+```@docs
+C2SXGate
 ```
 ## MGate
 ```@docs

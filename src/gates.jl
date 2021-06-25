@@ -347,6 +347,26 @@ function TdaggerGate()
 end
 
 @doc raw"""
+    SXGate()
+
+Single-qubit square root of pauli X gate ([XGate](@ref)). 
+
+**Matrix Representation**
+
+```math
+\sqrt{X} = \frac{1}{2} \begin{pmatrix}
+1 + i & 1 - i \\
+1 - i & 1 + i
+\end{pmatrix}
+```
+"""
+function SXGate()
+
+    return Array{Complex{Float64},2}(1/2*[1+im 1-im; 1-im 1+im])
+
+end
+
+@doc raw"""
     PhaseGate()
 
 Single-qubit rotation gate about the Z axis. This is also equivalent to [U3Gate](@ref)(``0,0,\lambda``). This 
@@ -590,6 +610,58 @@ function CHGate()
 end
 
 @doc raw"""
+    CVGate()
+
+Two-qubit, controlled-V gate, which is also the same as Controlled square-root of X gate ([C2SXGate](@ref)).  
+
+**Circuit Representation**
+```
+q_0: ──■──     
+     ┌─┴─┐    
+q_1: ┤ V ├     
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+CV = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0.5+0.5i & 0.5-0.5i \\
+        0 & 0 & 0.5-0.5i & 0.5+0.5i
+    \end{pmatrix}
+```
+"""
+function CVGate()
+
+    return QCO.C2SXGate() 
+
+end
+
+@doc raw"""
+    WGate()
+
+Two-qubit, W hermitian gate, typically useful to diagonlize the SWAP gate ([SwapGate](@ref)).  
+
+**Matrix Representation**
+
+```math
+CV = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & 0 \\
+        0 & \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}} & 0 \\
+        0 & 0 & 0 & 1
+    \end{pmatrix}
+```
+"""
+function WGate()
+
+    return Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1])
+
+end
+
+@doc raw"""
     CRXGate(θ::Number)
 
 Two-qubit controlled version of the [RXGate](@ref). 
@@ -817,6 +889,37 @@ function iSwapGate()
     return Array{Complex{Float64},2}([1 0 0 0; 0 0 im 0; 0 im 0 0; 0 0 0 1])
 
 end
+
+@doc raw"""
+    C2SXGate()
+
+Two-qubit controlled sqrt(X) gate ([SXGate](@ref)), which is also the square root of the X-Pauli gate. 
+
+**Circuit Representation**
+```
+q_0: ─────■─────
+     ┌────┴────┐
+q_1: ┤ sqrt(X) ├
+     └─────────┘
+```
+
+**Matrix Representation**
+
+```math
+C2SXGate = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0.5+0.5i & 0.5-0.5i \\
+0 & 0 & 0.5-0.5i & 0.5+0.5i
+    \end{pmatrix}
+```
+"""
+function C2SXGate()
+
+    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5+0.5im 0.5-0.5im; 0 0 0.5-0.5im 0.5+0.5im]) 
+
+end
+
 
 @doc raw"""
     MGate()

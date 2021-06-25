@@ -1,13 +1,14 @@
 function test_hadamard()
-    println(">>>>> Decomposing Hadamard Gate <<<<<")
 
+    println(">>>>> Hadamard Gate <<<<<")
+ 
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
     "depth" => 3,    
 
     "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-    "target_gate" => "H1",
+    "target_gate" => kron(QCO.HGate(), QCO.IGate(1)),
        
     "U_θ_discretization" => [0, π/2],
     "U_ϕ_discretization" => [0, π/2],
@@ -25,7 +26,8 @@ function test_hadamard()
 end
 
 function test_controlled_Z()
-    println(">>>>> Decomposing Controlled-Z Gate <<<<<")
+
+    println(">>>>> Controlled-Z Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -33,7 +35,7 @@ function test_controlled_Z()
     "depth" => 4,    
 
     "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-    "target_gate" => "controlled_Z",
+    "target_gate" => QCO.CZGate(),
        
     "U_θ_discretization" => [-π/2, 0, π/2],
     "U_ϕ_discretization" => [0, π/2],
@@ -52,7 +54,7 @@ end
 
 function test_controlled_V()
 
-    println(">>>>> Decomposing Controlled-V Gate <<<<<")
+    println(">>>>> Controlled-V Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -60,7 +62,7 @@ function test_controlled_V()
     "depth" => 7,    
 
     "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_conjugate", "cnot_12", "cnot_21"],
-    "target_gate" => "controlled_V",
+    "target_gate" => QCO.CVGate(),
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
@@ -75,7 +77,7 @@ end
 
 function test_controlled_H()
 
-    println(">>>>> Decomposing Controlled-H Gate <<<<<")
+    println(">>>>> Controlled-H Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -83,7 +85,7 @@ function test_controlled_H()
     "depth" => 5,    
 
     "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-    "target_gate" => "controlled_H_12",
+    "target_gate" => QCO.CHGate(),
 
     "U_θ_discretization" => [-π/4, 0, π/4],
     "U_ϕ_discretization" => [0],
@@ -102,7 +104,7 @@ end
 
 function test_controlled_H_with_R()
 
-    println(">>>>> Decomposing Controlled-H with R Gate <<<<<")
+    println(">>>>> Controlled-H with R Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -110,7 +112,7 @@ function test_controlled_H_with_R()
     "depth" => 5,    
 
     "elementary_gates" => ["R_y", "cnot_12", "Identity"], 
-    "target_gate" => "controlled_H_12",
+    "target_gate" => QCO.CHGate(),
        
     "R_x_discretization" => [], 
     "R_y_discretization" => [-π/4, π/4, π/2, -π/2], 
@@ -127,36 +129,9 @@ function test_controlled_H_with_R()
     
 end
 
-function test_controlled_R2()
-
-    println(">>>>> Decomposing Controlled-R2 Gate <<<<<")
-
-    params = Dict{String, Any}(
-    
-        "num_qubits" => 2, 
-        "depth" => 5,    
-    
-        "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-        "target_gate" => "controlled_R2",
-           
-        "U_θ_discretization" => [0],
-        "U_ϕ_discretization" => [0],
-        "U_λ_discretization" => [-π/4, π/4],
-           
-        "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",  
-        
-        "optimizer" => "cplex",
-                                    
-        )
-    
-        return params
-    
-end
-
 function test_magic_M()
     
-    println(">>>>> Decomposing M Gate <<<<<")
+    println(">>>>> M Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -164,7 +139,7 @@ function test_magic_M()
         "depth" => 4,    
     
         "elementary_gates" => ["U3", "cnot_12", "cnot_21", "Identity"], 
-        "target_gate" => "magic_M",   
+        "target_gate" => QCO.MGate(),   
            
         "U_θ_discretization" => [0, π/2],
         "U_ϕ_discretization" => [-π/2, π/2],
@@ -183,7 +158,7 @@ end
 
 function test_magic_M_using_SHCnot()
     
-    println(">>>>> Decomposing M gate using S, H and CNOT Gate <<<<<")
+    println(">>>>> M gate using S, H and CNOT Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -191,7 +166,7 @@ function test_magic_M_using_SHCnot()
         "depth" => 5,    
     
         "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
-        "target_gate" => "magic_M",
+        "target_gate" => QCO.MGate(),
            
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact",
@@ -206,7 +181,7 @@ end
 
 function test_S()
 
-    println(">>>>> Decomposing S Gate <<<<<")
+    println(">>>>> S Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -214,7 +189,7 @@ function test_S()
         "depth" => 3,    
     
         "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-        "target_gate" => "S1",
+        "target_gate" => kron(QCO.SGate(), QCO.IGate(1)),
            
         "U_θ_discretization" => [0, π/2],
         "U_ϕ_discretization" => [0, π/2],
@@ -233,7 +208,7 @@ end
 
 function test_cnot_21()
 
-    println(">>>>> Decomposing CNOT_21 Gate <<<<<")
+    println(">>>>> CNOT_21 Gate <<<<<")
 
     params = Dict{String, Any}(
     
@@ -241,7 +216,7 @@ function test_cnot_21()
     "depth" => 5,    
 
     "elementary_gates" => ["H1", "H2", "Identity", "cnot_12"],  
-    "target_gate" => "cnot_21",
+    "target_gate" => QCO.CNotRevGate(),
  
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
@@ -255,6 +230,8 @@ function test_cnot_21()
 end
 
 function test_cnot_21_with_U()
+    
+    println(">>>>> CNOT_21 using U3 and CNOT Gates <<<<<")
 
     params = Dict{String, Any}(
     
@@ -262,7 +239,7 @@ function test_cnot_21_with_U()
         "depth" => 5,    
     
         "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-        "target_gate" => "cnot_21",   
+        "target_gate" => QCO.CNotRevGate(),   
            
         "U_θ_discretization" => [-π/2, π/2],
         "U_ϕ_discretization" => [0, π/2],
@@ -281,13 +258,15 @@ end
 
 function test_swap()
 
+    println(">>>>> SWAP Gate <<<<<")
+
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
         "depth" => 5,    
     
         "elementary_gates" => ["cnot_21", "cnot_12", "Identity"], 
-        "target_gate" => "swap",   
+        "target_gate" => QCO.SwapGate(),   
            
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact", 
@@ -302,13 +281,15 @@ end
 
 function test_W()
 
+    println(">>>>> W Gate <<<<<")
+
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
         "depth" => 5,    
     
         "elementary_gates" => ["U3", "cnot_21", "cnot_12", "Identity"], 
-        "target_gate" => "W_hermitian",   
+        "target_gate" => QCO.WGate(),   
 
         "U_θ_discretization" => [-π/4, π/4],
         "U_ϕ_discretization" => [0],
@@ -327,13 +308,15 @@ end
 
 function test_W_using_HCnot()
 
+    println(">>>>> W Gate using H and CNOT gates <<<<<")
+
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
         "depth" => 6,    
     
         "elementary_gates" => ["controlled_H_12", "cnot_21", "cnot_12", "Identity"], 
-        "target_gate" => "W_hermitian",   
+        "target_gate" => QCO.WGate(),   
                   
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact", 

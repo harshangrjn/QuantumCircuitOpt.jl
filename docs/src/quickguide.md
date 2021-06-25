@@ -2,7 +2,7 @@
 
 ## Getting started
 
-To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QuantumCircuitOpt also needs a MIP solver such as [CPLEX](https://github.com/jump-dev/CPLEX.jl) or [Gurobi](https://github.com/jump-dev/Gurobi.jl). If you prefer an open-source MIP solver, install [CBC](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) from the Julia package manager, though be warned that the run times of QuantumCircuitOpt can be subastantially slower using these open-source MIP solvers. 
+To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QuantumCircuitOpt also needs a MIP solver such as [CPLEX](https://github.com/jump-dev/CPLEX.jl) or [Gurobi](https://github.com/jump-dev/Gurobi.jl). If you prefer an open-source MIP solver, install [CBC](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) from the Julia package manager, though be warned that the run times of QuantumCircuitOpt can be substantially slower using these open-source MIP solvers. 
 
 # User inputs
 | Necessary Inputs  | Description |
@@ -35,7 +35,7 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 Using some of the user input options as described above, an optimization model to minimize the total depth of decomposition for a 2-qubit controlled-Z gate can be executed as follows:
 
 ```julia
-using QuantumCircuitOpt
+import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
 
@@ -43,11 +43,11 @@ params = Dict{String, Any}(
 "num_qubits" => 2, 
 "depth" => 4,    
 "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-"target_gate" => "controlled_Z",
+"target_gate" => QCO.CZGate(),
        
 "U_θ_discretization" => [-π/2, 0, π/2],
 "U_ϕ_discretization" => [0, π/2],
-"U_λ_discretization" => [0, π/2],
+"U_λ_discretization" => [0, π/4],
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",
@@ -55,27 +55,27 @@ params = Dict{String, Any}(
 )
 
 qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer) 
-QuantumCircuitOpt.run_QCModel(params, qcm_optimizer)
+QCO.run_QCModel(params, qcm_optimizer)
 ```
 
 # Extracting results
 The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
 
 ```julia
-results = QuantumCircuitOpt.run_QCModel(params, qcm_optimizer)
+results = QCO.run_QCModel(params, qcm_optimizer)
 ```
 For example, for decomposing the above controlled-Z gate, the QuantumCircuitOpt's runtime and the optimal objective value (minimum depth) can be accessed using,
 ```julia
 results["solve_time"]
 results["objective"]
 ```
-Also,  `results["solution"]` contains detailed information about the solution produced by the optimization model.
+Also, `results["solution"]` contains detailed information about the solution produced by the optimization model.
 
 # Visualizing results
 QuantumCircuitOpt also currently supports the visualization of optimal circuit decompositions obtained from the results dictionary (from above), which can be executed using,
 ```julia
-data = QuantumCircuitOpt.get_data(params)
-QuantumCircuitOpt.visualize_solution(results, data)
+data = QCO.get_data(params)
+QCO.visualize_solution(results, data)
 ```
 For example, for the above controlled-Z gate decomposition, the processed output of QuantumCircuitOpt is as follows: 
 ```
@@ -88,15 +88,14 @@ Quantum Circuit Model Data
   Input elementary gates: ["U3", "cnot_12", "Identity"]
     U3 gate - θ discretization: [-90.0, 0.0, 90.0]
     U3 gate - ϕ discretization: [0.0, 90.0]
-    U3 gate - λ discretization: [0.0, 90.0]
-  Input target gate: controlled_Z
+    U3 gate - λ discretization: [0.0, 45.0]
   Type of decomposition: exact
 
 Optimal Circuit Decomposition
 
-  U3 (2, (-90.0,0.0,0.0)) * cnot_12 * U3 (2, (90.0,0.0,0.0)) = controlled_Z
+  U3 (2, (-90.0,0.0,0.0)) * cnot_12 * U3 (2, (90.0,0.0,0.0)) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 10.03 sec.
+  Optimizer run time: 15.29 sec.
 =============================================================================
 ```
  
