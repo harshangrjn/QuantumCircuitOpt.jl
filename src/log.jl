@@ -36,12 +36,12 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
             for i in R_gates_ids
 
-                if data["elementary_gates"][i] == "R_x"
-                    printstyled("    ","R_x gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_x"]), digits = 1),"\n"; color = :cyan)
-                elseif data["elementary_gates"][i] == "R_y"
-                    printstyled("    ","R_y gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_y"]), digits = 1),"\n"; color = :cyan)
-                elseif data["elementary_gates"][i] == "R_z"
-                    printstyled("    ","R_z gate discretization: ", ceil.(rad2deg.(data["discretization"]["R_z"]), digits = 1),"\n"; color = :cyan)
+                if data["elementary_gates"][i] == "RX"
+                    printstyled("    ","RX gate discretization: ", ceil.(rad2deg.(data["discretization"]["RX"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i] == "RY"
+                    printstyled("    ","RY gate discretization: ", ceil.(rad2deg.(data["discretization"]["RY"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i] == "RZ"
+                    printstyled("    ","RZ gate discretization: ", ceil.(rad2deg.(data["discretization"]["RZ"]), digits = 1),"\n"; color = :cyan)
                 end
 
             end
@@ -168,15 +168,15 @@ function get_postprocessed_solutions(results::Dict{String, Any}, data::Dict{Stri
                 end
 
                 if startswith(s1, "R")
-                    θ = rad2deg(gate_id["angle"])
+                    θ = round(rad2deg(gate_id["angle"]), digits = 3)
                     s3 = "$(θ)"
                     push!(gates_sol, string(s1," (",s2,", ",s3,")"))
 
                 elseif startswith(s1, "U")
                     
-                    θ = rad2deg(gate_id["angle"]["θ"])
-                    ϕ = rad2deg(gate_id["angle"]["ϕ"])
-                    λ = rad2deg(gate_id["angle"]["λ"])
+                    θ = round(rad2deg(gate_id["angle"]["θ"]), digits = 3)
+                    ϕ = round(rad2deg(gate_id["angle"]["ϕ"]), digits = 3)
+                    λ = round(rad2deg(gate_id["angle"]["λ"]), digits = 3)
                     s3 = string("(","$(θ)",",","$(ϕ)", ",","$(λ)",")")
                     push!(gates_sol, string(s1," (",s2,", ",s3,")"))
 

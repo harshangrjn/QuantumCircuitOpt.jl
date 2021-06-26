@@ -111,12 +111,12 @@ function test_controlled_H_with_R()
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["R_y", "cnot_12", "Identity"], 
+    "elementary_gates" => ["RY", "cnot_12", "Identity"], 
     "target_gate" => QCO.CHGate(),
        
-    "R_x_discretization" => [], 
-    "R_y_discretization" => [-π/4, π/4, π/2, -π/2], 
-    "R_z_discretization" => [], 
+    "RX_discretization" => [], 
+    "RY_discretization" => [-π/4, π/4, π/2, -π/2], 
+    "RZ_discretization" => [], 
   
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",

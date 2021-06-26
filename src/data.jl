@@ -87,12 +87,12 @@ function get_data(params::Dict{String, Any})
 
     if !isempty(R_gates_ids) 
         for i in R_gates_ids
-            if data["elementary_gates"][i] == "R_x"
-                data["discretization"]["R_x"] = params["R_x_discretization"]
-            elseif data["elementary_gates"][i] == "R_y"
-                data["discretization"]["R_y"] = params["R_y_discretization"]
-            elseif data["elementary_gates"][i] == "R_z"
-                data["discretization"]["R_z"] = params["R_z_discretization"]
+            if data["elementary_gates"][i] == "RX"
+                data["discretization"]["RX"] = params["RX_discretization"]
+            elseif data["elementary_gates"][i] == "RY"
+                data["discretization"]["RY"] = params["RY_discretization"]
+            elseif data["elementary_gates"][i] == "RZ"
+                data["discretization"]["RZ"] = params["RZ_discretization"]
             end
         end
     end
@@ -294,32 +294,18 @@ function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
     if length(R_gates_ids) >= 1 
         for i=1:length(R_gates_ids)
 
-            if (elementary_gates[R_gates_ids[i]] == "R_x")
-                if isempty(params["R_x_discretization"])
-                    Memento.error(_LOGGER, "No discretized angle was specified for R_x gate. Input at least one angle")
-                end        
+            gate_type = elementary_gates[R_gates_ids[i]]
 
-                R_complex["R_x"] = Dict{String, Any}()    
-                R_complex["R_x"] = get_discretized_R_gates("R_x", R_complex["R_x"], collect(params["R_x_discretization"]), params["num_qubits"])
+            if !(gate_type in ["RX", "RY", "RZ"])
+                Memento.error(_LOGGER, "Input R gate type ($(gate_type)) is not supported.")
             end
 
-            if (elementary_gates[R_gates_ids[i]] == "R_y")
-                if isempty(params["R_y_discretization"])
-                    Memento.error(_LOGGER, "No discretized angle was specified for R_y gate. Input at least one angle")
-                end    
+            if isempty(params[string(gate_type,"_discretization")])
+                Memento.error(_LOGGER, "No discretized angle was specified for $(gate_type) gate. Input at least one angle")
+            end        
 
-                R_complex["R_y"] = Dict{String, Any}()             
-                R_complex["R_y"] = get_discretized_R_gates("R_y", R_complex["R_y"], collect(params["R_y_discretization"]), params["num_qubits"])
-            end
-
-            if (elementary_gates[R_gates_ids[i]] == "R_z")
-                if isempty(params["R_z_discretization"])
-                    Memento.error(_LOGGER, "No discretized angle was specified for R_z gate. Input at least one angle")
-                end         
-
-                R_complex["R_z"] = Dict{String, Any}()             
-                R_complex["R_z"] = get_discretized_R_gates("R_z", R_complex["R_z"], collect(params["R_z_discretization"]), params["num_qubits"])
-            end
+            R_complex["$(gate_type)"] = Dict{String, Any}()    
+            R_complex["$(gate_type)"] = get_discretized_R_gates(gate_type, R_complex[gate_type], collect(params[string(gate_type,"_discretization")]), params["num_qubits"])
 
         end
     end
@@ -332,11 +318,18 @@ function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretiz
     if length(discretization) >= 1
 
         for i=1:length(discretization)
-            R_discrete = get_pauli_rotation_gates(discretization[i])[R_type]
+            if     R_type == "RX"
+                R_discrete = QCO.RXGate(discretization[i])
+            elseif R_type == "RY"
+                R_discrete = QCO.RYGate(discretization[i])
+            elseif R_type == "RZ"
+                R_discrete = QCO.RZGate(discretization[i])
+            end
+
             R["angle_$i"] = Dict{String, Any}("angle" => discretization[i],
                                              "1qubit_rep" => R_discrete,
-                                             "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(R_type, num_qubits, matrix=R_discrete, qubit_location = "qubit_1"),
-                                                                               "qubit_2" => get_full_sized_gate(R_type, num_qubits, matrix=R_discrete, qubit_location = "qubit_2")
+                                             "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "qubit_1"),
+                                                                               "qubit_2" => get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "qubit_2")
                                                                               ) 
                                             )            
         end
@@ -487,7 +480,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
             return QCO.WGate()
         
         # Gates with continuous angle parameters
-        elseif input in ["R_x", "R_y", "R_z", "U3"] 
+        elseif input in ["RX", "RY", "RZ", "U3"] 
 
             if qubit_location == "qubit_1"
                 return kron(matrix, QCO.IGate(1))
@@ -582,43 +575,43 @@ end
 
 function get_number_of_R_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
     
-    num_R_x = 0; num_R_y = 0; num_R_z = 0;
+    num_RX = 0; num_RY = 0; num_RZ = 0;
     
     # A factor of two to account for R gates on both qubits
-    if ("R_x" in elementary_gates)
-        if !("R_x_discretization" in keys(params))
-            Memento.error(_LOGGER, "Discretization angles for the R_x gate are unspecified")
+    if ("RX" in elementary_gates)
+        if !("RX_discretization" in keys(params))
+            Memento.error(_LOGGER, "Discretization angles for the RX gate are unspecified")
         end
 
-        num_R_x = 2*length(params["R_x_discretization"])
-        if num_R_x == 0
-            Memento.error(_LOGGER, "Dicsretization not specified for R_x gate")
+        num_RX = 2*length(params["RX_discretization"])
+        if num_RX == 0
+            Memento.error(_LOGGER, "Dicsretization not specified for RX gate")
         end
     end
     
-    if ("R_y" in elementary_gates)
-        if !("R_y_discretization" in keys(params))
-            Memento.error(_LOGGER, "Discretization angles for the R_y gate are unspecified")
+    if ("RY" in elementary_gates)
+        if !("RY_discretization" in keys(params))
+            Memento.error(_LOGGER, "Discretization angles for the RY gate are unspecified")
         end
 
-        num_R_y = 2*length(params["R_y_discretization"])
-        if num_R_y == 0 
-            Memento.error(_LOGGER, "Dicsretization not specified for R_y gate")
+        num_RY = 2*length(params["RY_discretization"])
+        if num_RY == 0 
+            Memento.error(_LOGGER, "Dicsretization not specified for RY gate")
         end 
     end
 
-    if ("R_z" in elementary_gates)
-        if !("R_z_discretization" in keys(params))
-            Memento.error(_LOGGER, "Discretization angles for the R_z gate are unspecified")
+    if ("RZ" in elementary_gates)
+        if !("RZ_discretization" in keys(params))
+            Memento.error(_LOGGER, "Discretization angles for the RZ gate are unspecified")
         end
 
-        num_R_z = 2*length(params["R_z_discretization"])
-        if num_R_z == 0
-            Memento.error(_LOGGER, "Dicsretization not specified for R_z gate")
+        num_RZ = 2*length(params["RZ_discretization"])
+        if num_RZ == 0
+            Memento.error(_LOGGER, "Dicsretization not specified for RZ gate")
         end
     end
 
-    return (num_R_x + num_R_y + num_R_z)
+    return (num_RX + num_RY + num_RZ)
 end
 
 function _num_U3_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
@@ -643,27 +636,4 @@ function _num_U3_gates(params::Dict{String, Any}, elementary_gates::Array{String
         end
 
     return num_U3
-end
-
-"""
-    get_pauli_rotation_gates(θ::Number)
-
-For a given angle in radiaons, this function returns standard rotation gates those define rotations around the Pauli axis {X,Y,Z}.
-Note that R_x(θ) = u3(θ, -π/2, π/2), R_y(θ) = u3(θ, 0, 0), R_z(λ) = exp((-λ/2)im)*u1(λ). 
-"""
-function get_pauli_rotation_gates(θ::Number)
-    #input angles in radians
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in Pauli rotation gate is not within valid bounds")
-    end
-
-    R_x = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
-    R_y = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
-    R_z = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
-    pauli_rotation_gates = Dict{String, Any}("R_x" => round_complex_values(R_x), 
-                                             "R_y" => round_complex_values(R_y), 
-                                             "R_z" => round_complex_values(R_z)
-                                            )
-
-    return pauli_rotation_gates
 end

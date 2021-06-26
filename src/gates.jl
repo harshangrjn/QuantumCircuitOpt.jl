@@ -123,7 +123,7 @@ end
 @doc raw"""
     RXGate(θ::Number)
 
-A single-qubit gate which represents rotation about the X axis.
+A single-qubit Pauli gate which represents rotation about the X axis.
 
 **Matrix Representation**
 ```math
@@ -150,7 +150,7 @@ end
 @doc raw"""
     RYGate(θ::Number)
 
-A single-qubit gate which represents rotation about the Y axis.
+A single-qubit Pauli gate which represents rotation about the Y axis.
 
 **Matrix Representation**
 ```math
@@ -177,7 +177,7 @@ end
 @doc raw"""
     RZGate(θ::Number)
 
-A single-qubit gate which represents rotation about the Z axis. This gate is also equivalent to [U1Gate](@ref) up to a phase factor, 
+A single-qubit Pauli gate which represents rotation about the Z axis. This gate is also equivalent to [U1Gate](@ref) up to a phase factor, 
 that is, ``RZ(\theta) = e^{-i{\theta}/2}U1(\theta)``.
 
 **Matrix Representation**
