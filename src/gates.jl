@@ -1037,3 +1037,134 @@ function ToffoliGate()
                                             0  0  0  0  0  0  1  0]))
 
 end
+
+@doc raw"""
+    CSwapGate()
+
+Three-qubit controlled SWAP gate, also known as the [Fredkin gate](https://en.wikipedia.org/wiki/Fredkin_gate). 
+
+**Circuit Representation**
+```
+q_0: ─■─
+      │
+q_1: ─X─
+      │
+q_2: ─X─
+```
+
+**Matrix Representation**
+
+```math
+CSwapGate =
+            \begin{pmatrix}
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+        \end{pmatrix}
+```
+"""
+function CSwapGate()
+
+    return SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                            0  1  0  0  0  0  0  0
+                                            0  0  1  0  0  0  0  0
+                                            0  0  0  1  0  0  0  0
+                                            0  0  0  0  1  0  0  0
+                                            0  0  0  0  0  0  1  0
+                                            0  0  0  0  0  1  0  0
+                                            0  0  0  0  0  0  0  1]))
+
+end
+
+@doc raw"""
+    CCZGate()
+
+Three-qubit controlled-controlled Z gate. 
+
+**Circuit Representation**
+```
+q_0: ─■─
+      │
+q_1: ─■─
+      │
+q_2: ─■─
+```
+
+**Matrix Representation**
+
+```math
+CCZGate =
+            \begin{pmatrix}
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 \\
+        \end{pmatrix}
+```
+"""
+function CCZGate()
+
+    return SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                            0  1  0  0  0  0  0  0
+                                            0  0  1  0  0  0  0  0
+                                            0  0  0  1  0  0  0  0
+                                            0  0  0  0  1  0  0  0
+                                            0  0  0  0  0  1  0  0
+                                            0  0  0  0  0  0  1  0
+                                            0  0  0  0  0  0  0  -1]))
+
+end
+
+@doc raw"""
+    PeresGate()
+
+Three-qubit Peres gate. This gate is equivalent to [ToffoliGate](@ref) followed by the [CNotGate](@ref) in 3 qubits. 
+Reference: [https://doi.org/10.1103/PhysRevA.32.3266](https://doi.org/10.1103/PhysRevA.32.3266)
+
+**Circuit Representation**
+```
+q_0: ──■─────■──          
+       │   ┌─┴─┐
+q_1: ──■───┤ X ├
+     ┌─┴─┐ └───┘
+q_2: ┤ X ├──────
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+PeresGate =
+            \begin{pmatrix}
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+        \end{pmatrix}
+```
+"""
+function PeresGate()
+
+    return SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                            0  1  0  0  0  0  0  0
+                                            0  0  1  0  0  0  0  0
+                                            0  0  0  1  0  0  0  0
+                                            0  0  0  0  0  0  0  1
+                                            0  0  0  0  0  0  1  0
+                                            0  0  0  0  0  1  0  0
+                                            0  0  0  0  1  0  0  0]))
+
+end

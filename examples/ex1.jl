@@ -1,9 +1,7 @@
-using QuantumCircuitOpt
+import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
 # using Cbc
-
-const QCO = QuantumCircuitOpt
 
 include("solver.jl")
 
@@ -19,12 +17,12 @@ params = Dict{String, Any}(
 "depth" => 5,
 
 # "elementary_gates" => ["R_x", "Identity"], 
-# "target_gate" => "test_R_x_1",
+# "target_gate" => QCO.RXGate(π/4),
 
 "elementary_gates" => ["U3", "Identity", "cnot_12"],
 "target_gate" => target_gate(),
 
-# "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_conjugate", "T2_conjugate", "cnot_12", "Identity"],  
+# "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_dagger", "T2_dagger", "cnot_12", "Identity"],  
 # "target_gate" => QCO.C2SXGate(),
 
 "R_x_discretization" => [π/4], 

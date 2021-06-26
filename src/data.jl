@@ -335,8 +335,8 @@ function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretiz
             R_discrete = get_pauli_rotation_gates(discretization[i])[R_type]
             R["angle_$i"] = Dict{String, Any}("angle" => discretization[i],
                                              "1qubit_rep" => R_discrete,
-                                             "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(R_type, num_qubits, M=R_discrete, qubit_location = "qubit_1"),
-                                                                               "qubit_2" => get_full_sized_gate(R_type, num_qubits, M=R_discrete, qubit_location = "qubit_2")
+                                             "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(R_type, num_qubits, matrix=R_discrete, qubit_location = "qubit_1"),
+                                                                               "qubit_2" => get_full_sized_gate(R_type, num_qubits, matrix=R_discrete, qubit_location = "qubit_2")
                                                                               ) 
                                             )            
         end
@@ -375,14 +375,14 @@ function get_discretized_U3_gates(U_type::String, U::Dict{String, Any}, θ_discr
         for j=1:length(ϕ_discretization)
             for k=1:length(λ_discretization)
                 
-                U_discrete = get_u3_gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                U_discrete = QCO.U3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
                 
                 U["angle_$(counter)"] = Dict{String, Any}("θ" => θ_discretization[i],
                                                           "ϕ" => ϕ_discretization[j],
                                                           "λ" => λ_discretization[k],
                                                           "1qubit_rep" => U_discrete,
-                                                          "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(U_type, num_qubits, M = U_discrete, qubit_location = "qubit_1"),
-                                                                                            "qubit_2" => get_full_sized_gate(U_type, num_qubits, M = U_discrete, qubit_location = "qubit_2")
+                                                          "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "qubit_1"),
+                                                                                            "qubit_2" => get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "qubit_2")
                                                                                            ) 
                                                          )
                 counter += 1
@@ -393,152 +393,149 @@ function get_discretized_U3_gates(U_type::String, U::Dict{String, Any}, θ_discr
     return U
 end
 
-# function get_full_sized_gate(input::String, num_qubits::Int64; M::Array{Complex{Float64},2} = nothing, qubit_location::String = nothing)
-function get_full_sized_gate(input::String, num_qubits::Int64; M = nothing, qubit_location = nothing)
+"""
+    get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing)
 
-    gates = get_elementary_gates(num_qubits)
+For a given string and number of qubits in the input specified input, this function returns a full 
+sized gate with respect to the input number of qubits. 
+"""
+function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing)
+
+    if input == "Identity"
+        return QCO.IGate(num_qubits)
+    end
+    
     # All 2-qubit full-sized gates
     if num_qubits == 2
-        
-        if input == "Identity"
-            return kron(gates["I_2"], gates["I_2"])
 
-        elseif input == "H1"
-            return kron(gates["hadamard_H"], gates["I_2"])
+        if input == "H1"
+            return kron(QCO.HGate(), QCO.IGate(1))
 
         elseif input == "H2"
-            return kron(gates["I_2"], gates["hadamard_H"])
+            return kron(QCO.IGate(1), QCO.HGate())
 
         elseif input == "cnot_12"
-            return gates["cnot_12"]
+            return QCO.CNotGate()
 
         elseif input == "cnot_21"
-            return gates["cnot_21"]
+            return QCO.CNotRevGate()
 
         elseif input == "cnot_swap"
-            return gates["cnot_12"] * gates["cnot_21"]
+            return QCO.CNotGate() * QCO.CNotRevGate()
 
         elseif input == "H1⊗H2"
-            return kron(gates["hadamard_H"], gates["hadamard_H"])
-
-        elseif input == "Z1"
-            return kron(gates["ph_shift_Z"], gates["I_2"]) 
-
-        elseif input == "Z2"
-            return kron(gates["I_2"], gates["ph_shift_Z"])        
+            return kron(QCO.HGate(), QCO.HGate())
 
         elseif input == "T1"
-            return kron(gates["ph_shift_T"], gates["I_2"]) 
+            return kron(QCO.TGate(), QCO.IGate(1)) 
 
         elseif input == "T2"
-            return kron(gates["I_2"], gates["ph_shift_T"])   
+            return kron(QCO.IGate(1), QCO.TGate())   
 
-        elseif input == "T1_conjugate"
-            return kron(gates["ph_shift_T_conj"], gates["I_2"]) 
+        elseif input == "T1_dagger"
+            return kron(QCO.TdaggerGate(), QCO.IGate(1)) 
 
-        elseif input == "T2_conjugate"
-            return kron(gates["I_2"], gates["ph_shift_T_conj"])   
+        elseif input == "T2_dagger"
+            return kron(QCO.IGate(1), QCO.TdaggerGate())   
 
         elseif input == "S1"
-            return kron(gates["ph_shift_S"], gates["I_2"]) 
+            return kron(QCO.SGate(), QCO.IGate(1)) 
 
         elseif input == "S2"
-            return kron(gates["I_2"], gates["ph_shift_S"])  
+            return kron(QCO.IGate(1), QCO.SGate())  
 
         elseif input == "X1"
-            return kron(gates["pauli_X"], gates["I_2"]) 
+            return kron(QCO.XGate(), QCO.IGate(1)) 
 
         elseif input == "X2"
-            return kron(gates["I_2"], gates["pauli_X"])   
+            return kron(QCO.IGate(1), QCO.XGate())   
 
         elseif input == "Y1"
-            return kron(gates["pauli_Y"], gates["I_2"]) 
+            return kron(QCO.YGate(), QCO.IGate(1)) 
 
         elseif input == "Y2"
-            return kron(gates["I_2"], gates["pauli_Y"])   
+            return kron(QCO.IGate(1), QCO.YGate())   
+
+        elseif input == "Z1"
+            return kron(QCO.ZGate(), QCO.IGate(1)) 
+
+        elseif input == "Z2"
+            return kron(QCO.IGate(1), QCO.ZGate())        
             
-        elseif input == "controlled_Z"
-            return gates["controlled_Z"]
+        elseif input == "CZ_12"
+            return QCO.CZGate()
 
-        elseif input == "controlled_H_12"
-            return gates["controlled_H_12"]
+        elseif input == "CH_12"
+            return QCO.CHGate()
 
-        elseif input == "controlled_V"
-            return gates["controlled_V"]
-
-        elseif input == "controlled_R2"
-            return gates["controlled_R2"]
+        elseif input == "CV_12"
+            return QCO.CVGate()
 
         elseif input == "swap"
-            return gates["swap"]
+            return QCO.SwapGate()
 
-        elseif input == "magic_M"
-            return gates["magic_M"]
+        elseif input == "M_12"
+            return QCO.MGate()
 
-        elseif input == "qft2"
-            return gates["qft2"]
+        elseif input == "QFT_12"
+            return QCO.QFT2Gate()
 
-        elseif input == "C2SXGate"
+        elseif input == "CSX_12"
             return QCO.C2SXGate()
         
-        elseif input == "W_hermitian"
-            return gates["W_hermitian"]
-
-        # Gates added for testing purposes --------------
-        elseif input == "test_R_x_1"
-            return kron(gates["test_R_x"], gates["I_2"])
-
-        elseif input == "test_R_x_2"
-            return kron(gates["I_2"], gates["test_R_x"])
-
-        elseif input == "test_R_y_1"
-            return kron(gates["test_R_y"], gates["I_2"])
-
-        elseif input == "test_R_y_2"
-            return kron(gates["I_2"], gates["test_R_y"])
-
-        elseif input == "test_R_z_1"
-            return kron(gates["test_R_z"], gates["I_2"])
-
-        elseif input == "test_R_z_2"
-            return kron(gates["I_2"], gates["test_R_z"])
-
-        elseif input == "test_U3_1"
-            return kron(gates["test_U3"], gates["I_2"])
-
-        elseif input == "test_U3_2"
-            return kron(gates["I_2"], gates["test_U3"])
-        #-------------------------------------------------
+        elseif input == "W_12"
+            return QCO.WGate()
         
         # Gates with continuous angle parameters
         elseif input in ["R_x", "R_y", "R_z", "U3"] 
 
             if qubit_location == "qubit_1"
-                return kron(M, gates["I_2"])
+                return kron(matrix, QCO.IGate(1))
             elseif qubit_location == "qubit_2"
-                return kron(gates["I_2"], M)
+                return kron(QCO.IGate(1), matrix)
             end
 
-        # Add here the other gates from get_elementary_gates
         else
+            
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
         end
     end
+
     # All 3-qubit full-sized gates
     if num_qubits == 3
+
         if input == "toffoli"
-            return gates["toffoli"]
+            return QCO.ToffoliGate()
+
+        elseif input == "CSwap"
+            return QCO.CSwapGate()
+
+        elseif input == "CCZ"
+            return QCO.CCZGate()
+
+        elseif input == "peres"
+            return QCO.PeresGate()
 
         elseif input == "cnot_13"
-            return gates["cnot_13"]
+            # |0⟩⟨0| ⊗ I ⊗ I 
+            control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , kron(QCO.IGate(1), QCO.IGate(1)))
+            # |1⟩⟨1| ⊗ I ⊗ X 
+            control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , kron(QCO.IGate(1), QCO.XGate()))
+            return control_0 + control_1
 
         elseif input == "cnot_31"
-            return gates["cnot_31"]
+            # I ⊗ I ⊗ |0⟩⟨0| 
+            control_0 = kron(QCO.IGate(1), kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0])))
+            # X ⊗ I ⊗ |1⟩⟨1|
+            control_1 = kron(kron(QCO.XGate(), QCO.IGate(1)), Array{Complex{Float64},2}([0 0; 0 1]))
+            return control_0 + control_1
 
         else
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
         end
+    
     end
+
 end
 
 function num_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
@@ -561,7 +558,7 @@ function num_input_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
 
     elseif !isempty(U_gates) && isempty(R_gates)
         
-        n_discretized_U_gates = get_number_of_U3_gates(params, elementary_gates)
+        n_discretized_U_gates = _num_U3_gates(params, elementary_gates)
 
         num_gates = length(elementary_gates) - length(U_gates) + n_discretized_U_gates
 
@@ -569,7 +566,7 @@ function num_input_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
         
         n_discretized_R_gates = get_number_of_R_gates(params, elementary_gates)
 
-        n_discretized_U_gates = get_number_of_U3_gates(params, elementary_gates)
+        n_discretized_U_gates = _num_U3_gates(params, elementary_gates)
 
         num_gates = length(elementary_gates) - length(R_gates) - length(U_gates) + n_discretized_R_gates + n_discretized_U_gates
 
@@ -624,7 +621,7 @@ function get_number_of_R_gates(params::Dict{String, Any}, elementary_gates::Arra
     return (num_R_x + num_R_y + num_R_z)
 end
 
-function get_number_of_U3_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+function _num_U3_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
     num_U3 = 0
 
@@ -649,133 +646,6 @@ function get_number_of_U3_gates(params::Dict{String, Any}, elementary_gates::Arr
 end
 
 """
-    get_elementary_gates(num_qubits::Int64)
-
-Given the number of qubits (`num_qubits`), `get_elementary_gates` function 
-returns all the elementary gates in the basic `2⨉2` form, without applying 
-kronecker tensor product operations. 
-""" 
-function get_elementary_gates(num_qubits::Int64)
-    
-    # 1-qubit gates 
-    I_2 = Array{Complex{Float64},2}([1 0; 0 1])
-
-    pauli_X = Array{Complex{Float64},2}([0 1; 1 0])
-
-    pauli_Y = Array{Complex{Float64},2}([0 -im; im 0])  
-    
-    hadamard_H = Array{Complex{Float64},2}(1/sqrt(2)*[1 1; 1 -1])
-
-    ph_shift_Z = Array{Complex{Float64},2}([1 0; 0 -1]) # Also called pauli-Z gate (π/8 gate)
-
-    ph_shift_S = Array{Complex{Float64},2}([1 0; 0 im])
-
-    ph_shift_T = Array{Complex{Float64},2}([1 0; 0 (1/sqrt(2)) + (1/sqrt(2))im])
-
-    ph_shift_T_conj = Array{Complex{Float64},2}([1 0; 0 (1/sqrt(2)) - (1/sqrt(2))im])
- 
-    # 2-qubit gates 
-    cnot_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]) 
-
-    cnot_21 = Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]) 
-
-    controlled_Z = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1])
-
-    # controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 0 1/sqrt(2); 0 0 1 0; 0 1/sqrt(2) 0 -1/sqrt(2)])
-    controlled_H_12 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1/sqrt(2) 1/sqrt(2); 0  0 1/sqrt(2) -1/sqrt(2)])
-
-    controlled_V = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5+(0.5)im 0.5-(0.5)im; 0 0 0.5-(0.5)im 0.5+(0.5)im])  #Also called sqrt(CNOT) gate
-
-    swap = Array{Complex{Float64},2}([1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1])
-
-    magic_M = Array{Complex{Float64},2}(1/sqrt(2)*[1 im 0 0; 0 0 im 1; 0 0 im -1; 1 -im 0 0])
-
-    qft2 = Array{Complex{Float64},2}(0.5*[1 1 1 1; 1 im -1 -im; 1 -1 1 -1; 1 -im -1 im])
-
-    controlled_R2 = Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 im]) # Useful for qft2's decomposition
-
-    W_hermitian = Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1]) # Useful to diagonlize the swap gate
-
-    # test_R_x = Array{Complex{Float64},2}([ 0.92388+0.0im   0.0-0.382683im
-    #                                         0.0-0.382683im  0.92388+0.0im])
-    test_R_x = QCO.RXGate(π/4)                                            
-
-    test_R_y = Array{Complex{Float64}, 2}([  0.92388+0.0im  -0.382683+0.0im
-                                            0.382683+0.0im    0.92388+0.0im ])
-
-    test_R_z = Array{Complex{Float64}, 2}([  0.92388-0.382683im      0.0+0.0im
-                                                0.0+0.0im       0.92388+0.382683im])
-
-    # U3 (θ=0, ϕ=0, λ=π/4)
-    test_U3 = Array{Complex{Float64}, 2}([ 1.0+0.0im       0.0+0.0im
-                                           0.0+0.0im  (1/sqrt(2))+(1/sqrt(2))im])
-
-    elementary_gates = Dict{String, Any}("I_2" => I_2,
-                                         "pauli_X" => pauli_X, 
-                                         "pauli_Y" => pauli_Y,
-                                         "hadamard_H" => hadamard_H,
-                                         "ph_shift_S" => ph_shift_S,
-                                         "ph_shift_Z" => ph_shift_Z,
-                                         "ph_shift_T" => ph_shift_T,
-                                         "ph_shift_T_conj" => ph_shift_T_conj,
-                                         "cnot_12" => cnot_12,
-                                         "cnot_21" => cnot_21,
-                                         "controlled_Z" => controlled_Z,
-                                         "controlled_H_12" => controlled_H_12,
-                                         "controlled_V" => controlled_V,
-                                         "controlled_R2" => controlled_R2,
-                                         "swap" => swap,
-                                         "magic_M" => magic_M,
-                                         "qft2" => qft2,
-                                         "W_hermitian" => W_hermitian,
-                                         "test_R_x" => test_R_x,
-                                         "test_R_y" => test_R_y,
-                                         "test_R_z" => test_R_z,
-                                         "test_U3"  => test_U3
-                                         )
-    
-    # 3-qubit gates 
-    if num_qubits == 3
-        I_3 = SA.sparse(Array{Complex{Float64},2}(Matrix(I, 2^3, 2^3)))
-
-        toffoli = SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                                    0  1  0  0  0  0  0  0
-                                                    0  0  1  0  0  0  0  0
-                                                    0  0  0  1  0  0  0  0
-                                                    0  0  0  0  1  0  0  0
-                                                    0  0  0  0  0  1  0  0
-                                                    0  0  0  0  0  0  0  1
-                                                    0  0  0  0  0  0  1  0]))
-        
-        cnot_13 = SA.sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
-                                                    0	1	0	0	0	0	0	0
-                                                    0	0	1	0	0	0	0	0
-                                                    0	0	0	1	0	0	0	0
-                                                    0	0	0	0	0	1	0	0
-                                                    0	0	0	0	1	0	0	0
-                                                    0	0	0	0	0	0	0	1
-                                                    0	0	0	0	0	0	1	0]))
-        
-        cnot_31 = SA.sparse(Array{Complex{Float64},2}([1	0	0	0	0	0	0	0
-                                                    0	0	0	0	0	1	0	0
-                                                    0	0	1	0	0	0	0	0
-                                                    0	0	0	0	0	0	0	1
-                                                    0	0	0	0	1	0	0	0
-                                                    0	1	0	0	0	0	0	0
-                                                    0	0	0	0	0	0	1	0
-                                                    0	0	0	1	0	0	0	0]))
-
-        elementary_gates["I_3"] = I_3
-        elementary_gates["toffoli"] = toffoli
-        elementary_gates["cnot_13"] = cnot_13
-        elementary_gates["cnot_31"] = cnot_31
-        
-    end
-
-    return elementary_gates
-end
-
-"""
     get_pauli_rotation_gates(θ::Number)
 
 For a given angle in radiaons, this function returns standard rotation gates those define rotations around the Pauli axis {X,Y,Z}.
@@ -790,62 +660,10 @@ function get_pauli_rotation_gates(θ::Number)
     R_x = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
     R_y = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
     R_z = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
-    pauli_rotationum_gates = Dict{String, Any}("R_x" => round_complex_values(R_x), 
+    pauli_rotation_gates = Dict{String, Any}("R_x" => round_complex_values(R_x), 
                                              "R_y" => round_complex_values(R_y), 
                                              "R_z" => round_complex_values(R_z)
                                             )
 
-    return pauli_rotationum_gates
-end
-
-function get_u1_gate(λ::Number)
-    #input angles in radians
-    θ = 0
-    ϕ = 0
-
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in universal u1 gate is not within valid bounds")
-    end
-
-    u1 = get_u3_gate(θ, ϕ, λ)
-    return u1
-end
-
-function get_u2_gate(ϕ::Number, λ::Number)
-    #input angles in radians
-    θ = π/2
-
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in universal u2 gate is not within valid bounds")
-    end
-    if !(-2*π <= ϕ <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle in universal u2 gate is not within valid bounds")
-    end
-
-    u2 = get_u3_gate(θ, ϕ, λ)
-    return u2
-end
-
-"""
-    get_u3_gate(θ::Number, ϕ::Number, λ::Number)
-
-Given three angles (θ,ϕ,λ),  this function returns the most general form of a single qubit unitary gate.
-"""
-function get_u3_gate(θ::Number, ϕ::Number, λ::Number)
-    #input angles in radians
-
-    if !(-π <= θ <= π)
-        Memento.error(_LOGGER, "θ angle in universal u3 gate is not within valid bounds")
-    end
-    if !(-2*π <= ϕ <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle in universal u3 gate is not within valid bounds")
-    end
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in universal u3 gate is not within valid bounds")
-    end
-
-    u3 = Array{Complex{Float64},2}([           cos(θ/2)               -(cos(λ) + (sin(λ))im)*sin(θ/2) 
-                                    (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)])
-
-    return round_complex_values(u3)
+    return pauli_rotation_gates
 end

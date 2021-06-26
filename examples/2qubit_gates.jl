@@ -61,7 +61,7 @@ function test_controlled_V()
     "num_qubits" => 2, 
     "depth" => 7,    
 
-    "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_conjugate", "cnot_12", "cnot_21"],
+    "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_dagger", "cnot_12", "cnot_21"],
     "target_gate" => QCO.CVGate(),
     
     "objective" => "minimize_depth", 
@@ -315,7 +315,7 @@ function test_W_using_HCnot()
         "num_qubits" => 2, 
         "depth" => 6,    
     
-        "elementary_gates" => ["controlled_H_12", "cnot_21", "cnot_12", "Identity"], 
+        "elementary_gates" => ["CH_12", "cnot_21", "cnot_12", "Identity"], 
         "target_gate" => QCO.WGate(),   
                   
         "objective" => "minimize_depth", 
