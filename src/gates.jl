@@ -287,7 +287,7 @@ end
     SGate()
 
 Single-qubit S gate, equivalent to [U3Gate](@ref)(``0,0,\frac{\pi}{2}``). This 
-gate is also referred to as a Clifford gate, P gate or a square-root of Pauli-Z. Historically, this is also 
+gate is also referred to as a Clifford gate, P gate or a square-root of Pauli-[ZGate](@ref). Historically, this is also 
 called as the phase gate (denoted by P), since it shifts the phase of the one state relative to the zero state.
 
 **Matrix Representation**
@@ -350,8 +350,8 @@ end
 @doc raw"""
     TdaggerGate()
 
-Single-qubit T adjoint gate (or the conjugate transpose of T gate), equivalent to [U3Gate](@ref)(``0,0,-\frac{\pi}{4}``). This 
-gate is also referred to as the fourth-root of Pauli-Z gate. 
+Single-qubit, hermitian conjugate of the [TGate](@ref). This gate is equivalent to [U3Gate](@ref)(``0,0,-\frac{\pi}{4}``). This 
+gate is also referred to as the fourth-root of Pauli-[ZGate](@ref). 
 
 **Matrix Representation**
 
@@ -371,7 +371,7 @@ end
 @doc raw"""
     SXGate()
 
-Single-qubit square root of pauli X gate ([XGate](@ref)). 
+Single-qubit square root of pauli-([XGate](@ref)).
 
 **Matrix Representation**
 
@@ -392,7 +392,7 @@ end
     PhaseGate()
 
 Single-qubit rotation gate about the Z axis. This is also equivalent to [U3Gate](@ref)(``0,0,\lambda``). This 
-gate is also referred to as the U1 gate. 
+gate is also referred to as the [U1Gate](@ref). 
 
 **Matrix Representation**
 
@@ -423,7 +423,8 @@ end
 @doc raw"""
     CNotGate()
 
-Two-qubit controlled NOT gate, which is also called the controlled X gate ([CXGate](@ref)). 
+Two-qubit controlled NOT gate with control and target on first and second qubits, respectively. This is also 
+called the controlled X gate ([CXGate](@ref)). 
 
 **Circuit Representation**
 ```
@@ -453,7 +454,7 @@ end
 @doc raw"""
     CNotRevGate()
 
-Two-qubit reverse controlled NOT gate.
+Two-qubit reverse controlled NOT gate, with target and control on first and second qubits, respectively. 
 
 **Circuit Representation**
 ```
@@ -483,7 +484,7 @@ end
 @doc raw"""
     DCXGate()
 
-Two-qubit double controlled NOT gate consisting of two back-to-back CNOTs with alternate controls. 
+Two-qubit double controlled NOT gate consisting of two back-to-back [CNotGate](@ref)s with alternate controls. 
 
 **Circuit Representation**
 ```
@@ -514,7 +515,7 @@ end
 @doc raw"""
     CXGate()
 
-Two-qubit controlled X gate, which is also the same as [CNotGate](@ref). 
+Two-qubit controlled [XGate](@ref), which is also the same as [CNotGate](@ref). 
 
 **Circuit Representation**
 ```
@@ -544,7 +545,7 @@ end
 @doc raw"""
     CYGate()
 
-Two-qubit controlled Y gate. 
+Two-qubit controlled [YGate](@ref). 
 
 **Circuit Representation**
 ```
@@ -574,7 +575,7 @@ end
 @doc raw"""
     CZGate()
 
-Two-qubit, symmetric, controlled-Z gate. 
+Two-qubit, symmetric, controlled [ZGate](@ref). 
 
 **Circuit Representation**
 ```
@@ -604,7 +605,7 @@ end
 @doc raw"""
     CHGate()
 
-Two-qubit, symmetric, controlled Hadamard gate. 
+Two-qubit, symmetric, controlled Hadamard gate ([HGate](@ref)). 
 
 **Circuit Representation**
 ```
@@ -664,7 +665,7 @@ end
 @doc raw"""
     WGate()
 
-Two-qubit, W hermitian gate, typically useful to diagonlize the SWAP gate ([SwapGate](@ref)).  
+Two-qubit, W hermitian gate, typically useful to diagonlize the ([SwapGate](@ref)).  
 
 **Matrix Representation**
 
@@ -686,7 +687,7 @@ end
 @doc raw"""
     CRXGate(θ::Number)
 
-Two-qubit controlled version of the [RXGate](@ref). 
+Two-qubit controlled [RXGate](@ref). 
 
 **Circuit Representation**
 ```
@@ -724,7 +725,7 @@ end
 @doc raw"""
     CRYGate(θ::Number)
 
-Two-qubit controlled version of the [RYGate](@ref). 
+Two-qubit controlled [RYGate](@ref). 
 
 **Circuit Representation**
 ```
@@ -766,7 +767,7 @@ end
 @doc raw"""
     CRZGate(θ::Number)
 
-Two-qubit controlled version of the [RZGate](@ref). 
+Two-qubit controlled [RZGate](@ref). 
 
 **Circuit Representation**
 ```
@@ -808,7 +809,7 @@ end
 @doc raw"""
     CU3Gate(θ::Number, ϕ::Number, λ::Number)
 
-Two-qubit controlled version of the universal rotation gate with three Euler angles ([U3Gate](@ref)). 
+Two-qubit, controlled version of the universal rotation gate with three Euler angles ([U3Gate](@ref)). 
 
 **Circuit Representation**
 ```
@@ -915,7 +916,7 @@ end
 @doc raw"""
     C2SXGate()
 
-Two-qubit controlled sqrt(X) gate ([SXGate](@ref)), which is also the square root of the X-Pauli gate. 
+Two-qubit controlled ([SXGate](@ref)), which is also the square root of the Pauli-[XGate](@ref). 
 
 **Circuit Representation**
 ```
@@ -1063,7 +1064,7 @@ end
 @doc raw"""
     CSwapGate()
 
-Three-qubit controlled SWAP gate, also known as the [Fredkin gate](https://en.wikipedia.org/wiki/Fredkin_gate). 
+Three-qubit, controlled [SwapGate](@ref), also known as the [Fredkin gate](https://en.wikipedia.org/wiki/Fredkin_gate).
 
 **Circuit Representation**
 ```

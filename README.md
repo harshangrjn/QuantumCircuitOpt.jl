@@ -8,7 +8,7 @@
 ## Installation
 QuantumCircuitOpt.jl is a registered package and can be installed by entering the following in the package manager:
 ```julia
-using Pkg
+import Pkg
 Pkg.add("QuantumCircuitOpt")
 ```
 
@@ -19,6 +19,38 @@ Pkg.add("QuantumCircuitOpt")
   you see an error because of missing packages, run `resolve`.
 
 On how to use this package, check the [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/quickguide/#Sample-circuit-decomposition) and the "examples" folder for more such decompositions.
+
+## Sample Circuit Decomposition
+```julia
+import QuantumCircuitOpt as QCO
+using JuMP
+using CPLEX
+
+# Target: CZGate
+function target_gate()
+    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1]) 
+end
+
+params = Dict{String, Any}(
+"num_qubits" => 2, 
+"depth" => 4,    
+"elementary_gates" => ["U3", "cnot_12", "Identity"], 
+"target_gate" => target_gate(),
+       
+"U_θ_discretization" => [-π/2, 0, π/2],
+"U_ϕ_discretization" => [0, π/2],
+"U_λ_discretization" => [0, π/4],
+
+"objective" => "minimize_depth", 
+"decomposition_type" => "exact",
+"optimizer" => "cplex"
+)
+
+qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer) 
+QCO.run_QCModel(params, qcm_optimizer)
+```
+If you prefer to decompose a target gate of your choice, update the `target_gate()` function 
+accordingly in the above sample code. 
 
 ## Bug reports and Contributing
 Please report any issues via the Github **[issue tracker](https://github.com/harshangrjn/QuantumCircuitOpt.jl/issues)**. All types of issues are welcome and encouraged; this includes bug reports, documentation typos, feature requests, etc. 
