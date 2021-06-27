@@ -12,9 +12,9 @@ CNotGate
 ```@docs
 CNotRevGate
 ```
-## DCNotGate
+## DCXGate
 ```@docs
-DCNotGate
+DCXGate
 ```
 ## CXGate
 ```@docs

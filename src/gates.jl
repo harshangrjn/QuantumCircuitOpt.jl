@@ -252,8 +252,8 @@ Single-qubit Pauli-Y gate (``\sigma_y``), equivalent to [U3Gate](@ref)(``\pi,\fr
 
 ```math
 Y = \begin{pmatrix}
-0 & i \\
--i & 0
+0 & -i \\
+i & 0
 \end{pmatrix}
 ```
 """
@@ -287,7 +287,8 @@ end
     SGate()
 
 Single-qubit S gate, equivalent to [U3Gate](@ref)(``0,0,\frac{\pi}{2}``). This 
-gate is also referred to as a Clifford gate, P gate or a square-root of Pauli-Z.
+gate is also referred to as a Clifford gate, P gate or a square-root of Pauli-Z. Historically, this is also 
+called as the phase gate (denoted by P), since it shifts the phase of the one state relative to the zero state.
 
 **Matrix Representation**
 
@@ -305,10 +306,31 @@ function SGate()
 end
 
 @doc raw"""
+    SdaggerGate()
+
+Single-qubit, hermitian conjugate of the [SGate](@ref). This is also an alternative square root of 
+the [ZGate](@ref). 
+
+**Matrix Representation**
+
+```math
+S = \begin{pmatrix}
+1 & 0 \\
+0 & -i
+\end{pmatrix}
+```
+"""
+function SdaggerGate()
+
+    return Array{Complex{Float64},2}([1 0; 0 -im])
+
+end
+
+@doc raw"""
     TGate()
 
 Single-qubit T gate, equivalent to [U3Gate](@ref)(``0,0,\frac{\pi}{4}``). This 
-gate is also referred to as a ``\frac{\pi}{8}`` gate or as a fourth-root of Pauli-Z gate. 
+gate is also referred to as a ``\frac{\pi}{8}`` gate or as a fourth-root of Pauli-[ZGate](@ref). 
 
 **Matrix Representation**
 
@@ -459,7 +481,7 @@ function CNotRevGate()
 end
 
 @doc raw"""
-    DCNotGate()
+    DCXGate()
 
 Two-qubit double controlled NOT gate consisting of two back-to-back CNOTs with alternate controls. 
 
@@ -483,7 +505,7 @@ DCNot = \begin{pmatrix}
     \end{pmatrix}
 ```
 """
-function DCNotGate()
+function DCXGate()
 
     return Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 1 0 0; 0 0 1 0]) 
 
@@ -996,7 +1018,7 @@ end
 @doc raw"""
     ToffoliGate()
 
-Three-qubit Toffoli gate, also known as the CCX gate. 
+Three-qubit Toffoli gate, also known as the CCX (controlled-controlled-NOT) gate. 
 
 **Circuit Representation**
 ```

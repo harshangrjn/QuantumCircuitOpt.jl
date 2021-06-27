@@ -52,6 +52,10 @@ ZGate
 ```@docs
 SGate
 ```
+## SdaggerGate
+```@docs
+SdaggerGate
+```
 ## TGate
 ```@docs
 TGate

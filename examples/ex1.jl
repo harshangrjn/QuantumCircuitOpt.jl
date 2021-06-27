@@ -8,21 +8,28 @@ include("solver.jl")
 #-------------------------------#
 #      User-defined inputs      #
 #-------------------------------#
-function target_gate()
-    # return kron(QCO.U3Gate(0,0,π/4), QCO.IGate(1))
-    return kron(QCO.RZGate(π/4), QCO.IGate(1))
-    # return QCO.C2SXGate()
+function target_gate(gate::Int)
+    if gate == 1
+        return kron(QCO.U3Gate(0,0,π/4), QCO.IGate(1))
+    elseif gate == 2
+        return kron(QCO.RZGate(π/4), QCO.IGate(1))
+    elseif gate == 3
+        return QCO.C2SXGate()
+    elseif gate == 4
+        return kron(QCO.SdaggerGate(), QCO.IGate(1))
+    end
 end
 
 params = Dict{String, Any}(
 "num_qubits" => 2,
-"depth" => 5,
+"depth" => 3,
 
-"elementary_gates" => ["RX", "RY", "RZ", "Identity"],
+# "elementary_gates" => ["RX", "RY", "RZ", "Identity"],
 # "elementary_gates" => ["U3", "Identity", "cnot_12"],
+"elementary_gates" => ["S1", "S2", "Identity"],
 # "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_dagger", "T2_dagger", "cnot_12", "Identity"],  
 
-"target_gate" => target_gate(),
+"target_gate" => target_gate(4),
 
 "RX_discretization" => [π/4],
 "RY_discretization" => [-π/4, π/4, π/2, -π/2, -π],
