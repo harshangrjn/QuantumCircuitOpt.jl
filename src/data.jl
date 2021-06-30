@@ -30,12 +30,12 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
     else
         decomposition_type = "exact"
     end
-    
-    # Optimizer
-    if "optimizer" in keys(params)
-        optimizer = params["optimizer"]
+
+    # Decomposition type 
+    if "objective" in keys(params)
+        objective = params["objective"]
     else
-        Memento.error(_LOGGER, "Input a valid MIP optimizer")
+        objective = "minimize_depth"
     end
     
     # Relax Integrality 
@@ -72,7 +72,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
                              "cnot_idx" => cnot_idx,
                              "elementary_gates" => elementary_gates,
                              "target_gate" => target_real,
-                             "objective" => params["objective"],
+                             "objective" => objective,
                              "slack_penalty" => slack_penalty,
                              "decomposition_type" => decomposition_type,                         
                              "relax_integrality" => relax_integrality
@@ -402,6 +402,10 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
 
     if input == "Identity"
         return QCO.IGate(num_qubits)
+    end
+
+    if num_qubits > 3
+        Memento.error(_LOGGER, "Gates with greater than 3 qubits are not currently supported")
     end
     
     if input == "H1"

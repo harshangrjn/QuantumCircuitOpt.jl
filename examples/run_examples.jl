@@ -21,7 +21,7 @@ test_gates = ["test_hadamard",
                "test_W_using_HCnot",
                "test_RX_on_q3"]
 
-test_gates = ["test_magic_M_using_SHCnot"]
+# test_gates = ["test_magic_M_using_SHCnot"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

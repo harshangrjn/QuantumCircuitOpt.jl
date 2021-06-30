@@ -9,7 +9,7 @@ function get_solver(params::Dict{String,Any})
 
     # Optimizer
     if !("optimizer" in keys(params))
-        Memento.error(Memento.getlogger(@__MODULE__), "Input a valid MILP optimizer")
+        Memento.error(Memento.getlogger(@__MODULE__), "Input a valid MIP optimizer")
     end
 
     if !(params["optimizer"] in optimizers_list)
@@ -45,7 +45,7 @@ function get_solver(params::Dict{String,Any})
        return get_cbc(optimizer_presolve, optimizer_log)
 
     elseif params["optimizer"] == "glpk"  # open-source
-        return get_glpk(optimizer_presolve, optimizer_log)
+       return get_glpk(optimizer_presolve, optimizer_log)
     
     # Local mixed-integer nonlinear programming optimizers
     elseif params["optimizer"] == "ipopt"    # open-source 

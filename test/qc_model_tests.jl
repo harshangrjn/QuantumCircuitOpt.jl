@@ -4,7 +4,7 @@
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["H1", "H2", "Identity", "cnot_12"],  
+    "elementary_gates" => ["H1", "H2", "cnot_12", "Identity"],  
     "target_gate" => QCO.CNotRevGate(),
 
     "initial_gate" => "Identity",
@@ -22,7 +22,7 @@
     @test result_qc["objective"] == 0
     @test (result_qc["solution"]["z_onoff_var"][1,1] == 1) || (result_qc["solution"]["z_onoff_var"][2,1] == 1)
     @test (result_qc["solution"]["z_onoff_var"][1,2] == 1) || (result_qc["solution"]["z_onoff_var"][2,2] == 1)
-    @test result_qc["solution"]["z_onoff_var"][4,3] == 1
+    @test result_qc["solution"]["z_onoff_var"][3,3] == 1
     @test (result_qc["solution"]["z_onoff_var"][1,4] == 1) || (result_qc["solution"]["z_onoff_var"][2,4] == 1)
     @test (result_qc["solution"]["z_onoff_var"][1,5] == 1) || (result_qc["solution"]["z_onoff_var"][2,5] == 1)
     

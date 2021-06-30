@@ -36,17 +36,16 @@ mutable struct GateData
     complex::Array{Complex{Float64},2}
     real::Array{Float64,2}
     inverse::Array{Float64,2}
-    isallreal::Bool
+    isreal::Bool
 
     "Contructor for struct `Gate`"
-    function Gate(gate_type::String, num_qubits::Int64)
+    function GateData(gate_type::String, num_qubits::Int64)
         type = gate_type
-
-        complex  = getfield(Main, Symbol(gate_type))(num_qubits) # String to function name 
+        complex = QCO.get_full_sized_gate(type, num_qubits)
         real = QCO.complex_to_real_matrix(complex)
         inverse = inv(real)
-        isallreal = false
-        gate = new(type, complex, real, inverse, isallreal)
+        isreal = iszero(imag(complex))
+        gate = new(type, complex, real, inverse, isreal)
 
         return gate
     end

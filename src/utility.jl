@@ -155,69 +155,42 @@ function real_to_complex_matrix(M::Array{Float64,2})
 end
 
 function round_complex_values(M::Array{Complex{Float64},2})
-    # round values close to 0 and 1 (within toleranes) for both real and imaginary values
+    # round values close to 0 (within toleranes) for both real and imaginary values
     # Input can be a vector (>= 1 element) or a matrix of complex values
    
     if size(M)[1] == 0
         Memento.error(_LOGGER, "Input cannot be a scalar")
     end
 
-    tol = 1E-6
-    n_r = size(M)[1]
-
-    if (length(size(M)) == 1)
-        M_round = Array{Complex{Float64},2}(zeros(n_r))
-        for i=1:n_r
-            M_r = 0.0; M_i = 0.0;
-            if abs(real(M[i])) > tol
-                M_r = real(M)
-            end
-            if abs(imag(M[i])) > tol
-                M_i = imag(M[i])
-            end
-            if (abs(M_r) > 0) || (abs(M_i) > 0)
-                M_round[i] = M_r + (M_i)im
-            end    
-        end
-    end
-
     if (length(size(M)) == 2)
+        n_r = size(M)[1]
         n_c = size(M)[2]
+
         M_round = Array{Complex{Float64},2}(zeros(n_r,n_c))
+        
         for i=1:n_r
             for j=1:n_c 
-                Mij_r = 0.0; Mij_i = 0.0;
-                if abs(real(M[i,j])) > tol
+
+                # Real components
+                if isapprox(real(M[i,j]), 0, atol=1E-6)
+                    Mij_r = 0
+                elseif isapprox(real(M[i,j]), 1, atol=1E-6)
+                    Mij_r = 1
+                else 
                     Mij_r = real(M[i,j])
                 end
-                if abs(imag(M[i,j])) > tol
+                
+                # Imaginary components
+                if isapprox(imag(M[i,j]), 0, atol=1E-6)
+                    Mij_i = 0
+                elseif isapprox(imag(M[i,j]), 1, atol=1E-6)
+                    Mij_i = 1
+                else 
                     Mij_i = imag(M[i,j])
                 end
-                if (abs(Mij_r) > 0) || (abs(Mij_i) > 0)
-                    M_round[i,j] = Mij_r + (Mij_i)im
-                end    
-            end
-        end
-    end
 
-    if (length(size(M)) == 3)
-        n_c = size(M)[2]
-        n_d = size(M)[3]
-        M_round = Array{Complex{Float64},3}(zeros(n_r, n_c, n_d))
-        for i=1:n_r
-            for j=1:n_c 
-                for k=1:n_d
-                    Mijk_r = 0.0; Mijk_i = 0.0;
-                    if abs(real(M[i,j,k])) > tol
-                        Mijk_r = real(M[i,j,k])
-                    end
-                    if abs(imag(M[i,j])) > tol
-                        Mijk_i = imag(M[i,j,k])
-                    end
-                    if (abs(Mijk_r) > 0) || (abs(Mijk_i) > 0)
-                        M_round[i,j,k] = Mijk_r + (Mijk_i)im
-                    end    
-                end
+                M_round[i,j] = Mij_r + (Mij_i)im
+                
             end
         end
     end

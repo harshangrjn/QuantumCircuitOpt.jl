@@ -1,5 +1,5 @@
 <p align="center">
-<img width="750px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.png"/>
+<img width="775px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.png"/>
 </p>
 
 
@@ -10,7 +10,7 @@ Status:
 
 
 <!-- # QuantumCircuitOpt.jl -->
-**QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization-based methods for optimization of the architecture of Quantum circuits. Given a desired target quantum gate and a set of elemental one and two qubit gates, this package provides a _provably optimal exact_ (or, if preferable, an approximate) decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions up to three qubit gates_.
+**QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization-based methods for optimal synthesis of the architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired target quantum gate and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (or, if preferable, an approximate) decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions up to three-qubit gates_.
 
 ## Installation
 QuantumCircuitOpt.jl is a registered package and can be installed by entering the following in the package manager:
@@ -58,8 +58,8 @@ params = Dict{String, Any}(
 qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer) 
 QCO.run_QCModel(params, qcm_optimizer)
 ```
-If you prefer to decompose a target gate of your choice, update the `target_gate()` function 
-accordingly in the above sample code. 
+If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
+set of `elementary_gates` accordingly in the above sample code. 
 
 ## Bug reports and Contributing
 Please report any issues via the Github **[issue tracker](https://github.com/harshangrjn/QuantumCircuitOpt.jl/issues)**. All types of issues are welcome and encouraged; this includes bug reports, documentation typos, feature requests, etc. 
