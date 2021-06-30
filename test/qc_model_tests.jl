@@ -18,7 +18,7 @@
     )
 
     # qcm_optimizer = get_solver(params)
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation", visualize_solution=false)
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation", visualize_solution=true)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
