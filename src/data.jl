@@ -47,7 +47,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
     end
 
     if "slack_penalty" in keys(params)
-        slack_penalty = params["relax_integrality"]
+        slack_penalty = params["slack_penalty"]
     else
         # default value
         slack_penalty = 1E3
