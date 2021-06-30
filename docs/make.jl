@@ -33,6 +33,5 @@ makedocs(
 
 deploydocs(
     repo = "github.com/harshangrjn/QuantumCircuitOpt.jl.git",
-    push_preview = true,
-    devbranch = "main"
+    push_preview = true
 )

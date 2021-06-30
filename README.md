@@ -25,7 +25,7 @@ Pkg.add("QuantumCircuitOpt")
 - Hit `]` to open the project environment and run `test` to run unit tests. If
   you see an error because of missing packages, run `resolve`.
 
-On how to use this package, check the [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/quickguide/#Sample-circuit-decomposition) and the "examples" folder for more such decompositions.
+On how to use this package, check the [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/quickguide/#Sample-circuit-decomposition) and the "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/main/examples)" folder for more such decompositions.
 
 ## Sample Circuit Synthesis
 Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate the universal rotation gate with three Euler angles, (θ,ϕ,λ) :
