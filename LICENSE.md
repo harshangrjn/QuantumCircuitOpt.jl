@@ -3,7 +3,8 @@ BSD 3-Clause License
 QuantumCircuitOpt is distributed with the 3-clause BSD license.
 
 Copyright (C) 2021, QuantumCicuitOpt Developer
-Harsha Nagarajan <harsha@lanl.gov>
+
+Harsha Nagarajan (<harsha@lanl.gov>)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
