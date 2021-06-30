@@ -68,6 +68,10 @@ TdaggerGate
 ```@docs
 SXGate
 ```
+## SXdaggerGate
+```@docs
+SXdaggerGate
+```
 ## PhaseGate
 ```@docs
 PhaseGate

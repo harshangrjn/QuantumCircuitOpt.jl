@@ -38,9 +38,9 @@ This work was supported by Los Alamos National Laboratory's LDRD Early Career Re
 If you find QuantumCircuitOpt useful in your work, we request you to cite the following paper: 
 ```bibtex
 @inproceedings{NagarajanHijaziCoffrin2021,
-  title={Optimal Quantum Circuit Decompositions using Discrete Optimization Approach},
+  title={Mixed-Integer Programming for Optimal Quantum Circuit Design},
   author={Nagarajan, Harsha and Hijazi, Hassan and Coffrin, Carleton},
-  booktitle={arXiv},
+  booktitle={Under preparation},
   year={2021}
 }
 ```

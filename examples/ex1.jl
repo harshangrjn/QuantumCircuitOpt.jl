@@ -10,34 +10,34 @@ include("solver.jl")
 #-------------------------------#
 function target_gate(gate::Int)
     if gate == 1
-        return kron(QCO.U3Gate(0,0,π/4), QCO.IGate(1))
+        return QCO.kron_single_gate(2, QCO.U3Gate(0,0,π/4), "q1")
     elseif gate == 2
-        return kron(QCO.RZGate(π/4), QCO.IGate(1))
+        return QCO.kron_single_gate(2, QCO.RZGate(π/4), "q1")
     elseif gate == 3
         return QCO.C2SXGate()
     elseif gate == 4
-        return kron(QCO.SdaggerGate(), QCO.IGate(1))
+        return QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3")
     end
 end
 
 params = Dict{String, Any}(
-"num_qubits" => 2,
-"depth" => 3,
+"num_qubits" => 3,
+"depth" => 4,
 
 # "elementary_gates" => ["RX", "RY", "RZ", "Identity"],
 # "elementary_gates" => ["U3", "Identity", "cnot_12"],
-"elementary_gates" => ["S1", "S2", "Identity"],
-# "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_dagger", "T2_dagger", "cnot_12", "Identity"],  
+"elementary_gates" => ["U3", "Identity"],
+# "elementary_gates" => ["H1", "H2", "T1", "T2", "Tdagger1", "Tdagger2", "cnot_12", "Identity"],  
 
 "target_gate" => target_gate(4),
 
 "RX_discretization" => [π/4],
 "RY_discretization" => [-π/4, π/4, π/2, -π/2, -π],
-"RZ_discretization" => [-π/2, π/2, π/4, -π/4, -π],
+"RZ_discretization" => [-π/2, π/2, π/4, -π/2, -π],
 
-"U_θ_discretization" => [-π/2, 0, π/2],
-"U_ϕ_discretization" => [0, π/2],
-"U_λ_discretization" => [0, π/4],
+"U_θ_discretization" => [0, π/4],
+"U_ϕ_discretization" => [0, -π/2],
+"U_λ_discretization" => [0, π/2],
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",

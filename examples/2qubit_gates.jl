@@ -8,7 +8,7 @@ function test_hadamard()
     "depth" => 3,    
 
     "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-    "target_gate" => kron(QCO.HGate(), QCO.IGate(1)),
+    "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
        
     "U_θ_discretization" => [0, π/2],
     "U_ϕ_discretization" => [0, π/2],
@@ -61,7 +61,7 @@ function test_controlled_V()
     "num_qubits" => 2, 
     "depth" => 7,    
 
-    "elementary_gates" => ["H1", "H2", "T1", "T2", "T1_dagger", "cnot_12", "cnot_21"],
+    "elementary_gates" => ["H1", "H2", "T1", "T2", "Tdagger1", "cnot_12", "cnot_21"],
     "target_gate" => QCO.CVGate(),
     
     "objective" => "minimize_depth", 
@@ -189,7 +189,7 @@ function test_S()
         "depth" => 3,    
     
         "elementary_gates" => ["U3", "cnot_12", "Identity"], 
-        "target_gate" => kron(QCO.SGate(), QCO.IGate(1)),
+        "target_gate" => QCO.kron_single_gate(2, QCO.SGate(), "q1"),
            
         "U_θ_discretization" => [0, π/2],
         "U_ϕ_discretization" => [0, π/2],
@@ -317,6 +317,29 @@ function test_W_using_HCnot()
     
         "elementary_gates" => ["CH_12", "cnot_21", "cnot_12", "Identity"], 
         "target_gate" => QCO.WGate(),   
+                  
+        "objective" => "minimize_depth", 
+        "decomposition_type" => "exact", 
+        
+        "optimizer" => "cplex",
+                                    
+        )
+    
+        return params
+    
+end
+
+function test_HCoinGate()
+
+    println(">>>>> Hadamard Coin gate <<<<<")
+
+    params = Dict{String, Any}(
+    
+        "num_qubits" => 2, 
+        "depth" => 14,    
+    
+        "elementary_gates" => ["Y1", "Y2", "Z1", "Z2", "T2", "Tdagger1", "Sdagger1", "SX1", "SXdagger2", "cnot_21", "cnot_12", "Identity"], 
+        "target_gate" => -QCO.HCoinGate(),   
                   
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact", 

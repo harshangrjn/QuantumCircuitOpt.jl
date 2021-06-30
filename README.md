@@ -3,7 +3,7 @@
 </p>
 
 <!-- # QuantumCircuitOpt.jl -->
-**QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization-based algorithms for optimization of Quantum circuits architecture. Given a desired target quantum gate and a set of elemental one and two qubit gates, this package provides an exact (and approximate) decomposition with minimum number of elemental gates and CNOT gates.   
+**QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization-based methods for optimization of the architecture of Quantum circuits. Given a desired target quantum gate and a set of elemental one and two qubit gates, this package provides a _provably optimal exact_ (or, if preferable, an approximate) decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions up to three qubit gates_.
 
 ## Installation
 QuantumCircuitOpt.jl is a registered package and can be installed by entering the following in the package manager:
@@ -64,9 +64,9 @@ This work was supported by Los Alamos National Laboratory's LDRD Early Career Re
 If you find QuantumCircuitOpt.jl useful in your work, we request you to cite the following paper: 
 ```bibtex
 @inproceedings{NagarajanHijaziCoffrin2021,
-  title={Optimal Quantum Circuit Decompositions using Discrete Optimization Approach},
+  title={Mixed-Integer Programming for Optimal Quantum Circuit Design},
   author={Nagarajan, Harsha and Hijazi, Hassan and Coffrin, Carleton},
-  booktitle={arXiv},
+  booktitle={Under preparation},
   year={2021}
 }
 ```

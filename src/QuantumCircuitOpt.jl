@@ -4,12 +4,10 @@ import JuMP
 import LinearAlgebra
 import Memento
 import MathOptInterface
-import SparseArrays
 
 const MOI = MathOptInterface
 const LA = LinearAlgebra
 const QCO = QuantumCircuitOpt
-const SA = SparseArrays
 
 # Create our module level logger (this will get precompiled)
 const _LOGGER = Memento.getlogger(@__MODULE__)

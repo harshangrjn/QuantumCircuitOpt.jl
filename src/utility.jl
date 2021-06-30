@@ -262,3 +262,54 @@ function unique_matrices(M::Array{Float64, 3})
 
     return M[:,:,idx], idx
 end
+
+function kron_single_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
+    
+    if size(M)[1] >= 2^num_qubits
+        Memento.warn(_LOGGER, "Input gate is already in $num_qubits qubits")
+        return M
+    end
+
+    I = QCO.IGate(1)
+
+    if num_qubits == 2     
+
+        if qubit_loc == "q1" 
+            return kron(M,I)
+        elseif qubit_loc == "q2"
+            return kron(I,M)
+        else
+            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2]") 
+        end
+
+    elseif num_qubits == 3 
+        
+        if qubit_loc == "q1" 
+            return kron(kron(M,I),I)
+        elseif qubit_loc == "q2" 
+            return kron(kron(I,M),I)
+        elseif qubit_loc == "q3" 
+            return kron(kron(I,I),M)
+        else
+            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3]")
+        end
+
+    elseif num_qubits == 4 
+        
+        if qubit_loc == "q1" 
+            return kron(kron(kron(M,I),I),I)
+        elseif qubit_loc == "q2" 
+            return kron(kron(kron(I,M),I),I)
+        elseif qubit_loc == "q3" 
+            return kron(kron(kron(I,I),M),I)
+        elseif qubit_loc == "q4" 
+            return kron(kron(kron(I,I),I),M)
+        else
+            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3, q4]")
+        end
+    
+    # Larger qubit circuits can be supported here.
+
+    end
+
+end

@@ -76,3 +76,7 @@ MGate
 ```@docs
 QFT2Gate
 ```
+## HCoinGate
+```@docs
+HCoinGate
+```

@@ -161,10 +161,10 @@ function get_postprocessed_solutions(results::Dict{String, Any}, data::Dict{Stri
                 
                 s2 = String[]
                 
-                if gate_id["qubit_location"] == "qubit_1"
-                    s2 = "1"
-                elseif gate_id["qubit_location"] == "qubit_2"
-                    s2 = "2"
+                for i_qu = 1:data["num_qubits"]
+                    if gate_id["qubit_location"] == "qubit_$i_qu"    
+                        s2 = "$i_qu"
+                    end
                 end
 
                 if startswith(s1, "R")

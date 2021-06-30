@@ -79,7 +79,8 @@ function get_cplex_epgap(optimizer_presolve::Bool, optimizer_log::Bool, optimize
     cplex = JuMP.optimizer_with_attributes(CPLEX.Optimizer, 
                                       MOI.Silent() => !optimizer_log, 
                                       "CPX_PARAM_PREIND" => optimizer_presolve,
-                                      "CPX_PARAM_EPGAP" => optimizer_optim_gap) 
+                                      "CPX_PARAM_EPGAP" => optimizer_optim_gap,
+                                      "CPX_PARAM_MIPEMPHASIS" => 1) 
    return cplex 
 end
 

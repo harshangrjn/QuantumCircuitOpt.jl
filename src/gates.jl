@@ -371,7 +371,7 @@ end
 @doc raw"""
     SXGate()
 
-Single-qubit square root of pauli-([XGate](@ref)).
+Single-qubit square root of pauli-[XGate](@ref).
 
 **Matrix Representation**
 
@@ -385,6 +385,26 @@ Single-qubit square root of pauli-([XGate](@ref)).
 function SXGate()
 
     return Array{Complex{Float64},2}(1/2*[1+im 1-im; 1-im 1+im])
+
+end
+
+@doc raw"""
+    SXdaggerGate()
+
+Single-qubit hermitian conjugate of the square root of pauli-[XGate](@ref), or the [SXGate](@ref).
+
+**Matrix Representation**
+
+```math
+\sqrt{X}^{\dagger} = \frac{1}{2} \begin{pmatrix}
+1 - i & 1 + i \\
+1 + i & 1 - i
+\end{pmatrix}
+```
+"""
+function SXdaggerGate()
+
+    return Array{Complex{Float64},2}(1/2*[1-im 1+im; 1+im 1-im])
 
 end
 
@@ -1012,6 +1032,29 @@ function QFT2Gate()
 
 end
 
+@doc raw"""
+    HCoinGate()
+
+Two-qubit, Hadamard Coin gate when implemented in tune with the quantum cellular automata. 
+Reference: [https://doi.org/10.1007/s11128-018-1983-x](https://doi.org/10.1007/s11128-018-1983-x), [https://arxiv.org/pdf/2106.03115.pdf](https://arxiv.org/pdf/2106.03115.pdf)
+
+**Matrix Representation**
+
+```math
+HCoinGate = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & 0 \\
+0 & \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}} & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+```
+"""
+function HCoinGate()
+
+    return Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1])
+
+end
+
 #---------------------------------------#
 #            Three-qubit gates          #
 #---------------------------------------#
@@ -1050,14 +1093,14 @@ Toffoli     =
 """
 function ToffoliGate()
 
-    return SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                            0  1  0  0  0  0  0  0
-                                            0  0  1  0  0  0  0  0
-                                            0  0  0  1  0  0  0  0
-                                            0  0  0  0  1  0  0  0
-                                            0  0  0  0  0  1  0  0
-                                            0  0  0  0  0  0  0  1
-                                            0  0  0  0  0  0  1  0]))
+    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                      0  1  0  0  0  0  0  0
+                                      0  0  1  0  0  0  0  0
+                                      0  0  0  1  0  0  0  0
+                                      0  0  0  0  1  0  0  0
+                                      0  0  0  0  0  1  0  0
+                                      0  0  0  0  0  0  0  1
+                                      0  0  0  0  0  0  1  0])
 
 end
 
@@ -1093,14 +1136,14 @@ CSwapGate =
 """
 function CSwapGate()
 
-    return SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                            0  1  0  0  0  0  0  0
-                                            0  0  1  0  0  0  0  0
-                                            0  0  0  1  0  0  0  0
-                                            0  0  0  0  1  0  0  0
-                                            0  0  0  0  0  0  1  0
-                                            0  0  0  0  0  1  0  0
-                                            0  0  0  0  0  0  0  1]))
+    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                      0  1  0  0  0  0  0  0
+                                      0  0  1  0  0  0  0  0
+                                      0  0  0  1  0  0  0  0
+                                      0  0  0  0  1  0  0  0
+                                      0  0  0  0  0  0  1  0
+                                      0  0  0  0  0  1  0  0
+                                      0  0  0  0  0  0  0  1])
 
 end
 
@@ -1136,14 +1179,14 @@ CCZGate =
 """
 function CCZGate()
 
-    return SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                            0  1  0  0  0  0  0  0
-                                            0  0  1  0  0  0  0  0
-                                            0  0  0  1  0  0  0  0
-                                            0  0  0  0  1  0  0  0
-                                            0  0  0  0  0  1  0  0
-                                            0  0  0  0  0  0  1  0
-                                            0  0  0  0  0  0  0  -1]))
+    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                      0  1  0  0  0  0  0  0
+                                      0  0  1  0  0  0  0  0
+                                      0  0  0  1  0  0  0  0
+                                      0  0  0  0  1  0  0  0
+                                      0  0  0  0  0  1  0  0
+                                      0  0  0  0  0  0  1  0
+                                      0  0  0  0  0  0  0  -1])
 
 end
 
@@ -1181,13 +1224,13 @@ PeresGate =
 """
 function PeresGate()
 
-    return SA.sparse(Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                            0  1  0  0  0  0  0  0
-                                            0  0  1  0  0  0  0  0
-                                            0  0  0  1  0  0  0  0
-                                            0  0  0  0  0  0  0  1
-                                            0  0  0  0  0  0  1  0
-                                            0  0  0  0  0  1  0  0
-                                            0  0  0  0  1  0  0  0]))
+    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                      0  1  0  0  0  0  0  0
+                                      0  0  1  0  0  0  0  0
+                                      0  0  0  1  0  0  0  0
+                                      0  0  0  0  0  0  0  1
+                                      0  0  0  0  0  0  1  0
+                                      0  0  0  0  0  1  0  0
+                                      0  0  0  0  1  0  0  0])
 
 end

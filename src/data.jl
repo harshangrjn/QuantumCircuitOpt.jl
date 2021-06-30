@@ -1,6 +1,6 @@
 import LinearAlgebra: I
 
-function get_data(params::Dict{String, Any})
+function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
     if isempty(params["elementary_gates"])
         Memento.error(_LOGGER, "Input elementary gates are empty. Enter at least two unique unitary gates")
     end
@@ -61,7 +61,7 @@ function get_data(params::Dict{String, Any})
 
     gates_dict, target_real = get_quantum_gates(params, elementary_gates)
 
-    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = eliminate_nonunique_gates(gates_dict)
+    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = eliminate_nonunique_gates(gates_dict, eliminate_identical_gates = eliminate_identical_gates)
     
     data = Dict{String, Any}("num_qubits" => params["num_qubits"],
                              "depth" => params["depth"],
@@ -114,7 +114,7 @@ end
     eliminate_nonunique_gates(gates_dict::Dict{String, Any})
 
 """
-function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_gates = false)
+function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_identical_gates = false)
 
     num_gates = length(keys(gates_dict))
 
@@ -127,7 +127,7 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_gate
     M_real_unique = M_real
     M_real_idx = collect(1:size(M_real)[3]) 
 
-    if eliminate_gates
+    if eliminate_identical_gates
         M_real_unique, M_real_idx = QCO.unique_matrices(M_real)
     end
     
@@ -248,12 +248,12 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
             for j in keys(M_elementary_dict)
                 if (j == elementary_gates[i])
                     for k in keys(M_elementary_dict[j])
-                        for l in keys(M_elementary_dict[j][k]["2qubit_rep"])
+                        for l in keys(M_elementary_dict[j][k]["$(num_qubits)qubit_rep"])
                             
                             gates_dict["$counter"] = Dict{String, Any}("type" => [j],
                                                                        "angle" => Any,
                                                                        "qubit_location" => l,
-                                                                       "matrix" => M_elementary_dict[j][k]["2qubit_rep"][l])
+                                                                       "matrix" => M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l])
 
                             if startswith(elementary_gates[i], "R")
                                 gates_dict["$counter"]["angle"] = M_elementary_dict[j][k]["angle"]
@@ -328,10 +328,13 @@ function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretiz
 
             R["angle_$i"] = Dict{String, Any}("angle" => discretization[i],
                                              "1qubit_rep" => R_discrete,
-                                             "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "qubit_1"),
-                                                                               "qubit_2" => get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "qubit_2")
-                                                                              ) 
-                                            )            
+                                             "$(num_qubits)qubit_rep" => Dict{String, Any}()
+                                            )
+            
+            for i_qu = 1:num_qubits
+                R["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "q$i_qu")
+            end
+
         end
     end 
 
@@ -374,10 +377,13 @@ function get_discretized_U3_gates(U_type::String, U::Dict{String, Any}, θ_discr
                                                           "ϕ" => ϕ_discretization[j],
                                                           "λ" => λ_discretization[k],
                                                           "1qubit_rep" => U_discrete,
-                                                          "2qubit_rep" => Dict{String, Any}("qubit_1" => get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "qubit_1"),
-                                                                                            "qubit_2" => get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "qubit_2")
-                                                                                           ) 
+                                                          "$(num_qubits)qubit_rep" => Dict{String, Any}()
                                                          )
+                
+                for i_qu=1:num_qubits
+                    U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "q$i_qu")
+                end
+
                 counter += 1
             end
         end
@@ -398,16 +404,76 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         return QCO.IGate(num_qubits)
     end
     
+    if input == "H1"
+        return QCO.kron_single_gate(num_qubits, QCO.HGate(), "q1")
+
+    elseif input == "H2"
+        return QCO.kron_single_gate(num_qubits, QCO.HGate(), "q2")
+
+    elseif input == "T1"
+        return QCO.kron_single_gate(num_qubits, QCO.TGate(), "q1")
+
+    elseif input == "T2"
+        return QCO.kron_single_gate(num_qubits, QCO.TGate(), "q2")
+
+    elseif input == "Tdagger1"
+        return QCO.kron_single_gate(num_qubits, QCO.TdaggerGate(), "q1")
+
+    elseif input == "Tdagger2"
+        return QCO.kron_single_gate(num_qubits, QCO.TdaggerGate(), "q2")   
+
+    elseif input == "S1"
+        return QCO.kron_single_gate(num_qubits, QCO.SGate(), "q1") 
+
+    elseif input == "S2"
+        return QCO.kron_single_gate(num_qubits, QCO.SGate(), "q2")  
+
+    elseif input == "Sdagger1"
+        return QCO.kron_single_gate(num_qubits, QCO.SdaggerGate(), "q1") 
+
+    elseif input == "Sdagger2"
+        return QCO.kron_single_gate(num_qubits, QCO.SdaggerGate(), "q2")   
+
+    elseif input == "SX1"
+        return QCO.kron_single_gate(num_qubits, QCO.SXGate(), "q1") 
+
+    elseif input == "SX2"
+        return QCO.kron_single_gate(num_qubits, QCO.SXGate(), "q2")  
+
+    elseif input == "SXdagger1"
+        return QCO.kron_single_gate(num_qubits, QCO.SXdaggerGate(), "q1")
+
+    elseif input == "SXdagger2"
+        return QCO.kron_single_gate(num_qubits, QCO.SXdaggerGate(), "q2")   
+
+    elseif input == "X1"
+        return QCO.kron_single_gate(num_qubits, QCO.XGate(), "q1") 
+
+    elseif input == "X2"
+        return QCO.kron_single_gate(num_qubits, QCO.XGate(), "q2")    
+
+    elseif input == "Y1"
+        return QCO.kron_single_gate(num_qubits, QCO.YGate(), "q1")  
+
+    elseif input == "Y2"
+        return QCO.kron_single_gate(num_qubits, QCO.YGate(), "q2")   
+
+    elseif input == "Z1"
+        return QCO.kron_single_gate(num_qubits, QCO.ZGate(), "q1") 
+
+    elseif input == "Z2"
+        return QCO.kron_single_gate(num_qubits, QCO.ZGate(), "q2")     
+
+    # Gates with continuous angle parameters
+    elseif input in ["RX", "RY", "RZ", "U3"] 
+        return QCO.kron_single_gate(num_qubits, matrix, qubit_location)
+    
+    end
+
     # All 2-qubit full-sized gates
     if num_qubits == 2
 
-        if input == "H1"
-            return kron(QCO.HGate(), QCO.IGate(1))
-
-        elseif input == "H2"
-            return kron(QCO.IGate(1), QCO.HGate())
-
-        elseif input == "cnot_12"
+        if input == "cnot_12"
             return QCO.CNotGate()
 
         elseif input == "cnot_21"
@@ -417,43 +483,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
             return QCO.CNotGate() * QCO.CNotRevGate()
 
         elseif input == "H1⊗H2"
-            return kron(QCO.HGate(), QCO.HGate())
-
-        elseif input == "T1"
-            return kron(QCO.TGate(), QCO.IGate(1)) 
-
-        elseif input == "T2"
-            return kron(QCO.IGate(1), QCO.TGate())   
-
-        elseif input == "T1_dagger"
-            return kron(QCO.TdaggerGate(), QCO.IGate(1)) 
-
-        elseif input == "T2_dagger"
-            return kron(QCO.IGate(1), QCO.TdaggerGate())   
-
-        elseif input == "S1"
-            return kron(QCO.SGate(), QCO.IGate(1)) 
-
-        elseif input == "S2"
-            return kron(QCO.IGate(1), QCO.SGate())  
-
-        elseif input == "X1"
-            return kron(QCO.XGate(), QCO.IGate(1)) 
-
-        elseif input == "X2"
-            return kron(QCO.IGate(1), QCO.XGate())   
-
-        elseif input == "Y1"
-            return kron(QCO.YGate(), QCO.IGate(1)) 
-
-        elseif input == "Y2"
-            return kron(QCO.IGate(1), QCO.YGate())   
-
-        elseif input == "Z1"
-            return kron(QCO.ZGate(), QCO.IGate(1)) 
-
-        elseif input == "Z2"
-            return kron(QCO.IGate(1), QCO.ZGate())        
+            return kron(QCO.HGate(), QCO.HGate())   
             
         elseif input == "CZ_12"
             return QCO.CZGate()
@@ -479,15 +509,6 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input == "W_12"
             return QCO.WGate()
         
-        # Gates with continuous angle parameters
-        elseif input in ["RX", "RY", "RZ", "U3"] 
-
-            if qubit_location == "qubit_1"
-                return kron(matrix, QCO.IGate(1))
-            elseif qubit_location == "qubit_2"
-                return kron(QCO.IGate(1), matrix)
-            end
-
         else
             
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
@@ -496,8 +517,42 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
 
     # All 3-qubit full-sized gates
     if num_qubits == 3
-
-        if input == "toffoli"
+        
+        if input == "H3"
+            return QCO.kron_single_gate(num_qubits, QCO.HGate(), "q3")
+    
+        elseif input == "T3"
+            return QCO.kron_single_gate(num_qubits, QCO.TGate(), "q3")
+    
+        elseif input == "Tdagger3"
+            return QCO.kron_single_gate(num_qubits, QCO.TdaggerGate(), "q3")   
+    
+        elseif input == "S3"
+            return QCO.kron_single_gate(num_qubits, QCO.SGate(), "q3") 
+    
+        elseif input == "Sdagger3"
+            return QCO.kron_single_gate(num_qubits, QCO.SdaggerGate(), "q3") 
+    
+        elseif input == "SX3"
+            return QCO.kron_single_gate(num_qubits, QCO.SXGate(), "q3") 
+    
+        elseif input == "SXdagger3"
+            return QCO.kron_single_gate(num_qubits, QCO.SXdaggerGate(), "q3")
+    
+        elseif input == "X3"
+            return QCO.kron_single_gate(num_qubits, QCO.XGate(), "q3") 
+    
+        elseif input == "Y3"
+            return QCO.kron_single_gate(num_qubits, QCO.YGate(), "q3")  
+     
+        elseif input == "Z3"
+            return QCO.kron_single_gate(num_qubits, QCO.ZGate(), "q3") 
+     
+        # Gates with continuous angle parameters
+        elseif input in ["RX", "RY", "RZ", "U3"] 
+            return QCO.kron_single_gate(num_qubits, matrix, qubit_location)
+        
+        elseif input == "toffoli"
             return QCO.ToffoliGate()
 
         elseif input == "CSwap"
@@ -508,6 +563,18 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
 
         elseif input == "peres"
             return QCO.PeresGate()
+
+        elseif input == "cnot_12"
+            return kron(QCO.CNotGate(), QCO.IGate(1))
+
+        elseif input == "cnot_23"
+            return kron(QCO.IGate(1), QCO.CNotGate())
+
+        elseif input == "cnot_21"
+            return kron(QCO.CNotRevGate(), QCO.IGate(1))
+
+        elseif input == "cnot_32"
+            return kron(QCO.IGate(1), QCO.CNotRevGate())
 
         elseif input == "cnot_13"
             # |0⟩⟨0| ⊗ I ⊗ I 

@@ -130,9 +130,9 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
     return qcm.result
 end
 
-function run_QCModel(params::Dict{String, Any}, qcm_optimizer::MOI.OptimizerWithAttributes; model_type = "compact_formulation", commute_matrix_cuts = false, visualize_solution=true)
+function run_QCModel(params::Dict{String, Any}, qcm_optimizer::MOI.OptimizerWithAttributes; model_type = "compact_formulation", commute_matrix_cuts = false, visualize_solution=true, eliminate_identical_gates = false)
 
-    data = QuantumCircuitOpt.get_data(params)
+    data = QuantumCircuitOpt.get_data(params, eliminate_identical_gates = eliminate_identical_gates)
 
     model_qc  = QuantumCircuitOpt.build_QCModel(data, model_type = model_type, commute_matrix_cuts = commute_matrix_cuts)
 
