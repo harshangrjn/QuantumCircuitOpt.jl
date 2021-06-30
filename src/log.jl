@@ -124,9 +124,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         printstyled("  ","Optimizer run time: ", ceil(results["solve_time"], digits=2)," sec.","\n"; color = :cyan)
 
-        printstyled("=============================================================================","\n"; color = :cyan)
-        
-        # @show gates_sol
+        printstyled("=============================================================================","\n"; color = :cyan)      
 
     else
         Memento.warn(_LOGGER, "Valid integral feasible solutions could not be found to visualize the solution")
