@@ -27,7 +27,9 @@ Pkg.add("QuantumCircuitOpt")
 
 On how to use this package, check the [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/quickguide/#Sample-circuit-decomposition) and the "examples" folder for more such decompositions.
 
-## Sample Circuit Decomposition
+## Sample Circuit Synthesis
+Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate the universal rotation gate with three Euler angles, ``\theta``, ``\phi`` and ``\lambda``:
+
 ```julia
 import QuantumCircuitOpt as QCO
 using JuMP
