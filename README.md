@@ -2,10 +2,12 @@
 <img width="750px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.png"/>
 </p>
 
+
 Status: 
 [![CI](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/main/graph/badge.svg?token=7EKATOHLYL)](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl)
+[![codecov](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/main/graph/badge.svg?token=KGJWIV6QF4)](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl)
 [![Documentation](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/documentation.yml/badge.svg)](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/)
+
 
 <!-- # QuantumCircuitOpt.jl -->
 **QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization-based methods for optimization of the architecture of Quantum circuits. Given a desired target quantum gate and a set of elemental one and two qubit gates, this package provides a _provably optimal exact_ (or, if preferable, an approximate) decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions up to three qubit gates_.
