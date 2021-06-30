@@ -29,9 +29,8 @@
 
     @test isapprox(QCO.SwapGate(), QCO.CNotGate() * QCO.CNotRevGate() * QCO.CNotGate(), atol = 1E-6)
 
-    
-    # S1_S2 = kron(QCO.SGate(), QCO.SGate())
-    # H2 = kron(QCO.IGate(1), QCO.HGate())
-    # @test isapprox(QCO.MGate(), S1_S2 * H2 * QCO.CNotRevGate())
+    S1_S2 = kron(QCO.SGate(), QCO.SGate())
+    H2 = kron(QCO.IGate(1), QCO.HGate())
+    @test isapprox(QCO.MGate(), QCO.CNotRevGate() * H2 * S1_S2)
 end
 
