@@ -19,7 +19,7 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | `U_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `objective` | Choose one of the following: (a) `"minimize_depth"`, which minimizes the total depth of decomposition. For this option, include `"Identity"` matrix in the above-mentioned `elementary_gates`, (b) `"minimize_cnot"`, which minimizes the number of CNOT gates in the decomposition. |
 | `decomposition_type` | Choose one of the following: (a) `"exact"`, which finds an exact decomposition if it exists, (b) `"approximate"`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. |
-| `optimizer` | Mixed-integer programming (MIP) optimizer. For various MIP solver options, check [solve.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/examples/solver.jl). |
+| `optimizer` | Mixed-integer programming (MIP) optimizer. For various MIP solver options, check [solver.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/examples/solver.jl). |
 
 | Optional Inputs  | Description |
 | -----------: | :----------- |
