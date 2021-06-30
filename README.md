@@ -69,7 +69,7 @@ QuantumCircuitOpt is being actively developed and suggestions or other forms of 
 ## Acknowledgement
 This work was supported by Los Alamos National Laboratory's LDRD Early Career Research Award, *"20190590ECR: Discrete Optimization Algorithms for Provable Optimal Quantum Circuit Design"*. The primary developer of this package is [Harsha Nagarajan](http://harshanagarajan.com) ([@harshangrjn](https://github.com/harshangrjn)). 
 
-## Citation
+<!-- ## Citation
 If you find QuantumCircuitOpt.jl useful in your work, we request you to cite the following paper: 
 ```bibtex
 @inproceedings{NagarajanHijaziCoffrin2021,
@@ -78,4 +78,4 @@ If you find QuantumCircuitOpt.jl useful in your work, we request you to cite the
   booktitle={Under preparation},
   year={2021}
 }
-```
+``` -->
