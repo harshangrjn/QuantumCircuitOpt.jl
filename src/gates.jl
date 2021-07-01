@@ -913,7 +913,15 @@ Two-qubit, symmetric and clifford, iSWAP gate.
 ```
 q_0: ─⨂─
       │     
-q_1: ─⨂─
+q_1: ─⨂─    
+```
+Minimum depth representation
+```
+      ┌───┐     ┌───┐ ┌───┐
+q_0: ─┤ X ├──■──┤ S ├─┤ X ├─
+      └─┬─┘┌─┴─┐└───┘ └─┬─┘
+q_1: ───■──┤ X ├────────■──
+           └───┘
 ```
 
 **Matrix Representation**

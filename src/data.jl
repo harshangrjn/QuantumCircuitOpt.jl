@@ -1,8 +1,9 @@
 import LinearAlgebra: I
 
 function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
-    if isempty(params["elementary_gates"])
-        Memento.error(_LOGGER, "Input elementary gates are empty. Enter at least two unique unitary gates")
+    
+    if !("elementary_gates" in keys(params)) || isempty(params["elementary_gates"])
+        Memento.error(_LOGGER, "params[\"elementary_gates\"] is empty. Enter at least two unique unitary gates")
     end
 
     # Initial gate
@@ -512,6 +513,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         
         elseif input == "W_12"
             return QCO.WGate()
+        
+        elseif input == "HCoin"
+            return QCO.HCoinGate()
         
         else
             

@@ -7,12 +7,10 @@
     "elementary_gates" => ["H1", "H2", "cnot_12", "Identity"],  
     "target_gate" => QCO.CNotRevGate(),
 
-    "initial_gate" => "Identity",
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cbc",
-    "optimizer_presolve" => false                               
+    "optimizer" => "cbc"
     )
 
     result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation", visualize_solution=true)
@@ -67,8 +65,7 @@ end
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cbc",
-    "optimizer_presolve" => false                               
+    "optimizer" => "cbc"                              
     )
 
     result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation", visualize_solution=true, eliminate_identical_gates = true)
@@ -100,8 +97,7 @@ end
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cbc",
-    "optimizer_presolve" => false                               
+    "optimizer" => "cbc"                             
     )
 
     result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation")
@@ -128,8 +124,7 @@ end
     "objective" => "minimize_cnot", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cbc",
-    "optimizer_presolve" => false                               
+    "optimizer" => "cbc"                               
     )
 
     result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", eliminate_identical_gates = true)
@@ -146,4 +141,31 @@ end
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["λ"]),  90, atol=1E-6)
     end
 
+end
+
+@testset "Feasibility objective tests" begin
+    params = Dict{String, Any}(
+        "num_qubits" => 2, 
+        "depth" => 3,    
+    
+        "elementary_gates" => ["H1", "H2"],  
+        "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
+    
+        "objective" => "minimize_depth", 
+        "decomposition_type" => "exact",
+        
+        "optimizer" => "cbc"
+        )
+
+    result_qc = QCO.run_QCModel(params, CBC)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    data = QCO.get_data(params)
+
+    for i in keys(data["gates_dict"])
+        if data["gates_dict"][i]["type"] == "H1"
+            @test isapprox(sum(result_qc["solution"]["z_onoff_var"][parse(Int64, i),:]), 3 , atol = 1E-6)
+        end
+    end
+  
 end

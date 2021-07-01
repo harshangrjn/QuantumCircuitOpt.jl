@@ -43,7 +43,7 @@ function objective_feasibility(qcm::QuantumCircuitModel)
 
     if decomposition_type == "exact"
 
-        # JuMP.@objective(qcm.model, Min, 1)
+        # Feasibility objective
 
     elseif decomposition_type == "approximate"
 

@@ -14,21 +14,21 @@ function target_gate(gate::Int)
     elseif gate == 2
         return QCO.kron_single_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_gate(2, QCO.RZGate(π/4), "q1")
     elseif gate == 3
-        return QCO.SwapGate()
+        return QCO.iSwapGate()
     elseif gate == 4
         return QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3")
     end
 end
 
 params = Dict{String, Any}(
-"num_qubits" => 3,
-"depth" => 2,
+"num_qubits" => 2,
+"depth" => 6,
 
-# "elementary_gates" => ["RX", "RY", "RZ", "Identity"],
-"elementary_gates" => ["U3", "Identity"],
+# "elementary_gates" => ["U3", "cnot_12", "cnot_21", "Identity"],
+"elementary_gates" => ["T1", "T2", "H1", "H2", "S1", "S2", "cnot_12", "cnot_21", "Identity"],
 # "elementary_gates" => ["H1", "H2", "T1", "T2", "Tdagger1", "Tdagger2", "cnot_12", "Identity"],  
 
-"target_gate" => target_gate(4),
+"target_gate" => target_gate(3),
 
 "RX_discretization" => [0, π/4],
 "RY_discretization" => [π/4],
@@ -38,7 +38,7 @@ params = Dict{String, Any}(
 "U_ϕ_discretization" => [0, -π/2],
 "U_λ_discretization" => [0, π/2],    
 
-"objective" => "minimize_cnot", 
+"objective" => "minimize_depth", 
 "decomposition_type" => "exact",
 "optimizer" => "cplex"                            
 )
@@ -47,4 +47,4 @@ params = Dict{String, Any}(
 #      Optimization model      #
 #------------------------------#
 qcm_optimizer = get_solver(params)
-result_qc = QCO.run_QCModel(params, qcm_optimizer, model_type = "balas_formulation", eliminate_identical_gates = true)
+result_qc = QCO.run_QCModel(params, qcm_optimizer, model_type = "compact_formulation", eliminate_identical_gates = true)
