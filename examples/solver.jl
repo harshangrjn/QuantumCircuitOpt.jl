@@ -23,6 +23,15 @@ function get_solver(params::Dict{String,Any})
         optimizer_presolve = true
     end
 
+    if "MIP_feasiblity_emphasis" in keys(params)
+        if params["MIP_feasiblity_emphasis"]
+            MIP_feasiblity_emphasis = 1
+        end
+    else
+        # default value: Balance optimality and feasibility
+        MIP_feasiblity_emphasis = 0
+    end
+
     if "optimizer_log" in keys(params)
         optimizer_log = params["optimizer_log"]
     else
@@ -39,7 +48,10 @@ function get_solver(params::Dict{String,Any})
     # Mixed-integer programming optimizers
     if params["optimizer"] == "cplex"    # commercial 
     #    return get_cplex(optimizer_presolve, optimizer_log) 
-       return get_cplex_epgap(optimizer_presolve, optimizer_log, optimizer_optim_gap)
+       return get_cplex_epgap(optimizer_presolve, optimizer_log, optimizer_optim_gap, MIP_feasiblity_emphasis)
+
+    elseif params["optimizer"] == "gurobi"    # commercial 
+        return get_gurobi(optimizer_presolve, optimizer_log)
 
     elseif params["optimizer"] == "cbc"  # open-source
        return get_cbc(optimizer_presolve, optimizer_log)
@@ -75,13 +87,23 @@ function get_cplex(optimizer_presolve::Bool, optimizer_log::Bool)
     return cplex 
 end
 
-function get_cplex_epgap(optimizer_presolve::Bool, optimizer_log::Bool, optimizer_optim_gap::Float64)
+function get_cplex_epgap(optimizer_presolve::Bool, optimizer_log::Bool, optimizer_optim_gap::Float64, MIP_feasiblity_emphasis::Int64)
     cplex = JuMP.optimizer_with_attributes(CPLEX.Optimizer, 
-                                      MOI.Silent() => !optimizer_log, 
-                                      "CPX_PARAM_PREIND" => optimizer_presolve,
-                                      "CPX_PARAM_EPGAP" => optimizer_optim_gap,
-                                      "CPX_PARAM_MIPEMPHASIS" => 1) 
+                                            MOI.Silent() => !optimizer_log, 
+                                            "CPX_PARAM_PREIND" => optimizer_presolve,
+                                            "CPX_PARAM_EPGAP" => optimizer_optim_gap,
+                                            "CPX_PARAM_MIPEMPHASIS" => MIP_feasiblity_emphasis) 
    return cplex 
+end
+
+function get_gurobi(optimizer_presolve::Bool, optimizer_log::Bool)
+    if optimizer_presolve 
+        presolve_val = -1
+    end
+    gurobi = JuMP.optimizer_with_attributes(Gurobi.Optimizer, 
+                                            MOI.Silent() => !optimizer_log, 
+                                            "Presolve" => optimizer_presolve) 
+   return gurobi 
 end
 
 function get_ipopt(optimizer_presolve::Bool, optimizer_log::Bool)

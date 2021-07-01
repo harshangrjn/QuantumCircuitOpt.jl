@@ -18,6 +18,7 @@ function test_hadamard()
     "decomposition_type" => "exact",
     
     "optimizer" => "cplex",
+    "MIP_feasiblity_emphasis" => true
     
     )
 
@@ -249,6 +250,7 @@ function test_cnot_21_with_U()
         "decomposition_type" => "exact", 
         
         "optimizer" => "cplex",
+        "MIP_feasiblity_emphasis" => true
                               
         )
     
