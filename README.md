@@ -13,7 +13,7 @@ Status:
 **QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization-based methods for optimal synthesis of the architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired target quantum gate and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (or, if preferable, an approximate) decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions up to three-qubit gates_.
 
 ## Installation
-QuantumCircuitOpt.jl is a registered package and can be installed by entering the following in the package manager:
+QuantumCircuitOpt.jl is a registered package and can be installed by entering the following in the Julia REPL-mode:
 ```julia
 import Pkg
 Pkg.add("QuantumCircuitOpt")
@@ -28,7 +28,7 @@ Pkg.add("QuantumCircuitOpt")
 On how to use this package, check the [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/quickguide/#Sample-circuit-decomposition) and the "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/main/examples)" folder for more such decompositions.
 
 ## Sample Circuit Synthesis
-Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate the universal rotation gate with three Euler angles, (θ,ϕ,λ) :
+Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate the universal rotation gate with three discretized Euler angles, (θ,ϕ,λ) :
 
 ```julia
 import QuantumCircuitOpt as QCO

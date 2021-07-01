@@ -31,8 +31,8 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 
 
 
-# Sample circuit decomposition
-Using some of the user input options as described above, an optimization model to minimize the total depth of decomposition for a 2-qubit controlled-Z gate can be executed as follows:
+# Sample circuit synthesis
+Using some of the above-described user input options, here is a sample optimization model to minimize the total depth of the decomposition for a 2-qubit controlled-Z gate. With entangling CNOT gate and the universal rotation gate with three discretized Euler angles, (θ,ϕ,λ), here is the sample code:
 
 ```julia
 import QuantumCircuitOpt as QCO
@@ -62,8 +62,8 @@ params = Dict{String, Any}(
 qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer) 
 QCO.run_QCModel(params, qcm_optimizer)
 ```
-If you prefer to decompose a target gate of your choice, update the `target_gate()` function 
-accordingly in the above sample code. 
+If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
+set of `elementary_gates` accordingly in the above sample code. 
 
 # Extracting results
 The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
