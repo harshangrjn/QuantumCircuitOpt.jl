@@ -17,6 +17,7 @@ const CBC = JuMP.optimizer_with_attributes(Cbc.Optimizer,  MOI.Silent() => true)
 
     include("utility_tests.jl")
     include("gates_tests.jl")
+    include("types_tests.jl")
     include("data_tests.jl")
     include("qc_model_tests.jl")
     include("relaxations_tests.jl")
