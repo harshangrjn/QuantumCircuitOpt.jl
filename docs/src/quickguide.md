@@ -9,7 +9,7 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | -----------: | :----------- |
 | `num_qubits`      | Number of qubits of the circuit (≥ 2).  |
 | `depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2)   |
-| `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QuantumCircuitOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/src/gates.jl). |
+| `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QuantumCircuitOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
 | `target_gate` | Target gate which you wish to decompose using the above-mentioned `elementary_gates`.|
 | `RX_discretization` | Vector of discretization angles (in radians) for `RXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RY_discretization` | Vector of discretization angles (in radians) for `RYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
@@ -19,7 +19,7 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | `U_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `objective` | Choose one of the following: (a) `"minimize_depth"`, which minimizes the total depth of decomposition. For this option, include `"Identity"` matrix in the above-mentioned `elementary_gates`, (b) `"minimize_cnot"`, which minimizes the number of CNOT gates in the decomposition. |
 | `decomposition_type` | Choose one of the following: (a) `"exact"`, which finds an exact decomposition if it exists, (b) `"approximate"`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. |
-| `optimizer` | Mixed-integer programming (MIP) optimizer. For various MIP solver options, check [solver.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/examples/solver.jl). |
+| `optimizer` | Mixed-integer programming (MIP) optimizer. For various MIP solver options, check [solver.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/examples/solver.jl). |
 
 | Optional Inputs  | Description |
 | -----------: | :----------- |

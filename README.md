@@ -1,11 +1,11 @@
 <p align="center">
-<img width="775px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/main/logo.png"/>
+<img width="775px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/logo.png"/>
 </p>
 
 
 Status: 
 [![CI](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/main/graph/badge.svg?token=KGJWIV6QF4)](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl)
+[![codecov](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/master/graph/badge.svg?token=KGJWIV6QF4)](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl)
 [![Documentation](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/documentation.yml/badge.svg)](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/)
 
 
@@ -25,7 +25,7 @@ Pkg.add("QuantumCircuitOpt")
 - Hit `]` to open the project environment and run `test` to run unit tests. If
   you see an error because of missing packages, run `resolve`.
 
-On how to use this package, check the [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/quickguide/#Sample-circuit-decomposition) and the "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/main/examples)" folder for more such decompositions.
+On how to use this package, check the [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/stable/quickguide/#Sample-circuit-decomposition) and the "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder for more such decompositions.
 
 ## Sample Circuit Synthesis
 Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate the universal rotation gate with three discretized Euler angles, (θ,ϕ,λ) :
