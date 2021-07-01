@@ -27,3 +27,30 @@
     test_U1_1 = exp(-((test_angle)/2)im)*QCO.U1Gate(test_angle)
     @test isapprox(QCO.RZGate(test_angle), test_U1_1)
 end 
+
+@testset "get_full_sized_gate tests" begin
+
+    # 2-qubit gates
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "depth" => 2,
+
+    "elementary_gates" => ["T1", "T2", "Tdagger1", "Tdagger2", "S1", "S2", "Sdagger1", "Sdagger2", "SX1", "SX2", "SXdagger1", "SXdagger2", "X1", "X2", "Y1", "Y2", "Z1", "Z2", "cnot_swap", "H1⊗H2", "CZ_12", "CH_12", "CV_12", "swap", "M_12", "QFT_12", "CSX_12", "W_12"],
+    "target_gate" => QCO.IGate(2),               
+    )
+
+    data = QCO.get_data(params)
+    @test length(keys(data["gates_dict"])) == 28 
+
+    # 3-qubit gates
+    params = Dict{String, Any}(
+    "num_qubits" => 3,
+    "depth" => 2,
+
+    "elementary_gates" => ["H3", "T3", "Tdagger3", "Sdagger3", "SX3", "SXdagger3", "X3", "Y3", "Z3", "toffoli", "CSwap", "CCZ", "peres", "cnot_12", "cnot_23", "cnot_21", "cnot_32", "cnot_13", "cnot_31"],
+    "target_gate" => QCO.IGate(3)
+    )
+
+    data = QCO.get_data(params)
+    @test length(keys(data["gates_dict"])) == 19
+end

@@ -602,7 +602,10 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
 
 end
 
-function num_input_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+#=
+function num_input_gates(params::Dict{String, Any})
+
+    elementary_gates = unique(params["elementary_gates"])
 
     # Update this if the naming convention for gates changes
     R_gates = findall(x -> startswith(x, "R"), (elementary_gates))
@@ -708,3 +711,4 @@ function _num_U3_gates(params::Dict{String, Any}, elementary_gates::Array{String
 
     return num_U3
 end
+=#
