@@ -100,7 +100,7 @@ end
     "optimizer" => "cbc"                             
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation")
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_matrix_cuts = true)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
