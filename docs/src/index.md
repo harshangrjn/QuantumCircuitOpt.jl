@@ -1,6 +1,6 @@
 ```@raw html
 <p align="center">
-<img width="750px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/logo.png"/>
+<img width="775px" src="assets/docs_header.png"/>
 </p>
 ```
 
