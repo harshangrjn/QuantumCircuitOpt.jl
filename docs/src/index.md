@@ -15,7 +15,7 @@ CurrentModule = QuantumCircuitOpt
 ## Installation 
 To use QuantumCircuitOpt, first [download and install](https://julialang.org/downloads/) Julia. Note that the current version of QuantumCircuitOpt is compatible with Julia 1.0 and later. 
 
-The latest stable release of QuantumCircuitOpt can be installed using the Julia package manager with
+The latest stable release of QuantumCircuitOpt can be installed by entering the following in the Julia REPL-mode:
 
 ```julia
 import Pkg

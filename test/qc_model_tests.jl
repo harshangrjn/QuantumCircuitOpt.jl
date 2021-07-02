@@ -78,7 +78,7 @@ end
     @test "Identity" in data["gates_dict"]["5"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 2, atol = 1E-6)
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][7,:]), 1, atol = 1E-6) 
-    @test data["gates_dict"]["7"]["qubit_location"] == "qubit_1"
+    @test data["gates_dict"]["7"]["qubit_loc"] == "qubit_1"
 end
 
 @testset "Test: Minimum depth RX, RY, RZ gate decomposition" begin
@@ -135,7 +135,7 @@ end
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = 1E-6)
     if isapprox(sum(result_qc["solution"]["z_onoff_var"][14,:]), 1, atol=1E-6)
-        @test data["gates_dict"]["14"]["qubit_location"] == "qubit_3"
+        @test data["gates_dict"]["14"]["qubit_loc"] == "qubit_3"
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["θ"]),  45, atol=1E-6)
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["ϕ"]), -90, atol=1E-6)
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["λ"]),  90, atol=1E-6)

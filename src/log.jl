@@ -160,7 +160,7 @@ function get_postprocessed_solutions(results::Dict{String, Any}, data::Dict{Stri
                 s2 = String[]
                 
                 for i_qu = 1:data["num_qubits"]
-                    if gate_id["qubit_location"] == "qubit_$i_qu"    
+                    if gate_id["qubit_loc"] == "qubit_$i_qu"    
                         s2 = "$i_qu"
                     end
                 end

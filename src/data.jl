@@ -249,7 +249,7 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
                             
                             gates_dict["$counter"] = Dict{String, Any}("type" => [j],
                                                                        "angle" => Any,
-                                                                       "qubit_location" => l,
+                                                                       "qubit_loc" => l,
                                                                        "matrix" => M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l])
 
                             if startswith(elementary_gates[i], "R")
