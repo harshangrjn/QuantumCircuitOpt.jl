@@ -1,8 +1,10 @@
+```@raw html
 <p align="center">
 <img width="750px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/logo.png"/>
 </p>
+```
 
-# QuantumCircuitOpt.jl Documentation
+# Documentation
 
 ```@meta
 CurrentModule = QuantumCircuitOpt
