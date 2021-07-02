@@ -26,9 +26,11 @@ function get_solver(params::Dict{String,Any})
     if "MIP_feasiblity_emphasis" in keys(params)
         if params["MIP_feasiblity_emphasis"]
             MIP_feasiblity_emphasis = 1
+        else
+            # default value: Balance optimality and feasibility
+            MIP_feasiblity_emphasis = 0
         end
     else
-        # default value: Balance optimality and feasibility
         MIP_feasiblity_emphasis = 0
     end
 

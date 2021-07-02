@@ -148,9 +148,9 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_iden
 
     identity_idx = _get_identity_idx(M_real_unique)
 
-    if length(identity_idx) > 0
-        if !("Identity" in gates_dict_unique["$(identity_idx[1])"]["type"])
-            push!(gates_dict_unique["$(identity_idx[1])"]["type"], "Identity")
+    for i_id = 1:length(identity_idx)
+        if !("Identity" in gates_dict_unique["$(identity_idx[i_id])"]["type"])
+            push!(gates_dict_unique["$(identity_idx[i_id])"]["type"], "Identity")
         end
     end
 
@@ -169,10 +169,6 @@ function _get_identity_idx(M::Array{Float64,3})
             push!(identity_idx, i)
         end
     end
-
-    # if length(identity_idx) >= 2
-    #     Memento.error(_LOGGER, "Detected more than one Identity matrix in the input set of gates (possibly due to discretization)")
-    # end
 
     return identity_idx
 end

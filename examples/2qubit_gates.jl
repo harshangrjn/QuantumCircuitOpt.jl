@@ -46,6 +46,7 @@ function test_controlled_Z()
     "decomposition_type" => "exact",
     
     "optimizer" => "cplex",
+    "MIP_feasiblity_emphasis" => true
                                 
     )
 
@@ -68,7 +69,7 @@ function test_controlled_V()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cplex",
+    "optimizer" => "cplex"
                                 
     )
 
@@ -96,6 +97,7 @@ function test_controlled_H()
     "decomposition_type" => "exact",
     
     "optimizer" => "cplex",
+    "MIP_feasiblity_emphasis" => true
                                 
     )
 
@@ -122,7 +124,7 @@ function test_controlled_H_with_R()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cplex",
+    "optimizer" => "cplex"
                                 
     )
 
@@ -150,6 +152,7 @@ function test_magic_M()
         "decomposition_type" => "exact",
         
         "optimizer" => "cplex",
+        "MIP_feasiblity_emphasis" => true
                                     
         )
     
@@ -172,7 +175,7 @@ function test_magic_M_using_SHCnot()
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact",
            
-        "optimizer" => "cplex",
+        "optimizer" => "cplex"
                                     
         )
     
@@ -347,6 +350,7 @@ function test_HCoinGate()
         "decomposition_type" => "exact", 
         
         "optimizer" => "cplex",
+        "MIP_feasiblity_emphasis" => true
                                     
         )
     

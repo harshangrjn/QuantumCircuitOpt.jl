@@ -47,4 +47,7 @@ params = Dict{String, Any}(
 #      Optimization model      #
 #------------------------------#
 qcm_optimizer = get_solver(params)
-result_qc = QCO.run_QCModel(params, qcm_optimizer, model_type = "compact_formulation", eliminate_identical_gates = true)
+result_qc = QCO.run_QCModel(params, 
+                            qcm_optimizer, 
+                            model_type = "compact_formulation", 
+                            eliminate_identical_gates = true)

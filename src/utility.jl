@@ -101,6 +101,12 @@ function get_commutative_gates(M::Array{Float64,3})
     return M_commute_2, M_commute_3
 end
 
+"""
+    complex_to_real_matrix(M::Array{Complex{Float64},2})
+
+Given a complex-valued 2D matrix of size NxN, complex_to_real_matrix function returns a real-valued matrix 
+of size 2Nx2N. 
+"""
 function complex_to_real_matrix(M::Array{Complex{Float64},2})
 
     n = size(M)[1]
@@ -127,9 +133,16 @@ function complex_to_real_matrix(M::Array{Complex{Float64},2})
     return M_real
 end
 
+"""
+    real_to_complex_matrix(M::Array{Complex{Float64},2})
+
+Given a real-valued 2D matrix of size 2Nx2N, real_to_complex_matrix function returns a complex-valued matrix 
+of size NxN, if the input matrix is in a valid complex matrix form. 
+"""
 function real_to_complex_matrix(M::Array{Float64,2})
     
     n = size(M)[1]
+
     if !iseven(n)
         Memento.error(_LOGGER, "Input real matrix can admit only even numbered columns and rows")
     end
@@ -140,7 +153,7 @@ function real_to_complex_matrix(M::Array{Float64,2})
     for i = collect(1:2:n)
         for j = collect(1:2:n)
 
-            if !isapprox(M[i,j], M[i+1, j+1], atol = 1E-4) || !isapprox(M[i+1,j], -M[i,j+1], atol = 1E-4)
+            if !isapprox(M[i,j], M[i+1, j+1], atol = 1E-5) || !isapprox(M[i+1,j], -M[i,j+1], atol = 1E-5)
                 Memento.error(_LOGGER, "Input real matrix cannot be converted into a valid complex matrix form")
             end
 
@@ -154,6 +167,12 @@ function real_to_complex_matrix(M::Array{Float64,2})
     return M_complex
 end
 
+"""
+    round_complex_values(M::Array{Complex{Float64},2})
+
+Given a complex-valued 2D matrix, round_complex_values function returns a complex-valued matrix which 
+rounds the valuest closest to 0 and 1. This is useful to avoid numerical issues. 
+"""
 function round_complex_values(M::Array{Complex{Float64},2})
     # round values close to 0 (within toleranes) for both real and imaginary values
     # Input can be a vector (>= 1 element) or a matrix of complex values
@@ -221,7 +240,8 @@ end
 """
     unique_matrices(M::Array{Float64, 3})
 
-unique_matrices returns the unique set of matrices and the corresponding indices of unique matrices from the given set of matrices.  
+unique_matrices returns the unique set of matrices and the corresponding indices 
+of unique matrices from the given set of matrices.  
 """
 function unique_matrices(M::Array{Float64, 3})
     M[isapprox.(M, 0, atol=1E-6)] .= 0
@@ -236,6 +256,12 @@ function unique_matrices(M::Array{Float64, 3})
     return M[:,:,idx], idx
 end
 
+"""
+    kron_single_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
+
+Given number of qubits of the circuit, the complex-valued gate and the qubit location ("q1","q2',"q3",...),
+kron_single_gate function returns a full-sized gate after applying appropriate kronecker products. 
+"""
 function kron_single_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
     
     if size(M)[1] >= 2^num_qubits

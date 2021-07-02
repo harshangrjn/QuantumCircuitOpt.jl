@@ -7,7 +7,6 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
     n_r          = size(qcm.data["gates_real"])[1]
     n_c          = size(qcm.data["gates_real"])[2]
     depth        = qcm.data["depth"]
-    M            = qcm.data["gates_real"]
     identity_idx = qcm.data["identity_idx"]
 
     decomposition_type = qcm.data["decomposition_type"]
