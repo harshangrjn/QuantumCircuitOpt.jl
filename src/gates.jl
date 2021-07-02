@@ -439,6 +439,34 @@ end
 #-------------------------------------#
 #            Two-qubit gates          #
 #-------------------------------------#
+@doc raw"""
+    NegIGate()
+
+Two-qubit negative Identity gate. 
+
+**Circuit Representation**
+```  ┌───────┐
+q_1: ┤ RZ(ϴ) ├
+     └───────┘
+q_0: ─────────
+```
+
+**Matrix Representation**
+
+```math
+NegI = \begin{pmatrix}
+    -1 & 0 & 0 & 0 \\
+    0 & -1 & 0 & 0 \\
+    0 & 0 & -1 & 0 \\
+    0 & 0 & 0 & -1
+    \end{pmatrix}
+```
+"""
+function NegIGate()
+
+    return Array{Complex{Float64},2}([-1 0 0 0; 0 -1 0 0; 0 0 -1 0; 0 0 0 -1]) 
+
+end
 
 @doc raw"""
     CNotGate()
@@ -487,7 +515,7 @@ q_1: ──■──
 **Matrix Representation**
 
 ```math
-CNot-rev = \begin{pmatrix}
+CNotRev = \begin{pmatrix}
             1 & 0 & 0 & 0 \\
             0 & 0 & 0 & 1 \\
             0 & 0 & 1 & 0 \\
@@ -578,7 +606,7 @@ q_1: ┤ Y ├
 **Matrix Representation**
 
 ```math
-CX = \begin{pmatrix}
+CY = \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
     0 & 0 & 0 & -i \\
