@@ -13,10 +13,13 @@ Themes.compile(joinpath(@__DIR__, "src/assets/themes/dark.scss"), joinpath(@__DI
 
 makedocs(
     modules = [QuantumCircuitOpt],
-    sitename = " ",
+    sitename = "QuantumCircuitOpt.jl",
     format = Documenter.HTML(mathengine = Documenter.MathJax(), 
-                             assets = [asset("https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&display=swap", class=:css)],
-                             prettyurls = get(ENV, "CI", nothing) == "true"),
+                             assets = [asset("https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&display=swap", class=:css),
+                                             "assets/extra_styles.css"],
+                             prettyurls = get(ENV, "CI", nothing) == "true",
+                             sidebar_sitename=false
+                             ),
     strict = true,
     authors = "Harsha Nagarajan",
     pages = [

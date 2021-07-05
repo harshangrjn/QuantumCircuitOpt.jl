@@ -29,9 +29,9 @@ version = "0.5.1"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "be770c08881f7bb928dfd86d1ba83798f76cf62a"
+git-tree-sha1 = "aec96e79e396dfa7f762c90e3cac8f15ddb43f03"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.10.9"
+version = "0.10.10"
 
 [[CodecBzip2]]
 deps = ["Bzip2_jll", "Libdl", "TranscodingStreams"]
@@ -102,9 +102,9 @@ deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
 [[ExprTools]]
-git-tree-sha1 = "555eab1f7c501166ba87eeb5d561e9f5e7d167d3"
+git-tree-sha1 = "38fe9afc9bdf8708213ef9dcd5557da90ea6a2d5"
 uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
-version = "0.1.4"
+version = "0.1.5"
 
 [[EzXML]]
 deps = ["Printf", "XML2_jll"]

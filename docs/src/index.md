@@ -1,7 +1,7 @@
 ```@raw html
-<p align="center">
-<img width="780px" src="assets/docs_header.png"/>
-</p>
+<align="center"/>
+<img width="790px" class="display-light-only" src="assets/docs_header.png" alt="assets/docs_header.png"/>
+<img width="790px" class="display-dark-only" src="assets/docs_header_dark.png" alt="assets/docs_header.png"/>
 ```
 
 # Documentation
