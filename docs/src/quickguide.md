@@ -65,6 +65,9 @@ QCO.run_QCModel(params, qcm_optimizer)
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
 set of `elementary_gates` accordingly in the above sample code. 
 
+!!! warning
+    Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input gates, target gate and the total depth of the decomposition. Hence, unlike local optimization methods in the literature, the run times for larger number of qubits and depths can be prohibitively slow since these problems are NP-hard. 
+
 # Extracting results
 The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
 
