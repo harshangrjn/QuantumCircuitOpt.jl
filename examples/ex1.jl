@@ -18,7 +18,7 @@ function target_gate(gate::Int)
     elseif gate == 4
         return QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3")
     elseif gate == 5
-        return Array{Complex{Float64},2}([-1 0 0 0; 0 -1 0 0; 0 0 -1 0; 0 0 0 -1]) 
+        return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1]) 
     end
 end
 
@@ -26,7 +26,7 @@ params = Dict{String, Any}(
 "num_qubits" => 2,
 "depth" => 3,
 
-"elementary_gates" => ["RZ", "cnot_12", "Identity"],
+"elementary_gates" => ["U3", "cnot_12", "Identity"],
 # "elementary_gates" => ["T1", "T2", "H1", "H2", "S1", "S2", "cnot_12", "cnot_21", "Identity"],
 # "elementary_gates" => ["H1", "H2", "T1", "T2", "Tdagger1", "Tdagger2", "cnot_12", "Identity"],  
 
@@ -36,9 +36,9 @@ params = Dict{String, Any}(
 "RY_discretization" => [π/4],
 "RZ_discretization" => [2*π],
 
-"U_θ_discretization" => [0, π/2, π],
-"U_ϕ_discretization" => [0, π/4, -π],
-"U_λ_discretization" => [0, π/2, π],    
+"U_θ_discretization" => collect(-π/2:π/2:π/2),
+"U_ϕ_discretization" => collect(-π/2:π/2:π/2),
+"U_λ_discretization" => collect(-π/2:π/2:π/2),    
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",
