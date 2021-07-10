@@ -54,3 +54,77 @@ end
     data = QCO.get_data(params)
     @test length(keys(data["gates_dict"])) == 19
 end
+
+@testset "get_input_circuit_dict tests" begin
+    
+    function input_circuit_1()
+        # [(depth, gate)]
+        return [(1, "cnot_21"), 
+                (2, "S1"), 
+                (3, "H2"), 
+                (4, "S2")
+                ]
+    end
+
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "depth" => 5,
+    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "target_gate" => QCO.MGate(),
+    "input_circuit" => input_circuit_1(),
+    )
+
+    data = QCO.get_data(params)
+
+    @test "input_circuit" in keys(data)
+    @test data["input_circuit"]["1"]["depth"] == 1
+    @test data["input_circuit"]["1"]["gate"] == "cnot_21"
+    @test data["input_circuit"]["2"]["depth"] == 2
+    @test data["input_circuit"]["2"]["gate"] == "S1"
+    @test data["input_circuit"]["3"]["depth"] == 3
+    @test data["input_circuit"]["3"]["gate"] == "H2"
+    @test data["input_circuit"]["4"]["depth"] == 4
+    @test data["input_circuit"]["4"]["gate"] == "S2"
+
+    function input_circuit_2()
+        # [(depth, gate)]
+        return [(1, "cnot_21"), 
+                (2, "S1"), 
+                (3, "H2"), 
+                (4, "T1")
+                ]
+    end
+
+    params["input_circuit"] = input_circuit_2()
+    data = QCO.get_data(params)
+    @test !("input_circuit" in keys(data))
+
+    function input_circuit_3()
+        # [(depth, gate)]
+        return [(1, "cnot_21"), 
+                (2, "S1"), 
+                (2, "H2"), 
+                (4, "S2")
+                ]
+    end
+
+    params["input_circuit"] = input_circuit_3()
+    data = QCO.get_data(params)
+    @test !("input_circuit" in keys(data))
+
+    function input_circuit_4()
+        # [(depth, gate)]
+        return [(1, "cnot_21"), 
+                (2, "S1"), 
+                (3, "H2"), 
+                (4, "S2"),
+                (5, "Identity"),
+                (6, "S1"),
+                ]
+    end
+
+    params["input_circuit"] = input_circuit_4()
+    data = QCO.get_data(params)
+    @test !("input_circuit" in keys(data))
+
+end

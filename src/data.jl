@@ -20,6 +20,24 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
     end
     # Add code here to support non-identity as an initial condition gate. 
 
+    # Input Circuit
+    if "input_circuit" in keys(params)
+        input_circuit = params["input_circuit"]
+    else
+        # default value
+        input_circuit = []
+    end
+    
+    input_circuit_dict = Dict{String,Any}()
+
+    if length(input_circuit) > 0 && (length(input_circuit) <= params["depth"])
+        
+        input_circuit_dict = QCO.get_input_circuit_dict(input_circuit, params)
+
+    else
+        (length(input_circuit) > 0) && (Memento.warn(_LOGGER, "Neglecting the input circuit as it's depth is greater than the allowable depth"))
+    end
+
     # Depth
     if params["depth"] < 2 
         Memento.error(_LOGGER, "Minimum depth of 2 is necessary")
@@ -106,6 +124,10 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
                 data["discretization"]["U3_λ"] = params["U_λ_discretization"]
             end
         end
+    end
+
+    if length(keys(input_circuit_dict)) > 0
+        data["input_circuit"] = input_circuit_dict
     end
                          
     return data
@@ -204,7 +226,7 @@ function get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{St
     end 
 
     if (size(params["target_gate"])[1] != size(params["target_gate"])[2]) || (size(params["target_gate"])[1] != 2^params["num_qubits"])
-        Memento.error(_LOGGER, "Dimensions of target gate are incorrect")
+        Memento.error(_LOGGER, "Dimensions of target gate do not match the input num_qubits")
     end
  
     return gates_dict, complex_to_real_matrix(params["target_gate"])
@@ -602,113 +624,37 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
 
 end
 
-#=
-function num_input_gates(params::Dict{String, Any})
+function get_input_circuit_dict(input_circuit::Vector{Tuple{Int64,String}}, params::Dict{String,Any})
 
-    elementary_gates = unique(params["elementary_gates"])
+    input_circuit_dict = Dict{String, Any}()
 
-    # Update this if the naming convention for gates changes
-    R_gates = findall(x -> startswith(x, "R"), (elementary_gates))
-    U_gates = findall(x -> startswith(x, "U"), (elementary_gates))
-
-    num_gates = 0
+    status = true
+    gate_type = []
     
-    if isempty(R_gates) && isempty(U_gates)
-
-        num_gates = length(elementary_gates)
-
-    elseif !isempty(R_gates) && isempty(U_gates)
-        
-        n_discretized_R_gates = get_number_of_R_gates(params, elementary_gates)
-
-        num_gates = length(elementary_gates) - length(R_gates) + n_discretized_R_gates
-
-    elseif !isempty(U_gates) && isempty(R_gates)
-        
-        n_discretized_U_gates = _num_U3_gates(params, elementary_gates)
-
-        num_gates = length(elementary_gates) - length(U_gates) + n_discretized_U_gates
-
-    elseif !isempty(R_gates) && !isempty(U_gates)
-        
-        n_discretized_R_gates = get_number_of_R_gates(params, elementary_gates)
-
-        n_discretized_U_gates = _num_U3_gates(params, elementary_gates)
-
-        num_gates = length(elementary_gates) - length(R_gates) - length(U_gates) + n_discretized_R_gates + n_discretized_U_gates
-
-    end
-    
-    if num_gates == 1
-        Memento.error(_LOGGER, "Input at least two unique elementary gates for non-trivial solutions")
-    else
-        return num_gates
-    end
-
-end
-
-function get_number_of_R_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
-    
-    num_RX = 0; num_RY = 0; num_RZ = 0;
-    
-    # A factor of two to account for R gates on both qubits
-    if ("RX" in elementary_gates)
-        if !("RX_discretization" in keys(params))
-            Memento.error(_LOGGER, "Discretization angles for the RX gate are unspecified")
-        end
-
-        num_RX = 2*length(params["RX_discretization"])
-        if num_RX == 0
-            Memento.error(_LOGGER, "Dicsretization not specified for RX gate")
-        end
-    end
-    
-    if ("RY" in elementary_gates)
-        if !("RY_discretization" in keys(params))
-            Memento.error(_LOGGER, "Discretization angles for the RY gate are unspecified")
-        end
-
-        num_RY = 2*length(params["RY_discretization"])
-        if num_RY == 0 
-            Memento.error(_LOGGER, "Dicsretization not specified for RY gate")
-        end 
-    end
-
-    if ("RZ" in elementary_gates)
-        if !("RZ_discretization" in keys(params))
-            Memento.error(_LOGGER, "Discretization angles for the RZ gate are unspecified")
-        end
-
-        num_RZ = 2*length(params["RZ_discretization"])
-        if num_RZ == 0
-            Memento.error(_LOGGER, "Dicsretization not specified for RZ gate")
+    for i = 1:length(input_circuit)
+        if !(input_circuit[i][2] in params["elementary_gates"])
+            status = false
+            gate_type = input_circuit[i][2]
         end
     end
 
-    return (num_RX + num_RY + num_RZ)
-end
-
-function _num_U3_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
-
-    num_U3 = 0
-
-        if ("U3" in elementary_gates)    
-            
-            if !("U_θ_discretization" in keys(params)) || !("U_ϕ_discretization" in keys(params)) || !("U_λ_discretization" in keys(params))
-                Memento.error(_LOGGER, "Discretization angles for the U3 gate are unspecified")
-            end
-
-            if (isempty(params["U_θ_discretization"])) || (isempty(params["U_ϕ_discretization"])) || (isempty(params["U_λ_discretization"]))
-                
-                Memento.error(_LOGGER, "Input atleast one discretization angle for every angle (θ,ϕ,λ)")
-
+    if status  
+        for i = 1:length(input_circuit)
+    
+            if i == input_circuit[i][1]
+                input_circuit_dict["$i"] = Dict{String, Any}("depth" => input_circuit[i][1],
+                                                             "gate" => input_circuit[i][2])
+                # Later: add support for universal and rotation gates here
             else
-                # A factor of two to account for U gates on both qubits                
-                num_U3 = 2 * length(params["U_θ_discretization"]) * length(params["U_ϕ_discretization"]) * length(params["U_λ_discretization"])
-
+                input_circuit_dict = Dict{String, Any}()          
+                Memento.warn(_LOGGER, "Neglecting the input circuit as multiple gates cannot be input at the same depth")
+                break
             end
-        end
 
-    return num_U3
-end
-=#
+        end
+    else
+        Memento.warn(_LOGGER, "Neglecting the input circuit as gate $gate_type is not in input elementary gates")
+    end
+    
+    return input_circuit_dict
+end 

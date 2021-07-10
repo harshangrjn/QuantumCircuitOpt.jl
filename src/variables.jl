@@ -44,7 +44,24 @@ function variable_gates_onoff(qcm::QuantumCircuitModel)
     depth   = qcm.data["depth"]
 
     qcm.variables[:z_onoff_var] = JuMP.@variable(qcm.model, z_onoff_var[1:num_gates,1:depth], Bin)
-    
+
+    if "input_circuit" in keys(qcm.data)
+        
+        gates_dict  = qcm.data["gates_dict"]
+        start_value = qcm.data["input_circuit"]
+        
+        for d in keys(start_value)
+            circuit_depth = start_value[d]["depth"]
+            gate_start = start_value[d]["gate"]
+            
+            for n in keys(gates_dict)    
+                if gate_start in gates_dict[n]["type"]                 
+                    JuMP.set_start_value(z_onoff_var[parse(Int64, n), circuit_depth], 1)
+                end
+            end
+        end
+    end
+        
     return
 end
 

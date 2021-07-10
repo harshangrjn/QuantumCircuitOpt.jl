@@ -21,12 +21,16 @@ test_gates = ["test_hadamard",
                "test_W_using_HCnot",
                "test_RX_on_q3"]
 
+# test_gates = ["test_toffoli"]
+
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
 #----------------------------------------------#
+result_qcm = Dict{String,Any}()
+
 for gates in test_gates 
     params = getfield(Main, Symbol(gates))()
     qcm_optimizer = get_solver(params)  
-    result_qcm = QCO.run_QCModel(params, qcm_optimizer, model_type="compact_formulation")
+    global result_qcm = QCO.run_QCModel(params, qcm_optimizer, model_type="compact_formulation")
 end
 

@@ -23,7 +23,8 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 
 | Optional Inputs  | Description |
 | -----------: | :----------- |
-| `initial_gate` |  Intitial condition gate to the decomposition (default: `"Identity"`).  | 
+| `initial_gate` | Intitial-condition gate to the decomposition (gate at 0th depth) (default: `"Identity"`).  | 
+| `input_circuit` | Input circuit representing an ensemble of elementary gates which decomposes the given target gate. This input circuit, which serves as a warm-start, can accelerate the MIP solver's search for the incumbent solution. (default: empty circuit).  | 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_presolve` | This option enables or disables the presolve option in the chosen `optimizer` (default: `true`). Turning it off can lead to slower run times.|
 | `optimizer_log` | This option enables or disables console logging for the `optimizer` (default: `true`).|

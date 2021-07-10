@@ -169,3 +169,32 @@ end
     end
   
 end
+
+@testset "JuMP set_start_value tests for on-off vars" begin
+    function input_circuit()
+        # [(depth, gate)]
+        return [(1, "cnot_21"), 
+                (2, "S1"), 
+                (3, "H2"), 
+                (4, "S2")
+                ]
+    end
+
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "depth" => 4,
+    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "target_gate" => QCO.MGate(),
+    "input_circuit" => input_circuit(),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
+    "optimizer" => "cbc"
+    )
+
+    result_qc = QCO.run_QCModel(params, CBC)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][6,:]), 1, atol=1E-6)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 0, atol=1E-6)
+    
+end

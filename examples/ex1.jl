@@ -8,6 +8,15 @@ include("solver.jl")
 #-------------------------------#
 #      User-defined inputs      #
 #-------------------------------#
+function input_circuit()
+         # [(depth, gate)]
+    return [(1, "cnot_21"), 
+            (2, "S1"), 
+            (3, "H2"), 
+            (4, "S2")
+            ]
+end
+
 function target_gate(gate::Int)
     if gate == 1
         return QCO.kron_single_gate(2, QCO.U3Gate(0,0,π/4), "q1")
@@ -24,13 +33,15 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2,
-"depth" => 3,
+"depth" => 5,
 
-"elementary_gates" => ["U3", "cnot_12", "Identity"],
-# "elementary_gates" => ["T1", "T2", "H1", "H2", "S1", "S2", "cnot_12", "cnot_21", "Identity"],
-# "elementary_gates" => ["H1", "H2", "T1", "T2", "Tdagger1", "Tdagger2", "cnot_12", "Identity"],  
+# "elementary_g/ates" => ["U3", "cnot_12", "Identity"],
+# "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3"],
+"elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
 
-"target_gate" => target_gate(5),
+"target_gate" => QCO.MGate(),
+
+"input_circuit" => input_circuit(),
 
 "RX_discretization" => [0, π/4],
 "RY_discretization" => [π/4],

@@ -1,6 +1,12 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.1.2
+- Update to warm start with an initial circuit (without U3 and R gates)
+- Update to unit tests to reflect the above changes
+- Update to docs to reflect the above changes
+- Bug fixes in error/warn messages 
+
 ### v0.1.1
 - docs/make.jl updates for sidebar name
 - Updated docs logo to handle dark theme
