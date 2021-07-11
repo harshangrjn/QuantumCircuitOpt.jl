@@ -45,19 +45,18 @@ end
 
 @testset "unique_matrices and unique_idx tests" begin
     
-    tol = 1E-6
     D = zeros(3,3,4)
     D[:,:,1] = Matrix(LA.I,3,3)
     D[:,:,2] = rand(3,3)
     D[:,:,3] = Matrix(LA.I,3,3)
     D[:,:,4] = rand(3,3)
 
-    D[1,1,3] = 1 + 2*tol
-    D[3,3,3] = 1 - tol
-    D[1,2,3] = 0 - tol
-    D[1,3,3] = 0 + tol
+    D[1,1,3] = 1 + 2*tol_0
+    D[3,3,3] = 1 - tol_0
+    D[1,2,3] = 0 - tol_0
+    D[1,3,3] = 0 + tol_0
 
-    D[isapprox.(D, 0, atol=1E-6)] .= 0
+    D[isapprox.(D, 0, atol=tol_0)] .= 0
 
     D_unique, D_unique_idx = QCO.unique_matrices(D)
 
@@ -81,7 +80,7 @@ end
     C2, C3 = QCO.get_commutative_gates(data["gates_real"])
     @test length(C2) == 4
     @test length(C3) == 1
-    @test isapprox(data["gates_real"][:,:,C2[1][1]] * data["gates_real"][:,:,C2[1][2]], data["gates_real"][:,:,C2[1][2]] * data["gates_real"][:,:,C2[1][1]], atol=1E-6)
+    @test isapprox(data["gates_real"][:,:,C2[1][1]] * data["gates_real"][:,:,C2[1][2]], data["gates_real"][:,:,C2[1][2]] * data["gates_real"][:,:,C2[1][1]], atol=tol_0)
 end
 
 @testset "kron_single_gate tests" begin

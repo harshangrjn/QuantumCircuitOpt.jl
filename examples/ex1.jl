@@ -37,11 +37,11 @@ params = Dict{String, Any}(
 
 # "elementary_g/ates" => ["U3", "cnot_12", "Identity"],
 # "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3"],
-"elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+"elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"],
 
 "target_gate" => QCO.MGate(),
 
-"input_circuit" => input_circuit(),
+# "input_circuit" => input_circuit(),
 
 "RX_discretization" => [0, π/4],
 "RY_discretization" => [π/4],

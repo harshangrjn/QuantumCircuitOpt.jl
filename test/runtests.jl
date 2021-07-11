@@ -12,6 +12,7 @@ const LA = LinearAlgebra
 QCO.logger_config!("error")
 
 const CBC = JuMP.optimizer_with_attributes(Cbc.Optimizer,  MOI.Silent() => true)
+tol_0 = 1E-6
 
 @testset "QuantumCircuitOpt" begin
 

@@ -17,12 +17,12 @@
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test result_qc["objective"] == 0
-    @test (result_qc["solution"]["z_onoff_var"][1,1] == 1) || (result_qc["solution"]["z_onoff_var"][2,1] == 1)
-    @test (result_qc["solution"]["z_onoff_var"][1,2] == 1) || (result_qc["solution"]["z_onoff_var"][2,2] == 1)
-    @test result_qc["solution"]["z_onoff_var"][3,3] == 1
-    @test (result_qc["solution"]["z_onoff_var"][1,4] == 1) || (result_qc["solution"]["z_onoff_var"][2,4] == 1)
-    @test (result_qc["solution"]["z_onoff_var"][1,5] == 1) || (result_qc["solution"]["z_onoff_var"][2,5] == 1)
+    @test isapprox(result_qc["objective"], 5, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_onoff_var"][1,1], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,1], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_onoff_var"][1,2], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,2], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_onoff_var"][3,3], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_onoff_var"][1,4], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,4], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_onoff_var"][1,5], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,5], 1, atol=tol_0)
     
 end
 
@@ -44,8 +44,8 @@ end
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test isapprox(result_qc["objective"], 3, atol = 1E-6)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][1:2,:]), 3, atol=1E-6)
+    @test isapprox(result_qc["objective"], 3, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][1:2,:]), 3, atol=tol_0)
     
 end
 
@@ -74,10 +74,10 @@ end
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test isapprox(result_qc["objective"], 2, atol = 1E-6)
+    @test isapprox(result_qc["objective"], 1, atol = tol_0)
     @test "Identity" in data["gates_dict"]["5"]["type"]
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 2, atol = 1E-6)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][7,:]), 1, atol = 1E-6) 
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 2, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][7,:]), 1, atol = tol_0) 
     @test data["gates_dict"]["7"]["qubit_loc"] == "qubit_1"
 end
 
@@ -104,7 +104,7 @@ end
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test isapprox(result_qc["objective"], 0, atol = 1E-6)
+    @test isapprox(result_qc["objective"], 3, atol = tol_0)
 
 end
 
@@ -133,12 +133,12 @@ end
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test isapprox(result_qc["objective"], 1, atol = 1E-6)
-    if isapprox(sum(result_qc["solution"]["z_onoff_var"][14,:]), 1, atol=1E-6)
+    @test isapprox(result_qc["objective"], 1, atol = tol_0)
+    if isapprox(sum(result_qc["solution"]["z_onoff_var"][14,:]), 1, atol=tol_0)
         @test data["gates_dict"]["14"]["qubit_loc"] == "qubit_3"
-        @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["θ"]),  45, atol=1E-6)
-        @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["ϕ"]), -90, atol=1E-6)
-        @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["λ"]),  90, atol=1E-6)
+        @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["θ"]),  45, atol=tol_0)
+        @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["ϕ"]), -90, atol=tol_0)
+        @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["λ"]),  90, atol=tol_0)
     end
 
 end
@@ -164,7 +164,7 @@ end
 
     for i in keys(data["gates_dict"])
         if data["gates_dict"][i]["type"] == "H1"
-            @test isapprox(sum(result_qc["solution"]["z_onoff_var"][parse(Int64, i),:]), 3 , atol = 1E-6)
+            @test isapprox(sum(result_qc["solution"]["z_onoff_var"][parse(Int64, i),:]), 3 , atol = tol_0)
         end
     end
   
@@ -194,7 +194,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][6,:]), 1, atol=1E-6)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 0, atol=1E-6)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][6,:]), 1, atol=tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 0, atol=tol_0)
     
 end
