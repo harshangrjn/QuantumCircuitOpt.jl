@@ -1,4 +1,4 @@
-[Logo](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/docs/src/assets/docs_header_dark.png?theme=dark
+![Logo](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/docs/src/assets/docs_header_dark.png?theme=dark
 ![Logo](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/logo.png?theme=light
 
 
