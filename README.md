@@ -1,8 +1,6 @@
-```
 <p align="center">
 <img width="775px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/logo.png" alt="https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/docs/src/assets/docs_header_dark.png"/>
 </p>
-```
 
 Status: 
 [![CI](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml)
