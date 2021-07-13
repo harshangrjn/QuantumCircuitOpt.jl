@@ -40,7 +40,7 @@ function test_toffoli()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    "relax_integrality" => true,
+    "relax_integrality" => false,
     
     "optimizer" => "cplex",
     

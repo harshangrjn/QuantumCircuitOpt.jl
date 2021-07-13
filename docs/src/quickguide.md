@@ -64,7 +64,7 @@ qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer)
 QCO.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
-set of `elementary_gates` accordingly in the above sample code. 
+set of `elementary_gates` accordingly in the above sample code. For more such 2-qubit and also 3-qubit gate decompositions with and without the universal unitary in the elementary gates, refer to "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder. 
 
 !!! warning
     Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input gates, target gate and the total depth of the decomposition. Hence, unlike local optimization methods in the literature, the run times for larger number of qubits and depths can be prohibitively slow since these problems are NP-hard. 
@@ -109,4 +109,4 @@ Optimal Circuit Decomposition
   Optimizer run time: 15.29 sec.
 =============================================================================
 ```
- 
+

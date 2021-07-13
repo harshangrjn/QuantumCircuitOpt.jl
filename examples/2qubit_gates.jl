@@ -240,7 +240,7 @@ function test_cnot_21_with_U()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 5,    
+        "depth" => 6,    
     
         "elementary_gates" => ["U3", "cnot_12", "Identity"], 
         "target_gate" => QCO.CNotRevGate(),   
@@ -253,7 +253,6 @@ function test_cnot_21_with_U()
         "decomposition_type" => "exact", 
         
         "optimizer" => "cplex",
-        "MIP_feasiblity_emphasis" => true
                               
         )
     

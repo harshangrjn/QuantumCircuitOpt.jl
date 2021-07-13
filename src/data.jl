@@ -269,10 +269,13 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
                     for k in keys(M_elementary_dict[j])
                         for l in keys(M_elementary_dict[j][k]["$(num_qubits)qubit_rep"])
                             
+                            M_sqrd = M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l]^2
+
                             gates_dict["$counter"] = Dict{String, Any}("type" => [j],
                                                                        "angle" => Any,
                                                                        "qubit_loc" => l,
-                                                                       "matrix" => M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l])
+                                                                       "matrix" => M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l],
+                                                                       "isInvolutory" => isapprox(M_sqrd, Matrix(LA.I, size(M_sqrd)[1], size(M_sqrd)[2]), atol=1E-6))
 
                             if startswith(elementary_gates[i], "R")
                                 gates_dict["$counter"]["angle"] = M_elementary_dict[j][k]["angle"]
@@ -291,9 +294,13 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
             end
             
         else 
+            
+            M = get_full_sized_gate(elementary_gates[i], num_qubits)
+            M_sqrd = M^2
 
             gates_dict["$counter"] = Dict{String, Any}("type" => [elementary_gates[i]],
-                                                       "matrix" => get_full_sized_gate(elementary_gates[i], num_qubits))
+                                                       "matrix" => M,
+                                                       "isInvolutory" => isapprox(M_sqrd, Matrix(LA.I, size(M_sqrd)[1], size(M_sqrd)[2]), atol=1E-6))
             counter += 1
 
         end

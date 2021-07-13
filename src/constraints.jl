@@ -203,3 +203,51 @@ function constraint_commutative_gates(qcm::QuantumCircuitModel)
 
     return
 end
+
+function constraint_unit_vectors_relaxation(qcm::QuantumCircuitModel)
+    
+    depth  = qcm.data["depth"]
+    U_var  = qcm.variables[:U_var]
+    n_r    = size(U_var)[1]
+    n_c    = size(U_var)[2]
+
+    for col=1:2:n_c
+        JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(U_var[:, col, d].^2) <= 1)
+    end
+
+    for row=1:2:n_r
+        JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(U_var[:, row, d].^2) <= 1)
+    end
+
+    return
+end
+
+function constraint_involutory_matrices(qcm::QuantumCircuitModel)
+
+    gates_dict  = qcm.data["gates_dict"]
+    depth       = qcm.data["depth"]
+    z_onoff_var = qcm.variables[:z_onoff_var]
+
+    num_involutory_matrices = 0 
+
+    for i in keys(gates_dict)
+        i_int = parse(Int64, i)
+        if gates_dict[i]["isInvolutory"]
+            
+            if !("Identity" in gates_dict[i]["type"])
+                JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[i_int, d] + z_onoff_var[i_int, d+1] <= 1)
+            else
+                # Allow consecutive Identity gates only at the end of decomposition
+                JuMP.@constraint(qcm.model, [d=1:(depth-2)], z_onoff_var[i_int, d] + z_onoff_var[i_int, d+1] <= 1)
+            end
+
+            num_involutory_matrices += 1
+        end
+    end
+
+    if num_involutory_matrices > 0
+        Memento.info(_LOGGER, "Detected $num_involutory_matrices input involutory matrices")
+    end
+
+    return
+end

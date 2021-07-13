@@ -4,6 +4,8 @@ QuantumCircuitOpt.jl Change Log
 ### v0.1.3
 - Update to minimize_depth from maximizing IGate to minimizing non-IGates, which also improved run times. 
 - Clean-up and update to unit tests to reflect the above change
+- Fixed Gurobi solver bug in `examples/solver.jl`
+- Involutory matrix constraints added and corresponding unit tests
 
 ### v0.1.2
 - Update to warm start with an initial circuit (without U3 and R gates)

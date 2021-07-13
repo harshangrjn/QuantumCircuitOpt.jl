@@ -1,6 +1,8 @@
 function build_QCModel(data::Dict{String, Any}; 
                        model_type = "compact_formulation", 
-                       commute_matrix_cuts = false)
+                       commute_matrix_constraints = false,
+                       unit_vector_constraints = false,
+                       involutory_matrix_constraints = true)
     
     m_qc = QuantumCircuitModel(data)
 
@@ -8,13 +10,19 @@ function build_QCModel(data::Dict{String, Any};
     if model_type == "balas_formulation" 
 
         variable_QCModel(m_qc)
-        constraint_QCModel(m_qc, commute_matrix_cuts)
+        constraint_QCModel(m_qc, 
+                           commute_matrix_constraints, 
+                           unit_vector_constraints,
+                           involutory_matrix_constraints)
 
     # minimal variables and constraints, but not a convex-hull formulation per depth
     elseif model_type == "compact_formulation" 
         
         variable_QCModel_compact(m_qc)
-        constraint_QCModel_compact(m_qc, commute_matrix_cuts)
+        constraint_QCModel_compact(m_qc, 
+                                   commute_matrix_constraints, 
+                                   unit_vector_constraints,
+                                   involutory_matrix_constraints)
 
     end
 
@@ -37,7 +45,10 @@ function variable_QCModel(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_QCModel(qcm::QuantumCircuitModel, commute_matrix_cuts::Bool)
+function constraint_QCModel(qcm::QuantumCircuitModel, 
+                            commute_matrix_constraints::Bool, 
+                            unit_vector_constraints::Bool,
+                            involutory_matrix_constraints::Bool)
     
     constraint_single_gate_per_depth(qcm)
     constraint_disjunction_of_gates_per_depth(qcm)
@@ -47,9 +58,10 @@ function constraint_QCModel(qcm::QuantumCircuitModel, commute_matrix_cuts::Bool)
     constraint_gate_target_condition(qcm)
     constraint_complex_to_real_symmetry(qcm)
 
-    if commute_matrix_cuts
-        constraint_commutative_gates(qcm)
-    end
+    commute_matrix_constraints    && constraint_commutative_gates(qcm)
+    unit_vector_constraints       && constraint_unit_vectors_relaxation(qcm)
+    involutory_matrix_constraints && constraint_involutory_matrices(qcm)
+
 
     return
 end
@@ -67,7 +79,10 @@ function variable_QCModel_compact(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_QCModel_compact(qcm::QuantumCircuitModel, commute_matrix_cuts::Bool)
+function constraint_QCModel_compact(qcm::QuantumCircuitModel, 
+                                    commute_matrix_constraints::Bool, 
+                                    unit_vector_constraints::Bool,
+                                    involutory_matrix_constraints::Bool)
 
     constraint_single_gate_per_depth(qcm)
     constraint_gate_initial_condition_compact(qcm)
@@ -76,9 +91,9 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel, commute_matrix_cut
     constraint_gate_target_condition_compact(qcm)
     constraint_complex_to_real_symmetry_compact(qcm)
 
-    if commute_matrix_cuts
-        constraint_commutative_gates(qcm)
-    end
+    commute_matrix_constraints    && constraint_commutative_gates(qcm)  
+    unit_vector_constraints       && constraint_unit_vectors_relaxation(qcm)
+    involutory_matrix_constraints && constraint_involutory_matrices(qcm)
 
     return
 end
@@ -130,11 +145,23 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
     return qcm.result
 end
 
-function run_QCModel(params::Dict{String, Any}, qcm_optimizer::MOI.OptimizerWithAttributes; model_type = "compact_formulation", commute_matrix_cuts = false, visualize_solution=true, eliminate_identical_gates = false)
+function run_QCModel(params::Dict{String, Any}, 
+                     qcm_optimizer::MOI.OptimizerWithAttributes; 
+                     model_type = "compact_formulation", 
+                     commute_matrix_constraints = false, 
+                     unit_vector_constraints = false,
+                     involutory_matrix_constraints = true, 
+                     visualize_solution=true, 
+                     eliminate_identical_gates = false)
 
-    data = QuantumCircuitOpt.get_data(params, eliminate_identical_gates = eliminate_identical_gates)
+    data = QuantumCircuitOpt.get_data(params, 
+                                      eliminate_identical_gates = eliminate_identical_gates)
 
-    model_qc  = QuantumCircuitOpt.build_QCModel(data, model_type = model_type, commute_matrix_cuts = commute_matrix_cuts)
+    model_qc  = QuantumCircuitOpt.build_QCModel(data, 
+                                                model_type = model_type, 
+                                                commute_matrix_constraints = commute_matrix_constraints, 
+                                                unit_vector_constraints = unit_vector_constraints,
+                                                involutory_matrix_constraints = involutory_matrix_constraints)
 
     result_qc = QuantumCircuitOpt.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
 

@@ -5,7 +5,7 @@ This function returns the JuMP optimizer with its appropriate attributes, based 
 user-defined inputs in `params` dictionary.  
 """
 function get_solver(params::Dict{String,Any})
-    optimizers_list = ["cplex", "cbc", "ipopt", "juniper", "alpine", "glpk"]
+    optimizers_list = ["gurobi", "cplex", "cbc", "ipopt", "juniper", "alpine", "glpk"]
 
     # Optimizer
     if !("optimizer" in keys(params))

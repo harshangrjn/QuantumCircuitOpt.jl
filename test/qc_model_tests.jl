@@ -100,7 +100,7 @@ end
     "optimizer" => "cbc"                             
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_matrix_cuts = true)
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_matrix_constraints = true)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
@@ -196,5 +196,38 @@ end
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][6,:]), 1, atol=tol_0)
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 0, atol=tol_0)
+    
+end
+
+@testset "Involutory matrix constraints tests" begin
+    
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "depth" => 4,
+    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "target_gate" => QCO.MGate(),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
+    "optimizer" => "cbc"
+    )
+
+    gates_dict = QCO.get_data(params)["gates_dict"]
+    
+    num_involutory_matrices = 0 
+    for i in keys(gates_dict)
+        if gates_dict[i]["isInvolutory"]
+            num_involutory_matrices += 1
+        end
+
+        if ("S1" in gates_dict[i]["type"]) || ("S2" in gates_dict[i]["type"])
+            @test !(gates_dict[i]["isInvolutory"])
+        end
+    end
+    @test num_involutory_matrices == 5
+
+    result_qc = QCO.run_QCModel(params, CBC)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 4, atol = tol_0)
     
 end
