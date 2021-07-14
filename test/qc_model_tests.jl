@@ -231,3 +231,22 @@ end
     @test isapprox(result_qc["objective"], 4, atol = tol_0)
     
 end
+
+@testset "TIME_LIMIT test for building results dict and log" begin
+    
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "depth" => 5,
+    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "target_gate" => QCO.MGate(),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
+    "optimizer" => "cbc",
+    "time_limit" => 1
+    )
+
+    result_qc = QCO.run_QCModel(params, CBC)
+    @test result_qc["termination_status"] == MOI.TIME_LIMIT
+    @test result_qc["primal_status"] == MOI.NO_SOLUTION
+    
+end

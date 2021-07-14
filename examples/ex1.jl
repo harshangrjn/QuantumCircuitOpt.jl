@@ -1,7 +1,7 @@
 import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
-# using Cbc
+using Cbc
 
 include("solver.jl")
 include("2qubit_gates.jl")
@@ -35,7 +35,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2,
-"depth" => 8,
+"depth" => 5,
 
 # "elementary_g/ates" => ["U3", "cnot_12", "Identity"],
 # "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3", "Identity"],
@@ -55,8 +55,8 @@ params = Dict{String, Any}(
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",
-"optimizer" => "cplex",
-"time_limit" => 2,
+"optimizer" => "cbc",
+"time_limit" => 1,
                            
 )
 

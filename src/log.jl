@@ -1,27 +1,30 @@
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
-    if results["primal_status"] != MOI.FEASIBLE_POINT 
-        if results["termination_status"] != MOI.TIME_LIMIT
-            Memento.error(_LOGGER, "Infeasible primal status. Gate decomposition may not be accurate!")
-        else 
-            Memento.warn(_LOGGER, "Optimizer hits time limit with an infeasible primal status. Gate decomposition may not be accurate!")
-            return
+    if data["relax_integrality"]
+        if results["primal_status"] == MOI.FEASIBLE_POINT 
+            Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
+        else
+            Memento.info(_LOGGER, "Infeasible primal status for the integrality-relaxed problem")
         end
+
+        return
+    end
+
+    if results["primal_status"] != MOI.FEASIBLE_POINT 
+        
+        if results["termination_status"] != MOI.TIME_LIMIT
+            Memento.error(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
+        else 
+            Memento.warn(_LOGGER, "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate")
+        end
+
+        return
+    else
+        gates_sol, gates_sol_compressed = get_postprocessed_solutions(results, data)
     end
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
     U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
-
-    if data["relax_integrality"] 
-        Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
-        return
-    end
-
-    if results["primal_status"] == MOI.FEASIBLE_POINT 
-        gates_sol, gates_sol_compressed = get_postprocessed_solutions(results, data)
-    else 
-        return
-    end
 
     if !isempty(gates_sol_compressed)
 
