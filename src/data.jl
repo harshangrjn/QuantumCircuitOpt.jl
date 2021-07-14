@@ -65,11 +65,20 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
         relax_integrality = false
     end
 
+    # Slack Penalty
     if "slack_penalty" in keys(params)
         slack_penalty = params["slack_penalty"]
     else
         # default value
         slack_penalty = 1E3
+    end
+
+    # Optimizer time limit (in seconds)
+    if "time_limit" in keys(params) && params["time_limit"] isa Number
+        time_limit = params["time_limit"]
+    else
+        # default value
+        time_limit = 10800
     end
 
     elementary_gates = unique(params["elementary_gates"])
@@ -94,7 +103,8 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
                              "objective" => objective,
                              "slack_penalty" => slack_penalty,
                              "decomposition_type" => decomposition_type,                         
-                             "relax_integrality" => relax_integrality
+                             "relax_integrality" => relax_integrality,
+                             "time_limit" => time_limit
                              )
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])

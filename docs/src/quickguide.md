@@ -29,6 +29,7 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | `optimizer_presolve` | This option enables or disables the presolve option in the chosen `optimizer` (default: `true`). Turning it off can lead to slower run times.|
 | `optimizer_log` | This option enables or disables console logging for the `optimizer` (default: `true`).|
 | `slack_penalty` | This option allows the user to set the penalty for minimizing the slack term in the objective, when `decomposition_type` is set to `"approximate"` (default: `1E3`).  |
+| `time_limit` | This option allows the user to set the maximum time limit for the optimizer in seconds (default: `10,800`).  |
 
 
 

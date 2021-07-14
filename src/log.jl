@@ -1,16 +1,25 @@
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
-    if results["primal_status"] != MOI.FEASIBLE_POINT
-        Memento.error(_LOGGER, "Non-feasible primal status. Gate decomposition may not be accurate!")
+    if results["primal_status"] != MOI.FEASIBLE_POINT 
+        if results["termination_status"] != MOI.TIME_LIMIT
+            Memento.error(_LOGGER, "Infeasible primal status. Gate decomposition may not be accurate!")
+        else 
+            Memento.warn(_LOGGER, "Optimizer hits time limit with an infeasible primal status. Gate decomposition may not be accurate!")
+            return
+        end
     end
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
     U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
 
-    if !data["relax_integrality"]
+    if data["relax_integrality"] 
+        Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
+        return
+    end
+
+    if results["primal_status"] == MOI.FEASIBLE_POINT 
         gates_sol, gates_sol_compressed = get_postprocessed_solutions(results, data)
     else 
-        Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
         return
     end
 
@@ -89,29 +98,33 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         end
 
         if data["objective"] == "minimize_depth"
-            if length(data["identity_idx"]) >= 1
+
+            if length(data["identity_idx"]) >= 1 && !(results["termination_status"] == MOI.TIME_LIMIT)
                 printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
             else 
-                printstyled("  ","Compressed depth for a feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
+                printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
             end
 
         elseif data["objective"] == "minimize_cnot"
 
             if !isempty(data["cnot_idx"])
                 
-                if data["decomposition_type"] == "exact"
-                    
+                if data["decomposition_type"] == "exact" 
                     printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
                 
                 elseif data["decomposition_type"] == "approximate"
-                    
                     printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - data["slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = :cyan)
                 end
             
             elseif !isempty(data["identity_idx"])
                
                 printstyled("  ","Objective function changed to minimize_depth (CNOT gate not found in input)", "\n"; color = :cyan) 
-                printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+                
+                if !(results["termination_status"] == MOI.TIME_LIMIT)
+                    printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+                else
+                    printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+                end
             
             else
 
@@ -123,6 +136,11 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         end
 
         printstyled("  ","Optimizer run time: ", ceil(results["solve_time"], digits=2)," sec.","\n"; color = :cyan)
+            
+        if results["termination_status"] == MOI.TIME_LIMIT
+            printstyled("  ","Termination status: TIME_LIMIT", "\n"; color = :cyan)
+            printstyled("  ","Decomposition may not be optimal", "\n"; color = :cyan)
+        end
 
         printstyled("=============================================================================","\n"; color = :cyan)      
 

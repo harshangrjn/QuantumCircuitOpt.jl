@@ -58,11 +58,9 @@ function constraint_gate_target_condition(qcm::QuantumCircuitModel)
     
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
     if decomposition_type == "exact"
-    
         JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"])  
     
     elseif decomposition_type == "approximate"
-
         JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"][:,:] + qcm.variables[:slack_var][:,:])  
         
     end
@@ -106,11 +104,13 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
         for j=1:n_c
             for n=1:num_gates
                 for d=1:(depth-1)
+                    
                     QCO.relaxation_bilinear(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff_var][n,(d+1)])
                     if isodd(j)
                         JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j,n,d]   ==  qcm.variables[:zU_var][i+1,j+1,n,d])
                         JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d] == -qcm.variables[:zU_var][i+1,j,n,d])
                     end
+
                 end
             end
         end
@@ -152,11 +152,9 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
     if decomposition_type == "exact"
-        
         JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"][:,:])  
     
     elseif decomposition_type == "approximate"
-
         JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"][:,:] + qcm.variables[:slack_var][:,:])    
     
     end
@@ -199,24 +197,6 @@ function constraint_commutative_gates(qcm::QuantumCircuitModel)
             JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(z[commute_triplets[i][k], d] for k=1:3)  + sum(z[commute_triplets[i][k], (d+1)] for k=1:3) <= 3)
         end
 
-    end
-
-    return
-end
-
-function constraint_unit_vectors_relaxation(qcm::QuantumCircuitModel)
-    
-    depth  = qcm.data["depth"]
-    U_var  = qcm.variables[:U_var]
-    n_r    = size(U_var)[1]
-    n_c    = size(U_var)[2]
-
-    for col=1:2:n_c
-        JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(U_var[:, col, d].^2) <= 1)
-    end
-
-    for row=1:2:n_r
-        JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(U_var[:, row, d].^2) <= 1)
     end
 
     return

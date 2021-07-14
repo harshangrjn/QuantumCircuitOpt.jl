@@ -1,6 +1,13 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.1.4
+- Optimizer time limit option added for early termination of solvers
+- `log.jl` updates to support optimizer hitting time limits 
+- Updated commuting matrix valid inequalites 
+- Added support for eliminating pairs of M*M^-1 = M^-1*M = I
+- Updated unit tests for the above changes
+
 ### v0.1.3
 - Update to minimize_depth from maximizing IGate to minimizing non-IGates, which also improved run times. 
 - Clean-up and update to unit tests to reflect the above change

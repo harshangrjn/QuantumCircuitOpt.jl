@@ -35,7 +35,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2,
-"depth" => 5,
+"depth" => 8,
 
 # "elementary_g/ates" => ["U3", "cnot_12", "Identity"],
 # "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3", "Identity"],
@@ -55,7 +55,8 @@ params = Dict{String, Any}(
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",
-"optimizer" => "cplex"
+"optimizer" => "cplex",
+"time_limit" => 2,
                            
 )
 
