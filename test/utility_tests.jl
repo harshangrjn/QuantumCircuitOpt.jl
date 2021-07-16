@@ -77,9 +77,8 @@ end
        )
     
     data = QCO.get_data(params)
-    C2, C3 = QCO.get_commutative_gates(data["gates_real"])
+    C2 = QCO.get_commutative_gate_pairs(data["gates_dict"])
     @test length(C2) == 4
-    @test length(C3) == 1
     @test isapprox(data["gates_real"][:,:,C2[1][1]] * data["gates_real"][:,:,C2[1][2]], data["gates_real"][:,:,C2[1][2]] * data["gates_real"][:,:,C2[1][1]], atol=tol_0)
 end
 

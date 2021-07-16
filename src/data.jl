@@ -2,23 +2,42 @@ import LinearAlgebra: I
 
 function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
     
+    # Number of qubits
+    if "num_qubits" in keys(params)
+        if params["num_qubits"] < 2 
+            Memento.error(_LOGGER, "Minimum of 2 qubits is necessary")
+        end
+        num_qubits = params["num_qubits"]
+    else
+        Memento.error(_LOGGER, "Number of qubits has to be specified by the user")
+    end
+
+    # Depth
+    if "depth" in keys(params)
+        if params["depth"] < 2 
+            Memento.error(_LOGGER, "Minimum depth of 2 is necessary")
+        end
+        depth = params["depth"]
+    else
+        Memento.error(_LOGGER, "Depth of decomposition has to be specified by the user")
+    end
+
+    # Elementary gates
     if !("elementary_gates" in keys(params)) || isempty(params["elementary_gates"])
-        Memento.error(_LOGGER, "params[\"elementary_gates\"] is empty. Enter at least two unique unitary gates")
+        Memento.error(_LOGGER, "Input elementary gates is empty. Enter at least two unique unitary gates")
     end
 
     # Initial gate
     if "initial_gate" in keys(params)
-        initial_gate = params["initial_gate"]
+        if params["initial_gate"] == "Identity"
+            initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
+        else 
+            Memento.error(_LOGGER, "Currently, only \"Identity\" is supported as an initial gate")
+            # Add code here to support non-identity as an initial gate. 
+        end
     else
-        initial_gate = "Identity"
+        initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
     end
-
-    if initial_gate == "Identity"
-        M_initial = Matrix(I, 2^(params["num_qubits"]+1), 2^(params["num_qubits"]+1))
-    else
-        Memento.error(_LOGGER, "Currently, non-identity gate is not supported as the initial condition")
-    end
-    # Add code here to support non-identity as an initial condition gate. 
 
     # Input Circuit
     if "input_circuit" in keys(params)
@@ -38,11 +57,6 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
         (length(input_circuit) > 0) && (Memento.warn(_LOGGER, "Neglecting the input circuit as it's depth is greater than the allowable depth"))
     end
 
-    # Depth
-    if params["depth"] < 2 
-        Memento.error(_LOGGER, "Minimum depth of 2 is necessary")
-    end
-
     # Decomposition type 
     if "decomposition_type" in keys(params)
         decomposition_type = params["decomposition_type"]
@@ -50,7 +64,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
         decomposition_type = "exact"
     end
 
-    # Decomposition type 
+    # Objective function
     if "objective" in keys(params)
         objective = params["objective"]
     else
@@ -63,14 +77,6 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
     else
         # default value
         relax_integrality = false
-    end
-
-    # Slack Penalty
-    if "slack_penalty" in keys(params)
-        slack_penalty = params["slack_penalty"]
-    else
-        # default value
-        slack_penalty = 1E3
     end
 
     # Optimizer time limit (in seconds)
@@ -91,17 +97,16 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
 
     gates_dict_unique, M_real_unique, identity_idx, cnot_idx = eliminate_nonunique_gates(gates_dict, eliminate_identical_gates = eliminate_identical_gates)
     
-    data = Dict{String, Any}("num_qubits" => params["num_qubits"],
-                             "depth" => params["depth"],
+    data = Dict{String, Any}("num_qubits" => num_qubits,
+                             "depth" => depth,
                              "gates_dict" => gates_dict_unique,
                              "gates_real" => M_real_unique,
-                             "initial_gate" => M_initial,
+                             "initial_gate" => initial_gate,
                              "identity_idx" => identity_idx,
                              "cnot_idx" => cnot_idx,
                              "elementary_gates" => elementary_gates,
                              "target_gate" => target_real,
                              "objective" => objective,
-                             "slack_penalty" => slack_penalty,
                              "decomposition_type" => decomposition_type,                         
                              "relax_integrality" => relax_integrality,
                              "time_limit" => time_limit
@@ -136,8 +141,19 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
         end
     end
 
+    # Input circuit
     if length(keys(input_circuit_dict)) > 0
         data["input_circuit"] = input_circuit_dict
+    end
+
+    # Slack Penalty
+    if decomposition_type == "approximate"
+        if "slack_penalty" in keys(params)
+            data["slack_penalty"] = params["slack_penalty"]
+        else
+            # default value
+            data["slack_penalty"] = 1E3
+        end
     end
                          
     return data

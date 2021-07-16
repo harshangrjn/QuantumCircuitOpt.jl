@@ -1,7 +1,7 @@
 import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
-using Cbc
+# using Cbc
 
 include("solver.jl")
 include("2qubit_gates.jl")
@@ -35,28 +35,28 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2,
-"depth" => 5,
+"depth" => 4,
 
-# "elementary_g/ates" => ["U3", "cnot_12", "Identity"],
+"elementary_gates" => ["U3", "cnot_12", "Identity"],
 # "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3", "Identity"],
-"elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"],
+# "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"],
 
-"target_gate" => QCO.MGate(),
+"target_gate" => QCO.CZGate(),
 
-# "input_circuit" => input_circuit(),
+# "input_circuit" => toffoli_circuit(),
 
-"RX_discretization" => [0, π/4],
-"RY_discretization" => [π/4],
-"RZ_discretization" => [2*π],
+# "RX_discretization" => [0, π/4],
+# "RY_discretization" => [π/4],
+# "RZ_discretization" => [2*π],
 
-"U_θ_discretization" => collect(-π/2:π/2:π/2),
-"U_ϕ_discretization" => collect(-π/2:π/2:π/2),
-"U_λ_discretization" => collect(-π/2:π/2:π/2),    
+"U_θ_discretization" => [-π/2, 0, π/2],
+"U_ϕ_discretization" => [0, π/2],
+"U_λ_discretization" => [0, π/2],    
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",
-"optimizer" => "cbc",
-"time_limit" => 1,
+"optimizer" => "cplex",
+"optimizer_presolve" => false
                            
 )
 
@@ -64,7 +64,10 @@ params = Dict{String, Any}(
 #      Optimization model      #
 #------------------------------#
 qcm_optimizer = get_solver(params)
+eliminate_identical_gates = true
+
+# data = QCO.get_data(params, eliminate_identical_gates = eliminate_identical_gates)
 result_qc = QCO.run_QCModel(params, 
                             qcm_optimizer, 
                             model_type = "compact_formulation", 
-                            eliminate_identical_gates = true)
+                            eliminate_identical_gates = eliminate_identical_gates)

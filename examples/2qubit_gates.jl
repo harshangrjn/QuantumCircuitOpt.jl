@@ -46,7 +46,7 @@ function test_controlled_Z()
     "decomposition_type" => "exact",
     
     "optimizer" => "cplex",
-    "MIP_feasiblity_emphasis" => true
+    "optimizer_presolve" => false
                                 
     )
 

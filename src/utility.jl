@@ -50,55 +50,55 @@ function gate_element_bounds(M::Array{Float64,3})
     return M_l, M_u
 end
 
-function get_commutative_gates(M::Array{Float64,3})
+"""
+    get_commutative_gate_pairs(M::Dict{String,Any}; identity_pairs = true)
 
-    depth = size(M)[3]
+Given a dictionary of gates, as processed in `src/data.jl`, `get_commutative_gate_pairs` outputs all pairs of commuting 
+matrices. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
+"""
+function get_commutative_gate_pairs(M::Dict{String,Any}; identity_pairs = true)
+    
+    depth = length(keys(M))
+    commute_pairs = Array{Tuple{Int64,Int64},1}()
 
-    M_commute_2 = Array{Tuple{Int64,Int64},1}()
-    M_commute_3 = Array{Tuple{Int64,Int64,Int64},1}()
+    # Non-Identity commuting pairs
+    for i = 1:(depth-1)
+        for j = (i+1):depth
+            M_i = M["$i"]["matrix"]
+            M_j = M["$j"]["matrix"]
 
-    # Check for commutative matrix pairs
-    for d1 = 1:depth
-        for d2 = (d1+1):depth
-            M_d1 = real_to_complex_matrix(M[:,:,d1])
-            M_d2 = real_to_complex_matrix(M[:,:,d2])
-
-            if isapprox(M_d1*M_d2, M_d2*M_d1, atol = 1E-4)
-                push!(M_commute_2, (d1, d2))
+            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
+                continue
             end
-
-            for d3 = (d2+1):depth
-                M_d3 = real_to_complex_matrix(M[:,:,d3])
-
-                M_product = Array{Complex{Float64},3}(zeros(size(M_d3)[1], size(M_d3)[2], 6))
-
-                # All commuting permutations
-                M_product[:,:,1] = M_d1 * M_d2 * M_d3
-                M_product[:,:,2] = M_d2 * M_d1 * M_d3
-                M_product[:,:,3] = M_d1 * M_d3 * M_d2
-                M_product[:,:,4] = M_d3 * M_d1 * M_d2
-                M_product[:,:,5] = M_d2 * M_d3 * M_d1
-                M_product[:,:,6] = M_d3 * M_d2 * M_d1
-                
-                triplet_commutes = true
-
-                for i=1:6
-                    for j=(i+1):6
-                        if !isapprox(M_product[:,:,i], M_product[:,:,j], atol = 1E-4)
-                            triplet_commutes = false
-                        end
-                    end
-                end
-
-                if triplet_commutes
-                    push!(M_commute_3, (d1, d2, d3))
-                end
-
+            
+            if isapprox(M_i*M_j, M_j*M_i, atol = 1E-4)
+                push!(commute_pairs, (i, j))
             end
         end
     end
- 
-    return M_commute_2, M_commute_3
+
+    if identity_pairs
+        # Identity commuting pairs
+        identity_idx = []
+        for i in keys(M)
+            if "Identity" in M[i]["type"]
+                push!(identity_idx, parse(Int64, i))
+            end
+        end
+
+        if length(identity_idx) > 0
+            for i = 1:length(identity_idx)
+                for j = 1:depth
+                    if j != identity_idx[i]
+                        push!(commute_pairs, (j, identity_idx[i]))
+                    end
+                end
+            end
+        end
+    end 
+
+    return commute_pairs
+
 end
 
 """

@@ -100,7 +100,7 @@ end
     "optimizer" => "cbc"                             
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_matrix_constraints = true)
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_gate_constraints = true)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
@@ -157,7 +157,7 @@ end
         "optimizer" => "cbc"
         )
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, CBC, involutory_gate_constraints = false)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     data = QCO.get_data(params)
@@ -199,7 +199,7 @@ end
     
 end
 
-@testset "Involutory matrix constraints tests" begin
+@testset "Involutory gate constraints tests" begin
     
     params = Dict{String, Any}(
     "num_qubits" => 2,

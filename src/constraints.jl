@@ -5,7 +5,7 @@
 function constraint_single_gate_per_depth(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth   = qcm.data["depth"]
+    depth     = qcm.data["depth"]
     
     JuMP.@constraint(qcm.model, [d=1:depth], sum(qcm.variables[:z_onoff_var][n,d] for n=1:num_gates) == 1)
     
@@ -15,7 +15,7 @@ end
 function constraint_disjunction_of_gates_per_depth(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth   = qcm.data["depth"]
+    depth     = qcm.data["depth"]
 
     JuMP.@constraint(qcm.model, [d=1:depth], qcm.variables[:M_var][:,:,d] .== 
                                     sum(qcm.variables[:z_onoff_var][n,d] * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
@@ -36,7 +36,7 @@ end
 function constraint_gate_intermediate_products(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth   = qcm.data["depth"]
+    depth     = qcm.data["depth"]
 
     JuMP.@constraint(qcm.model, [d=1:(depth-1)], qcm.variables[:U_var][:,:,d] .== 
                                 sum(qcm.variables[:V_var][:,:,n,d] * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
@@ -174,29 +174,20 @@ function constraint_complex_to_real_symmetry_compact(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_commutative_gates(qcm::QuantumCircuitModel)
+function constraint_commutative_gate_pairs(qcm::QuantumCircuitModel)
     
     depth  = qcm.data["depth"]
+    z_onoff_var  = qcm.variables[:z_onoff_var]
 
-    commute_pairs, commute_triplets = QCO.get_commutative_gates(qcm.data["gates_real"])
-    z = qcm.variables[:z_onoff_var]
+    commute_pairs = QCO.get_commutative_gate_pairs(qcm.data["gates_dict"])
 
     if !isempty(commute_pairs)
-        Memento.info(_LOGGER, "Detected $(length(commute_pairs)) input elementary gate pairs which commute")
+        (length(commute_pairs) == 1) && (Memento.info(_LOGGER, "Detected $(length(commute_pairs)) input elementary gate pair which commutes"))
+        (length(commute_pairs) > 1)  && (Memento.info(_LOGGER, "Detected $(length(commute_pairs)) input elementary gate pairs which commute"))
 
         for i = 1:length(commute_pairs)
-            JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(z[commute_pairs[i][k], d] for k=1:2)  + sum(z[commute_pairs[i][k], (d+1)] for k=1:2) <= 2)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[commute_pairs[i][2], d] + z_onoff_var[commute_pairs[i][1], d+1] <= 1)
         end
-
-    end
-
-    if !isempty(commute_triplets)
-        Memento.info(_LOGGER, "Detected $(length(commute_triplets)) input elementary gate triplets which commute")
-
-        for i = 1:length(commute_triplets)
-            JuMP.@constraint(qcm.model, [d=1:(depth-1)], sum(z[commute_triplets[i][k], d] for k=1:3)  + sum(z[commute_triplets[i][k], (d+1)] for k=1:3) <= 3)
-        end
-
     end
 
     return
@@ -216,17 +207,15 @@ function constraint_involutory_matrices(qcm::QuantumCircuitModel)
             
             if !("Identity" in gates_dict[i]["type"])
                 JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[i_int, d] + z_onoff_var[i_int, d+1] <= 1)
-            else
-                # Allow consecutive Identity gates only at the end of decomposition
-                JuMP.@constraint(qcm.model, [d=1:(depth-2)], z_onoff_var[i_int, d] + z_onoff_var[i_int, d+1] <= 1)
+                num_involutory_matrices += 1
             end
 
-            num_involutory_matrices += 1
         end
     end
 
     if num_involutory_matrices > 0
-        Memento.info(_LOGGER, "Detected $num_involutory_matrices input involutory matrices")
+        (num_involutory_matrices == 1) && (Memento.info(_LOGGER, "Detected $num_involutory_matrices input involutory matrix"))
+        (num_involutory_matrices > 1)  && (Memento.info(_LOGGER, "Detected $num_involutory_matrices input involutory matrices"))
     end
 
     return

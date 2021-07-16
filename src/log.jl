@@ -13,7 +13,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
     if results["primal_status"] != MOI.FEASIBLE_POINT 
         
         if results["termination_status"] != MOI.TIME_LIMIT
-            Memento.error(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
+            Memento.warn(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
         else 
             Memento.warn(_LOGGER, "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate")
         end

@@ -2,7 +2,7 @@ import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
 using LinearAlgebra
-#using Cbc
+using Cbc
 
 include("solver.jl")
 include("2qubit_gates.jl")
@@ -21,18 +21,19 @@ test_gates = ["test_hadamard",
                "test_W_using_HCnot",
                "test_RX_on_q3"]
 
-# test_gates = ["test_toffoli"]
+# test_gates = ["test_RX_on_q3"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
 #----------------------------------------------#
-result_qcm = Dict{String,Any}()
+result_qc = Dict{String,Any}()
 
 for gates in test_gates 
     params = getfield(Main, Symbol(gates))()
-    qcm_optimizer = get_solver(params)  
-    global result_qcm = QCO.run_QCModel(params, 
-                                        qcm_optimizer, 
-                                        model_type = "compact_formulation")
+    qcm_optimizer = get_solver(params)
+    global result_qc = QCO.run_QCModel(params, 
+                                       qcm_optimizer, 
+                                       model_type = "compact_formulation",
+                                       eliminate_identical_gates = true)
 end
 
