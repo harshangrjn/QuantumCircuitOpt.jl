@@ -1,6 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.1.5
+- Handling pair-wise commuting products with Identity, (AB=BA=I)
+- Updated docs to reflect the improved run times
+
 ### v0.1.4
 - Optimizer time limit option added for early termination of solvers
 - `log.jl` updates to support optimizer hitting time limits 

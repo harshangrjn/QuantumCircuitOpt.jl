@@ -55,7 +55,7 @@ function constraint_QCModel(qcm::QuantumCircuitModel,
     constraint_complex_to_real_symmetry(qcm)
 
     commute_gate_constraints    && constraint_commutative_gate_pairs(qcm)
-    involutory_gate_constraints && constraint_involutory_matrices(qcm)
+    involutory_gate_constraints && constraint_involutory_gates(qcm)
 
     return
 end
@@ -85,7 +85,7 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel,
     constraint_complex_to_real_symmetry_compact(qcm)
 
     commute_gate_constraints    && constraint_commutative_gate_pairs(qcm)  
-    involutory_gate_constraints && constraint_involutory_matrices(qcm)
+    involutory_gate_constraints && constraint_involutory_gates(qcm)
 
     return
 end

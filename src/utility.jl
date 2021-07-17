@@ -56,10 +56,11 @@ end
 Given a dictionary of gates, as processed in `src/data.jl`, `get_commutative_gate_pairs` outputs all pairs of commuting 
 matrices. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
 """
-function get_commutative_gate_pairs(M::Dict{String,Any}; identity_pairs = true)
+function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
     
     depth = length(keys(M))
     commute_pairs = Array{Tuple{Int64,Int64},1}()
+    commute_pairs_prodIdentity = Array{Tuple{Int64,Int64},1}()
 
     # Non-Identity commuting pairs
     for i = 1:(depth-1)
@@ -74,10 +75,14 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_pairs = true)
             if isapprox(M_i*M_j, M_j*M_i, atol = 1E-4)
                 push!(commute_pairs, (i, j))
             end
+
+            if isapprox(M_i*M_j, Matrix(LA.I, size(M_i)[1], size(M_i)[2]), atol=1E-6)
+                push!(commute_pairs_prodIdentity, (i,j))
+            end
         end
     end
 
-    if identity_pairs
+    if identity_in_pairs
         # Identity commuting pairs
         identity_idx = []
         for i in keys(M)
@@ -95,9 +100,10 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_pairs = true)
                 end
             end
         end
+
     end 
 
-    return commute_pairs
+    return commute_pairs, commute_pairs_prodIdentity
 
 end
 

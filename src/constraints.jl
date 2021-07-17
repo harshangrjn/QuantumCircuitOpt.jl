@@ -179,7 +179,7 @@ function constraint_commutative_gate_pairs(qcm::QuantumCircuitModel)
     depth  = qcm.data["depth"]
     z_onoff_var  = qcm.variables[:z_onoff_var]
 
-    commute_pairs = QCO.get_commutative_gate_pairs(qcm.data["gates_dict"])
+    commute_pairs, commute_pairs_prodIdentity = QCO.get_commutative_gate_pairs(qcm.data["gates_dict"])
 
     if !isempty(commute_pairs)
         (length(commute_pairs) == 1) && (Memento.info(_LOGGER, "Detected $(length(commute_pairs)) input elementary gate pair which commutes"))
@@ -190,16 +190,26 @@ function constraint_commutative_gate_pairs(qcm::QuantumCircuitModel)
         end
     end
 
+    if !isempty(commute_pairs_prodIdentity)
+        (length(commute_pairs_prodIdentity) == 1) && (Memento.info(_LOGGER, "Detected $(length(commute_pairs_prodIdentity)) input elementary gate pair whose product is Identity"))
+        (length(commute_pairs_prodIdentity) > 1)  && (Memento.info(_LOGGER, "Detected $(length(commute_pairs_prodIdentity)) input elementary gate pairs whose product is Identity"))
+
+        for i = 1:length(commute_pairs_prodIdentity)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[commute_pairs_prodIdentity[i][2], d] + z_onoff_var[commute_pairs_prodIdentity[i][1], d+1] <= 1)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[commute_pairs_prodIdentity[i][1], d] + z_onoff_var[commute_pairs_prodIdentity[i][2], d+1] <= 1)
+        end
+    end
+
     return
 end
 
-function constraint_involutory_matrices(qcm::QuantumCircuitModel)
+function constraint_involutory_gates(qcm::QuantumCircuitModel)
 
     gates_dict  = qcm.data["gates_dict"]
     depth       = qcm.data["depth"]
     z_onoff_var = qcm.variables[:z_onoff_var]
 
-    num_involutory_matrices = 0 
+    num_involutory_gates = 0 
 
     for i in keys(gates_dict)
         i_int = parse(Int64, i)
@@ -207,15 +217,15 @@ function constraint_involutory_matrices(qcm::QuantumCircuitModel)
             
             if !("Identity" in gates_dict[i]["type"])
                 JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[i_int, d] + z_onoff_var[i_int, d+1] <= 1)
-                num_involutory_matrices += 1
+                num_involutory_gates += 1
             end
 
         end
     end
 
-    if num_involutory_matrices > 0
-        (num_involutory_matrices == 1) && (Memento.info(_LOGGER, "Detected $num_involutory_matrices input involutory matrix"))
-        (num_involutory_matrices > 1)  && (Memento.info(_LOGGER, "Detected $num_involutory_matrices input involutory matrices"))
+    if num_involutory_gates > 0
+        (num_involutory_gates == 1) && (Memento.info(_LOGGER, "Detected $num_involutory_gates input involutory gate"))
+        (num_involutory_gates > 1)  && (Memento.info(_LOGGER, "Detected $num_involutory_gates input involutory gates"))
     end
 
     return

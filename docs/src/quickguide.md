@@ -105,9 +105,9 @@ Quantum Circuit Model Data
 
 Optimal Circuit Decomposition
 
-  U3 (2, (-90.0,-90.0,0.0)) * cnot_12 * U3 (2, (90.0,0.0,90.0)) = Target gate
+  U3 (2, (-90.0,0.0,0.0)) * cnot_12 * U3 (2, (90.0,0.0,0.0)) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 6.5 sec.
+  Optimizer run time: 3.1 sec.
 =============================================================================
 ```
 

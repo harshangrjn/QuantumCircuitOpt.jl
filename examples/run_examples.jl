@@ -33,7 +33,6 @@ for gates in test_gates
     qcm_optimizer = get_solver(params)
     global result_qc = QCO.run_QCModel(params, 
                                        qcm_optimizer, 
-                                       model_type = "compact_formulation",
-                                       eliminate_identical_gates = true)
+                                       model_type = "compact_formulation")
 end
 

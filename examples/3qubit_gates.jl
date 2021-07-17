@@ -18,7 +18,7 @@ function test_RX_on_q3()
     "decomposition_type" => "exact",
     
     "optimizer" => "cplex",
-    "optimizer_presolve" => false,
+    "optimizer_presolve" => false, #turning this true will give infeasiblity in CPLEX - most probably a bug in CPLEX's presolve
     
     )
 

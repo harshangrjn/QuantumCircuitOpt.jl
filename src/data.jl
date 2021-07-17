@@ -184,7 +184,7 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_iden
 
     if size(M_real_unique)[3] < size(M_real)[3]
 
-        Memento.info(_LOGGER, "Eliminating $(size(M_real)[3]-size(M_real_unique)[3]) non-unique gates (after discretization)")
+        Memento.info(_LOGGER, "Detected $(size(M_real)[3]-size(M_real_unique)[3]) non-unique gates (after discretization)")
 
         for i = 1:length(M_real_idx)
             gates_dict_unique["$i"] = gates_dict["$(M_real_idx[i])"]
