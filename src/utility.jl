@@ -62,7 +62,6 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
     commute_pairs = Array{Tuple{Int64,Int64},1}()
     commute_pairs_prodIdentity = Array{Tuple{Int64,Int64},1}()
 
-    # Non-Identity commuting pairs
     for i = 1:(depth-1)
         for j = (i+1):depth
             M_i = M["$i"]["matrix"]
@@ -72,18 +71,25 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
                 continue
             end
             
-            if isapprox(M_i*M_j, M_j*M_i, atol = 1E-4)
+            M_ij = M_i*M_j
+            M_ji = M_j*M_i
+            Id = Matrix(LA.I, size(M_ij)[1], size(M_ij)[2])
+
+            # Commuting pairs == Identity 
+            if isapprox(M_ij, Id, atol=1E-6)
+                push!(commute_pairs_prodIdentity, (i,j))
+            
+            # Commuting pairs != Identity 
+            elseif isapprox(M_ij, M_ji, atol = 1E-4)
                 push!(commute_pairs, (i, j))
+
             end
 
-            if isapprox(M_i*M_j, Matrix(LA.I, size(M_i)[1], size(M_i)[2]), atol=1E-6)
-                push!(commute_pairs_prodIdentity, (i,j))
-            end
         end
     end
 
     if identity_in_pairs
-        # Identity commuting pairs
+        # Commuting pairs involving Identity
         identity_idx = []
         for i in keys(M)
             if "Identity" in M[i]["type"]
@@ -105,6 +111,40 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
 
     return commute_pairs, commute_pairs_prodIdentity
 
+end
+
+function get_redundant_gate_product_pairs(M::Dict{String,Any})
+    depth = length(keys(M))
+    redundant_pairs = Array{Tuple{Int64,Int64},1}()
+
+    # Non-Identity redundant pairs
+    for i = 1:(depth-1)
+        for j = (i+1):depth
+            M_i = M["$i"]["matrix"]
+            M_j = M["$j"]["matrix"]
+
+            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
+                continue
+            end
+            
+            for k = 1:depth
+                if (k != i) && (k != j) && !("Identity" in M["$k"]["type"])                
+                    M_k = M["$k"]["matrix"]
+                
+                    if isapprox(M_i*M_j, M_k, atol = 1E-4)
+                        push!(redundant_pairs, (i, j))
+                    end
+
+                    if isapprox(M_j*M_i, M_k, atol = 1E-4)
+                        push!(redundant_pairs, (j, i))
+                    end
+                end
+            end
+
+        end
+    end
+
+    return redundant_pairs
 end
 
 """

@@ -230,3 +230,23 @@ function constraint_involutory_gates(qcm::QuantumCircuitModel)
 
     return
 end
+
+function constraint_redundant_gate_product_pairs(qcm::QuantumCircuitModel)
+
+    gates_dict  = qcm.data["gates_dict"]
+    depth       = qcm.data["depth"]
+    z_onoff_var = qcm.variables[:z_onoff_var]
+
+    redundant_pairs = QCO.get_redundant_gate_product_pairs(gates_dict)
+    
+    if !isempty(redundant_pairs)
+        (length(redundant_pairs) == 1) && (Memento.info(_LOGGER, "Detected $(length(redundant_pairs)) redundant input elementary gate pair"))
+        (length(redundant_pairs) > 1)  && (Memento.info(_LOGGER, "Detected $(length(redundant_pairs)) redundant input elementary gate pairs"))
+
+        for i = 1:length(redundant_pairs)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[redundant_pairs[i][2], d] + z_onoff_var[redundant_pairs[i][1], d+1] <= 1)
+        end
+    end
+
+    return
+end

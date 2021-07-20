@@ -2,18 +2,14 @@
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
-    "depth" => 5,    
-
+    "depth" => 5,
     "elementary_gates" => ["H1", "H2", "cnot_12", "Identity"],  
     "target_gate" => QCO.CNotRevGate(),
-
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "cbc"
+    "decomposition_type" => "exact"
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation", visualize_solution=true)
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation")
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
@@ -30,17 +26,14 @@ end
 
     params = Dict{String, Any}(
         "num_qubits" => 2,
-        "depth" => 4,
-        
+        "depth" => 4,        
         "elementary_gates" => ["cnot_12", "cnot_21", "Identity"],
-        "target_gate" => QCO.SwapGate(),
-    
+        "target_gate" => QCO.SwapGate(),  
         "objective" => "minimize_cnot", 
-        "decomposition_type" => "exact",
-        "optimizer" => "cbc"                         
+        "decomposition_type" => "exact"                      
         )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", visualize_solution=true)
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation")
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
@@ -54,21 +47,16 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,    
-
     "elementary_gates" => ["U3", "Identity"],  
     "target_gate" => QCO.kron_single_gate(2, QCO.U3Gate(0,0,π/4), "q1"),
-
     "U_θ_discretization" => [0, π/2],
     "U_ϕ_discretization" => [0],
     "U_λ_discretization" => [0, π/4],
-
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "cbc"                              
+    "decomposition_type" => "exact"                  
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation", visualize_solution=true, eliminate_identical_gates = true)
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation")
 
     data = QCO.get_data(params, eliminate_identical_gates = true)
 
@@ -85,19 +73,14 @@ end
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
-    "depth" => 3,    
-
+    "depth" => 3,
     "elementary_gates" => ["RX", "RY", "RZ", "Identity"],  
     "target_gate" => QCO.kron_single_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_gate(2, QCO.RZGate(π/4), "q1"),
-
     "RX_discretization" => [0, π/4],
     "RY_discretization" => [π/4],
     "RZ_discretization" => [π/2, π/4],
-
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "cbc"                             
+    "decomposition_type" => "exact"                            
     )
 
     result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_gate_constraints = true)
@@ -113,18 +96,13 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 3, 
     "depth" => 2,    
-
     "elementary_gates" => ["U3", "Identity"],  
     "target_gate" => QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3"),
-
     "U_θ_discretization" => [0, π/4],
     "U_ϕ_discretization" => [0, -π/2],
     "U_λ_discretization" => [0, π/2],    
-
     "objective" => "minimize_cnot", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "cbc"                               
+    "decomposition_type" => "exact"                   
     )
 
     result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", eliminate_identical_gates = true)
@@ -147,17 +125,13 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 2, 
         "depth" => 3,    
-    
         "elementary_gates" => ["H1", "H2"],  
         "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
-    
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",
-        
-        "optimizer" => "cbc"
+        "decomposition_type" => "exact"
         )
 
-    result_qc = QCO.run_QCModel(params, CBC, involutory_gate_constraints = false)
+    result_qc = QCO.run_QCModel(params, CBC, all_valid_constraints = false)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     data = QCO.get_data(params)
@@ -187,8 +161,7 @@ end
     "target_gate" => QCO.MGate(),
     "input_circuit" => input_circuit(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    "optimizer" => "cbc"
+    "decomposition_type" => "exact"
     )
 
     result_qc = QCO.run_QCModel(params, CBC)
@@ -207,8 +180,7 @@ end
     "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    "optimizer" => "cbc"
+    "decomposition_type" => "exact"
     )
 
     gates_dict = QCO.get_data(params)["gates_dict"]
@@ -241,7 +213,6 @@ end
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    "optimizer" => "cbc",
     "time_limit" => 1
     )
 
@@ -249,4 +220,35 @@ end
     @test result_qc["termination_status"] == MOI.TIME_LIMIT
     @test result_qc["primal_status"] == MOI.NO_SOLUTION
     
+end
+
+@testset "constraint_redundant_gate_product_pairs test" begin
+    
+    function target_gate()
+        T1 = QCO.get_full_sized_gate("U3", 2, matrix = QCO.U3Gate(0,π/2,π), qubit_location = "q2")
+        T2 = QCO.get_full_sized_gate("U3", 2, matrix = QCO.U3Gate(π/2,π/2,-π/2), qubit_location = "q1")
+        return T1*T2
+    end
+    
+    params = Dict{String, Any}(
+               "num_qubits" => 2, 
+               "depth" => 2,    
+               "elementary_gates" => ["U3", "Identity"], 
+               "target_gate" => target_gate(),   
+               "U_θ_discretization" => [0, π/2],
+               "U_ϕ_discretization" => [π/2],
+               "U_λ_discretization" => [-π/2, π], 
+               "objective" => "minimize_depth")
+
+    data = QCO.get_data(params, eliminate_identical_gates = true)
+    redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"])
+    @test length(redundant_pairs) == 2
+    @test redundant_pairs[1] == (1,6)
+    @test redundant_pairs[2] == (2,7)
+
+    result_qc = QCO.run_QCModel(params, CBC)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 2.0, atol = tol_0)
+
 end

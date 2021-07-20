@@ -90,3 +90,17 @@ end
     I4 = QCO.kron_single_gate(4, QCO.IGate(1), "q4")
     @test I1 == I2 == I3 == I4
 end
+
+@testset "get_redundant_gate_product_pairs tests" begin 
+     
+    params = Dict{String, Any}(
+        "num_qubits" => 3, 
+        "depth" => 15,    
+        "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3", "Identity"], 
+        "target_gate" => QCO.ToffoliGate()
+        )
+    data = QCO.get_data(params)
+    redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"])
+    @test length(redundant_pairs) == 0
+
+end

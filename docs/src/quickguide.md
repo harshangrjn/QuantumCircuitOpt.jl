@@ -65,7 +65,7 @@ qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer)
 QCO.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
-set of `elementary_gates` accordingly in the above sample code. For more such 2-qubit and also 3-qubit gate decompositions with and without the universal unitary in the elementary gates, refer to "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder. 
+set of `elementary_gates` accordingly in the above sample code. For more such 2-qubit and 3-qubit gate decompositions, with and without the universal unitary in the elementary gates, refer to "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder. 
 
 !!! warning
     Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input gates, target gate and the total depth of the decomposition. Hence, unlike local optimization methods in the literature, the run times for larger number of qubits and depths can be prohibitively slow since these problems are NP-hard. 
@@ -81,10 +81,10 @@ For example, for decomposing the above controlled-Z gate, the QuantumCircuitOpt'
 results["solve_time"]
 results["objective"]
 ```
-Also, `results["solution"]` contains detailed information about the solution produced by the optimization model.
+Also, `results["solution"]` contains detailed information about the solution produced by the optimization model, which can be utilized for further analysis. 
 
 # Visualizing results
-QuantumCircuitOpt also currently supports the visualization of optimal circuit decompositions obtained from the results dictionary (from above), which can be executed using,
+QuantumCircuitOpt currently supports the visualization of optimal circuit decompositions obtained from the results dictionary (from above), which can be executed using,
 ```julia
 data = QCO.get_data(params)
 QCO.visualize_solution(results, data)
@@ -107,7 +107,7 @@ Optimal Circuit Decomposition
 
   U3 (2, (-90.0,0.0,0.0)) * cnot_12 * U3 (2, (90.0,0.0,0.0)) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 3.1 sec.
+  Optimizer run time: 2.6 sec.
 =============================================================================
 ```
 

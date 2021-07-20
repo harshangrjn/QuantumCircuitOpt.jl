@@ -139,7 +139,7 @@ function test_magic_M()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 4,    
+        "depth" => 5,    
     
         "elementary_gates" => ["U3", "cnot_12", "cnot_21", "Identity"], 
         "target_gate" => QCO.MGate(),   
@@ -151,8 +151,7 @@ function test_magic_M()
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact",
         
-        "optimizer" => "cplex",
-        "MIP_feasiblity_emphasis" => true
+        "optimizer" => "cplex"
                                     
         )
     

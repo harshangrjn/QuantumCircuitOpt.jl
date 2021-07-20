@@ -1,6 +1,6 @@
 import LinearAlgebra: I
 
-function get_data(params::Dict{String, Any}; eliminate_identical_gates = false)
+function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     
     # Number of qubits
     if "num_qubits" in keys(params)

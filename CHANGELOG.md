@@ -2,7 +2,10 @@ QuantumCircuitOpt.jl Change Log
 ===============================
 
 ### v0.1.5
-- Handling pair-wise commuting products with Identity, (AB=BA=I)
+- Added support for pair-wise commuting products with Identity, (AB=BA=I)
+- Bug fix to remove redundant pairs in `get_commutative_gate_pairs` when corresponding product is an Identity gate
+- Added support for eliminating redundant pairs whose product matches an input elementary gate (`get_redundant_gate_product_pairs` in utility) - improved run times
+- Added support to turn on/off all valid constraints (`all_valid_constraints`)
 - Updated docs to reflect the improved run times
 
 ### v0.1.4
