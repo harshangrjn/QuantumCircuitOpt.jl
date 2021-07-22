@@ -104,3 +104,24 @@ end
     @test length(redundant_pairs) == 0
 
 end
+
+@testset "get_idempotent_gates tests" begin
+    params = Dict{String, Any}(
+        "num_qubits" => 2, 
+        "depth" => 14,    
+        "elementary_gates" => ["Y1", "Y2", "Z1", "Z2", "T2", "Tdagger1", "Sdagger1", "SX1", "SXdagger2", "cnot_21", "cnot_12", "Identity"], 
+        "target_gate" => -QCO.HCoinGate())
+    data = QCO.get_data(params)
+    idempotent_gates = QCO.get_idempotent_gates(data["gates_dict"])
+    @test idempotent_gates[1] == 6
+    @test idempotent_gates[2] == 7
+    @test "Tdagger1" in data["gates_dict"]["$(idempotent_gates[1])"]["type"]
+    @test "Sdagger1" in data["gates_dict"]["$(idempotent_gates[2])"]["type"]
+    @test "Z1" in data["gates_dict"]["3"]["type"]
+    
+    M1 = data["gates_dict"]["$(idempotent_gates[1])"]["matrix"]
+    M2 = data["gates_dict"]["$(idempotent_gates[2])"]["matrix"]
+    
+    @test isapprox(M1^2, data["gates_dict"]["7"]["matrix"], atol = tol_0)
+    @test isapprox(M2^2, data["gates_dict"]["3"]["matrix"], atol = tol_0)
+end

@@ -93,7 +93,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
     end
 
-    gates_dict, target_real = get_quantum_gates(params, elementary_gates)
+    gates_dict, target_real = QCO.get_quantum_gates(params, elementary_gates)
 
     gates_dict_unique, M_real_unique, identity_idx, cnot_idx = eliminate_nonunique_gates(gates_dict, eliminate_identical_gates = eliminate_identical_gates)
     
@@ -194,7 +194,7 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_iden
         gates_dict_unique = gates_dict
     end
 
-    identity_idx = _get_identity_idx(M_real_unique)
+    identity_idx = QCO._get_identity_idx(M_real_unique)
 
     for i_id = 1:length(identity_idx)
         if !("Identity" in gates_dict_unique["$(identity_idx[i_id])"]["type"])
@@ -202,7 +202,7 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_iden
         end
     end
 
-    cnot_idx = _get_cnot_idx(gates_dict_unique)
+    cnot_idx = QCO._get_cnot_idx(gates_dict_unique)
 
     return gates_dict_unique, M_real_unique, identity_idx, cnot_idx
 
@@ -245,7 +245,7 @@ function get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{St
 
     num_qubits = params["num_qubits"]
 
-    gates_dict = get_all_gates_dictionary(params, elementary_gates)
+    gates_dict = QCO.get_all_gates_dictionary(params, elementary_gates)
 
     if !("target_gate" in keys(params)) || isempty(params["target_gate"])
         Memento.error(_LOGGER, "Target gate not found in the input data")
@@ -267,12 +267,12 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
 
     R_complex_dict = Dict{}
     if !isempty(R_gates_ids)
-        R_complex_dict = get_all_R_gates(params, elementary_gates)
+        R_complex_dict = QCO.get_all_R_gates(params, elementary_gates)
     end
     
     U_complex_dict = Dict{}
     if !isempty(U_gates_ids)
-        U_complex_dict = get_all_U_gates(params, elementary_gates)
+        U_complex_dict = QCO.get_all_U_gates(params, elementary_gates)
     end
 
     gates_dict = Dict{String, Any}()
@@ -321,7 +321,7 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
             
         else 
             
-            M = get_full_sized_gate(elementary_gates[i], num_qubits)
+            M = QCO.get_full_sized_gate(elementary_gates[i], num_qubits)
             M_sqrd = M^2
 
             gates_dict["$counter"] = Dict{String, Any}("type" => [elementary_gates[i]],
@@ -357,7 +357,7 @@ function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
             end        
 
             R_complex["$(gate_type)"] = Dict{String, Any}()    
-            R_complex["$(gate_type)"] = get_discretized_R_gates(gate_type, R_complex[gate_type], collect(params[string(gate_type,"_discretization")]), params["num_qubits"])
+            R_complex["$(gate_type)"] = QCO.get_discretized_R_gates(gate_type, R_complex[gate_type], collect(params[string(gate_type,"_discretization")]), params["num_qubits"])
 
         end
     end
@@ -384,7 +384,7 @@ function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretiz
                                             )
             
             for i_qu = 1:num_qubits
-                R["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "q$i_qu")
+                R["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = QCO.get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "q$i_qu")
             end
 
         end
@@ -404,7 +404,7 @@ function get_all_U_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
 
             if (elementary_gates[U_gates_ids[i]] == "U3")        
                 U_complex["U3"] = Dict{String, Any}()    
-                U_complex["U3"] = get_discretized_U3_gates("U3", U_complex["U3"], collect(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
+                U_complex["U3"] = QCO.get_discretized_U3_gates("U3", U_complex["U3"], collect(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
             end
 
             # Add support for U1 and U2 universal gates here
@@ -433,7 +433,7 @@ function get_discretized_U3_gates(U_type::String, U::Dict{String, Any}, θ_discr
                                                          )
                 
                 for i_qu=1:num_qubits
-                    U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "q$i_qu")
+                    U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = QCO.get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "q$i_qu")
                 end
 
                 counter += 1

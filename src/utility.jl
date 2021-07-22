@@ -148,6 +148,35 @@ function get_redundant_gate_product_pairs(M::Dict{String,Any})
 end
 
 """
+    get_idempotent_gates(M::Dict{String,Any})
+
+Given the dictionary of complex gates, this function returns the indices of matrices which are self-idempotent 
+or idempotent with other set of input gates, excluding the Identity gate.
+"""
+function get_idempotent_gates(M::Dict{String,Any})
+    depth = length(keys(M))
+    idempotent_gates = Vector{Int64}()
+
+    # Excluding Identity gates in input 
+    for i=1:depth
+        M_i = M["$i"]["matrix"]
+        for j=1:depth
+            M_j = M["$j"]["matrix"]
+            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
+                continue
+            end
+
+            if isapprox(M_i^2, M_j, atol=1E-4)
+                push!(idempotent_gates, i)
+            end
+
+        end
+    end
+
+    return idempotent_gates
+end
+
+"""
     complex_to_real_matrix(M::Array{Complex{Float64},2})
 
 Given a complex-valued 2D matrix of size NxN, complex_to_real_matrix function returns a real-valued matrix 

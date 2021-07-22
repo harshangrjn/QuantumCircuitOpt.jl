@@ -250,3 +250,23 @@ function constraint_redundant_gate_product_pairs(qcm::QuantumCircuitModel)
 
     return
 end
+
+function constraint_idempotent_gates(qcm::QuantumCircuitModel)
+
+    gates_dict  = qcm.data["gates_dict"]
+    depth       = qcm.data["depth"]
+    z_onoff_var = qcm.variables[:z_onoff_var]
+
+    idempotent_gates = QCO.get_idempotent_gates(gates_dict)
+    
+    if !isempty(idempotent_gates)
+        (length(idempotent_gates) == 1) && (Memento.info(_LOGGER, "Detected $(length(idempotent_gates)) idempotent elementary gate"))
+        (length(idempotent_gates) > 1)  && (Memento.info(_LOGGER, "Detected $(length(idempotent_gates)) idempotent elementary gates"))
+
+        for i = 1:length(idempotent_gates)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[idempotent_gates[i], d] + z_onoff_var[idempotent_gates[i], d+1] <= 1)
+        end
+    end
+
+    return
+end

@@ -58,7 +58,7 @@ end
 
     result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation")
 
-    data = QCO.get_data(params, eliminate_identical_gates = true)
+    data = QCO.get_data(params)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
@@ -105,9 +105,9 @@ end
     "decomposition_type" => "exact"                   
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", eliminate_identical_gates = true)
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation")
     
-    data = QCO.get_data(params, eliminate_identical_gates = true)
+    data = QCO.get_data(params)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
@@ -131,7 +131,7 @@ end
         "decomposition_type" => "exact"
         )
 
-    result_qc = QCO.run_QCModel(params, CBC, all_valid_constraints = false)
+    result_qc = QCO.run_QCModel(params, CBC, all_valid_constraints = -1)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     data = QCO.get_data(params)
@@ -240,7 +240,7 @@ end
                "U_λ_discretization" => [-π/2, π], 
                "objective" => "minimize_depth")
 
-    data = QCO.get_data(params, eliminate_identical_gates = true)
+    data = QCO.get_data(params)
     redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"])
     @test length(redundant_pairs) == 2
     @test redundant_pairs[1] == (1,6)
@@ -250,5 +250,32 @@ end
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 2.0, atol = tol_0)
+
+end
+
+@testset "constraint_idempotent_gates" begin
+    params = Dict{String, Any}(
+    "num_qubits" => 2, 
+    "depth" => 3,    
+    "elementary_gates" => ["U3", "cnot_12", "Identity"], 
+    "target_gate" => QCO.CZGate(),
+    "U_θ_discretization" => [-π/2, 0, π/2],
+    "U_ϕ_discretization" => [0, π/2],
+    "U_λ_discretization" => [0, π/2])
+
+    data = QCO.get_data(params)
+    idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"])
+    @test length(idempotent_pairs) == 2
+
+    result_qc = QCO.run_QCModel(params, CBC, all_valid_constraints = 1)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
+
+    for i in keys(data["gates_dict"])
+        if "Identity" in data["gates_dict"][i]["type"]
+            @test isapprox(sum(result_qc["solution"]["z_onoff_var"][parse(Int64, i),:]), 0, atol = tol_0)
+        end
+    end
 
 end

@@ -20,7 +20,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         return
     else
-        gates_sol, gates_sol_compressed = get_postprocessed_solutions(results, data)
+        gates_sol, gates_sol_compressed = QCO.get_postprocessed_solutions(results, data)
     end
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])

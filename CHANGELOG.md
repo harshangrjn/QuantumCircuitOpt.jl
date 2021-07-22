@@ -1,6 +1,12 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.1.6
+- Added support for obtaining idempotent matrices and adding corresponding valid constraints 
+- Updated `all_valid_constraints` from `Bool` to values in `[-1,0,1]`
+- `qc_model.jl` clean-up 
+- Updated unit tests to reflect above changes
+
 ### v0.1.5
 - Added support for pair-wise commuting products with Identity, (AB=BA=I)
 - Bug fix to remove redundant pairs in `get_commutative_gate_pairs` when corresponding product is an Identity gate

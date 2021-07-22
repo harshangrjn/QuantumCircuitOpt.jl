@@ -39,8 +39,8 @@ function test_controlled_Z()
     "target_gate" => QCO.CZGate(),
        
     "U_θ_discretization" => [-π/2, 0, π/2],
-    "U_ϕ_discretization" => [0, π/2],
-    "U_λ_discretization" => [0, π/2],
+    "U_ϕ_discretization" => [-π/2, 0, π/2],
+    "U_λ_discretization" => [-π/2, 0, π/2],
 
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
@@ -194,8 +194,8 @@ function test_S()
         "elementary_gates" => ["U3", "cnot_12", "Identity"], 
         "target_gate" => QCO.kron_single_gate(2, QCO.SGate(), "q1"),
            
-        "U_θ_discretization" => [0, π/2],
-        "U_ϕ_discretization" => [0, π/2],
+        "U_θ_discretization" => [0, π/4, π/2],
+        "U_ϕ_discretization" => [-π/2, 0, π/2],
         "U_λ_discretization" => [0, π],
          
         "objective" => "minimize_depth", 
@@ -348,7 +348,7 @@ function test_HCoinGate()
         "decomposition_type" => "exact", 
         
         "optimizer" => "cplex",
-        "MIP_feasiblity_emphasis" => true
+        # "MIP_feasiblity_emphasis" => true
                                     
         )
     
