@@ -36,6 +36,10 @@ CHGate
 ```@docs
 CVGate
 ```
+## CVDaggerGate
+```@docs
+CVGate
+```
 ## WGate
 ```@docs
 WGate
