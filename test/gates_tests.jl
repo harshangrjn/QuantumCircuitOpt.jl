@@ -58,5 +58,9 @@
     CV_13 = QCO.get_full_sized_gate("CV_13", 3);
     @test isapprox(QCO.ToffoliGate(), CV_23 * cnot_12 * CVdagger_23 * cnot_12 * CV_13, atol = tol_0)
 
+    CVdagger_13 = QCO.get_full_sized_gate("CVdagger_12", 3);
+    CVdagger_31 = QCO.get_full_sized_gate("CVdagger_31", 3);
+    @test isapprox(QCO.IGate(3), CVdagger_13 * CVdagger_13 * CVdagger_13 * CVdagger_13 * CVdagger_31 * CVdagger_31 * CVdagger_31 * CVdagger_31, atol = tol_0)
+    
 end
 
