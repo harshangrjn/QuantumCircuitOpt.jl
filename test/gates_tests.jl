@@ -58,9 +58,9 @@
     CV_13 = QCO.get_full_sized_gate("CV_13", 3);
     @test isapprox(QCO.ToffoliGate(), CV_23 * cnot_12 * CVdagger_23 * cnot_12 * CV_13, atol = tol_0)
 
-    CVdagger_13 = QCO.get_full_sized_gate("CVdagger_12", 3);
+    CVdagger_12 = QCO.get_full_sized_gate("CVdagger_12", 3);
     CVdagger_31 = QCO.get_full_sized_gate("CVdagger_31", 3);
-    @test isapprox(QCO.IGate(3), CVdagger_13 * CVdagger_13 * CVdagger_13 * CVdagger_13 * CVdagger_31 * CVdagger_31 * CVdagger_31 * CVdagger_31, atol = tol_0)
+    @test isapprox(QCO.IGate(3), CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_31 * CVdagger_31 * CVdagger_31 * CVdagger_31, atol = tol_0)
 
     H2 = QCO.get_full_sized_gate("H2", 2);
     T1 = QCO.get_full_sized_gate("T1", 2);
@@ -70,7 +70,7 @@
     cnot_12 = QCO.get_full_sized_gate("cnot_12", 2);
     @test isapprox(QCO.CVGate(), cnot_12 * QCO.CVdaggerGate(), atol = tol_0)
 
-    # Next 2 tests from: https://american-cse.org/csci2015/data/9795a059.pdf
+    # Next 3 tests from: https://american-cse.org/csci2015/data/9795a059.pdf
 
     CV_31 = QCO.get_full_sized_gate("CV_31", 3);
     cnot_23 = QCO.get_full_sized_gate("cnot_23", 3);
@@ -88,6 +88,10 @@
     cnot_13 = QCO.get_full_sized_gate("cnot_13", 3);
 
     @test isapprox(CV_32 * cnot_13 * CVdagger_32 * cnot_13 * CV_12, CVdagger_32 * cnot_13 * CV_32 * cnot_13 * CVdagger_12, atol = tol_0)
+
+    CVdagger_13 = QCO.get_full_sized_gate("CVdagger_13", 3);
+    cnot_21 = QCO.get_full_sized_gate("cnot_21", 3);
+    @test isapprox(CV_13 * cnot_21 * CVdagger_13 * cnot_21 * CV_23, CVdagger_13 * cnot_21 * CV_13 * cnot_21 * CVdagger_23, atol = tol_0)
 
 end
 
