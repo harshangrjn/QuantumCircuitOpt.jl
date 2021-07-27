@@ -649,6 +649,58 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
             control_1 = kron(kron(QCO.XGate(), QCO.IGate(1)), Array{Complex{Float64},2}([0 0; 0 1]))
             return control_0 + control_1
 
+        elseif input == "CV_12"
+            return kron(QCO.CVGate(), QCO.IGate(1))
+
+        elseif input == "CV_23"
+            return kron(QCO.IGate(1), QCO.CVGate())
+
+        elseif input == "CV_21"
+            return kron(QCO.CVRevGate(), QCO.IGate(1))
+
+        elseif input == "CV_32"
+            return kron(QCO.IGate(1), QCO.CVRevGate())
+
+        elseif input == "CV_13"
+            # |0⟩⟨0| ⊗ I ⊗ I 
+            control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , kron(QCO.IGate(1), QCO.IGate(1)))
+            # |1⟩⟨1| ⊗ I ⊗ V 
+            control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , kron(QCO.IGate(1), QCO.SXGate()))
+            return control_0 + control_1
+
+        elseif input == "CV_31"
+            # I ⊗ I ⊗ |0⟩⟨0| 
+            control_0 = kron(QCO.IGate(1), kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0])))
+            # V ⊗ I ⊗ |1⟩⟨1|
+            control_1 = kron(kron(QCO.SXGate(), QCO.IGate(1)), Array{Complex{Float64},2}([0 0; 0 1]))
+            return control_0 + control_1
+
+        elseif input == "CVdagger_12"
+            return kron(QCO.CVdaggerGate(), QCO.IGate(1))
+
+        elseif input == "CVdagger_23"
+            return kron(QCO.IGate(1), QCO.CVdaggerGate())
+
+        elseif input == "CVdagger_21"
+            return kron(QCO.CVRevdaggerGate(), QCO.IGate(1))
+
+        elseif input == "CVdagger_32"
+            return kron(QCO.IGate(1), QCO.CVRevdaggerGate())
+
+        elseif input == "CVdagger_13"
+            # |0⟩⟨0| ⊗ I ⊗ I 
+            control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , kron(QCO.IGate(1), QCO.IGate(1)))
+            # |1⟩⟨1| ⊗ I ⊗ V 
+            control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , kron(QCO.IGate(1), QCO.SXdaggerGate()))
+            return control_0 + control_1
+
+        elseif input == "CVdagger_31"
+            # I ⊗ I ⊗ |0⟩⟨0| 
+            control_0 = kron(QCO.IGate(1), kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0])))
+            # V ⊗ I ⊗ |1⟩⟨1|
+            control_1 = kron(kron(QCO.SXdaggerGate(), QCO.IGate(1)), Array{Complex{Float64},2}([0 0; 0 1]))
+            return control_0 + control_1
+
         else
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
         end

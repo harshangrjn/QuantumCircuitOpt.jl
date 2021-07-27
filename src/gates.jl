@@ -710,6 +710,97 @@ function CVGate()
 
 end
 
+
+@doc raw"""
+    CVRevGate()
+
+Two-qubit reverse controlled-V gate, with target and control on first and second qubits, respectively. 
+
+**Circuit Representation**
+```
+     ┌───┐
+q_0: ┤ V ├
+     └─┬─┘
+q_1: ──■──
+```
+
+**Matrix Representation**
+
+```math
+CV = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 0.5+0.5i & 0 & 0.5-0.5i \\
+        0 & 0 & 1 & 0 \\
+        0 & 0.5-0.5i & 0 & 0.5+0.5i
+    \end{pmatrix}
+```
+"""
+function CVRevGate()
+
+    return return Array{Complex{Float64},2}([1 0 0 0; 0 0.5+0.5im 0 0.5-0.5im; 0 0 1 0; 0 0.5-0.5im 0 0.5+0.5im])
+
+end
+
+@doc raw"""
+    CVdaggerGate()
+
+Two-qubit hermitian conjugate of controlled-V gate, which is also the same as hermitian conjugate Controlled square-root of X gate ([C2SXGate](@ref)).  
+
+**Circuit Representation**
+```
+q_0: ──■──     
+     ┌─┴─┐    
+q_1: ┤ V'├     
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+CV = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0.5-0.5i & 0.5+0.5i \\
+        0 & 0 & 0.5+0.5i & 0.5-0.5i
+    \end{pmatrix}
+```
+"""
+function CVdaggerGate()
+
+    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5-0.5im 0.5+0.5im; 0 0 0.5+0.5im 0.5-0.5im])
+end
+
+
+@doc raw"""
+    CVRevdaggerGate()
+
+Two-qubit hermitian conjugate of reverse controlled-V gate, with target and control on first and second qubits, respectively. 
+
+**Circuit Representation**
+```
+     ┌───┐
+q_0: ┤ V'├
+     └─┬─┘
+q_1: ──■──
+```
+
+**Matrix Representation**
+
+```math
+CV = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 0.5-0.5i & 0 & 0.5+0.5i \\
+        0 & 0 & 1 & 0 \\
+        0 & 0.5+0.5i & 0 & 0.5-0.5i
+    \end{pmatrix}
+```
+"""
+function CVRevdaggerGate()
+
+    return return Array{Complex{Float64},2}([1 0 0 0; 0 0.5-0.5im 0 0.5+0.5im; 0 0 1 0; 0 0.5+0.5im 0 0.5-0.5im])
+
+end
+
 @doc raw"""
     WGate()
 
