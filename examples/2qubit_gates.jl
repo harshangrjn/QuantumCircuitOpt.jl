@@ -63,7 +63,7 @@ function test_controlled_V()
     "num_qubits" => 2, 
     "depth" => 7,    
 
-    "elementary_gates" => ["H1", "H2", "T1", "T2", "Tdagger1", "cnot_12", "cnot_21"],
+    "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "cnot_12", "cnot_21"],
     "target_gate" => QCO.CVGate(),
     
     "objective" => "minimize_depth", 
@@ -168,7 +168,7 @@ function test_magic_M_using_SHCnot()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+        "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
         "target_gate" => QCO.MGate(),
            
         "objective" => "minimize_depth", 
@@ -218,7 +218,7 @@ function test_cnot_21()
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["H1", "H2", "Identity", "cnot_12"],  
+    "elementary_gates" => ["H_1", "H_2", "Identity", "cnot_12"],  
     "target_gate" => QCO.CNotRevGate(),
  
     "objective" => "minimize_depth", 
@@ -341,7 +341,7 @@ function test_HCoinGate()
         "num_qubits" => 2, 
         "depth" => 14,    
     
-        "elementary_gates" => ["Y1", "Y2", "Z1", "Z2", "T2", "Tdagger1", "Sdagger1", "SX1", "SXdagger2", "cnot_21", "cnot_12", "Identity"], 
+        "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "cnot_21", "cnot_12", "Identity"], 
         "target_gate" => -QCO.HCoinGate(),   
                   
         "objective" => "minimize_depth", 

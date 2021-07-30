@@ -72,7 +72,7 @@ end
        "num_qubits" => 2, 
        "depth" => 5,    
 
-       "elementary_gates" => ["H1", "H2", "cnot_12", "Identity"],  
+       "elementary_gates" => ["H_1", "H_2", "cnot_12", "Identity"],  
        "target_gate" => QCO.CNotRevGate()
        )
     
@@ -96,7 +96,7 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 3, 
         "depth" => 15,    
-        "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3", "Identity"], 
+        "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "cnot_12", "cnot_13", "cnot_23", "Tdagger_2", "Tdagger_3", "Identity"], 
         "target_gate" => QCO.ToffoliGate()
         )
     data = QCO.get_data(params)
@@ -109,15 +109,15 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 2, 
         "depth" => 14,    
-        "elementary_gates" => ["Y1", "Y2", "Z1", "Z2", "T2", "Tdagger1", "Sdagger1", "SX1", "SXdagger2", "cnot_21", "cnot_12", "Identity"], 
+        "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "cnot_21", "cnot_12", "Identity"], 
         "target_gate" => -QCO.HCoinGate())
     data = QCO.get_data(params)
     idempotent_gates = QCO.get_idempotent_gates(data["gates_dict"])
     @test idempotent_gates[1] == 6
     @test idempotent_gates[2] == 7
-    @test "Tdagger1" in data["gates_dict"]["$(idempotent_gates[1])"]["type"]
-    @test "Sdagger1" in data["gates_dict"]["$(idempotent_gates[2])"]["type"]
-    @test "Z1" in data["gates_dict"]["3"]["type"]
+    @test "Tdagger_1" in data["gates_dict"]["$(idempotent_gates[1])"]["type"]
+    @test "Sdagger_1" in data["gates_dict"]["$(idempotent_gates[2])"]["type"]
+    @test "Z_1" in data["gates_dict"]["3"]["type"]
     
     M1 = data["gates_dict"]["$(idempotent_gates[1])"]["matrix"]
     M2 = data["gates_dict"]["$(idempotent_gates[2])"]["matrix"]

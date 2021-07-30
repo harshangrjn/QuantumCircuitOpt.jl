@@ -460,64 +460,64 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         Memento.error(_LOGGER, "Gates with greater than 3 qubits are not currently supported")
     end
     
-    if input == "H1"
+    if input == "H_1"
         return QCO.kron_single_gate(num_qubits, QCO.HGate(), "q1")
 
-    elseif input == "H2"
+    elseif input == "H_2"
         return QCO.kron_single_gate(num_qubits, QCO.HGate(), "q2")
 
-    elseif input == "T1"
+    elseif input == "T_1"
         return QCO.kron_single_gate(num_qubits, QCO.TGate(), "q1")
 
-    elseif input == "T2"
+    elseif input == "T_2"
         return QCO.kron_single_gate(num_qubits, QCO.TGate(), "q2")
 
-    elseif input == "Tdagger1"
+    elseif input == "Tdagger_1"
         return QCO.kron_single_gate(num_qubits, QCO.TdaggerGate(), "q1")
 
-    elseif input == "Tdagger2"
+    elseif input == "Tdagger_2"
         return QCO.kron_single_gate(num_qubits, QCO.TdaggerGate(), "q2")   
 
-    elseif input == "S1"
+    elseif input == "S_1"
         return QCO.kron_single_gate(num_qubits, QCO.SGate(), "q1") 
 
-    elseif input == "S2"
+    elseif input == "S_2"
         return QCO.kron_single_gate(num_qubits, QCO.SGate(), "q2")  
 
-    elseif input == "Sdagger1"
+    elseif input == "Sdagger_1"
         return QCO.kron_single_gate(num_qubits, QCO.SdaggerGate(), "q1") 
 
-    elseif input == "Sdagger2"
+    elseif input == "Sdagger_2"
         return QCO.kron_single_gate(num_qubits, QCO.SdaggerGate(), "q2")   
 
-    elseif input == "SX1"
+    elseif input == "SX_1"
         return QCO.kron_single_gate(num_qubits, QCO.SXGate(), "q1") 
 
-    elseif input == "SX2"
+    elseif input == "SX_2"
         return QCO.kron_single_gate(num_qubits, QCO.SXGate(), "q2")  
 
-    elseif input == "SXdagger1"
+    elseif input == "SXdagger_1"
         return QCO.kron_single_gate(num_qubits, QCO.SXdaggerGate(), "q1")
 
-    elseif input == "SXdagger2"
+    elseif input == "SXdagger_2"
         return QCO.kron_single_gate(num_qubits, QCO.SXdaggerGate(), "q2")   
 
-    elseif input == "X1"
+    elseif input == "X_1"
         return QCO.kron_single_gate(num_qubits, QCO.XGate(), "q1") 
 
-    elseif input == "X2"
+    elseif input == "X_2"
         return QCO.kron_single_gate(num_qubits, QCO.XGate(), "q2")    
 
-    elseif input == "Y1"
+    elseif input == "Y_1"
         return QCO.kron_single_gate(num_qubits, QCO.YGate(), "q1")  
 
-    elseif input == "Y2"
+    elseif input == "Y_2"
         return QCO.kron_single_gate(num_qubits, QCO.YGate(), "q2")   
 
-    elseif input == "Z1"
+    elseif input == "Z_1"
         return QCO.kron_single_gate(num_qubits, QCO.ZGate(), "q1") 
 
-    elseif input == "Z2"
+    elseif input == "Z_2"
         return QCO.kron_single_gate(num_qubits, QCO.ZGate(), "q2")     
 
     # Gates with continuous angle parameters
@@ -538,7 +538,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input == "cnot_swap"
             return QCO.CNotGate() * QCO.CNotRevGate()
 
-        elseif input == "H1⊗H2"
+        elseif input == "H_1⊗H_2"
             return kron(QCO.HGate(), QCO.HGate())   
             
         elseif input == "CZ_12"
@@ -577,34 +577,34 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
     # All 3-qubit full-sized gates
     if num_qubits == 3
         
-        if input == "H3"
+        if input == "H_3"
             return QCO.kron_single_gate(num_qubits, QCO.HGate(), "q3")
     
-        elseif input == "T3"
+        elseif input == "T_3"
             return QCO.kron_single_gate(num_qubits, QCO.TGate(), "q3")
     
-        elseif input == "Tdagger3"
+        elseif input == "Tdagger_3"
             return QCO.kron_single_gate(num_qubits, QCO.TdaggerGate(), "q3")   
     
-        elseif input == "S3"
+        elseif input == "S_3"
             return QCO.kron_single_gate(num_qubits, QCO.SGate(), "q3") 
     
-        elseif input == "Sdagger3"
+        elseif input == "Sdagger_3"
             return QCO.kron_single_gate(num_qubits, QCO.SdaggerGate(), "q3") 
     
-        elseif input == "SX3"
+        elseif input == "SX_3"
             return QCO.kron_single_gate(num_qubits, QCO.SXGate(), "q3") 
     
-        elseif input == "SXdagger3"
+        elseif input == "SXdagger_3"
             return QCO.kron_single_gate(num_qubits, QCO.SXdaggerGate(), "q3")
     
-        elseif input == "X3"
+        elseif input == "X_3"
             return QCO.kron_single_gate(num_qubits, QCO.XGate(), "q3") 
     
-        elseif input == "Y3"
+        elseif input == "Y_3"
             return QCO.kron_single_gate(num_qubits, QCO.YGate(), "q3")  
      
-        elseif input == "Z3"
+        elseif input == "Z_3"
             return QCO.kron_single_gate(num_qubits, QCO.ZGate(), "q3") 
      
         # Gates with continuous angle parameters

@@ -18,7 +18,7 @@ function test_RX_on_q3()
     "decomposition_type" => "exact",
     
     "optimizer" => "cplex",
-    "optimizer_presolve" => false, #turning this true will give infeasiblity in CPLEX - most probably a bug in CPLEX's presolve
+    "optimizer_presolve" => false, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
     
     )
 
@@ -35,7 +35,7 @@ function test_toffoli()
     "num_qubits" => 3, 
     "depth" => 15,    
 
-    "elementary_gates" => ["T1", "T2", "T3", "H3", "cnot_12", "cnot_13", "cnot_23", "Tdagger2", "Tdagger3", "Identity"], 
+    "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "cnot_12", "cnot_13", "cnot_23", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
     "input_circuit" => toffoli_circuit(),
     
@@ -53,20 +53,20 @@ end
 
 function toffoli_circuit()
     # [(depth, gate)]
-    return [(1, "H3"), 
+    return [(1, "H_3"), 
         (2, "cnot_23"), 
-        (3, "Tdagger3"), 
+        (3, "Tdagger_3"), 
         (4, "cnot_13"), 
-        (5, "T3"), 
+        (5, "T_3"), 
         (6, "cnot_23"), 
-        (7, "Tdagger3"), 
+        (7, "Tdagger_3"), 
         (8, "cnot_13"), 
-        (9, "T2"), 
-        (10, "T3"), 
+        (9, "T_2"), 
+        (10, "T_3"), 
         (11, "cnot_12"), 
-        (12, "H3"), 
-        (13, "T1"), 
-        (14, "Tdagger2"),
+        (12, "H_3"), 
+        (13, "T_1"), 
+        (14, "Tdagger_2"),
         (15, "cnot_12")
         ] 
 end
