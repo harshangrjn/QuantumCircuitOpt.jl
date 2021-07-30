@@ -34,7 +34,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 2,
-    "elementary_gates" => ["T1", "T2", "Tdagger1", "Tdagger2", "S1", "S2", "Sdagger1", "Sdagger2", "SX1", "SX2", "SXdagger1", "SXdagger2", "X1", "X2", "Y1", "Y2", "Z1", "Z2", "cnot_swap", "H1⊗H2", "CZ_12", "CH_12", "CV_12", "swap", "M_12", "QFT_12", "CSX_12", "W_12", "HCoin"],
+    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "cnot_swap", "H_1⊗H_2", "CZ_12", "CH_12", "CV_12", "swap", "M_12", "QFT_12", "CSX_12", "W_12", "HCoin"],
     "target_gate" => QCO.IGate(2),               
     )
 
@@ -45,7 +45,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 3,
     "depth" => 2,
-    "elementary_gates" => ["H3", "T3", "Tdagger3", "Sdagger3", "SX3", "SXdagger3", "X3", "Y3", "Z3", "toffoli", "CSwap", "CCZ", "peres", "cnot_12", "cnot_23", "cnot_21", "cnot_32", "cnot_13", "cnot_31"],
+    "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "Sdagger_3", "SX_3", "SXdagger_3", "X_3", "Y_3", "Z_3", "toffoli", "CSwap", "CCZ", "peres", "cnot_12", "cnot_23", "cnot_21", "cnot_32", "cnot_13", "cnot_31"],
     "target_gate" => QCO.IGate(3)
     )
 
@@ -58,16 +58,16 @@ end
     function input_circuit_1()
         # [(depth, gate)]
         return [(1, "cnot_21"), 
-                (2, "S1"), 
-                (3, "H2"), 
-                (4, "S2")
+                (2, "S_1"), 
+                (3, "H_2"), 
+                (4, "S_2")
                 ]
     end
 
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 5,
-    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "input_circuit" => input_circuit_1(),
     )
@@ -78,18 +78,18 @@ end
     @test data["input_circuit"]["1"]["depth"] == 1
     @test data["input_circuit"]["1"]["gate"] == "cnot_21"
     @test data["input_circuit"]["2"]["depth"] == 2
-    @test data["input_circuit"]["2"]["gate"] == "S1"
+    @test data["input_circuit"]["2"]["gate"] == "S_1"
     @test data["input_circuit"]["3"]["depth"] == 3
-    @test data["input_circuit"]["3"]["gate"] == "H2"
+    @test data["input_circuit"]["3"]["gate"] == "H_2"
     @test data["input_circuit"]["4"]["depth"] == 4
-    @test data["input_circuit"]["4"]["gate"] == "S2"
+    @test data["input_circuit"]["4"]["gate"] == "S_2"
 
     function input_circuit_2()
         # [(depth, gate)]
         return [(1, "cnot_21"), 
-                (2, "S1"), 
-                (3, "H2"), 
-                (4, "T1")
+                (2, "S_1"), 
+                (3, "H_2"), 
+                (4, "T_1")
                 ]
     end
 
@@ -100,9 +100,9 @@ end
     function input_circuit_3()
         # [(depth, gate)]
         return [(1, "cnot_21"), 
-                (2, "S1"), 
-                (2, "H2"), 
-                (4, "S2")
+                (2, "S_1"), 
+                (2, "H_2"), 
+                (4, "S_2")
                 ]
     end
 
@@ -113,11 +113,11 @@ end
     function input_circuit_4()
         # [(depth, gate)]
         return [(1, "cnot_21"), 
-                (2, "S1"), 
-                (3, "H2"), 
-                (4, "S2"),
+                (2, "S_1"), 
+                (3, "H_2"), 
+                (4, "S_2"),
                 (5, "Identity"),
-                (6, "S1"),
+                (6, "S_1"),
                 ]
     end
 
