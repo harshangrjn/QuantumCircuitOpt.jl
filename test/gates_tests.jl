@@ -40,16 +40,16 @@
     @test isapprox(QCO.MGate(), QCO.CNotRevGate() * H2 * S1_S2)
 
     @test isapprox(QCO.NegIGate(), kron(QCO.RZGate(2*π), QCO.IGate(1)), atol = tol_0)
-    Z1 = QCO.get_full_sized_gate("Z1", 2);
-    Z2 = QCO.get_full_sized_gate("Z2", 2);
-    T2 = QCO.get_full_sized_gate("T2", 2);
-    Y2 = QCO.get_full_sized_gate("Y2", 2);
+    Z1 = QCO.get_full_sized_gate("Z_1", 2);
+    Z2 = QCO.get_full_sized_gate("Z_2", 2);
+    T2 = QCO.get_full_sized_gate("T_2", 2);
+    Y2 = QCO.get_full_sized_gate("Y_2", 2);
     cnot_12 = QCO.get_full_sized_gate("cnot_12", 2);
     cnot_21 = QCO.get_full_sized_gate("cnot_21", 2);
-    Sdagger1 = QCO.get_full_sized_gate("Sdagger1", 2);
-    Tdagger1 = QCO.get_full_sized_gate("Tdagger1", 2);
-    SX1 = QCO.get_full_sized_gate("SX1", 2);
-    SXdagger2 = QCO.get_full_sized_gate("SXdagger2", 2);
+    Sdagger1 = QCO.get_full_sized_gate("Sdagger_1", 2);
+    Tdagger1 = QCO.get_full_sized_gate("Tdagger_1", 2);
+    SX1 = QCO.get_full_sized_gate("SX_1", 2);
+    SXdagger2 = QCO.get_full_sized_gate("SXdagger_2", 2);
     @test isapprox(-QCO.HCoinGate(), Z2 * cnot_21 * SXdagger2 * Y2 * cnot_21 * Tdagger1 * Z1 * T2 * Sdagger1 * cnot_12 * Sdagger1 * SX1 * cnot_21 * cnot_12, atol = tol_0)
 
     CV_23 = QCO.get_full_sized_gate("CV_23", 3);
@@ -62,9 +62,9 @@
     CVdagger_31 = QCO.get_full_sized_gate("CVdagger_31", 3);
     @test isapprox(QCO.IGate(3), CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_31 * CVdagger_31 * CVdagger_31 * CVdagger_31, atol = tol_0)
 
-    H2 = QCO.get_full_sized_gate("H2", 2);
-    T1 = QCO.get_full_sized_gate("T1", 2);
-    Tdagger2 = QCO.get_full_sized_gate("Tdagger2", 2);
+    H2 = QCO.get_full_sized_gate("H_2", 2);
+    T1 = QCO.get_full_sized_gate("T_1", 2);
+    Tdagger2 = QCO.get_full_sized_gate("Tdagger_2", 2);
     @test isapprox(QCO.CVdaggerGate(), H2 * Tdagger1 * cnot_21 * T1 * Tdagger2 * cnot_21 * H2, atol = tol_0)
 
     cnot_12 = QCO.get_full_sized_gate("cnot_12", 2);
