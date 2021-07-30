@@ -3,7 +3,7 @@
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 5,
-    "elementary_gates" => ["H1", "H2", "cnot_12", "Identity"],  
+    "elementary_gates" => ["H_1", "H_2", "cnot_12", "Identity"],  
     "target_gate" => QCO.CNotRevGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"
@@ -125,7 +125,7 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 2, 
         "depth" => 3,    
-        "elementary_gates" => ["H1", "H2"],  
+        "elementary_gates" => ["H_1", "H_2"],  
         "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact"
@@ -137,7 +137,7 @@ end
     data = QCO.get_data(params)
 
     for i in keys(data["gates_dict"])
-        if data["gates_dict"][i]["type"] == "H1"
+        if data["gates_dict"][i]["type"] == "H_1"
             @test isapprox(sum(result_qc["solution"]["z_onoff_var"][parse(Int64, i),:]), 3 , atol = tol_0)
         end
     end
@@ -148,16 +148,16 @@ end
     function input_circuit()
         # [(depth, gate)]
         return [(1, "cnot_21"), 
-                (2, "S1"), 
-                (3, "H2"), 
-                (4, "S2")
+                (2, "S_1"), 
+                (3, "H_2"), 
+                (4, "S_2")
                 ]
     end
 
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 4,
-    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "input_circuit" => input_circuit(),
     "objective" => "minimize_depth", 
@@ -177,7 +177,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 4,
-    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"
@@ -191,7 +191,7 @@ end
             num_involutory_matrices += 1
         end
 
-        if ("S1" in gates_dict[i]["type"]) || ("S2" in gates_dict[i]["type"])
+        if ("S_1" in gates_dict[i]["type"]) || ("S_2" in gates_dict[i]["type"])
             @test !(gates_dict[i]["isInvolutory"])
         end
     end
@@ -209,7 +209,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 5,
-    "elementary_gates" => ["S1", "S2", "H1", "H2", "cnot_12", "cnot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
