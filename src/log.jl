@@ -256,7 +256,7 @@ function get_compressed_solutions(data::Dict{String, Any}, gates_sol::Array{Stri
                     status = false
                     continue
                 else
-                    if !(startswith(gates_sol[i], "cnot")) && !(startswith(gates_sol[i+1], "cnot"))
+                    if !(startswith(gates_sol[i], "CNot")) && !(startswith(gates_sol[i+1], "CNot"))
                         if (occursin('1', gates_sol[i]) && occursin('2', gates_sol[i+1])) || (occursin('2', gates_sol[i]) && occursin('1', gates_sol[i+1])) 
                             if occursin('1', gates_sol[i])
                                 gate_string = string(gates_sol[i],"⊗",gates_sol[i+1])

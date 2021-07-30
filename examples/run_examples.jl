@@ -8,27 +8,28 @@ include("solver.jl")
 include("2qubit_gates.jl")
 include("3qubit_gates.jl")
 
-test_gates = ["test_hadamard", 
-               "test_S", 
-               "test_magic_M",  
-               "test_cnot_21", 
-               "test_cnot_21_with_U", 
-               "test_controlled_Z",
-               "test_magic_M_using_SHCnot",
-               "test_swap",
-               "test_controlled_V",
-               "test_W",
-               "test_W_using_HCnot",
-               "test_RX_on_q3"]
+decompose_gates = ["decompose_hadamard", 
+                    "decompose_S", 
+                    "decompose_magic_M",  
+                    "decompose_cnot_21", 
+                    "decompose_cnot_21_with_U", 
+                    "decompose_controlled_Z",
+                    "decompose_magic_M_using_SHCnot",
+                    "decompose_swap",
+                    "decompose_controlled_V",
+                    "decompose_W",
+                    "decompose_W_using_HCnot",
+                    "decompose_GroverDiffusionGate",
+                    "decompose_RX_on_q3"]
 
-# test_gates = ["test_controlled_Z"]
+# decompose_gates = ["decompose_GroverDiffusionGate"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
 #----------------------------------------------#
 result_qc = Dict{String,Any}()
 
-for gates in test_gates 
+for gates in decompose_gates 
     params = getfield(Main, Symbol(gates))()
     qcm_optimizer = get_solver(params)
     global result_qc = QCO.run_QCModel(params, 

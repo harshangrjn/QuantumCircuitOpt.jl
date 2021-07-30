@@ -227,7 +227,7 @@ function _get_cnot_idx(gates_dict::Dict{String, Any})
 
     # Note: The below objective minimizes both cnot_12 and cnot_21 in the decomposition
     for i in keys(gates_dict)
-        if !isempty(findall(x -> startswith(x, "cnot"), gates_dict[i]["type"]))
+        if !isempty(findall(x -> startswith(x, "CNot"), gates_dict[i]["type"]))
             push!(cnot_idx, parse(Int64, i))
         end
     end
@@ -529,13 +529,13 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
     # All 2-qubit full-sized gates
     if num_qubits == 2
 
-        if input == "cnot_12"
+        if input == "CNot_12"
             return QCO.CNotGate()
 
-        elseif input == "cnot_21"
+        elseif input == "CNot_21"
             return QCO.CNotRevGate()
 
-        elseif input == "cnot_swap"
+        elseif input == "CNotSwap"
             return QCO.CNotGate() * QCO.CNotRevGate()
 
         elseif input == "H_1⊗H_2"
@@ -550,7 +550,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input == "CV_12"
             return QCO.CVGate()
 
-        elseif input == "swap"
+        elseif input == "Swap"
             return QCO.SwapGate()
 
         elseif input == "M_12"
@@ -611,7 +611,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input in ["RX", "RY", "RZ", "U3"] 
             return QCO.kron_single_gate(num_qubits, matrix, qubit_location)
         
-        elseif input == "toffoli"
+        elseif input == "Toffoli"
             return QCO.ToffoliGate()
 
         elseif input == "CSwap"
@@ -620,29 +620,29 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input == "CCZ"
             return QCO.CCZGate()
 
-        elseif input == "peres"
+        elseif input == "Peres"
             return QCO.PeresGate()
 
-        elseif input == "cnot_12"
+        elseif input == "CNot_12"
             return kron(QCO.CNotGate(), QCO.IGate(1))
 
-        elseif input == "cnot_23"
+        elseif input == "CNot_23"
             return kron(QCO.IGate(1), QCO.CNotGate())
 
-        elseif input == "cnot_21"
+        elseif input == "CNot_21"
             return kron(QCO.CNotRevGate(), QCO.IGate(1))
 
-        elseif input == "cnot_32"
+        elseif input == "CNot_32"
             return kron(QCO.IGate(1), QCO.CNotRevGate())
 
-        elseif input == "cnot_13"
+        elseif input == "CNot_13"
             # |0⟩⟨0| ⊗ I ⊗ I 
             control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , kron(QCO.IGate(1), QCO.IGate(1)))
             # |1⟩⟨1| ⊗ I ⊗ X 
             control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , kron(QCO.IGate(1), QCO.XGate()))
             return control_0 + control_1
 
-        elseif input == "cnot_31"
+        elseif input == "CNot_31"
             # I ⊗ I ⊗ |0⟩⟨0| 
             control_0 = kron(QCO.IGate(1), kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0])))
             # X ⊗ I ⊗ |1⟩⟨1|

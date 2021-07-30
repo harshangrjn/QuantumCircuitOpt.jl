@@ -44,7 +44,7 @@ end
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "depth" => 3,    
-"elementary_gates" => ["U3", "cnot_12", "Identity"], 
+"elementary_gates" => ["U3", "CNot_12", "Identity"], 
 "target_gate" => target_gate(),
        
 "U_θ_discretization" => collect(-π/2:π/2:π/2),

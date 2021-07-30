@@ -1182,6 +1182,30 @@ function HCoinGate()
 
 end
 
+@doc raw"""
+    GroverDiffusionGate()
+
+Two-qubit, Grover's diffusion operator, a key building block of the Glover's algorithm used to find a specific
+item (with probability > 0.5) within a randomly ordered database of N items in O(sqrt(N)) operations. 
+Reference: [https://arxiv.org/pdf/1804.03719.pdf](https://arxiv.org/pdf/1804.03719.pdf)
+
+**Matrix Representation**
+
+```math
+GroverDiffusionGate = \frac{1}{2}\begin{pmatrix}
+1 & -1 & -1 & -1 \\
+-1 & 1 & -1 & -1 \\
+-1 & -1 & 1 & -1 \\ 
+-1 & -1 & -1 & 1
+\end{pmatrix}
+```
+"""
+function GroverDiffusionGate()
+
+    return Array{Complex{Float64},2}(0.5*[1 -1 -1 -1; -1 1 -1 -1; -1 -1 1 -1; -1 -1 -1 1]) 
+
+end
+
 #---------------------------------------#
 #            Three-qubit gates          #
 #---------------------------------------#

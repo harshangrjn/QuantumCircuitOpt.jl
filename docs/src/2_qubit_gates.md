@@ -36,9 +36,17 @@ CHGate
 ```@docs
 CVGate
 ```
+## CVRevGate
+```@docs
+CVRevGate
+```
 ## CVdaggerGate
 ```@docs
 CVdaggerGate
+```
+## CVRevdaggerGate
+```@docs
+CVRevdaggerGate
 ```
 ## WGate
 ```@docs
@@ -83,4 +91,8 @@ QFT2Gate
 ## HCoinGate
 ```@docs
 HCoinGate
+```
+## GroverDiffusionGate
+```@docs
+GroverDiffusionGate
 ```

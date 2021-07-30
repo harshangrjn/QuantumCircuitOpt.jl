@@ -49,7 +49,7 @@ end
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "depth" => 3,    
-"elementary_gates" => ["U3", "cnot_12", "Identity"], 
+"elementary_gates" => ["U3", "CNot_12", "Identity"], 
 "target_gate" => target_gate(),
        
 "U_θ_discretization" => [-π/2, 0, π/2],
@@ -97,7 +97,7 @@ Quantum Circuit Model Data
   Number of qubits: 2
   Total number of elementary gates (including discretization): 36
   Maximum depth of decomposition: 3
-  Input elementary gates: ["U3", "cnot_12", "Identity"]
+  Input elementary gates: ["U3", "CNot_12", "Identity"]
     U3 gate - θ discretization: [-90.0, 0.0, 90.0]
     U3 gate - ϕ discretization: [-90.0, 0.0, 90.0]
     U3 gate - λ discretization: [-90.0, 0.0, 90.0]

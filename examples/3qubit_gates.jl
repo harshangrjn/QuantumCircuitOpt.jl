@@ -1,4 +1,4 @@
-function test_RX_on_q3()
+function decompose_RX_on_q3()
 
     println(">>>>> RX Gate on third qubit using U3Gate <<<<<")
  
@@ -26,7 +26,7 @@ function test_RX_on_q3()
     
 end
 
-function test_toffoli()
+function decompose_toffoli()
 
     println(">>>>> Toffoli gate <<<<<")
  
@@ -35,7 +35,7 @@ function test_toffoli()
     "num_qubits" => 3, 
     "depth" => 15,    
 
-    "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "cnot_12", "cnot_13", "cnot_23", "Tdagger_2", "Tdagger_3", "Identity"], 
+    "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
     "input_circuit" => toffoli_circuit(),
     
@@ -54,19 +54,19 @@ end
 function toffoli_circuit()
     # [(depth, gate)]
     return [(1, "H_3"), 
-        (2, "cnot_23"), 
-        (3, "Tdagger_3"), 
-        (4, "cnot_13"), 
-        (5, "T_3"), 
-        (6, "cnot_23"), 
-        (7, "Tdagger_3"), 
-        (8, "cnot_13"), 
-        (9, "T_2"), 
-        (10, "T_3"), 
-        (11, "cnot_12"), 
-        (12, "H_3"), 
-        (13, "T_1"), 
-        (14, "Tdagger_2"),
-        (15, "cnot_12")
-        ] 
+            (2, "CNot_23"), 
+            (3, "Tdagger_3"), 
+            (4, "CNot_13"), 
+            (5, "T_3"), 
+            (6, "CNot_23"), 
+            (7, "Tdagger_3"), 
+            (8, "CNot_13"), 
+            (9, "T_2"), 
+            (10, "T_3"), 
+            (11, "CNot_12"), 
+            (12, "H_3"), 
+            (13, "T_1"), 
+            (14, "Tdagger_2"),
+            (15, "CNot_12")
+            ] 
 end

@@ -1,4 +1,4 @@
-function test_hadamard()
+function decompose_hadamard()
 
     println(">>>>> Hadamard Gate <<<<<")
  
@@ -7,7 +7,7 @@ function test_hadamard()
     "num_qubits" => 2, 
     "depth" => 3,    
 
-    "elementary_gates" => ["U3", "cnot_12", "Identity"], 
+    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
     "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
        
     "U_θ_discretization" => [0, π/2],
@@ -26,7 +26,7 @@ function test_hadamard()
     
 end
 
-function test_controlled_Z()
+function decompose_controlled_Z()
 
     println(">>>>> Controlled-Z Gate <<<<<")
 
@@ -35,7 +35,7 @@ function test_controlled_Z()
     "num_qubits" => 2, 
     "depth" => 4,    
 
-    "elementary_gates" => ["U3", "cnot_12", "Identity"], 
+    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
     "target_gate" => QCO.CZGate(),
        
     "U_θ_discretization" => [-π/2, 0, π/2],
@@ -54,7 +54,7 @@ function test_controlled_Z()
     
 end
 
-function test_controlled_V()
+function decompose_controlled_V()
 
     println(">>>>> Controlled-V Gate <<<<<")
 
@@ -63,7 +63,7 @@ function test_controlled_V()
     "num_qubits" => 2, 
     "depth" => 7,    
 
-    "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "cnot_12", "cnot_21"],
+    "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "CNot_12", "CNot_21"],
     "target_gate" => QCO.CVGate(),
     
     "objective" => "minimize_depth", 
@@ -77,7 +77,7 @@ function test_controlled_V()
     
 end
 
-function test_controlled_H()
+function decompose_controlled_H()
 
     println(">>>>> Controlled-H Gate <<<<<")
 
@@ -86,7 +86,7 @@ function test_controlled_H()
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["U3", "cnot_12", "Identity"], 
+    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
     "target_gate" => QCO.CHGate(),
 
     "U_θ_discretization" => [-π/4, 0, π/4],
@@ -105,7 +105,7 @@ function test_controlled_H()
     
 end
 
-function test_controlled_H_with_R()
+function decompose_controlled_H_with_R()
 
     println(">>>>> Controlled-H with R Gate <<<<<")
 
@@ -114,7 +114,7 @@ function test_controlled_H_with_R()
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["RY", "cnot_12", "Identity"], 
+    "elementary_gates" => ["RY", "CNot_12", "Identity"], 
     "target_gate" => QCO.CHGate(),
        
     "RX_discretization" => [], 
@@ -132,7 +132,7 @@ function test_controlled_H_with_R()
     
 end
 
-function test_magic_M()
+function decompose_magic_M()
     
     println(">>>>> M Gate <<<<<")
 
@@ -141,7 +141,7 @@ function test_magic_M()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["U3", "cnot_12", "cnot_21", "Identity"], 
+        "elementary_gates" => ["U3", "CNot_12", "CNot_21", "Identity"], 
         "target_gate" => QCO.MGate(),   
            
         "U_θ_discretization" => [0, π/2],
@@ -159,7 +159,7 @@ function test_magic_M()
     
 end
 
-function test_magic_M_using_SHCnot()
+function decompose_magic_M_using_SHCnot()
     
     println(">>>>> M gate using S, H and CNOT Gate <<<<<")
 
@@ -168,7 +168,7 @@ function test_magic_M_using_SHCnot()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
+        "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"], 
         "target_gate" => QCO.MGate(),
            
         "objective" => "minimize_depth", 
@@ -182,7 +182,7 @@ function test_magic_M_using_SHCnot()
     
 end
 
-function test_S()
+function decompose_S()
 
     println(">>>>> S Gate <<<<<")
 
@@ -191,7 +191,7 @@ function test_S()
         "num_qubits" => 2, 
         "depth" => 3,    
     
-        "elementary_gates" => ["U3", "cnot_12", "Identity"], 
+        "elementary_gates" => ["U3", "CNot_12", "Identity"], 
         "target_gate" => QCO.kron_single_gate(2, QCO.SGate(), "q1"),
            
         "U_θ_discretization" => [0, π/4, π/2],
@@ -209,7 +209,7 @@ function test_S()
     
 end
 
-function test_cnot_21()
+function decompose_cnot_21()
 
     println(">>>>> CNOT_21 Gate <<<<<")
 
@@ -218,7 +218,7 @@ function test_cnot_21()
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["H_1", "H_2", "Identity", "cnot_12"],  
+    "elementary_gates" => ["H_1", "H_2", "Identity", "CNot_12"],  
     "target_gate" => QCO.CNotRevGate(),
  
     "objective" => "minimize_depth", 
@@ -232,7 +232,7 @@ function test_cnot_21()
     
 end
 
-function test_cnot_21_with_U()
+function decompose_cnot_21_with_U()
     
     println(">>>>> CNOT_21 using U3 and CNOT Gates <<<<<")
 
@@ -241,7 +241,7 @@ function test_cnot_21_with_U()
         "num_qubits" => 2, 
         "depth" => 6,    
     
-        "elementary_gates" => ["U3", "cnot_12", "Identity"], 
+        "elementary_gates" => ["U3", "CNot_12", "Identity"], 
         "target_gate" => QCO.CNotRevGate(),   
            
         "U_θ_discretization" => [-π/2, π/2],
@@ -259,7 +259,7 @@ function test_cnot_21_with_U()
     
 end
 
-function test_swap()
+function decompose_swap()
 
     println(">>>>> SWAP Gate <<<<<")
 
@@ -268,7 +268,7 @@ function test_swap()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["cnot_21", "cnot_12", "Identity"], 
+        "elementary_gates" => ["CNot_21", "CNot_12", "Identity"], 
         "target_gate" => QCO.SwapGate(),   
            
         "objective" => "minimize_depth", 
@@ -282,7 +282,7 @@ function test_swap()
     
 end
 
-function test_W()
+function decompose_W()
 
     println(">>>>> W Gate <<<<<")
 
@@ -291,7 +291,7 @@ function test_W()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["U3", "cnot_21", "cnot_12", "Identity"], 
+        "elementary_gates" => ["U3", "CNot_21", "CNot_12", "Identity"], 
         "target_gate" => QCO.WGate(),   
 
         "U_θ_discretization" => [-π/4, π/4],
@@ -309,7 +309,7 @@ function test_W()
     
 end
 
-function test_W_using_HCnot()
+function decompose_W_using_HCnot()
 
     println(">>>>> W Gate using H and CNOT gates <<<<<")
 
@@ -318,7 +318,7 @@ function test_W_using_HCnot()
         "num_qubits" => 2, 
         "depth" => 6,    
     
-        "elementary_gates" => ["CH_12", "cnot_21", "cnot_12", "Identity"], 
+        "elementary_gates" => ["CH_12", "CNot_21", "CNot_12", "Identity"], 
         "target_gate" => QCO.WGate(),   
                   
         "objective" => "minimize_depth", 
@@ -332,7 +332,7 @@ function test_W_using_HCnot()
     
 end
 
-function test_HCoinGate()
+function decompose_HCoinGate()
 
     println(">>>>> Hadamard Coin gate <<<<<")
 
@@ -341,7 +341,7 @@ function test_HCoinGate()
         "num_qubits" => 2, 
         "depth" => 14,    
     
-        "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "cnot_21", "cnot_12", "Identity"], 
+        "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_21", "CNot_12", "Identity"], 
         "target_gate" => -QCO.HCoinGate(),   
                   
         "objective" => "minimize_depth", 
@@ -349,6 +349,29 @@ function test_HCoinGate()
         
         "optimizer" => "cplex",
         # "MIP_feasiblity_emphasis" => true
+                                    
+        )
+    
+        return params
+    
+end
+
+function decompose_GroverDiffusionGate()
+
+    println(">>>>> Grover's Diffusion Operator <<<<<")
+
+    params = Dict{String, Any}(
+    
+        "num_qubits" => 2, 
+        "depth" => 10,    
+    
+        "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "CNot_12", "Identity"], 
+        "target_gate" => QCO.GroverDiffusionGate(),   
+                  
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact", 
+        
+        "optimizer" => "cplex"
                                     
         )
     

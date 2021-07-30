@@ -3,7 +3,7 @@
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 5,
-    "elementary_gates" => ["H_1", "H_2", "cnot_12", "Identity"],  
+    "elementary_gates" => ["H_1", "H_2", "CNot_12", "Identity"],  
     "target_gate" => QCO.CNotRevGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"
@@ -27,7 +27,7 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 2,
         "depth" => 4,        
-        "elementary_gates" => ["cnot_12", "cnot_21", "Identity"],
+        "elementary_gates" => ["CNot_12", "CNot_21", "Identity"],
         "target_gate" => QCO.SwapGate(),  
         "objective" => "minimize_cnot", 
         "decomposition_type" => "exact"                      
@@ -147,7 +147,7 @@ end
 @testset "JuMP set_start_value tests for on-off vars" begin
     function input_circuit()
         # [(depth, gate)]
-        return [(1, "cnot_21"), 
+        return [(1, "CNot_21"), 
                 (2, "S_1"), 
                 (3, "H_2"), 
                 (4, "S_2")
@@ -157,7 +157,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 4,
-    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "input_circuit" => input_circuit(),
     "objective" => "minimize_depth", 
@@ -177,7 +177,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 4,
-    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"
@@ -209,7 +209,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 5,
-    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
@@ -257,7 +257,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,    
-    "elementary_gates" => ["U3", "cnot_12", "Identity"], 
+    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
     "target_gate" => QCO.CZGate(),
     "U_θ_discretization" => [-π/2, 0, π/2],
     "U_ϕ_discretization" => [0, π/2],

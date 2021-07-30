@@ -12,7 +12,7 @@ include("3qubit_gates.jl")
 #-------------------------------#
 function input_circuit()
          # [(depth, gate)]
-    return [(1, "cnot_21"), 
+    return [(1, "CNot_21"), 
             (2, "S_1"), 
             (3, "H_2"), 
             (4, "S_2")
@@ -37,9 +37,9 @@ params = Dict{String, Any}(
 "num_qubits" => 2,
 "depth" => 4,
 
-"elementary_gates" => ["U3", "cnot_12", "Identity"],
-# "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "cnot_12", "cnot_13", "cnot_23", "Tdagger_2", "Tdagger_3", "Identity"],
-# "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "cnot_12", "cnot_21", "Identity"],
+"elementary_gates" => ["U3", "CNot_12", "Identity"],
+# "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"],
+# "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"],
 
 "target_gate" => QCO.CZGate(),
 

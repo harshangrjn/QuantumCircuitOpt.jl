@@ -1,6 +1,13 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.1.7
+- Added support for a few controlled versions of V gates in 2 & 3 qubits
+- Added support for Grover's diffusion operator
+- Naming convention updated from NameQubit to Name_Qubit for 1 qubit gates (consistent with 2 qubit gates)
+- `cnot_ij` updated to `CNot_ij` to be consistent with naming convention in `src/gates.jl`
+- Docs and tests updated to reflect above changes
+
 ### v0.1.6
 - Added support for obtaining idempotent matrices and adding corresponding valid constraints 
 - Updated `all_valid_constraints` from `Bool` to values in `[-1,0,1]`
