@@ -48,11 +48,11 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
             for i in R_gates_ids
 
-                if data["elementary_gates"][i] == "RX"
+                if data["elementary_gates"][i][1:2] == "RX"
                     printstyled("    ","RX gate discretization: ", ceil.(rad2deg.(data["discretization"]["RX"]), digits = 1),"\n"; color = :cyan)
-                elseif data["elementary_gates"][i] == "RY"
+                elseif data["elementary_gates"][i][1:2] == "RY"
                     printstyled("    ","RY gate discretization: ", ceil.(rad2deg.(data["discretization"]["RY"]), digits = 1),"\n"; color = :cyan)
-                elseif data["elementary_gates"][i] == "RZ"
+                elseif data["elementary_gates"][i][1:2] == "RZ"
                     printstyled("    ","RZ gate discretization: ", ceil.(rad2deg.(data["discretization"]["RZ"]), digits = 1),"\n"; color = :cyan)
                 end
 
@@ -64,7 +64,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
             for i in U_gates_ids
 
-                if data["elementary_gates"][i] == "U3"
+                if data["elementary_gates"][i][1:2] == "U3"
                     printstyled("    ","U3 gate - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
                     printstyled("    ","U3 gate - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
                     printstyled("    ","U3 gate - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
