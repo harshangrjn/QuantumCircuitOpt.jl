@@ -37,7 +37,7 @@ params = Dict{String, Any}(
 "num_qubits" => 2,
 "depth" => 4,
 
-"elementary_gates" => ["U3", "CNot_12", "Identity"],
+"elementary_gates" => ["U3_2", "CNot_12", "Identity"],
 # "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"],
 # "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"],
 
