@@ -47,7 +47,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,    
-    "elementary_gates" => ["U3", "Identity"],  
+    "elementary_gates" => ["U3_1", "Identity"],  
     "target_gate" => QCO.kron_single_gate(2, QCO.U3Gate(0,0,π/4), "q1"),
     "U_θ_discretization" => [0, π/2],
     "U_ϕ_discretization" => [0],
@@ -74,7 +74,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,
-    "elementary_gates" => ["RX", "RY", "RZ", "Identity"],  
+    "elementary_gates" => ["RX_1", "RY_2", "RZ_1", "Identity"],  
     "target_gate" => QCO.kron_single_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_gate(2, QCO.RZGate(π/4), "q1"),
     "RX_discretization" => [0, π/4],
     "RY_discretization" => [π/4],
@@ -96,7 +96,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 3, 
     "depth" => 2,    
-    "elementary_gates" => ["U3", "Identity"],  
+    "elementary_gates" => ["U3_3", "Identity"],  
     "target_gate" => QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3"),
     "U_θ_discretization" => [0, π/4],
     "U_ϕ_discretization" => [0, -π/2],
@@ -233,7 +233,7 @@ end
     params = Dict{String, Any}(
                "num_qubits" => 2, 
                "depth" => 2,    
-               "elementary_gates" => ["U3", "Identity"], 
+               "elementary_gates" => ["U3_1", "U3_2", "Identity"], 
                "target_gate" => target_gate(),   
                "U_θ_discretization" => [0, π/2],
                "U_ϕ_discretization" => [π/2],
@@ -257,7 +257,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,    
-    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
+    "elementary_gates" => ["U3_2", "CNot_12", "Identity"], 
     "target_gate" => QCO.CZGate(),
     "U_θ_discretization" => [-π/2, 0, π/2],
     "U_ϕ_discretization" => [0, π/2],
