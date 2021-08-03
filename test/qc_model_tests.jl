@@ -96,7 +96,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 3, 
     "depth" => 2,    
-    "elementary_gates" => ["U3_3", "Identity"],  
+    "elementary_gates" => ["U3_1", "U3_2", "U3_3", "Identity"],  
     "target_gate" => QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3"),
     "U_θ_discretization" => [0, π/4],
     "U_ϕ_discretization" => [0, -π/2],
