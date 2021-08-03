@@ -257,7 +257,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,    
-    "elementary_gates" => ["U3_2", "CNot_12", "Identity"], 
+    "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"],
     "target_gate" => QCO.CZGate(),
     "U_θ_discretization" => [-π/2, 0, π/2],
     "U_ϕ_discretization" => [0, π/2],
