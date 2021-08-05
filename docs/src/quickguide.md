@@ -49,7 +49,7 @@ end
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "depth" => 3,    
-"elementary_gates" => ["U3_2", "CNot_12", "Identity"], 
+"elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
 "target_gate" => target_gate(),
        
 "U_θ_discretization" => [-π/2, 0, π/2],
@@ -97,17 +97,17 @@ Quantum Circuit Model Data
   Number of qubits: 2
   Total number of elementary gates (including discretization): 36
   Maximum depth of decomposition: 3
-  Input elementary gates: ["U3_2", "CNot_12", "Identity"]
-    U3 gate - θ discretization: [-90.0, 0.0, 90.0]
-    U3 gate - ϕ discretization: [-90.0, 0.0, 90.0]
-    U3 gate - λ discretization: [-90.0, 0.0, 90.0]
+  Input elementary gates: ["U3_1", "U3_2", "CNot_12", "Identity"]
+    U3 - θ discretization: [-90.0, 0.0, 90.0]
+    U3 - ϕ discretization: [-90.0, 0.0, 90.0]
+    U3 - λ discretization: [-90.0, 0.0, 90.0]
   Type of decomposition: exact
 
 Optimal Circuit Decomposition
 
-  U3 (2, (-90.0,0.0,0.0)) * cnot_12 * U3 (2, (90.0,0.0,0.0)) = Target gate
+  U3_2(-90.0,0.0,0.0) * CNot_12 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 2.6 sec.
+  Optimizer run time: 1.25 sec.
 =============================================================================
 ```
 

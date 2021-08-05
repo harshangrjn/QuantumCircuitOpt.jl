@@ -2,9 +2,9 @@ QuantumCircuitOpt.jl Change Log
 ===============================
 
 ### v0.1.8
+- Added support for specificity of qubits in U3 and Rotation (RX, RY, RZ) gates (Major change). Example: U3_1, RX_2, RZ_3, etc
 - Added support for kronecker product gates (`X_1⊗X_2`, `S_1⊗S_2`, etc) and bug fix to handle this change in `get_compressed_decomposition` in `src/log.jl`
 - Added `is_multi_qubit_gate` function in `src/log.jl`
-- Added support for specificity of qubits in U3 and Rotation (RX, RY, RZ) gates (Major change)
 - Docs and tests updated to reflect above changes
 
 ### v0.1.7

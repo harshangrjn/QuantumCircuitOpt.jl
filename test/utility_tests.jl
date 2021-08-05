@@ -12,17 +12,17 @@ M_r = [1.0   0.0   0.0  -1.0
 l = [-2, -1, 0, 2]
 u = [-1,  2, 3, 2]
 
-@testset "complex to real matrix function tests" begin
+@testset "Tests: complex to real matrix function" begin
     test_M_r = QCO.complex_to_real_matrix(M_c)
     @test test_M_r == M_r
 end
 
-@testset "real to complex matrix function tests" begin
+@testset "Tests: real to complex matrix function" begin
     test_M_c = QCO.real_to_complex_matrix(M_r)
     @test test_M_c == M_c
 end
 
-@testset "auxiliary variable product bounds tests" begin
+@testset "Tests: auxiliary variable product bounds" begin
     m = Model()
     @variable(m, l[i] <= x[i=1:length(l)] <= u[i])
     # x1*x2 
@@ -43,7 +43,7 @@ end
     @test QCO.auxiliary_variable_bounds([x[4], x[3], x[2], x[1]]) == (-24, 12)
 end
 
-@testset "unique_matrices and unique_idx tests" begin
+@testset "Tests: unique_matrices and unique_idx" begin
     
     D = zeros(3,3,4)
     D[:,:,1] = Matrix(LA.I,3,3)
@@ -67,7 +67,7 @@ end
 
 end
 
-@testset "commuting matrices tests" begin
+@testset "Tests: commuting matrices" begin
     params = Dict{String, Any}(
        "num_qubits" => 2, 
        "depth" => 5,    
@@ -83,7 +83,7 @@ end
     @test isapprox(data["gates_real"][:,:,C2[1][1]] * data["gates_real"][:,:,C2[1][2]], data["gates_real"][:,:,C2[1][2]] * data["gates_real"][:,:,C2[1][1]], atol=tol_0)
 end
 
-@testset "kron_single_gate tests" begin
+@testset "Tests: kron_single_gate" begin
     I1 = QCO.kron_single_gate(4, QCO.IGate(1), "q1")
     I2 = QCO.kron_single_gate(4, QCO.IGate(1), "q2")
     I3 = QCO.kron_single_gate(4, QCO.IGate(1), "q3")
@@ -91,7 +91,7 @@ end
     @test I1 == I2 == I3 == I4
 end
 
-@testset "get_redundant_gate_product_pairs tests" begin 
+@testset "Tests: get_redundant_gate_product_pairs" begin 
      
     params = Dict{String, Any}(
         "num_qubits" => 3, 
@@ -105,12 +105,14 @@ end
 
 end
 
-@testset "get_idempotent_gates tests" begin
+@testset "Tests: get_idempotent_gates" begin
+    
     params = Dict{String, Any}(
         "num_qubits" => 2, 
         "depth" => 14,    
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_21", "CNot_12", "Identity"], 
         "target_gate" => -QCO.HCoinGate())
+
     data = QCO.get_data(params)
     idempotent_gates = QCO.get_idempotent_gates(data["gates_dict"])
     @test idempotent_gates[1] == 6

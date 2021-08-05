@@ -352,9 +352,9 @@ function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
                 Memento.error(_LOGGER, "Input R gate type ($(gate_type)) is not supported.")
             end
             
-            # This means that discretizations are the same for all gates, checks only for RX/RY/RZ discretization
+            # This implies that discretizations are the same for all gates, checks only for RX/RY/RZ discretization
             if isempty(params[string(gate_type[1:2],"_discretization")])
-                Memento.error(_LOGGER, "No discretized angle was specified for $(gate_type) gate. Input at least one angle")
+                Memento.error(_LOGGER, "Empty discretization angles for $(gate_type) gate. Input at least one angle")
             end        
 
             R_complex["$(gate_type)"] = Dict{String, Any}()    
@@ -403,8 +403,15 @@ function get_all_U_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
     if length(U_gates_ids) >= 1 
         for i=1:length(U_gates_ids)
             gate_name = elementary_gates[U_gates_ids[i]]
-            if (gate_name[1:2] == "U3")        
+            if startswith(gate_name, "U3")        
                 U_complex[gate_name] = Dict{String, Any}()    
+                
+                for angle in ["θ","ϕ","λ"]
+                    if isempty(params["U_$(angle)_discretization"])
+                        Memento.error(_LOGGER, "Empty $(angle) discretization angle for U3 gate. Input at least one angle")
+                    end
+                end
+
                 U_complex[gate_name] = QCO.get_discretized_U3_gates(gate_name, U_complex[gate_name], collect(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
             end
 
