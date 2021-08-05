@@ -365,7 +365,7 @@ function decompose_GroverDiffusionGate()
         "num_qubits" => 2, 
         "depth" => 10,    
     
-        "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "CNot_12", "Identity"], 
+        "elementary_gates" => ["X_1", "X_1⊗X_2", "H_1⊗H_2", "X_2", "H_1", "H_2", "CNot_12", "Identity"], 
         "target_gate" => QCO.GroverDiffusionGate(),   
                   
         "objective" => "minimize_depth",

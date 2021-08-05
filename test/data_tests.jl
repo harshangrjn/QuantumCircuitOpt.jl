@@ -34,12 +34,12 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 2,
-    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CNotSwap", "H_1⊗H_2", "CZ_12", "CH_12", "CV_12", "Swap", "M_12", "QFT_12", "CSX_12", "W_12", "HCoin"],
+    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CNotSwap", "H_1⊗H_2", "X_1⊗X_2", "Y_1⊗Y_2", "Z_1⊗Z_2", "SX_1⊗SX_2", "T_1⊗T_2", "CZ_12", "CH_12", "CV_12", "Swap", "M_12", "QFT_12", "CSX_12", "W_12", "HCoin"],
     "target_gate" => QCO.IGate(2),               
     )
 
     data = QCO.get_data(params, eliminate_identical_gates = false)
-    @test length(keys(data["gates_dict"])) == 29 
+    @test length(keys(data["gates_dict"])) == 34 
 
     # 3-qubit gates
     params = Dict{String, Any}(
