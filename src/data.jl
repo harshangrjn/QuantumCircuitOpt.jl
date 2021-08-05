@@ -121,11 +121,11 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
 
     if !isempty(R_gates_ids) 
         for i in R_gates_ids
-            if data["elementary_gates"][i] == "RX"
+            if startswith(data["elementary_gates"][i], "RX")
                 data["discretization"]["RX"] = params["RX_discretization"]
-            elseif data["elementary_gates"][i] == "RY"
+            elseif startswith(data["elementary_gates"][i], "RY")
                 data["discretization"]["RY"] = params["RY_discretization"]
-            elseif data["elementary_gates"][i] == "RZ"
+            elseif startswith(data["elementary_gates"][i], "RZ")
                 data["discretization"]["RZ"] = params["RZ_discretization"]
             end
         end
@@ -133,7 +133,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
 
     if !isempty(U_gates_ids)
         for i in U_gates_ids
-            if data["elementary_gates"][i] == "U3"
+            if startswith(data["elementary_gates"][i], "U3")
                 data["discretization"]["U3_θ"] = params["U_θ_discretization"]
                 data["discretization"]["U3_ϕ"] = params["U_ϕ_discretization"]
                 data["discretization"]["U3_λ"] = params["U_λ_discretization"]
@@ -290,10 +290,10 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
                 M_elementary_dict = U_complex_dict
             end
 
-            for j in keys(M_elementary_dict)
+            for j in keys(M_elementary_dict) # Gate type
                 if (j == elementary_gates[i])
-                    for k in keys(M_elementary_dict[j])
-                        for l in keys(M_elementary_dict[j][k]["$(num_qubits)qubit_rep"])
+                    for k in keys(M_elementary_dict[j]) # Angle
+                        for l in keys(M_elementary_dict[j][k]["$(num_qubits)qubit_rep"]) # qubits (which will now be 1)
                             
                             M_sqrd = M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l]^2
 
@@ -348,16 +348,17 @@ function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
 
             gate_type = elementary_gates[R_gates_ids[i]]
 
-            if !(gate_type in ["RX", "RY", "RZ"])
+            if !(gate_type in ["RX_1", "RX_2", "RX_3", "RY_1", "RY_2", "RY_3", "RZ_1", "RZ_2", "RZ_3"])
                 Memento.error(_LOGGER, "Input R gate type ($(gate_type)) is not supported.")
             end
-
-            if isempty(params[string(gate_type,"_discretization")])
-                Memento.error(_LOGGER, "No discretized angle was specified for $(gate_type) gate. Input at least one angle")
+            
+            # This implies that discretizations are the same for all gates, checks only for RX/RY/RZ discretization
+            if isempty(params[string(gate_type[1:2],"_discretization")])
+                Memento.error(_LOGGER, "Empty discretization angles for $(gate_type) gate. Input at least one angle")
             end        
 
             R_complex["$(gate_type)"] = Dict{String, Any}()    
-            R_complex["$(gate_type)"] = QCO.get_discretized_R_gates(gate_type, R_complex[gate_type], collect(params[string(gate_type,"_discretization")]), params["num_qubits"])
+            R_complex["$(gate_type)"] = QCO.get_discretized_R_gates(gate_type, R_complex[gate_type], collect(params[string(gate_type[1:2],"_discretization")]), params["num_qubits"])
 
         end
     end
@@ -365,12 +366,14 @@ function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
     return R_complex    
 end
 
-function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretization::Array{Float64,1}, num_qubits::Int64)
+function get_discretized_R_gates(gate_type::String, R::Dict{String, Any}, discretization::Array{Float64,1}, num_qubits::Int64)
+
+    R_type = gate_type[1:2]
 
     if length(discretization) >= 1
 
         for i=1:length(discretization)
-            if     R_type == "RX"
+            if R_type == "RX"
                 R_discrete = QCO.RXGate(discretization[i])
             elseif R_type == "RY"
                 R_discrete = QCO.RYGate(discretization[i])
@@ -383,9 +386,7 @@ function get_discretized_R_gates(R_type::String, R::Dict{String, Any}, discretiz
                                              "$(num_qubits)qubit_rep" => Dict{String, Any}()
                                             )
             
-            for i_qu = 1:num_qubits
-                R["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = QCO.get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "q$i_qu")
-            end
+            R["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[4])"] = QCO.get_full_sized_gate(R_type, num_qubits, matrix = R_discrete, qubit_location = "q$(gate_type[4])")
 
         end
     end 
@@ -401,10 +402,17 @@ function get_all_U_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
 
     if length(U_gates_ids) >= 1 
         for i=1:length(U_gates_ids)
+            gate_name = elementary_gates[U_gates_ids[i]]
+            if startswith(gate_name, "U3")        
+                U_complex[gate_name] = Dict{String, Any}()    
+                
+                for angle in ["θ","ϕ","λ"]
+                    if isempty(params["U_$(angle)_discretization"])
+                        Memento.error(_LOGGER, "Empty $(angle) discretization angle for U3 gate. Input at least one angle")
+                    end
+                end
 
-            if (elementary_gates[U_gates_ids[i]] == "U3")        
-                U_complex["U3"] = Dict{String, Any}()    
-                U_complex["U3"] = QCO.get_discretized_U3_gates("U3", U_complex["U3"], collect(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
+                U_complex[gate_name] = QCO.get_discretized_U3_gates(gate_name, U_complex[gate_name], collect(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
             end
 
             # Add support for U1 and U2 universal gates here
@@ -415,9 +423,11 @@ function get_all_U_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
     return U_complex    
 end
 
-function get_discretized_U3_gates(U_type::String, U::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, λ_discretization::Array{Float64,1}, num_qubits::Int64)
+function get_discretized_U3_gates(gate_type::String, U::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, λ_discretization::Array{Float64,1}, num_qubits::Int64)
     
     counter = 1 
+
+    U_type = gate_type[1:2]
 
     for i=1:length(θ_discretization)
         for j=1:length(ϕ_discretization)
@@ -432,9 +442,7 @@ function get_discretized_U3_gates(U_type::String, U::Dict{String, Any}, θ_discr
                                                           "$(num_qubits)qubit_rep" => Dict{String, Any}()
                                                          )
                 
-                for i_qu=1:num_qubits
-                    U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$i_qu"] = QCO.get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "q$i_qu")
-                end
+                U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[4])"] = QCO.get_full_sized_gate(U_type, num_qubits, matrix = U_discrete, qubit_location = "q$(gate_type[4])")
 
                 counter += 1
             end
@@ -540,6 +548,24 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
 
         elseif input == "H_1⊗H_2"
             return kron(QCO.HGate(), QCO.HGate())   
+        
+        elseif input == "X_1⊗X_2"
+            return kron(QCO.XGate(), QCO.XGate())
+
+        elseif input == "Y_1⊗Y_2"
+            return kron(QCO.YGate(), QCO.YGate())
+
+        elseif input == "Z_1⊗Z_2"
+            return kron(QCO.ZGate(), QCO.ZGate())
+            
+        elseif input == "S_1⊗S_2"
+            return kron(QCO.SGate(), QCO.SGate())
+
+        elseif input == "SX_1⊗SX_2"
+            return kron(QCO.SXGate(), QCO.SXGate())
+
+        elseif input == "T_1⊗T_2"
+            return kron(QCO.TGate(), QCO.TGate())
             
         elseif input == "CZ_12"
             return QCO.CZGate()

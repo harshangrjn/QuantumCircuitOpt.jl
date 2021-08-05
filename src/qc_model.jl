@@ -7,12 +7,12 @@ function build_QCModel(data::Dict{String, Any};
                        idempotent_gate_constraints = false)
 
     if !(all_valid_constraints in [-1,0,1])
-        Memento.warn(_LOGGER, "Invalid all_valid_constraints value; choose a value ∈ [-1,0,1]. Setting it to default value of 0.")
+        Memento.warn(_LOGGER, "Invalid all_valid_constraints; choose a value ∈ [-1,0,1]. Setting it to default value of 0.")
         all_valid_constraints = 0
     end
 
     if !(model_type in ["compact_formulation", "balas_formulation"])
-        Memento.warn(_LOGGER, "Invalid model_type value. Setting it to default value (compact_formulation).")
+        Memento.warn(_LOGGER, "Invalid model_type. Setting it to default value (compact_formulation).")
         model_type = "compact_formulation"
     end
     

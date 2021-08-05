@@ -1,4 +1,4 @@
-@testset "Test: Minimum depth controlled-NOT gate" begin
+@testset "Tests: Minimize depth for controlled-NOT gate" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
@@ -22,7 +22,7 @@
     
 end
 
-@testset "Test: Minimum CNOT swap gate decomposition" begin
+@testset "Tests: Minimum CNOT swap gate decomposition" begin
 
     params = Dict{String, Any}(
         "num_qubits" => 2,
@@ -42,12 +42,12 @@ end
     
 end
 
-@testset "Test: Minimum depth U3(0,0,π/4) gate" begin
+@testset "Tests: Minimum depth U3(0,0,π/4) gate" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
-    "depth" => 3,    
-    "elementary_gates" => ["U3", "Identity"],  
+    "depth" => 2,    
+    "elementary_gates" => ["U3_1", "U3_2", "Identity"],  
     "target_gate" => QCO.kron_single_gate(2, QCO.U3Gate(0,0,π/4), "q1"),
     "U_θ_discretization" => [0, π/2],
     "U_ϕ_discretization" => [0],
@@ -63,18 +63,18 @@ end
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
-    @test "Identity" in data["gates_dict"]["5"]["type"]
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 2, atol = tol_0)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][7,:]), 1, atol = tol_0) 
-    @test data["gates_dict"]["7"]["qubit_loc"] == "qubit_1"
+    @test "Identity" in data["gates_dict"]["3"]["type"]
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
+    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1"
 end
 
-@testset "Test: Minimum depth RX, RY, RZ gate decomposition" begin
+@testset "Tests: Minimum depth RX, RY, RZ gate decomposition" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,
-    "elementary_gates" => ["RX", "RY", "RZ", "Identity"],  
+    "elementary_gates" => ["RX_1", "RY_2", "RZ_1", "Identity"],  
     "target_gate" => QCO.kron_single_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_gate(2, QCO.RZGate(π/4), "q1"),
     "RX_discretization" => [0, π/4],
     "RY_discretization" => [π/4],
@@ -91,12 +91,12 @@ end
 
 end
 
-@testset "Test: 3-qubit RX gate decomposition" begin
+@testset "Tests: 3-qubit RX gate decomposition" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 3, 
     "depth" => 2,    
-    "elementary_gates" => ["U3", "Identity"],  
+    "elementary_gates" => ["U3_1", "U3_2", "U3_3", "Identity"],  
     "target_gate" => QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3"),
     "U_θ_discretization" => [0, π/4],
     "U_ϕ_discretization" => [0, -π/2],
@@ -121,7 +121,7 @@ end
 
 end
 
-@testset "Feasibility objective tests" begin
+@testset "Tests: feasibility problem" begin
     params = Dict{String, Any}(
         "num_qubits" => 2, 
         "depth" => 3,    
@@ -144,7 +144,7 @@ end
   
 end
 
-@testset "JuMP set_start_value tests for on-off vars" begin
+@testset "Tests: JuMP set_start_value for z_onoff_var variables" begin
     function input_circuit()
         # [(depth, gate)]
         return [(1, "CNot_21"), 
@@ -172,7 +172,7 @@ end
     
 end
 
-@testset "Involutory gate constraints tests" begin
+@testset "Tests: Involutory gate constraints" begin
     
     params = Dict{String, Any}(
     "num_qubits" => 2,
@@ -204,7 +204,7 @@ end
     
 end
 
-@testset "TIME_LIMIT test for building results dict and log" begin
+@testset "Tests: TIME_LIMIT for building results dict and log" begin
     
     params = Dict{String, Any}(
     "num_qubits" => 2,
@@ -222,7 +222,7 @@ end
     
 end
 
-@testset "constraint_redundant_gate_product_pairs test" begin
+@testset "Tests: constraint_redundant_gate_product_pairs" begin
     
     function target_gate()
         T1 = QCO.get_full_sized_gate("U3", 2, matrix = QCO.U3Gate(0,π/2,π), qubit_location = "q2")
@@ -233,7 +233,7 @@ end
     params = Dict{String, Any}(
                "num_qubits" => 2, 
                "depth" => 2,    
-               "elementary_gates" => ["U3", "Identity"], 
+               "elementary_gates" => ["U3_1", "U3_2", "Identity"], 
                "target_gate" => target_gate(),   
                "U_θ_discretization" => [0, π/2],
                "U_ϕ_discretization" => [π/2],
@@ -243,8 +243,10 @@ end
     data = QCO.get_data(params)
     redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"])
     @test length(redundant_pairs) == 2
-    @test redundant_pairs[1] == (1,6)
-    @test redundant_pairs[2] == (2,7)
+    @test redundant_pairs[1] == (1,4)
+    @test redundant_pairs[2] == (5,7)
+    @test isapprox(data["gates_dict"]["1"]["matrix"] * data["gates_dict"]["4"]["matrix"], data["gates_dict"]["2"]["matrix"], atol = tol_0)
+    @test isapprox(data["gates_dict"]["5"]["matrix"] * data["gates_dict"]["7"]["matrix"], data["gates_dict"]["6"]["matrix"], atol = tol_0)
 
     result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL
@@ -253,11 +255,11 @@ end
 
 end
 
-@testset "constraint_idempotent_gates" begin
+@testset "Tests: constraint_idempotent_gates" begin
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,    
-    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
+    "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
     "target_gate" => QCO.CZGate(),
     "U_θ_discretization" => [-π/2, 0, π/2],
     "U_ϕ_discretization" => [0, π/2],

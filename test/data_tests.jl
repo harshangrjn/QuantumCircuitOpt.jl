@@ -1,6 +1,6 @@
 # Unit tests for functions in data.jl
 
-@testset "building elementary universal gate tests" begin
+@testset "Tests: building elementary universal gate" begin
     test_angle = π/3
     pauli_Y = QCO.YGate()
     H = QCO.HGate()
@@ -28,18 +28,18 @@
     @test isapprox(QCO.RZGate(test_angle), test_U1_1)
 end 
 
-@testset "get_full_sized_gate tests" begin
+@testset "Tests: get_full_sized_gate" begin
 
     # 2-qubit gates
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 2,
-    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CNotSwap", "H_1⊗H_2", "CZ_12", "CH_12", "CV_12", "Swap", "M_12", "QFT_12", "CSX_12", "W_12", "HCoin"],
+    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CNotSwap", "H_1⊗H_2", "X_1⊗X_2", "Y_1⊗Y_2", "Z_1⊗Z_2", "SX_1⊗SX_2", "T_1⊗T_2", "CZ_12", "CH_12", "CV_12", "Swap", "M_12", "QFT_12", "CSX_12", "W_12", "HCoin"],
     "target_gate" => QCO.IGate(2),               
     )
 
     data = QCO.get_data(params, eliminate_identical_gates = false)
-    @test length(keys(data["gates_dict"])) == 29 
+    @test length(keys(data["gates_dict"])) == 34 
 
     # 3-qubit gates
     params = Dict{String, Any}(
@@ -53,7 +53,7 @@ end
     @test length(keys(data["gates_dict"])) == 19
 end
 
-@testset "get_input_circuit_dict tests" begin
+@testset "Tests: get_input_circuit_dict" begin
     
     function input_circuit_1()
         # [(depth, gate)]

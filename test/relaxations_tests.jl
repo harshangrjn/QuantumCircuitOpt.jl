@@ -1,4 +1,4 @@
-@testset "relaxation_bilinear tests" begin
+@testset "Tests: relaxation_bilinear" begin
     QCO.silence()
     
     m = JuMP.Model(CBC)

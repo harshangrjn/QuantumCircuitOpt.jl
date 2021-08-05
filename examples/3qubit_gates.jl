@@ -7,7 +7,7 @@ function decompose_RX_on_q3()
     "num_qubits" => 3, 
     "depth" => 3,    
 
-    "elementary_gates" => ["U3", "Identity"], 
+    "elementary_gates" => ["U3_3", "Identity"], 
     "target_gate" => QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3"),
        
     "U_θ_discretization" => [0, π/4],
@@ -41,7 +41,7 @@ function decompose_toffoli()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    "relax_integrality" => false,
+    "relax_integrality" => true,
     
     "optimizer" => "cplex",
     

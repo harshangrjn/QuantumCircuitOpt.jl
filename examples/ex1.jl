@@ -1,6 +1,7 @@
 import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
+
 # using Cbc
 
 include("solver.jl")
@@ -35,11 +36,9 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2,
-"depth" => 4,
+"depth" => 3,
 
-"elementary_gates" => ["U3", "CNot_12", "Identity"],
-# "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"],
-# "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"],
+"elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"],
 
 "target_gate" => QCO.CZGate(),
 
@@ -50,24 +49,20 @@ params = Dict{String, Any}(
 # "RZ_discretization" => [2*π],
 
 "U_θ_discretization" => [-π/2, 0, π/2],
-"U_ϕ_discretization" => [0, π/2],
-"U_λ_discretization" => [0, π/2],    
+"U_ϕ_discretization" => [-π/2, 0, π/2],
+"U_λ_discretization" => [-π/2, 0, π/2],
 
 "objective" => "minimize_depth", 
-"decomposition_type" => "exact",
 "optimizer" => "cplex",
-"optimizer_presolve" => false
-                           
+# "optimizer_presolve" => false                           
 )
 
 #------------------------------#
 #      Optimization model      #
 #------------------------------#
 qcm_optimizer = get_solver(params)
-eliminate_identical_gates = true
 
-# data = QCO.get_data(params, eliminate_identical_gates = eliminate_identical_gates)
+# data = QCO.get_data(params)
 result_qc = QCO.run_QCModel(params, 
                             qcm_optimizer, 
-                            model_type = "compact_formulation", 
-                            eliminate_identical_gates = eliminate_identical_gates)
+                            model_type = "compact_formulation")

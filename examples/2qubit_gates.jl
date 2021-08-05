@@ -7,7 +7,7 @@ function decompose_hadamard()
     "num_qubits" => 2, 
     "depth" => 3,    
 
-    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
+    "elementary_gates" => ["U3_1", "CNot_12", "Identity"], 
     "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
        
     "U_θ_discretization" => [0, π/2],
@@ -35,7 +35,7 @@ function decompose_controlled_Z()
     "num_qubits" => 2, 
     "depth" => 4,    
 
-    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
+    "elementary_gates" => ["U3_2", "CNot_12", "Identity"], 
     "target_gate" => QCO.CZGate(),
        
     "U_θ_discretization" => [-π/2, 0, π/2],
@@ -86,7 +86,7 @@ function decompose_controlled_H()
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["U3", "CNot_12", "Identity"], 
+    "elementary_gates" => ["U3_2", "CNot_12", "Identity"], 
     "target_gate" => QCO.CHGate(),
 
     "U_θ_discretization" => [-π/4, 0, π/4],
@@ -114,7 +114,7 @@ function decompose_controlled_H_with_R()
     "num_qubits" => 2, 
     "depth" => 5,    
 
-    "elementary_gates" => ["RY", "CNot_12", "Identity"], 
+    "elementary_gates" => ["RY_1", "RY_2", "CNot_12", "Identity"], 
     "target_gate" => QCO.CHGate(),
        
     "RX_discretization" => [], 
@@ -141,7 +141,7 @@ function decompose_magic_M()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["U3", "CNot_12", "CNot_21", "Identity"], 
+        "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "CNot_21", "Identity"], 
         "target_gate" => QCO.MGate(),   
            
         "U_θ_discretization" => [0, π/2],
@@ -191,7 +191,7 @@ function decompose_S()
         "num_qubits" => 2, 
         "depth" => 3,    
     
-        "elementary_gates" => ["U3", "CNot_12", "Identity"], 
+        "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
         "target_gate" => QCO.kron_single_gate(2, QCO.SGate(), "q1"),
            
         "U_θ_discretization" => [0, π/4, π/2],
@@ -241,7 +241,7 @@ function decompose_cnot_21_with_U()
         "num_qubits" => 2, 
         "depth" => 6,    
     
-        "elementary_gates" => ["U3", "CNot_12", "Identity"], 
+        "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
         "target_gate" => QCO.CNotRevGate(),   
            
         "U_θ_discretization" => [-π/2, π/2],
@@ -291,7 +291,7 @@ function decompose_W()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["U3", "CNot_21", "CNot_12", "Identity"], 
+        "elementary_gates" => ["U3_1", "U3_2", "CNot_21", "CNot_12", "Identity"], 
         "target_gate" => QCO.WGate(),   
 
         "U_θ_discretization" => [-π/4, π/4],
@@ -365,7 +365,7 @@ function decompose_GroverDiffusionGate()
         "num_qubits" => 2, 
         "depth" => 10,    
     
-        "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "CNot_12", "Identity"], 
+        "elementary_gates" => ["X_1", "X_1⊗X_2", "H_1⊗H_2", "X_2", "H_1", "H_2", "CNot_12", "Identity"], 
         "target_gate" => QCO.GroverDiffusionGate(),   
                   
         "objective" => "minimize_depth",
