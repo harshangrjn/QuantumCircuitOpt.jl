@@ -41,7 +41,7 @@ function decompose_toffoli()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    "relax_integrality" => true,
+    "relax_integrality" => false,
     
     "optimizer" => "cplex",
     
@@ -53,20 +53,20 @@ end
 
 function toffoli_circuit()
     # [(depth, gate)]
-    return [(1, "H_3"), 
-            (2, "CNot_23"), 
-            (3, "Tdagger_3"), 
-            (4, "CNot_13"), 
-            (5, "T_3"), 
-            (6, "CNot_23"), 
-            (7, "Tdagger_3"), 
-            (8, "CNot_13"), 
-            (9, "T_2"), 
-            (10, "T_3"), 
-            (11, "CNot_12"), 
-            (12, "H_3"), 
-            (13, "T_1"), 
-            (14, "Tdagger_2"),
-            (15, "CNot_12")
+    return [(1, "T_1"),              
+            (2, "T_2"),                   
+            (3, "H_3"),              
+            (4, "CNot_23"),           
+            (5, "Tdagger_3"),        
+            (6, "CNot_13"),          
+            (7, "T_3"),               
+            (8, "CNot_23"),                 
+            (9, "Tdagger_3"),          
+            (10, "CNot_13"),           
+            (11, "T_3"),             
+            (12, "H_3"),             
+            (13, "CNot_12"),         
+            (14, "Tdagger_2"),       
+            (15, "CNot_12")          
             ] 
 end
