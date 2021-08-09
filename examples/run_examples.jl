@@ -22,7 +22,7 @@ decompose_gates = ["decompose_hadamard",
                     "decompose_GroverDiffusionGate",
                     "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_toffoli"]
+decompose_gates = ["decompose_toffoli_using_RY"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

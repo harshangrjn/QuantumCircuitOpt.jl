@@ -51,6 +51,32 @@ function decompose_toffoli()
     
 end
 
+function decompose_toffoli_using_RY()
+
+    println(">>>>> Toffoli gate <<<<<")
+ 
+    params = Dict{String, Any}(
+    
+    "num_qubits" => 3, 
+    "depth" => 8,
+
+    "elementary_gates" => ["RY_3", "cnot_13", "cnot_23"],
+    "RY_discretization" => [-π/4, π/4], 
+
+    "target_gate" => QCO.ToffoliGate(),
+    
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
+    "relax_integrality" => false,
+    
+    "optimizer" => "cplex",
+    
+    )
+
+    return params
+    
+end
+
 function toffoli_circuit()
     # [(depth, gate)]
     return [(1, "T_1"),              
