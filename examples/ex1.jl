@@ -35,12 +35,13 @@ function target_gate(gate::Int)
 end
 
 params = Dict{String, Any}(
-"num_qubits" => 2,
-"depth" => 3,
+"num_qubits" => 3,
+"depth" => 7,
 
-"elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"],
+# "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"],
+"elementary_gates" => ["CV_12", "CV_23", "CV_13", "CVdagger_12", "CVdagger_23", "CVdagger_13", "CNot_12", "CNot_32", "CNot_23", "CNot_13", "Identity"],
 
-"target_gate" => QCO.CZGate(),
+"target_gate" => QCO.CSwapGate(),
 
 # "input_circuit" => toffoli_circuit(),
 
@@ -48,9 +49,9 @@ params = Dict{String, Any}(
 # "RY_discretization" => [π/4],
 # "RZ_discretization" => [2*π],
 
-"U_θ_discretization" => [-π/2, 0, π/2],
-"U_ϕ_discretization" => [-π/2, 0, π/2],
-"U_λ_discretization" => [-π/2, 0, π/2],
+# "U_θ_discretization" => [-π/4, 0, π/4],
+# "U_ϕ_discretization" => [-π/2, 0, π/2],
+# "U_λ_discretization" => [-π/2, 0, π/4],
 
 "objective" => "minimize_depth", 
 "optimizer" => "cplex",
