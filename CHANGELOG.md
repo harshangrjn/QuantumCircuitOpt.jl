@@ -1,6 +1,12 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+
+### v0.1.9
+- Updated toffoli input circuit to make it feasible for the commuting gate constraints 
+- Added support for 3-qubit Toffoli using Rotation gates, Fredkin gate and `CNot_13` (in `src/examples`)
+- Infeasibility bug fix in commuting gate constraints (for `T_2` expressed as `U3_2(0,0,π/4)`)
+
 ### v0.1.8
 - Added support for specificity of qubits in U3 and Rotation (RX, RY, RZ) gates (Major change). Example: U3_1, RX_2, RZ_3, etc
 - Added support for kronecker product gates (`X_1⊗X_2`, `S_1⊗S_2`, etc) and bug fix to handle this change in `get_compressed_decomposition` in `src/log.jl`
