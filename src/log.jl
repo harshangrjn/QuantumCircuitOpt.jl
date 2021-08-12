@@ -25,6 +25,8 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
     U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
+    CR_gates_ids = findall(x -> startswith(x, "CR"), data["elementary_gates"])
+    CU_gates_ids = findall(x -> startswith(x, "CU"), data["elementary_gates"])
 
     if !isempty(gates_sol_compressed)
 
@@ -63,6 +65,27 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             printstyled("    ","U3 - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
             printstyled("    ","U3 - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
             printstyled("    ","U3 - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
+
+        end
+
+        if !isempty(CR_gates_ids) 
+            for i in CR_gates_ids
+                if data["elementary_gates"][i][1:3] == "CRX"
+                    printstyled("    ","CRX discretization: ", ceil.(rad2deg.(data["discretization"]["CRX"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i][1:3] == "CRY"
+                    printstyled("    ","CRY discretization: ", ceil.(rad2deg.(data["discretization"]["CRY"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i][1:3] == "CRZ"
+                    printstyled("    ","CRZ discretization: ", ceil.(rad2deg.(data["discretization"]["CRZ"]), digits = 1),"\n"; color = :cyan)
+                end
+
+            end
+        end
+
+        if !isempty(CU_gates_ids)
+            # Assuming that the Euler angle discretizations are identical on U3 gates of all qubits.
+            printstyled("    ","CU3 - θ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_θ"]), digits = 1),"\n"; color = :cyan)
+            printstyled("    ","CU3 - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_ϕ"]), digits = 1),"\n"; color = :cyan)
+            printstyled("    ","CU3 - λ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_λ"]), digits = 1),"\n"; color = :cyan)
 
         end
         
@@ -164,7 +187,7 @@ function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{
             
             s1 = gate_id["type"][1]
 
-            if !(startswith(s1, "R") || startswith(s1, "U"))
+            if !(startswith(s1, "R") || startswith(s1, "U") || startswith(s1, "CR") || startswith(s1, "CU"))
             
                 push!(gates_sol, s1)
             
@@ -178,12 +201,12 @@ function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{
                     end
                 end
 
-                if startswith(s1, "R")
+                if startswith(s1, "R") || startswith(s1, "CR")
                     θ = round(rad2deg(gate_id["angle"]), digits = 3)
                     s3 = "$(θ)"
                     push!(gates_sol, string(s1,"(", s3, ")"))
 
-                elseif startswith(s1, "U")
+                elseif startswith(s1, "U") || startswith(s1, "CU")
                     
                     θ = round(rad2deg(gate_id["angle"]["θ"]), digits = 3)
                     ϕ = round(rad2deg(gate_id["angle"]["ϕ"]), digits = 3)
