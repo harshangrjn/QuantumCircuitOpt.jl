@@ -114,8 +114,10 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
     U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
+    CR_gates_ids = findall(x -> startswith(x, "CR"), data["elementary_gates"])
+    CU_gates_ids = findall(x -> startswith(x, "CU3"), data["elementary_gates"])
     
-    if !isempty(R_gates_ids) || !isempty(U_gates_ids)
+    if !isempty(R_gates_ids) || !isempty(U_gates_ids) || !isempty(CR_gates_ids) || !isempty(CU_gates_ids)
         data["discretization"] = Dict{String, Any}()
     end
 
@@ -140,6 +142,29 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
             end
         end
     end
+
+    if !isempty(CR_gates_ids) 
+        for i in CR_gates_ids
+            if startswith(data["elementary_gates"][i], "CRX")
+                data["discretization"]["CRX"] = params["CRX_discretization"]
+            elseif startswith(data["elementary_gates"][i], "CRY")
+                data["discretization"]["CRY"] = params["CRY_discretization"]
+            elseif startswith(data["elementary_gates"][i], "CRZ")
+                data["discretization"]["CRZ"] = params["CRZ_discretization"]
+            end
+        end
+    end
+
+    if !isempty(CU_gates_ids)
+        for i in CU_gates_ids
+            if startswith(data["elementary_gates"][i], "CU3")
+                data["discretization"]["CU3_θ"] = params["CU_θ_discretization"]
+                data["discretization"]["CU3_ϕ"] = params["CU_ϕ_discretization"]
+                data["discretization"]["CU3_λ"] = params["CU_λ_discretization"]
+            end
+        end
+    end
+
 
     # Input circuit
     if length(keys(input_circuit_dict)) > 0
@@ -264,6 +289,8 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
 
     R_gates_ids = findall(x -> startswith(x, "R"), elementary_gates)
     U_gates_ids = findall(x -> startswith(x, "U"), elementary_gates)
+    CR_gates_ids = findall(x -> startswith(x, "CR"), elementary_gates)
+    CU_gates_ids = findall(x -> startswith(x, "CU3"), elementary_gates)
 
     R_complex_dict = Dict{}
     if !isempty(R_gates_ids)
@@ -275,19 +302,33 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
         U_complex_dict = QCO.get_all_U_gates(params, elementary_gates)
     end
 
+    CR_complex_dict = Dict{}
+    if !isempty(CR_gates_ids)
+        CR_complex_dict = QCO.get_all_CR_gates(params, elementary_gates)
+    end
+
+    CU_complex_dict = Dict{}
+    if !isempty(CU_gates_ids)
+        CU_complex_dict = QCO.get_all_CU_gates(params, elementary_gates)
+    end
+
     gates_dict = Dict{String, Any}()
 
     counter = 1
 
     for i=1:length(elementary_gates)
 
-        if startswith(elementary_gates[i], "R") || startswith(elementary_gates[i], "U")
+        if startswith(elementary_gates[i], "R") || startswith(elementary_gates[i], "U") || startswith(elementary_gates[i], "CR") || startswith(elementary_gates[i], "CU")
             M_elementary_dict = Dict{}
 
             if startswith(elementary_gates[i], "R")
                 M_elementary_dict = R_complex_dict
             elseif startswith(elementary_gates[i], "U")
                 M_elementary_dict = U_complex_dict
+            elseif startswith(elementary_gates[i], "CR")
+                M_elementary_dict = CR_complex_dict
+            elseif startswith(elementary_gates[i], "CU")
+                M_elementary_dict = CU_complex_dict
             end
 
             for j in keys(M_elementary_dict) # Gate type
@@ -303,13 +344,13 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
                                                                        "matrix" => M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l],
                                                                        "isInvolutory" => isapprox(M_sqrd, Matrix(LA.I, size(M_sqrd)[1], size(M_sqrd)[2]), atol=1E-6))
 
-                            if startswith(elementary_gates[i], "R")
+                            if startswith(elementary_gates[i], "R") || startswith(elementary_gates[i], "CR")
                                 gates_dict["$counter"]["angle"] = M_elementary_dict[j][k]["angle"]
 
-                            elseif startswith(elementary_gates[i], "U")
-                                gates_dict["$counter"]["angle"] = Dict{String, Any}("θ" => U_complex_dict[j][k]["θ"],
-                                                                                    "ϕ" => U_complex_dict[j][k]["ϕ"],
-                                                                                    "λ" => U_complex_dict[j][k]["λ"],)
+                            elseif startswith(elementary_gates[i], "U") || startswith(elementary_gates[i], "CU")
+                                gates_dict["$counter"]["angle"] = Dict{String, Any}("θ" => M_elementary_dict[j][k]["θ"],
+                                                                                    "ϕ" => M_elementary_dict[j][k]["ϕ"],
+                                                                                    "λ" => M_elementary_dict[j][k]["λ"],)
                             end
 
                             counter += 1
@@ -335,6 +376,64 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
 
     return gates_dict
     
+end
+
+function get_all_CR_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+    CR_gates_ids = findall(x -> startswith(x, "CR"), elementary_gates)
+
+    CR_complex = Dict{String, Any}()
+
+    if length(CR_gates_ids) >= 1 
+        for i=1:length(CR_gates_ids)
+
+            gate_type = elementary_gates[CR_gates_ids[i]]
+            # CRP_12
+            if !(gate_type[3] == 'X' || gate_type[3] == 'Y' || gate_type[3] == 'Z')
+                Memento.error(_LOGGER, "Input CR gate type ($(gate_type[3])) is not supported.")
+            end
+            
+            # This implies that discretizations are the same for all gates, checks only for RX/RY/RZ discretization
+            if isempty(params[string(gate_type[1:3],"_discretization")])
+                Memento.error(_LOGGER, "Empty discretization angles for $(gate_type) gate. Input at least one angle")
+            end        
+
+            CR_complex["$(gate_type)"] = Dict{String, Any}()    
+            CR_complex["$(gate_type)"] = QCO.get_discretized_CR_gates(gate_type, CR_complex[gate_type], collect(params[string(gate_type[1:3],"_discretization")]), params["num_qubits"])
+
+        end
+    end
+
+    return CR_complex
+end
+
+function get_discretized_CR_gates(gate_type::String, CR::Dict{String, Any}, discretization::Array{Float64,1}, num_qubits::Int64)
+
+    R_type = gate_type[2:3]
+
+    if length(discretization) >= 1
+
+        for i=1:length(discretization)
+            if R_type == "RX"
+                CR_discrete = [QCO.CRXGate(discretization[i]), QCO.CRXRevGate(discretization[i])]
+                target_gate = QCO.RXGate(discretization[i])
+            elseif R_type == "RY"
+                CR_discrete = [QCO.CRYGate(discretization[i]), QCO.CRYRevGate(discretization[i])]
+                target_gate = QCO.RYGate(discretization[i])
+            elseif R_type == "RZ"
+                CR_discrete = [QCO.CRZGate(discretization[i]), QCO.CRZRevGate(discretization[i])]
+                target_gate = QCO.RZGate(discretization[i])
+            end
+
+            CR["angle_$i"] = Dict{String, Any}("angle" => discretization[i],
+                                             "$(num_qubits)qubit_rep" => Dict{String, Any}()
+                                            )
+
+            CR["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[5:6])"] = QCO.get_full_sized_gate(gate_type, num_qubits, matrix = CR_discrete, qubit_location = "q$(gate_type[5:6])", target_gate = target_gate)
+
+        end
+    end 
+
+    return CR 
 end
 
 function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
@@ -392,6 +491,63 @@ function get_discretized_R_gates(gate_type::String, R::Dict{String, Any}, discre
     end 
 
     return R 
+end
+
+function get_all_CU_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+
+    U_gates_ids = findall(x -> startswith(x, "CU"), elementary_gates)
+
+    U_complex = Dict{String, Any}()
+
+    if length(U_gates_ids) >= 1 
+        for i=1:length(U_gates_ids)
+            gate_name = elementary_gates[U_gates_ids[i]]
+            if startswith(gate_name, "CU3")        
+                U_complex[gate_name] = Dict{String, Any}()    
+                
+                for angle in ["θ","ϕ","λ"]
+                    if isempty(params["CU_$(angle)_discretization"])
+                        Memento.error(_LOGGER, "Empty $(angle) discretization angle for U3 gate. Input at least one angle")
+                    end
+                end
+
+                U_complex[gate_name] = QCO.get_discretized_CU3_gates(gate_name, U_complex[gate_name], collect(float(params["CU_θ_discretization"])), collect(float(params["CU_ϕ_discretization"])), collect(float(params["CU_λ_discretization"])), params["num_qubits"])
+            end
+
+            # Add support for U1 and U2 universal gates here
+
+        end
+    end
+    
+    return U_complex  
+end
+
+function get_discretized_CU3_gates(gate_type::String, U::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, λ_discretization::Array{Float64,1}, num_qubits::Int64)
+    
+    counter = 1 
+
+    U_type = gate_type[1:2]
+
+    for i=1:length(θ_discretization)
+        for j=1:length(ϕ_discretization)
+            for k=1:length(λ_discretization)
+                
+                U_discrete = [QCO.CU3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k]), QCO.CU3RevGate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])]
+                target = QCO.U3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                U["angle_$(counter)"] = Dict{String, Any}("θ" => θ_discretization[i],
+                                                          "ϕ" => ϕ_discretization[j],
+                                                          "λ" => λ_discretization[k],
+                                                          "$(num_qubits)qubit_rep" => Dict{String, Any}()
+                                                         )
+                
+                U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[5:6])"] = QCO.get_full_sized_gate(gate_type, num_qubits, matrix = U_discrete, qubit_location = "q$(gate_type[5:6])", target_gate = target)
+
+                counter += 1
+            end
+        end
+    end
+    
+    return U
 end
 
 function get_all_U_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
@@ -453,12 +609,12 @@ function get_discretized_U3_gates(gate_type::String, U::Dict{String, Any}, θ_di
 end
 
 """
-    get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing)
+    get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing, target_gate = nothing)
 
 For a given string and number of qubits in the input specified input, this function returns a full 
 sized gate with respect to the input number of qubits. 
 """
-function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing)
+function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing, target_gate = nothing)
 
     if input == "Identity"
         return QCO.IGate(num_qubits)
@@ -594,6 +750,12 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input == "HCoin"
             return QCO.HCoinGate()
         
+        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12"]
+            return matrix[1]
+        
+        elseif input in ["CRX_21", "CRY_21", "CRZ_21", "CU3_21"]
+            return matrix[2]
+
         else
             
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
@@ -636,6 +798,32 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         # Gates with continuous angle parameters
         elseif input in ["RX", "RY", "RZ", "U3"] 
             return QCO.kron_single_gate(num_qubits, matrix, qubit_location)
+
+        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12"] 
+            return kron(matrix[1], QCO.IGate(1))
+
+        elseif input in ["CRX_23", "CRY_23", "CRZ_23", "CU3_23"] 
+            return kron(QCO.IGate(1), matrix[1])
+
+        elseif input in ["CRX_21", "CRY_21", "CRZ_21", "CU3_21"] 
+            return kron(matrix[2], QCO.IGate(1))
+
+        elseif input in ["CRX_32", "CRY_32", "CRZ_32", "CU3_32"] 
+            return kron(QCO.IGate(1), matrix[2])
+
+        elseif input in ["CRX_13", "CRY_13", "CRZ_13", "CU3_13"] 
+            # |0⟩⟨0| ⊗ I ⊗ I 
+            control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , kron(QCO.IGate(1), QCO.IGate(1)))
+            # |1⟩⟨1| ⊗ I ⊗ R
+            control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , kron(QCO.IGate(1), target_gate))
+            return control_0 + control_1
+
+        elseif input in ["CRX_31", "CRY_31", "CRZ_31", "CU3_31"] 
+            # I ⊗ I ⊗ |0⟩⟨0| 
+            control_0 = kron(QCO.IGate(1), kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0])))
+            # R ⊗ I ⊗ |1⟩⟨1|
+            control_1 = kron(kron(target_gate, QCO.IGate(1)), Array{Complex{Float64},2}([0 0; 0 1]))
+            return control_0 + control_1
         
         elseif input == "Toffoli"
             return QCO.ToffoliGate()
