@@ -101,5 +101,13 @@
 
     @test isapprox(QCO.GroverDiffusionGate(), H1 * H2 * X1 * X2 * H2 * cnot_12 * H2 * X1 * X2 * H1 * H2, atol=tol_0)
 
+    # 2 Qubit QFT (Ref: https://www.cs.bham.ac.uk/internal/courses/intro-mqc/current/lecture06_handout.pdf)
+
+    H2 = QCO.get_full_sized_gate("H_2", 2);
+    SWAP = QCO.get_full_sized_gate("Swap", 2);
+    CU = QCO.get_full_sized_gate("CU3_21", 2, matrix = [0, QCO.CU3RevGate(0, π/4, π/4)]);
+
+    @test isapprox(QCO.QFT2Gate(), H1 * CU * H2 * SWAP)
+
 end
 
