@@ -63,7 +63,7 @@ function decompose_controlled_V()
     "num_qubits" => 2, 
     "depth" => 7,    
 
-    "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "CNot_12", "CNot_21"],
+    "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "CNot_12", "CNot_21", "Identity"],
     "target_gate" => QCO.CVGate(),
     
     "objective" => "minimize_depth", 
@@ -291,12 +291,12 @@ function decompose_W()
         "num_qubits" => 2, 
         "depth" => 5,    
     
-        "elementary_gates" => ["U3_1", "U3_2", "CNot_21", "CNot_12", "Identity"], 
-        "target_gate" => QCO.WGate(),   
+        "elementary_gates" => ["U3_2", "CNot_21", "CNot_12", "Identity"], 
+        "target_gate" => QCO.WGate(),
 
-        "U_θ_discretization" => [-π/4, π/4],
-        "U_ϕ_discretization" => [0],
-        "U_λ_discretization" => [0],
+        "U_θ_discretization" => [-π/4, 0, π/4],
+        "U_ϕ_discretization" => [0, π/4],
+        "U_λ_discretization" => [0, π/2],
                    
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact", 
@@ -342,7 +342,7 @@ function decompose_HCoinGate()
         "depth" => 14,    
     
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_21", "CNot_12", "Identity"], 
-        "target_gate" => -QCO.HCoinGate(),   
+        "target_gate" => QCO.HCoinGate(),   
                   
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact", 
@@ -378,3 +378,27 @@ function decompose_GroverDiffusionGate()
         return params
     
 end
+
+function decompose_iSwapGate()
+
+    println(">>>>> iSwap Gate <<<<<")
+
+    params = Dict{String, Any}(
+    
+        "num_qubits" => 2, 
+        "depth" => 9,    
+    
+        "elementary_gates" => ["T_1", "T_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"],
+        "target_gate" => QCO.iSwapGate(),   
+                  
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact", 
+        
+        "optimizer" => "cplex"
+                                    
+        )
+    
+        return params
+    
+end
+

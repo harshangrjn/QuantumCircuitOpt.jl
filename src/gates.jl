@@ -727,7 +727,7 @@ q_1: ──■──
 **Matrix Representation**
 
 ```math
-CV = \begin{pmatrix}
+CVRev = \begin{pmatrix}
         1 & 0 & 0 & 0 \\
         0 & 0.5+0.5i & 0 & 0.5-0.5i \\
         0 & 0 & 1 & 0 \\
@@ -757,7 +757,7 @@ q_1: ┤ V'├
 **Matrix Representation**
 
 ```math
-CV = \begin{pmatrix}
+CVdagger = \begin{pmatrix}
         1 & 0 & 0 & 0 \\
         0 & 1 & 0 & 0 \\
         0 & 0 & 0.5-0.5i & 0.5+0.5i \\
@@ -787,7 +787,7 @@ q_1: ──■──
 **Matrix Representation**
 
 ```math
-CV = \begin{pmatrix}
+CVRevdagger = \begin{pmatrix}
         1 & 0 & 0 & 0 \\
         0 & 0.5-0.5i & 0 & 0.5+0.5i \\
         0 & 0 & 1 & 0 \\
@@ -809,7 +809,7 @@ Two-qubit, W hermitian gate, typically useful to diagonlize the ([SwapGate](@ref
 **Matrix Representation**
 
 ```math
-CV = \begin{pmatrix}
+W = \begin{pmatrix}
         1 & 0 & 0 & 0 \\
         0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & 0 \\
         0 & \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}} & 0 \\
@@ -862,6 +862,44 @@ function CRXGate(θ::Number)
 end
 
 @doc raw"""
+    CRXRevGate(θ::Number)
+
+Two-qubit controlled reverse [RXGate](@ref). 
+
+**Circuit Representation**
+```
+     ┌───────┐
+q_1: ┤ RX(ϴ) ├
+     └───┬───┘
+q_0: ────■────
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CRXRev(\theta)\ q_1, q_0 =
+|0\rangle\langle0| \otimes I + |1\rangle\langle1| \otimes RX(\theta) =
+    \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & \cos{\th} & 0 & -i\sin{\th} \\
+        0 & 0 & 1 & 0\\
+        0 & -i\sin{\th} & 0 & \cos{\th}
+    \end{pmatrix}
+```
+"""
+function CRXRevGate(θ::Number)
+
+    CRX = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 cos(θ/2) 0 -(sin(θ/2))im      
+                                      0 0 1 0
+                                      0 -(sin(θ/2))im 0 cos(θ/2)])
+
+    return round_complex_values(CRX)
+end
+
+@doc raw"""
     CRYGate(θ::Number)
 
 Two-qubit controlled [RYGate](@ref). 
@@ -904,6 +942,48 @@ function CRYGate(θ::Number)
 end
 
 @doc raw"""
+    CRYRevGate(θ::Number)
+
+Two-qubit controlled reverse [RYGate](@ref). 
+
+**Circuit Representation**
+```
+     ┌───────┐
+q_1: ┤ RY(ϴ) ├
+     └───┬───┘
+q_0: ────■────
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CRYRev(\theta)\ q_1, q_0 =
+|0\rangle\langle0| \otimes I + |1\rangle\langle1| \otimes RY(\theta) =
+    \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & \cos{\th} & 0 & -\sin{\th} \\
+        0 & 0 & 1 & 0 \\
+        0 & \sin{\th} & 0 & \cos{\th}
+    \end{pmatrix}
+```
+"""
+function CRYRevGate(θ::Number)
+    
+    if !(-2*π <= θ <= 2*π)
+        Memento.error(_LOGGER, "θ angle in CRYGate is not within valid bounds")
+    end
+
+    CRY = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 cos(θ/2) 0 -(sin(θ/2))      
+                                      0 0 1 0
+                                      0 (sin(θ/2)) 0 cos(θ/2)])
+
+    return round_complex_values(CRY)
+end
+
+@doc raw"""
     CRZGate(θ::Number)
 
 Two-qubit controlled [RZGate](@ref). 
@@ -940,6 +1020,48 @@ function CRZGate(θ::Number)
     CRZ = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 1 0 0       
                                       0 0  (cos(θ/2) - (sin(θ/2))im)  0 
+                                      0 0  0  (cos(θ/2) + (sin(θ/2))im)])
+
+    return round_complex_values(CRZ)
+end
+
+@doc raw"""
+    CRZGate(θ::Number)
+
+Two-qubit controlled reverse [RZGate](@ref). 
+
+**Circuit Representation**
+```
+     ┌───────┐
+q_1: ┤ RZ(ϴ) ├
+     └───┬───┘
+q_0: ────■────
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CRZRev(\theta)\ q_1, q_0 =
+|0\rangle\langle0| \otimes I + |1\rangle\langle1| \otimes RZ(\theta) =
+    \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & e^{-i\th} & 0 & 0 \\
+        0 & 0 & 1 &  0 \\
+        0 & 0 & 0 & e^{i\th}
+    \end{pmatrix}
+```
+"""
+function CRZRevGate(θ::Number)
+    
+    if !(-2*π <= θ <= 2*π)
+        Memento.error(_LOGGER, "θ angle in CRZGate is not within valid bounds")
+    end
+
+    CRZ = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 (cos(θ/2) - (sin(θ/2))im) 0 0       
+                                      0 0 1 0 
                                       0 0  0  (cos(θ/2) + (sin(θ/2))im)])
 
     return round_complex_values(CRZ)
@@ -990,6 +1112,55 @@ function CU3Gate(θ::Number, ϕ::Number, λ::Number)
                                       0 1 0 0       
                                       0 0  cos(θ/2)  -(cos(λ)+(sin(λ))im)*sin(θ/2) 
                                       0 0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
+
+    return round_complex_values(CU3)
+end
+
+@doc raw"""
+    CU3RevGate(θ::Number, ϕ::Number, λ::Number)
+
+Two-qubit, reverse controlled version of the universal rotation gate with three Euler angles ([U3Gate](@ref)). 
+
+**Circuit Representation**
+```
+     ┌────────────┐
+q_1: ┤  U3(ϴ,φ,λ) ├
+     └──────┬─────┘
+q_0: ───────■──────
+```
+
+**Matrix Representation**
+
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+
+CU3(\theta, \phi, \lambda)\ q_1, q_0 =
+                |0\rangle\langle 0| \otimes I +
+                |1\rangle\langle 1| \otimes U3(\theta,\phi,\lambda) =
+                \begin{pmatrix}
+                    1 & 0   & 0  & 0 \\
+                    0 & \cos(\th)   & 0 & -e^{i\lambda}\sin(\th) \\
+                    0 & 0   &  1 & 0 \\
+                    0 & e^{i\phi}\sin(\th)  & 0  & e^{i(\phi+\lambda)}\cos(\th)
+                \end{pmatrix}
+```
+"""
+function CU3RevGate(θ::Number, ϕ::Number, λ::Number)
+
+    if !(-π <= θ <= π)
+        Memento.error(_LOGGER, "θ angle in CU3Gate is not within valid bounds")
+    end
+    if !(-2*π <= ϕ <= 2*π)
+        Memento.error(_LOGGER, "ϕ angle in CU3Gate is not within valid bounds")
+    end
+    if !(-2*π <= λ <= 2*π)
+        Memento.error(_LOGGER, "λ angle in CU3Gate is not within valid bounds")
+    end
+
+    CU3 = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 cos(θ/2) 0 -(cos(λ)+(sin(λ))im)*sin(θ/2)    
+                                      0 0 1 0 
+                                      0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2) 0 (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
 
     return round_complex_values(CU3)
 end

@@ -56,17 +56,33 @@ WGate
 ```@docs
 CRXGate
 ```
+## CRXRevGate
+```@docs
+CRXRevGate
+```
 ## CRYGate
 ```@docs
 CRYGate
+```
+## CRYRevGate
+```@docs
+CRYRevGate
 ```
 ## CRZGate
 ```@docs
 CRZGate
 ```
+## CRZRevGate
+```@docs
+CRZRevGate
+```
 ## CU3Gate
 ```@docs
 CU3Gate
+```
+## CU3RevGate
+```@docs
+CU3RevGate
 ```
 ## SwapGate
 ```@docs

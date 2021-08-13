@@ -41,7 +41,7 @@ function decompose_toffoli()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    "relax_integrality" => true,
+    "relax_integrality" => false,
     
     "optimizer" => "cplex",
     
@@ -51,22 +51,80 @@ function decompose_toffoli()
     
 end
 
+function decompose_toffoli_using_Rotations()
+
+    println(">>>>> Toffoli gate <<<<<")
+ 
+    params = Dict{String, Any}(
+    
+    "num_qubits" => 3,
+    "depth" => 10,
+
+    "elementary_gates" => ["RZ_3", "CNot_13", "CNot_23", "Identity"],
+    "RZ_discretization" => [-π/2, π/2, π/4],
+
+    "target_gate" => QCO.ToffoliGate(),
+    
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact",
+    "relax_integrality" => false,
+    
+    "optimizer" => "cplex",
+    )
+
+    return params
+    
+end
+
 function toffoli_circuit()
     # [(depth, gate)]
-    return [(1, "H_3"), 
-            (2, "CNot_23"), 
-            (3, "Tdagger_3"), 
-            (4, "CNot_13"), 
-            (5, "T_3"), 
-            (6, "CNot_23"), 
-            (7, "Tdagger_3"), 
-            (8, "CNot_13"), 
-            (9, "T_2"), 
-            (10, "T_3"), 
-            (11, "CNot_12"), 
-            (12, "H_3"), 
-            (13, "T_1"), 
-            (14, "Tdagger_2"),
-            (15, "CNot_12")
+    return [(1, "T_1"),              
+            (2, "T_2"),                   
+            (3, "H_3"),              
+            (4, "CNot_23"),           
+            (5, "Tdagger_3"),        
+            (6, "CNot_13"),          
+            (7, "T_3"),               
+            (8, "CNot_23"),                 
+            (9, "Tdagger_3"),          
+            (10, "CNot_13"),           
+            (11, "T_3"),             
+            (12, "H_3"),             
+            (13, "CNot_12"),         
+            (14, "Tdagger_2"),       
+            (15, "CNot_12")          
             ] 
+end
+
+function decompose_cnot_13()
+
+    params = Dict{String, Any}(
+    "num_qubits" => 3,
+    "depth" => 5,
+
+    "elementary_gates" => ["CNot_12", "CNot_23", "Identity"],
+    "target_gate" => QCO.get_full_sized_gate("CNot_13", 3),
+
+    "objective" => "minimize_cnot", 
+    "optimizer" => "cplex"   
+    )
+
+    return
+end
+
+function decompose_FredkinGate()
+
+    params = Dict{String, Any}(
+    "num_qubits" => 3,
+    "depth" => 7,
+
+    # Reference: https://doi.org/10.1103/PhysRevA.53.2855
+    "elementary_gates" => ["CV_12", "CV_23", "CV_13", "CVdagger_12", "CVdagger_23", "CVdagger_13", "CNot_12", "CNot_32", "CNot_23", "CNot_13", "Identity"],
+    "target_gate" => QCO.CSwapGate(), #also Fredkin
+
+    "objective" => "minimize_depth", 
+    "optimizer" => "cplex",
+    )
+    
+    return 
 end
