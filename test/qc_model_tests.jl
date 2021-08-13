@@ -124,7 +124,7 @@ end
     "num_qubits" => 3, 
     "depth" => 3,
     "elementary_gates" => ["CRX_12", "CRY_23", "CRZ_31", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, matrix=[QCO.CRXGate(pi/4)]) * QCO.get_full_sized_gate("CRY_23", 3, matrix=[QCO.CRYGate(pi/4)]) * QCO.get_full_sized_gate("CRZ_31", 3, target_gate = QCO.RZGate(pi/4)),
+    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, matrix=QCO.CRXGate(pi/4)) * QCO.get_full_sized_gate("CRY_23", 3, matrix=QCO.CRYGate(pi/4)) * QCO.get_full_sized_gate("CRZ_31", 3, target_gate = QCO.RZGate(pi/4)),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
