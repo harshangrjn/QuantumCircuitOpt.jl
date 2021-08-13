@@ -105,9 +105,11 @@
 
     H2 = QCO.get_full_sized_gate("H_2", 2);
     SWAP = QCO.get_full_sized_gate("Swap", 2);
-    CU = QCO.get_full_sized_gate("CU3_21", 2, matrix = [0, QCO.CU3RevGate(0, π/4, π/4)]);
+    CU = QCO.get_full_sized_gate("CU3_21", 2, matrix = QCO.CU3RevGate(0, π/4, π/4));
 
     @test isapprox(QCO.QFT2Gate(), H1 * CU * H2 * SWAP)
+
+    # CRY Decomp (Ref: )
 
 end
 
