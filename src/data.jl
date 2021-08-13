@@ -514,7 +514,7 @@ function get_all_CU_gates(params::Dict{String, Any}, elementary_gates::Array{Str
                 U_complex[gate_name] = QCO.get_discretized_CU3_gates(gate_name, U_complex[gate_name], collect(float(params["CU_θ_discretization"])), collect(float(params["CU_ϕ_discretization"])), collect(float(params["CU_λ_discretization"])), params["num_qubits"])
             end
 
-            # Add support for U1 and U2 universal gates here
+            # Add support for CU1 and CU2 universal gates here
 
         end
     end
