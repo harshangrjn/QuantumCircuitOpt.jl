@@ -263,7 +263,7 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
     end
     
     # This part of the code may be hacky. This needs to be updated once the input format gets cleaned up for elementary gates with U and R gates. 
-    if isempty(findall(x -> startswith(x, "R") || startswith(x, "U"), data["elementary_gates"]))
+    if isempty(findall(x -> startswith(x, "R") || startswith(x, "U") || startswith(x, "CR") || startswith(x, "CU"), data["elementary_gates"]))
         
         status = false
 
