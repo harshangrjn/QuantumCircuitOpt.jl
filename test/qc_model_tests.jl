@@ -96,6 +96,33 @@ end
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_12"
 end
 
+@testset "Tests: Minimum depth Rev CU3(0,0,π/4) gate" begin
+
+    params = Dict{String, Any}(
+    "num_qubits" => 3, 
+    "depth" => 2,    
+    "elementary_gates" => ["CU3_31", "CU3_13", "Identity"],  
+    "target_gate" => QCO.get_full_sized_gate("CU3_31", 3, target_angle = [0, 0, pi/4]),
+    "CU_θ_discretization" => [0, π/2],
+    "CU_ϕ_discretization" => [0],
+    "CU_λ_discretization" => [0, π/4],
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact"                  
+    )
+
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation")
+
+    data = QCO.get_data(params)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 1, atol = tol_0)
+    @test "Identity" in data["gates_dict"]["3"]["type"]
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
+    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_31"
+end
+
 @testset "Tests: Minimum depth RX, RY, RZ gate decomposition" begin
 
     params = Dict{String, Any}(
