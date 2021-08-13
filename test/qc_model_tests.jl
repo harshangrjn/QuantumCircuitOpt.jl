@@ -118,6 +118,29 @@ end
 
 end
 
+@testset "Tests: Minimum depth CRX, CRY, CRZ gate decomposition" begin
+
+    params = Dict{String, Any}(
+    "num_qubits" => 3, 
+    "depth" => 3,
+    "elementary_gates" => ["CRX_12", "CRY_23", "CRZ_31", "Identity"],  
+    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, matrix=[QCO.CRXGate(pi/4)]) * QCO.get_full_sized_gate("CRY_23", 3, matrix=[QCO.CRYGate(pi/4)]) * QCO.get_full_sized_gate("CRZ_31", 3, target_gate = QCO.RZGate(pi/4)),
+    "CRX_discretization" => [0, π/4],
+    "CRY_discretization" => [π/4],
+    "CRZ_discretization" => [π/2, π/4],
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact"                            
+    )
+
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_gate_constraints = true)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 3, atol = tol_0)
+
+end
+
+
 @testset "Tests: 3-qubit RX gate decomposition" begin
 
     params = Dict{String, Any}(
@@ -144,6 +167,36 @@ end
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["θ"]),  45, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["ϕ"]), -90, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["λ"]),  90, atol=tol_0)
+    end
+
+end
+
+@testset "Tests: 3-qubit CRX gate decomposition" begin
+
+    params = Dict{String, Any}(
+        "num_qubits" => 3, 
+        "depth" => 2,    
+        "elementary_gates" => ["CU3_12", "CU3_23", "CU3_13", "Identity"],  
+        "target_gate" => QCO.get_full_sized_gate("CRX_13", 3, target_gate = QCO.RXGate(pi/4)),
+        "CU_θ_discretization" => [0, π/4],
+        "CU_ϕ_discretization" => [0, -π/2],
+        "CU_λ_discretization" => [0, π/2],    
+        "objective" => "minimize_cnot", 
+        "decomposition_type" => "exact"                  
+    )
+
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation")
+    
+    data = QCO.get_data(params)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 1, atol = tol_0)
+    if isapprox(sum(result_qc["solution"]["z_onoff_var"][18,:]), 1, atol=tol_0)
+        @test data["gates_dict"]["18"]["qubit_loc"] == "qubit_13"
+        @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["θ"]),  45, atol=tol_0)
+        @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["ϕ"]), -90, atol=tol_0)
+        @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["λ"]),  90, atol=tol_0)
     end
 
 end
