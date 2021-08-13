@@ -414,13 +414,25 @@ function get_discretized_CR_gates(gate_type::String, CR::Dict{String, Any}, disc
 
         for i=1:length(discretization)
             if R_type == "RX"
-                CR_discrete = [QCO.CRXGate(discretization[i]), QCO.CRXRevGate(discretization[i])]
+                if gate_type[5] < gate_type[6]
+                    CR_discrete = QCO.CRXGate(discretization[i])
+                else
+                    CR_discrete = QCO.CRXRevGate(discretization[i])
+                end
                 target_gate = QCO.RXGate(discretization[i])
             elseif R_type == "RY"
-                CR_discrete = [QCO.CRYGate(discretization[i]), QCO.CRYRevGate(discretization[i])]
+                if gate_type[5] < gate_type[6]
+                    CR_discrete = QCO.CRYGate(discretization[i])
+                else
+                    CR_discrete = QCO.CRYRevGate(discretization[i])
+                end
                 target_gate = QCO.RYGate(discretization[i])
             elseif R_type == "RZ"
-                CR_discrete = [QCO.CRZGate(discretization[i]), QCO.CRZRevGate(discretization[i])]
+                if gate_type[5] < gate_type[6]
+                    CR_discrete = QCO.CRYGate(discretization[i])
+                else
+                    CR_discrete = QCO.CRYRevGate(discretization[i])
+                end
                 target_gate = QCO.RZGate(discretization[i])
             end
 
@@ -514,7 +526,7 @@ function get_all_CU_gates(params::Dict{String, Any}, elementary_gates::Array{Str
                 U_complex[gate_name] = QCO.get_discretized_CU3_gates(gate_name, U_complex[gate_name], collect(float(params["CU_θ_discretization"])), collect(float(params["CU_ϕ_discretization"])), collect(float(params["CU_λ_discretization"])), params["num_qubits"])
             end
 
-            # Add support for CU1 and CU2 universal gates here
+            # Add support for U1 and U2 universal gates here
 
         end
     end
@@ -531,8 +543,12 @@ function get_discretized_CU3_gates(gate_type::String, U::Dict{String, Any}, θ_d
     for i=1:length(θ_discretization)
         for j=1:length(ϕ_discretization)
             for k=1:length(λ_discretization)
-                
-                U_discrete = [QCO.CU3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k]), QCO.CU3RevGate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])]
+                if gate_type[5] < gate_type[6]
+                    U_discrete = QCO.CU3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                else
+                    U_discrete = QCO.CU3RevGate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                end
+
                 target = QCO.U3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
                 U["angle_$(counter)"] = Dict{String, Any}("θ" => θ_discretization[i],
                                                           "ϕ" => ϕ_discretization[j],
@@ -750,12 +766,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input == "HCoin"
             return QCO.HCoinGate()
         
-        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12"]
-            return matrix[1]
+        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12", "CRX_21", "CRY_21", "CRZ_21", "CU3_21"]
+            return matrix
         
-        elseif input in ["CRX_21", "CRY_21", "CRZ_21", "CU3_21"]
-            return matrix[2]
-
         else
             
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
@@ -799,17 +812,11 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input in ["RX", "RY", "RZ", "U3"] 
             return QCO.kron_single_gate(num_qubits, matrix, qubit_location)
 
-        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12"] 
-            return kron(matrix[1], QCO.IGate(1))
+        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12", "CRX_21", "CRY_21", "CRZ_21", "CU3_21"] 
+            return kron(matrix, QCO.IGate(1))
 
-        elseif input in ["CRX_23", "CRY_23", "CRZ_23", "CU3_23"] 
-            return kron(QCO.IGate(1), matrix[1])
-
-        elseif input in ["CRX_21", "CRY_21", "CRZ_21", "CU3_21"] 
-            return kron(matrix[2], QCO.IGate(1))
-
-        elseif input in ["CRX_32", "CRY_32", "CRZ_32", "CU3_32"] 
-            return kron(QCO.IGate(1), matrix[2])
+        elseif input in ["CRX_23", "CRY_23", "CRZ_23", "CU3_23", "CRX_32", "CRY_32", "CRZ_32", "CU3_32"] 
+            return kron(QCO.IGate(1), matrix)
 
         elseif input in ["CRX_13", "CRY_13", "CRZ_13", "CU3_13"] 
             # |0⟩⟨0| ⊗ I ⊗ I 
