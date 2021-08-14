@@ -1064,7 +1064,7 @@ function CRZRevGate(θ::Number)
                                       0 0 1 0 
                                       0 0  0  (cos(θ/2) + (sin(θ/2))im)])
 
-    return round_complex_values(CRZREv)
+    return round_complex_values(CRZRev)
 end
 
 @doc raw"""
