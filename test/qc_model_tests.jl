@@ -96,6 +96,33 @@ end
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_12"
 end
 
+@testset "Tests: Minimum depth Rev CU3(0,0,π/4) gate" begin
+
+    params = Dict{String, Any}(
+    "num_qubits" => 3, 
+    "depth" => 2,    
+    "elementary_gates" => ["CU3_31", "CU3_13", "Identity"],  
+    "target_gate" => QCO.get_full_sized_gate("CU3_31", 3, target_angle = [0, 0, pi/4]),
+    "CU_θ_discretization" => [0, π/2],
+    "CU_ϕ_discretization" => [0],
+    "CU_λ_discretization" => [0, π/4],
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact"                  
+    )
+
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation")
+
+    data = QCO.get_data(params)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 1, atol = tol_0)
+    @test "Identity" in data["gates_dict"]["3"]["type"]
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
+    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_31"
+end
+
 @testset "Tests: Minimum depth RX, RY, RZ gate decomposition" begin
 
     params = Dict{String, Any}(
@@ -124,7 +151,29 @@ end
     "num_qubits" => 3, 
     "depth" => 3,
     "elementary_gates" => ["CRX_12", "CRY_23", "CRZ_31", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, matrix=[QCO.CRXGate(pi/4)]) * QCO.get_full_sized_gate("CRY_23", 3, matrix=[QCO.CRYGate(pi/4)]) * QCO.get_full_sized_gate("CRZ_31", 3, target_gate = QCO.RZGate(pi/4)),
+    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, matrix=QCO.CRXGate(pi/4)) * QCO.get_full_sized_gate("CRY_23", 3, matrix=QCO.CRYGate(pi/4)) * QCO.get_full_sized_gate("CRZ_31", 3, target_angle = pi/4),
+    "CRX_discretization" => [0, π/4],
+    "CRY_discretization" => [π/4],
+    "CRZ_discretization" => [π/2, π/4],
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact"                            
+    )
+
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", commute_gate_constraints = true)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 3, atol = tol_0)
+
+end
+
+@testset "Tests: Minimum depth Rev CRX, CRY, CRZ gate decomposition" begin
+
+    params = Dict{String, Any}(
+    "num_qubits" => 3, 
+    "depth" => 3,
+    "elementary_gates" => ["CRX_31", "CRY_31", "CRZ_13", "Identity"],  
+    "target_gate" => QCO.get_full_sized_gate("CRX_31", 3, target_angle=pi/4) * QCO.get_full_sized_gate("CRY_31", 3, target_angle=pi/4) * QCO.get_full_sized_gate("CRZ_13", 3, target_angle = pi/2),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
@@ -177,7 +226,7 @@ end
         "num_qubits" => 3, 
         "depth" => 2,    
         "elementary_gates" => ["CU3_12", "CU3_23", "CU3_13", "Identity"],  
-        "target_gate" => QCO.get_full_sized_gate("CRX_13", 3, target_gate = QCO.RXGate(pi/4)),
+        "target_gate" => QCO.get_full_sized_gate("CRX_13", 3, target_angle = pi/4),
         "CU_θ_discretization" => [0, π/4],
         "CU_ϕ_discretization" => [0, -π/2],
         "CU_λ_discretization" => [0, π/2],    

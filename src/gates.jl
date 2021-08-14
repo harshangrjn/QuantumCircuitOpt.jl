@@ -891,12 +891,12 @@ CRXRev(\theta)\ q_1, q_0 =
 """
 function CRXRevGate(θ::Number)
 
-    CRX = Array{Complex{Float64},2}([ 1 0 0 0            
+    CRXRev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 cos(θ/2) 0 -(sin(θ/2))im      
                                       0 0 1 0
                                       0 -(sin(θ/2))im 0 cos(θ/2)])
 
-    return round_complex_values(CRX)
+    return round_complex_values(CRXRev)
 end
 
 @doc raw"""
@@ -975,12 +975,12 @@ function CRYRevGate(θ::Number)
         Memento.error(_LOGGER, "θ angle in CRYGate is not within valid bounds")
     end
 
-    CRY = Array{Complex{Float64},2}([ 1 0 0 0            
+    CRYRev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 cos(θ/2) 0 -(sin(θ/2))      
                                       0 0 1 0
                                       0 (sin(θ/2)) 0 cos(θ/2)])
 
-    return round_complex_values(CRY)
+    return round_complex_values(CRYRev)
 end
 
 @doc raw"""
@@ -1026,7 +1026,7 @@ function CRZGate(θ::Number)
 end
 
 @doc raw"""
-    CRZGate(θ::Number)
+    CRZRevGate(θ::Number)
 
 Two-qubit controlled reverse [RZGate](@ref). 
 
@@ -1059,12 +1059,12 @@ function CRZRevGate(θ::Number)
         Memento.error(_LOGGER, "θ angle in CRZGate is not within valid bounds")
     end
 
-    CRZ = Array{Complex{Float64},2}([ 1 0 0 0            
+    CRZRev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 (cos(θ/2) - (sin(θ/2))im) 0 0       
                                       0 0 1 0 
                                       0 0  0  (cos(θ/2) + (sin(θ/2))im)])
 
-    return round_complex_values(CRZ)
+    return round_complex_values(CRZRev)
 end
 
 @doc raw"""
@@ -1157,12 +1157,12 @@ function CU3RevGate(θ::Number, ϕ::Number, λ::Number)
         Memento.error(_LOGGER, "λ angle in CU3Gate is not within valid bounds")
     end
 
-    CU3 = Array{Complex{Float64},2}([ 1 0 0 0            
+    CU3Rev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 cos(θ/2) 0 -(cos(λ)+(sin(λ))im)*sin(θ/2)    
                                       0 0 1 0 
                                       0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2) 0 (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
 
-    return round_complex_values(CU3)
+    return round_complex_values(CU3Rev)
 end
 
 @doc raw"""

@@ -414,21 +414,30 @@ function get_discretized_CR_gates(gate_type::String, CR::Dict{String, Any}, disc
 
         for i=1:length(discretization)
             if R_type == "RX"
-                CR_discrete = [QCO.CRXGate(discretization[i]), QCO.CRXRevGate(discretization[i])]
-                target_gate = QCO.RXGate(discretization[i])
+                if gate_type[5] < gate_type[6]
+                    CR_discrete = QCO.CRXGate(discretization[i])
+                else
+                    CR_discrete = QCO.CRXRevGate(discretization[i])
+                end
             elseif R_type == "RY"
-                CR_discrete = [QCO.CRYGate(discretization[i]), QCO.CRYRevGate(discretization[i])]
-                target_gate = QCO.RYGate(discretization[i])
+                if gate_type[5] < gate_type[6]
+                    CR_discrete = QCO.CRYGate(discretization[i])
+                else
+                    CR_discrete = QCO.CRYRevGate(discretization[i])
+                end
             elseif R_type == "RZ"
-                CR_discrete = [QCO.CRZGate(discretization[i]), QCO.CRZRevGate(discretization[i])]
-                target_gate = QCO.RZGate(discretization[i])
+                if gate_type[5] < gate_type[6]
+                    CR_discrete = QCO.CRYGate(discretization[i])
+                else
+                    CR_discrete = QCO.CRYRevGate(discretization[i])
+                end
             end
-
+            target = discretization[i]
             CR["angle_$i"] = Dict{String, Any}("angle" => discretization[i],
                                              "$(num_qubits)qubit_rep" => Dict{String, Any}()
                                             )
 
-            CR["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[5:6])"] = QCO.get_full_sized_gate(gate_type, num_qubits, matrix = CR_discrete, qubit_location = "q$(gate_type[5:6])", target_gate = target_gate)
+            CR["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[5:6])"] = QCO.get_full_sized_gate(gate_type, num_qubits, matrix = CR_discrete, qubit_location = "q$(gate_type[5:6])", target_angle = target)
 
         end
     end 
@@ -531,16 +540,20 @@ function get_discretized_CU3_gates(gate_type::String, U::Dict{String, Any}, θ_d
     for i=1:length(θ_discretization)
         for j=1:length(ϕ_discretization)
             for k=1:length(λ_discretization)
-                
-                U_discrete = [QCO.CU3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k]), QCO.CU3RevGate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])]
-                target = QCO.U3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                if gate_type[5] < gate_type[6]
+                    U_discrete = QCO.CU3Gate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                else
+                    U_discrete = QCO.CU3RevGate(θ_discretization[i], ϕ_discretization[j], λ_discretization[k])
+                end
+
+                target = [θ_discretization[i], ϕ_discretization[j], λ_discretization[k]]
                 U["angle_$(counter)"] = Dict{String, Any}("θ" => θ_discretization[i],
                                                           "ϕ" => ϕ_discretization[j],
                                                           "λ" => λ_discretization[k],
                                                           "$(num_qubits)qubit_rep" => Dict{String, Any}()
                                                          )
                 
-                U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[5:6])"] = QCO.get_full_sized_gate(gate_type, num_qubits, matrix = U_discrete, qubit_location = "q$(gate_type[5:6])", target_gate = target)
+                U["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[5:6])"] = QCO.get_full_sized_gate(gate_type, num_qubits, matrix = U_discrete, qubit_location = "q$(gate_type[5:6])", target_angle = target)
 
                 counter += 1
             end
@@ -614,7 +627,7 @@ end
 For a given string and number of qubits in the input specified input, this function returns a full 
 sized gate with respect to the input number of qubits. 
 """
-function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing, target_gate = nothing)
+function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing, qubit_location = nothing, target_angle = nothing)
 
     if input == "Identity"
         return QCO.IGate(num_qubits)
@@ -750,12 +763,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input == "HCoin"
             return QCO.HCoinGate()
         
-        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12"]
-            return matrix[1]
+        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12", "CRX_21", "CRY_21", "CRZ_21", "CU3_21"]
+            return matrix
         
-        elseif input in ["CRX_21", "CRY_21", "CRZ_21", "CU3_21"]
-            return matrix[2]
-
         else
             
             Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")
@@ -799,19 +809,22 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
         elseif input in ["RX", "RY", "RZ", "U3"] 
             return QCO.kron_single_gate(num_qubits, matrix, qubit_location)
 
-        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12"] 
-            return kron(matrix[1], QCO.IGate(1))
+        elseif input in ["CRX_12", "CRY_12", "CRZ_12", "CU3_12", "CRX_21", "CRY_21", "CRZ_21", "CU3_21"] 
+            return kron(matrix, QCO.IGate(1))
 
-        elseif input in ["CRX_23", "CRY_23", "CRZ_23", "CU3_23"] 
-            return kron(QCO.IGate(1), matrix[1])
-
-        elseif input in ["CRX_21", "CRY_21", "CRZ_21", "CU3_21"] 
-            return kron(matrix[2], QCO.IGate(1))
-
-        elseif input in ["CRX_32", "CRY_32", "CRZ_32", "CU3_32"] 
-            return kron(QCO.IGate(1), matrix[2])
+        elseif input in ["CRX_23", "CRY_23", "CRZ_23", "CU3_23", "CRX_32", "CRY_32", "CRZ_32", "CU3_32"] 
+            return kron(QCO.IGate(1), matrix)
 
         elseif input in ["CRX_13", "CRY_13", "CRZ_13", "CU3_13"] 
+            if input[3] == 'X'
+                target_gate = QCO.RXGate(target_angle)
+            elseif input[3] == 'Y'
+                target_gate = QCO.RYGate(target_angle)
+            elseif input[3] == 'Z'
+                target_gate = QCO.RZGate(target_angle)
+            elseif input[3] == '3'
+                target_gate = QCO.U3Gate(target_angle[1], target_angle[2], target_angle[3])
+            end
             # |0⟩⟨0| ⊗ I ⊗ I 
             control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , kron(QCO.IGate(1), QCO.IGate(1)))
             # |1⟩⟨1| ⊗ I ⊗ R
@@ -819,6 +832,15 @@ function get_full_sized_gate(input::String, num_qubits::Int64; matrix = nothing,
             return control_0 + control_1
 
         elseif input in ["CRX_31", "CRY_31", "CRZ_31", "CU3_31"] 
+            if input[3] == 'X'
+                target_gate = QCO.RXGate(target_angle)
+            elseif input[3] == 'Y'
+                target_gate = QCO.RYGate(target_angle)
+            elseif input[3] == 'Z'
+                target_gate = QCO.RZGate(target_angle)
+            elseif input[3] == '3'
+                target_gate = QCO.U3Gate(target_angle[1], target_angle[2], target_angle[3])
+            end
             # I ⊗ I ⊗ |0⟩⟨0| 
             control_0 = kron(QCO.IGate(1), kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0])))
             # R ⊗ I ⊗ |1⟩⟨1|
