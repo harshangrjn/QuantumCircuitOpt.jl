@@ -109,7 +109,13 @@
 
     @test isapprox(QCO.QFT2Gate(), H1 * CU * H2 * SWAP)
 
-    # CRY Decomp (Ref: )
+    # CRY Decomp (Ref: https://quantumcomputing.stackexchange.com/questions/2143/how-can-a-controlled-ry-be-made-from-cnots-and-rotations)
+
+    CNOT12 = QCO.get_full_sized_gate("CNot_12", 2)
+    U3_negpi = QCO.get_full_sized_gate("U3", 2, matrix=QCO.U3Gate(-pi/2, 0, 0), qubit_location="q2")
+    U3_pi = QCO.get_full_sized_gate("U3", 2, matrix=QCO.U3Gate(pi/2, 0, 0), qubit_location="q2")
+
+    @test isapprox(QCO.CRYGate(pi), CNOT12 * U3_negpi * CNOT12 * U3_pi, atol = tol_0)
 
 end
 
