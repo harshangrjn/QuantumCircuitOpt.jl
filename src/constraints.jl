@@ -134,10 +134,8 @@ function constraint_gate_intermediate_products_compact(qcm::QuantumCircuitModel)
     num_gates = size(qcm.data["gates_real"])[3]
     depth   = qcm.data["depth"]
     
-    if depth > 2
-        JuMP.@constraint(qcm.model, [d=2:(depth-1)], qcm.variables[:U_var][:,:,d] .== 
-                                            sum((qcm.variables[:zU_var][:,:,n,(d-1)]) * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
-    end
+    JuMP.@constraint(qcm.model, [d=2:(depth-1)], qcm.variables[:U_var][:,:,d] .== 
+                                        sum((qcm.variables[:zU_var][:,:,n,(d-1)]) * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
 
     return
 end
