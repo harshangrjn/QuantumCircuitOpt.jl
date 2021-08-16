@@ -1,6 +1,14 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.2.0
+- Enabling Controlled-R (CRX, CRY, CRZ) and Controlled-U3 (CU3) gates
+- Adding functions to data.jl that are the equivalent of the single-qubit ones (e.g. get_all_CR_gates)
+- Enabling this functionality in the log.jl
+- Added CR/CU gates and `target_angle` optional flag to `get_full_sized_gate`
+- Added the reverse controlled gates for the 4 gates in the gates.jl
+- Docs and unit tests updated to reflect above changes
+- Fixed a few typos in the code/in the documentation
 
 ### v0.1.9
 - Updated toffoli input circuit to make it feasible for the commuting gate constraints 
