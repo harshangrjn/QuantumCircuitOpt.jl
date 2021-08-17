@@ -113,7 +113,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
                              )
     
     # Rotation and Universal gate angle discretizations
-    data = _populate_data_angle_discretization!(data, params)
+    data = QCO._populate_data_angle_discretization!(data, params)
 
     # Input circuit
     if length(keys(input_circuit_dict)) > 0
@@ -347,16 +347,16 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
 
     for i=1:length(elementary_gates)
 
-        if startswith(elementary_gates[i], "R") || startswith(elementary_gates[i], "U3") || startswith(elementary_gates[i], "CR") || startswith(elementary_gates[i], "CU3")
+        if i in union(R_gates_idx, U3_gates_idx, CR_gates_idx, CU3_gates_idx)
             M_elementary_dict = Dict{}
 
-            if startswith(elementary_gates[i], "R")
+            if i in R_gates_idx
                 M_elementary_dict = R_complex_dict
-            elseif startswith(elementary_gates[i], "U3")
+            elseif i in U3_gates_idx
                 M_elementary_dict = U3_complex_dict
-            elseif startswith(elementary_gates[i], "CR")
+            elseif i in CR_gates_idx
                 M_elementary_dict = CR_complex_dict
-            elseif startswith(elementary_gates[i], "CU3")
+            elseif i in CU3_gates_idx
                 M_elementary_dict = CU3_complex_dict
             end
 
@@ -373,10 +373,10 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
                                                                        "matrix" => M_elementary_dict[j][k]["$(num_qubits)qubit_rep"][l],
                                                                        "isInvolutory" => isapprox(M_sqrd, Matrix(LA.I, size(M_sqrd)[1], size(M_sqrd)[2]), atol=1E-6))
 
-                            if startswith(elementary_gates[i], "R") || startswith(elementary_gates[i], "CR")
+                            if i in union(R_gates_idx, CR_gates_idx)
                                 gates_dict["$counter"]["angle"] = M_elementary_dict[j][k]["angle"]
 
-                            elseif startswith(elementary_gates[i], "U3") || startswith(elementary_gates[i], "CU3")
+                            elseif i in union(U3_gates_idx, CU3_gates_idx)
                                 gates_dict["$counter"]["angle"] = Dict{String, Any}("θ" => M_elementary_dict[j][k]["θ"],
                                                                                     "ϕ" => M_elementary_dict[j][k]["ϕ"],
                                                                                     "λ" => M_elementary_dict[j][k]["λ"],)
@@ -514,8 +514,8 @@ function get_discretized_CR_gates(gate_type::String, CR::Dict{String, Any}, disc
 
             angle = discretization[i]
             CR["angle_$i"] = Dict{String, Any}("angle" => discretization[i],
-                                             "$(num_qubits)qubit_rep" => Dict{String, Any}()
-                                            )
+                                               "$(num_qubits)qubit_rep" => Dict{String, Any}()
+                                              )
 
             CR["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(gate_type[5:6])"] = QCO.get_full_sized_gate(gate_type, num_qubits, matrix = CR_discrete, qubit_location = "q$(gate_type[5:6])", target_angle = angle)
 

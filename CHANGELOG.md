@@ -8,7 +8,7 @@ QuantumCircuitOpt.jl Change Log
 - Added CR/CU gates and `target_angle` optional flag to `get_full_sized_gate`
 - Added the reverse controlled gates for the 4 gates in the gates.jl
 - Docs and unit tests updated to reflect above changes
-- Fixed a few typos in the code/in the documentation
+- Fixed typos and major clean-up of `src/data.jl`
 
 ### v0.1.9
 - Updated toffoli input circuit to make it feasible for the commuting gate constraints 
