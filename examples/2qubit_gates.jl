@@ -8,7 +8,7 @@ function decompose_hadamard()
     "depth" => 3,    
 
     "elementary_gates" => ["U3_1", "CNot_12", "Identity"], 
-    "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
+    "target_gate" => QCO.kron_single_qubit_gate(2, QCO.HGate(), "q1"),
        
     "U_θ_discretization" => [0, π/2],
     "U_ϕ_discretization" => [0, π/2],
@@ -192,7 +192,7 @@ function decompose_S()
         "depth" => 3,    
     
         "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
-        "target_gate" => QCO.kron_single_gate(2, QCO.SGate(), "q1"),
+        "target_gate" => QCO.kron_single_qubit_gate(2, QCO.SGate(), "q1"),
            
         "U_θ_discretization" => [0, π/4, π/2],
         "U_ϕ_discretization" => [-π/2, 0, π/2],
@@ -365,7 +365,7 @@ function decompose_GroverDiffusionGate()
         "num_qubits" => 2, 
         "depth" => 10,    
     
-        "elementary_gates" => ["X_1", "X_1⊗X_2", "H_1⊗H_2", "X_2", "H_1", "H_2", "CNot_12", "Identity"], 
+        "elementary_gates" => ["X_1", "X_1xX_2", "H_1xH_2", "X_2", "H_1", "H_2", "CNot_12", "Identity"], 
         "target_gate" => QCO.GroverDiffusionGate(),   
                   
         "objective" => "minimize_depth",

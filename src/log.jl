@@ -25,6 +25,8 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
     R_gates_ids = findall(x -> startswith(x, "R"), data["elementary_gates"])
     U_gates_ids = findall(x -> startswith(x, "U"), data["elementary_gates"])
+    CR_gates_ids = findall(x -> startswith(x, "CR"), data["elementary_gates"])
+    CU_gates_ids = findall(x -> startswith(x, "CU"), data["elementary_gates"])
 
     if !isempty(gates_sol_compressed)
 
@@ -63,6 +65,27 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             printstyled("    ","U3 - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
             printstyled("    ","U3 - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
             printstyled("    ","U3 - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
+
+        end
+
+        if !isempty(CR_gates_ids) 
+            for i in CR_gates_ids
+                if data["elementary_gates"][i][1:3] == "CRX"
+                    printstyled("    ","CRX discretization: ", ceil.(rad2deg.(data["discretization"]["CRX"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i][1:3] == "CRY"
+                    printstyled("    ","CRY discretization: ", ceil.(rad2deg.(data["discretization"]["CRY"]), digits = 1),"\n"; color = :cyan)
+                elseif data["elementary_gates"][i][1:3] == "CRZ"
+                    printstyled("    ","CRZ discretization: ", ceil.(rad2deg.(data["discretization"]["CRZ"]), digits = 1),"\n"; color = :cyan)
+                end
+
+            end
+        end
+
+        if !isempty(CU_gates_ids)
+            # Assuming that the Euler angle discretizations are identical on U3 gates of all qubits.
+            printstyled("    ","CU3 - θ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_θ"]), digits = 1),"\n"; color = :cyan)
+            printstyled("    ","CU3 - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_ϕ"]), digits = 1),"\n"; color = :cyan)
+            printstyled("    ","CU3 - λ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_λ"]), digits = 1),"\n"; color = :cyan)
 
         end
         
@@ -164,7 +187,7 @@ function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{
             
             s1 = gate_id["type"][1]
 
-            if !(startswith(s1, "R") || startswith(s1, "U"))
+            if !(startswith(s1, "R") || startswith(s1, "U") || startswith(s1, "CR") || startswith(s1, "CU"))
             
                 push!(gates_sol, s1)
             
@@ -178,12 +201,12 @@ function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{
                     end
                 end
 
-                if startswith(s1, "R")
+                if startswith(s1, "R") || startswith(s1, "CR")
                     θ = round(rad2deg(gate_id["angle"]), digits = 3)
                     s3 = "$(θ)"
                     push!(gates_sol, string(s1,"(", s3, ")"))
 
-                elseif startswith(s1, "U")
+                elseif startswith(s1, "U") || startswith(s1, "CU")
                     
                     θ = round(rad2deg(gate_id["angle"]["θ"]), digits = 3)
                     ϕ = round(rad2deg(gate_id["angle"]["ϕ"]), digits = 3)
@@ -229,7 +252,7 @@ end
     get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{String,1})
 
 This function returns a decomposition of gates after compressing adjacent pair of gates represented on two separate qubits. 
-For example, gates H1 and H2 appearing in a sequence will be compressed to H1⊗H2. This functionality is currently supported only for
+For example, gates H1 and H2 appearing in a sequence will be compressed to H1xH2 (kron(H1,H2)). This functionality is currently supported only for
 two qubit circuits. 
 """
 function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{String,1})
@@ -240,7 +263,7 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
     end
     
     # This part of the code may be hacky. This needs to be updated once the input format gets cleaned up for elementary gates with U and R gates. 
-    if isempty(findall(x -> startswith(x, "R") || startswith(x, "U"), data["elementary_gates"]))
+    if isempty(findall(x -> startswith(x, "R") || startswith(x, "U") || startswith(x, "CR") || startswith(x, "CU"), data["elementary_gates"]))
         
         status = false
 
@@ -256,9 +279,9 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
                     if !(gate_i) && !(gate_iplus1)
                         if (occursin('1', gates_sol[i]) && occursin('2', gates_sol[i+1])) || (occursin('2', gates_sol[i]) && occursin('1', gates_sol[i+1])) 
                             if occursin('1', gates_sol[i])
-                                gate_string = string(gates_sol[i],"⊗",gates_sol[i+1])
+                                gate_string = string(gates_sol[i],"x",gates_sol[i+1])
                             else 
-                                gate_string = string(gates_sol[i+1],"⊗",gates_sol[i])
+                                gate_string = string(gates_sol[i+1],"x",gates_sol[i])
                             end
                             push!(gates_sol_compressed, gate_string)
                             status = true
@@ -296,7 +319,7 @@ function is_multi_qubit_gate(gate::String)
         return true
     elseif occursin("12", gate) || occursin("21", gate) || occursin("13", gate) || occursin("31", gate) || occursin("23", gate) || occursin("32", gate)
         return true
-    elseif occursin("⊗", gate)
+    elseif occursin(kron_symbol, gate)
         return true
     elseif occursin("Swap", gate) || occursin("HCoin", gate)
         return true

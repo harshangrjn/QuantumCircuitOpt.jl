@@ -1,6 +1,18 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.2.0
+- MAJOR framework updates which support gates upto *five* qubit gates. Framework is now flexible to generalize it to even larger qubit circuits, by updating functions `kron_single_qubit_gate` and `kron_double_qubit_gate`
+- Bug fixes and major re-factoring of `src/data.jl` to support any permutation of gates on qubits 
+- Enabling Controlled-R (CRX, CRY, CRZ) and Controlled-U3 (CU3) gates
+- Adding functions to data.jl that are the equivalent of the single-qubit ones (e.g. get_all_CR_gates)
+- Enabling this functionality in the log.jl
+- Kron symbol updated from `⊗` to `x`
+- Enabling functionality to take elementary gates with kronecker symbols over all qubits. For example, `"H_1xCNot_23xI_4xI_5"`, `H_1xH_2xT_3`, `I_1xSX_2xTdagger_3`. This functionality only supports one and 2 qubit gates without angle parameters (excluded controlled R and U3 gates)
+- Adding various new 2 qubit gates (including controlled R and U3) in `src/gates.jl`
+- Expanding the elementary gates set with cleaner and flexible framework for any `num_qubits` in functions, `get_full_sized_gate` and `get_full_sized_kron_symbol_gate`
+- Adding new functions: `_parse_gates_with_kron_symbol`, `kron_double_qubit_gate`
+- Updating Docs and adding new unit tests to reflect above changes
 
 ### v0.1.9
 - Updated toffoli input circuit to make it feasible for the commuting gate constraints 
