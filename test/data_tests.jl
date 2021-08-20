@@ -60,8 +60,33 @@ end
     "target_gate" => QCO.IGate(3)
     )
 
+    # 4-qubit gates
+    params = Dict{String, Any}(
+        "num_qubits" => 4,
+        "depth" => 2,
+        "elementary_gates" => ["CU3_13", "CRX_34", "CNot_24", "CH_14"],
+        "CRX_discretization" => [π],
+        "CU_θ_discretization" => [π/2],
+        "CU_ϕ_discretization" => [-π/2],
+        "CU_λ_discretization" => [π/4],
+        "target_gate" => QCO.IGate(4)
+        )
     data = QCO.get_data(params)
-    @test length(keys(data["gates_dict"])) == 15
+    @test length(keys(data["gates_dict"])) == 4
+
+    #5-qubit gates
+    params = Dict{String, Any}(
+        "num_qubits" => 5,
+        "depth" => 2,
+        "elementary_gates" => ["H_1", "T_2", "Tdagger_3", "Sdagger_4", "SX_5", "CX_12", "CX_21", "CY_12", "CY_21", "CRX_23", "CNot_34", "CH_54", "CRY_13", "CRZ_24", "CV_35", "CZ_41", "CSX_51"],
+        "CRX_discretization" => [π],
+        "CRY_discretization" => [π],
+        "CRZ_discretization" => [π],
+        "target_gate" => QCO.IGate(5)
+        )
+
+    data = QCO.get_data(params)
+    @test length(keys(data["gates_dict"])) == 17
 end
 
 @testset "Tests: get_input_circuit_dict" begin

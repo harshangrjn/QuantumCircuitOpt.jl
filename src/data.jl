@@ -248,11 +248,11 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
         if !isempty(R_gates_idx) 
             for i in R_gates_idx
                 if startswith(data["elementary_gates"][i], "RX")
-                    data["discretization"]["RX"] = params["RX_discretization"]
+                    data["discretization"]["RX"] = Float64.(params["RX_discretization"])
                 elseif startswith(data["elementary_gates"][i], "RY")
-                    data["discretization"]["RY"] = params["RY_discretization"]
+                    data["discretization"]["RY"] = Float64.(params["RY_discretization"])
                 elseif startswith(data["elementary_gates"][i], "RZ")
-                    data["discretization"]["RZ"] = params["RZ_discretization"]
+                    data["discretization"]["RZ"] = Float64.(params["RZ_discretization"])
                 end
             end
         end
@@ -260,9 +260,9 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
         if !isempty(U3_gates_idx)
             for i in U3_gates_idx
                 if startswith(data["elementary_gates"][i], "U3")
-                    data["discretization"]["U3_θ"] = params["U_θ_discretization"]
-                    data["discretization"]["U3_ϕ"] = params["U_ϕ_discretization"]
-                    data["discretization"]["U3_λ"] = params["U_λ_discretization"]
+                    data["discretization"]["U3_θ"] = Float64.(params["U_θ_discretization"])
+                    data["discretization"]["U3_ϕ"] = Float64.(params["U_ϕ_discretization"])
+                    data["discretization"]["U3_λ"] = Float64.(params["U_λ_discretization"])
                 end
             end
         end
@@ -270,11 +270,11 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
         if !isempty(CR_gates_idx) 
             for i in CR_gates_idx
                 if startswith(data["elementary_gates"][i], "CRX")
-                    data["discretization"]["CRX"] = params["CRX_discretization"]
+                    data["discretization"]["CRX"] = Float64.(params["CRX_discretization"])
                 elseif startswith(data["elementary_gates"][i], "CRY")
-                    data["discretization"]["CRY"] = params["CRY_discretization"]
+                    data["discretization"]["CRY"] = Float64.(params["CRY_discretization"])
                 elseif startswith(data["elementary_gates"][i], "CRZ")
-                    data["discretization"]["CRZ"] = params["CRZ_discretization"]
+                    data["discretization"]["CRZ"] = Float64.(params["CRZ_discretization"])
                 end
             end
         end
@@ -282,9 +282,9 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
         if !isempty(CU3_gates_idx)
             for i in CU3_gates_idx
                 if startswith(data["elementary_gates"][i], "CU3")
-                    data["discretization"]["CU3_θ"] = params["CU_θ_discretization"]
-                    data["discretization"]["CU3_ϕ"] = params["CU_ϕ_discretization"]
-                    data["discretization"]["CU3_λ"] = params["CU_λ_discretization"]
+                    data["discretization"]["CU3_θ"] = Float64.(params["CU_θ_discretization"])
+                    data["discretization"]["CU3_ϕ"] = Float64.(params["CU_ϕ_discretization"])
+                    data["discretization"]["CU3_λ"] = Float64.(params["CU_λ_discretization"])
                 end
             end
         end
@@ -444,7 +444,7 @@ function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
             end        
 
             R_complex["$(gate_type)"] = Dict{String, Any}()    
-            R_complex["$(gate_type)"] = QCO.get_discretized_R_gates(gate_type, R_complex[gate_type], collect(params[string(gate_type[1:2],"_discretization")]), params["num_qubits"])
+            R_complex["$(gate_type)"] = QCO.get_discretized_R_gates(gate_type, R_complex[gate_type], Float64.(params[string(gate_type[1:2],"_discretization")]), params["num_qubits"])
 
         end
     end
@@ -486,7 +486,7 @@ function get_all_CR_gates(params::Dict{String, Any}, elementary_gates::Array{Str
             end        
 
             CR_complex["$(gate_type)"] = Dict{String, Any}()    
-            CR_complex["$(gate_type)"] = QCO.get_discretized_CR_gates(gate_type, CR_complex[gate_type], collect(params[string(gate_type[1:3],"_discretization")]), params["num_qubits"])
+            CR_complex["$(gate_type)"] = QCO.get_discretized_CR_gates(gate_type, CR_complex[gate_type], Float64.(params[string(gate_type[1:3],"_discretization")]), params["num_qubits"])
 
         end
     end
@@ -528,7 +528,7 @@ function get_all_U3_gates(params::Dict{String, Any}, elementary_gates::Array{Str
                     end
                 end
 
-                U3_complex[gate_name] = QCO.get_discretized_U3_gates(gate_name, U3_complex[gate_name], collect(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
+                U3_complex[gate_name] = QCO.get_discretized_U3_gates(gate_name, U3_complex[gate_name], Float64.(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
             end
 
         end
@@ -577,7 +577,7 @@ function get_all_CU3_gates(params::Dict{String, Any}, elementary_gates::Array{St
                     end
                 end
 
-                CU3_complex[gate_name] = QCO.get_discretized_CU3_gates(gate_name, CU3_complex[gate_name], collect(float(params["CU_θ_discretization"])), collect(float(params["CU_ϕ_discretization"])), collect(float(params["CU_λ_discretization"])), params["num_qubits"])
+                CU3_complex[gate_name] = QCO.get_discretized_CU3_gates(gate_name, CU3_complex[gate_name], Float64.(float(params["CU_θ_discretization"])), collect(float(params["CU_ϕ_discretization"])), collect(float(params["CU_λ_discretization"])), params["num_qubits"])
             end
 
         end
