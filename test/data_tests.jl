@@ -34,12 +34,23 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 2,
-    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "H_1xH_2", "X_1xX_2", "Y_1xY_2", "Z_1xZ_2", "SX_1xSX_2", "T_1xT_2", "CZ_12", "CH_12", "CV_12", "CSX_12"],
+    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CZ_12", "CH_12", "CV_12", "CSX_12"],
     "target_gate" => QCO.IGate(2),               
     )
 
     data = QCO.get_data(params, eliminate_identical_gates = false)
-    @test length(keys(data["gates_dict"])) == 28 
+    @test length(keys(data["gates_dict"])) == 22
+    
+    # kron gates
+    params = Dict{String, Any}(
+    "num_qubits" => 3,
+    "depth" => 2,
+    "elementary_gates" => ["I_1xH_2xT_3", "Tdagger_1xS_2xSdagger_3", "SX_1xSXdagger_2xX_3", "Y_1xCNot_23", "CNot_21xZ_3", "CV_21xI_3", "I_1xCV_23", "CVdagger_21xI_3", "I_1xCVdagger_23", "CX_21xI_3", "I_1xCX_23", "CY_21xI_3", "I_1xCY_23", "CZ_21xI_3", "I_1xCZ_23", "CH_21xI_3", "I_1xCH_23", "CSX_21xI_3", "I_1xCSX_23", "Swap_21xI_3", "I_1xiSwap_23"],
+    "target_gate" => QCO.IGate(3),         
+    )
+
+    data = QCO.get_data(params, eliminate_identical_gates = false)
+    @test length(keys(data["gates_dict"])) == 21
 
     # 3-qubit gates
     params = Dict{String, Any}(

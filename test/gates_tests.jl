@@ -1,6 +1,6 @@
 # Unit tests for functions in gates.jl
 
-@testset "Tests: building elementary universal gates" begin
+@testset "Tests: elementary universal gates in gates.jl" begin
     @test isapprox(QCO.U2Gate(0,-π/4), QCO.U3Gate(π/2,0,-π/4), atol=tol_0)
     @test isapprox(QCO.U1Gate(-π/4), QCO.U3Gate(0,0,-π/4), atol=tol_0)
 
@@ -119,19 +119,51 @@
 
     # Identity tests
 
-    Iden = QCO.IGate(2);
+    Id = QCO.IGate(2);
     CRXRev = QCO.get_full_sized_gate("CRX_21", 2, angle=pi);
 
-    @test isapprox(Iden, CRXRev * CRXRev * CRXRev * CRXRev, atol = tol_0)
+    @test isapprox(Id, CRXRev * CRXRev * CRXRev * CRXRev, atol = tol_0)
 
-    Iden = QCO.IGate(2);
     CRYRev = QCO.get_full_sized_gate("CRY_21", 2, angle=pi);
+    @test isapprox(Id, CRYRev * CRYRev * CRYRev * CRYRev, atol = tol_0)
 
-    @test isapprox(Iden, CRYRev * CRYRev * CRYRev * CRYRev, atol = tol_0)
-
-    Iden = QCO.IGate(2);
     CRZRev = QCO.get_full_sized_gate("CRZ_21", 2, angle=pi);
+    @test isapprox(Id, CRZRev * CRZRev * CRZRev * CRZRev, atol = tol_0)
 
-    @test isapprox(Iden, CRZRev * CRZRev * CRZRev * CRZRev, atol = tol_0)
+    # Rev gate tests for involution
+    @test isapprox(QCO.CXRevGate(), QCO.CNotRevGate(), atol = tol_0)
+    @test isapprox(QCO.CXGate() * QCO.SwapGate() * QCO.CXRevGate() * QCO.SwapGate(), QCO.IGate(2), atol = tol_0)
+    @test isapprox(QCO.CYGate() * QCO.SwapGate() * QCO.CYRevGate() * QCO.SwapGate(), QCO.IGate(2), atol = tol_0)
+    @test isapprox(QCO.CZGate() * QCO.SwapGate() * QCO.CZRevGate() * QCO.SwapGate(), QCO.IGate(2), atol = tol_0)
+    @test isapprox(QCO.CHGate() * QCO.SwapGate() * QCO.CHRevGate() * QCO.SwapGate(), QCO.IGate(2), atol = tol_0)
+    
+    # Rev gate tests for non-involution
+    @test isapprox(QCO.CVGate() * QCO.SwapGate() * QCO.CVRevGate() * QCO.SwapGate(), QCO.CVGate()^2, atol = tol_0)
+    @test isapprox(QCO.CSXGate() * QCO.SwapGate() * QCO.CSXRevGate() * QCO.SwapGate(), QCO.CSXGate()^2, atol = tol_0)
+
+    @test isapprox(QCO.WGate(), QCO.HCoinGate(), atol = tol_0)
+
+    # Fredkin test = CSwapGate
+    CNot_32 = QCO.get_full_sized_gate("CNot_32", 3)
+    CV_23 = QCO.get_full_sized_gate("CV_23", 3)
+    CV_13 = QCO.get_full_sized_gate("CV_13", 3)
+    CNot_12 = QCO.get_full_sized_gate("CNot_12", 3)
+    CVdagger_23 = QCO.get_full_sized_gate("CVdagger_23", 3)
+    @test isapprox(QCO.CSwapGate(), CNot_32 * CV_23 * CV_13 * CNot_12 * CVdagger_23 * CNot_12 * CNot_32, atol = tol_0)
+
+    # CCZGate test: CCZ is equivalent to Toffoli when the target qubit is conjugated by Hadamard gates
+    H_3 = QCO.get_full_sized_gate("H_3", 3)
+    @test isapprox(QCO.ToffoliGate(), H_3 * QCO.CCZGate() * H_3, atol = tol_0)
+
+    # Peres test 
+    CVdagger_13 = QCO.get_full_sized_gate("CVdagger_13", 3)
+    @test isapprox(QCO.PeresGate(), QCO.ToffoliGate() * CNot_12, atol = tol_0)
+    @test isapprox(QCO.PeresGate(), CVdagger_13 * CVdagger_23 * CNot_12 * CV_23, atol = tol_0)
+
+    #iSwap test 
+    @test isapprox(QCO.get_full_sized_gate("iSwap_21", 3), QCO.get_full_sized_gate("iSwap_12", 3), atol = tol_0)
+    @test isapprox(QCO.get_full_sized_gate("iSwap_23", 4), QCO.get_full_sized_gate("iSwap_32", 4), atol = tol_0)
+    @test isapprox(QCO.get_full_sized_gate("iSwap_35", 5), QCO.get_full_sized_gate("iSwap_53", 5), atol = tol_0)
+
 end
 

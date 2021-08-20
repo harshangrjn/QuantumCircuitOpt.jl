@@ -887,7 +887,7 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
             if c_qubit < t_qubit
                 M = kron(M, QCO.CVdaggerGate())
             else
-                M = kron(M, QCO.CVdaggerRevGate())
+                M = kron(M, QCO.CVRevdaggerGate())
             end
 
         elseif kron_gates[i] in "CH_" .* qubits_string_2

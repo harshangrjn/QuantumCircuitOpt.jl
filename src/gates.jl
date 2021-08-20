@@ -1417,7 +1417,7 @@ end
 @doc raw"""
     CSXRevGate()
 
-Two-qubit controlled version of ([SXRevGate](@ref)). 
+Two-qubit controlled version of the reverse ([SXGate](@ref)). 
 
 **Circuit Representation**
 ```
@@ -1724,8 +1724,8 @@ PeresGate =
             0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
             0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
             0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
             0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
             0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
             0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
         \end{pmatrix}
@@ -1737,8 +1737,8 @@ function PeresGate()
                                       0  1  0  0  0  0  0  0
                                       0  0  1  0  0  0  0  0
                                       0  0  0  1  0  0  0  0
-                                      0  0  0  0  0  0  0  1
                                       0  0  0  0  0  0  1  0
+                                      0  0  0  0  0  0  0  1
                                       0  0  0  0  0  1  0  0
                                       0  0  0  0  1  0  0  0])
 
