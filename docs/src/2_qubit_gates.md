@@ -20,17 +20,33 @@ DCXGate
 ```@docs
 CXGate
 ```
+## CXRevGate
+```@docs
+CXRevGate
+```
 ## CYGate
 ```@docs
 CYGate
+```
+## CYRevGate
+```@docs
+CYRevGate
 ```
 ## CZGate
 ```@docs
 CZGate
 ```
+## CZRevGate
+```@docs
+CZRevGate
+```
 ## CHGate
 ```@docs
 CHGate
+```
+## CHRevGate
+```@docs
+CHRevGate
 ```
 ## CVGate
 ```@docs
@@ -92,9 +108,9 @@ SwapGate
 ```@docs
 iSwapGate
 ```
-## C2SXGate
+## CSXGate
 ```@docs
-C2SXGate
+CSXGate
 ```
 ## MGate
 ```@docs

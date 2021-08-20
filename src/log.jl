@@ -252,7 +252,7 @@ end
     get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{String,1})
 
 This function returns a decomposition of gates after compressing adjacent pair of gates represented on two separate qubits. 
-For example, gates H1 and H2 appearing in a sequence will be compressed to H1⊗H2. This functionality is currently supported only for
+For example, gates H1 and H2 appearing in a sequence will be compressed to H1xH2 (kron(H1,H2)). This functionality is currently supported only for
 two qubit circuits. 
 """
 function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{String,1})
@@ -279,9 +279,9 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
                     if !(gate_i) && !(gate_iplus1)
                         if (occursin('1', gates_sol[i]) && occursin('2', gates_sol[i+1])) || (occursin('2', gates_sol[i]) && occursin('1', gates_sol[i+1])) 
                             if occursin('1', gates_sol[i])
-                                gate_string = string(gates_sol[i],"⊗",gates_sol[i+1])
+                                gate_string = string(gates_sol[i],"x",gates_sol[i+1])
                             else 
-                                gate_string = string(gates_sol[i+1],"⊗",gates_sol[i])
+                                gate_string = string(gates_sol[i+1],"x",gates_sol[i])
                             end
                             push!(gates_sol_compressed, gate_string)
                             status = true
@@ -319,7 +319,7 @@ function is_multi_qubit_gate(gate::String)
         return true
     elseif occursin("12", gate) || occursin("21", gate) || occursin("13", gate) || occursin("31", gate) || occursin("23", gate) || occursin("32", gate)
         return true
-    elseif occursin("⊗", gate)
+    elseif occursin(kron_symbol, gate)
         return true
     elseif occursin("Swap", gate) || occursin("HCoin", gate)
         return true

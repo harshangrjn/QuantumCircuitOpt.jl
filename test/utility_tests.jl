@@ -83,11 +83,11 @@ end
     @test isapprox(data["gates_real"][:,:,C2[1][1]] * data["gates_real"][:,:,C2[1][2]], data["gates_real"][:,:,C2[1][2]] * data["gates_real"][:,:,C2[1][1]], atol=tol_0)
 end
 
-@testset "Tests: kron_single_gate" begin
-    I1 = QCO.kron_single_gate(4, QCO.IGate(1), "q1")
-    I2 = QCO.kron_single_gate(4, QCO.IGate(1), "q2")
-    I3 = QCO.kron_single_gate(4, QCO.IGate(1), "q3")
-    I4 = QCO.kron_single_gate(4, QCO.IGate(1), "q4")
+@testset "Tests: kron_single_qubit_gate" begin
+    I1 = QCO.kron_single_qubit_gate(4, QCO.IGate(1), "q1")
+    I2 = QCO.kron_single_qubit_gate(4, QCO.IGate(1), "q2")
+    I3 = QCO.kron_single_qubit_gate(4, QCO.IGate(1), "q3")
+    I4 = QCO.kron_single_qubit_gate(4, QCO.IGate(1), "q4")
     @test I1 == I2 == I3 == I4
 end
 

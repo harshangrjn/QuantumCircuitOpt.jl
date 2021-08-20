@@ -8,7 +8,7 @@ function decompose_RX_on_q3()
     "depth" => 3,    
 
     "elementary_gates" => ["U3_3", "Identity"], 
-    "target_gate" => QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3"),
+    "target_gate" => QCO.kron_single_qubit_gate(3, QCO.RXGate(π/4), "q3"),
        
     "U_θ_discretization" => [0, π/4],
     "U_ϕ_discretization" => [0, -π/2],

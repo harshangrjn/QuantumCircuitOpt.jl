@@ -332,16 +332,15 @@ function unique_matrices(M::Array{Float64, 3})
 end
 
 """
-    kron_single_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
+    kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
 
 Given number of qubits of the circuit, the complex-valued gate and the qubit location ("q1","q2',"q3",...),
-kron_single_gate function returns a full-sized gate after applying appropriate kronecker products. 
+kron_single_qubit_gate function returns a full-sized gate after applying appropriate kronecker products. 
 """
-function kron_single_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
+function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
     
-    if size(M)[1] >= 2^num_qubits
-        Memento.warn(_LOGGER, "Input gate is already in $num_qubits qubits")
-        return M
+    if size(M)[1] != 2
+        Memento.error(_LOGGER, "Input gate should be 1 qubit")
     end
 
     I = QCO.IGate(1)
@@ -381,9 +380,127 @@ function kron_single_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit
         else
             Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3, q4]")
         end
+
+    elseif num_qubits == 5
+        
+        if qubit_loc == "q1" 
+            return kron(kron(kron(kron(M,I),I),I),I)
+        elseif qubit_loc == "q2" 
+            return kron(kron(kron(kron(I,M),I),I),I)
+        elseif qubit_loc == "q3" 
+            return kron(kron(kron(kron(I,I),M),I),I)
+        elseif qubit_loc == "q4" 
+            return kron(kron(kron(kron(I,I),I),M),I)
+        elseif qubit_loc == "q5" 
+            return kron(kron(kron(kron(I,I),I),I),M)
+        else
+            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3, q4, q5]")
+        end
     
     # Larger qubit circuits can be supported here.
 
     end
 
 end
+
+function kron_double_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit::String, t_qubit::String)
+    
+    if size(M)[1] != 4
+        Memento.error(_LOGGER, "Input gate should be in 2 qubits")
+    end
+
+    if c_qubit == t_qubit
+        Memento.error(_LOGGER, "Control and target qubits cannot be identical for multi-qubit elementary gates")
+    end
+
+    I = QCO.IGate(1)
+    Swap = QCO.SwapGate()
+
+    if num_qubits == 2
+        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
+            return M
+        else
+            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2]") 
+        end
+        
+    elseif num_qubits == 3     
+
+        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
+            return kron(M,I)
+        elseif (c_qubit in ["q2", "q3"]) && (t_qubit in ["q2", "q3"])
+            return kron(I,M)
+        elseif (c_qubit in ["q1", "q3"]) && (t_qubit in ["q1", "q3"])
+            return kron(I, Swap) * kron(M, I) * kron(I, Swap)
+        else
+            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3]") 
+        end
+
+
+    elseif num_qubits == 4
+
+        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
+            return kron(kron(M,I),I)
+        elseif (c_qubit in ["q2", "q3"]) && (t_qubit in ["q2", "q3"])
+            return kron(kron(I,M),I)
+        elseif (c_qubit in ["q3", "q4"]) && (t_qubit in ["q3", "q4"])
+            return kron(kron(I,I),M)
+        elseif (c_qubit in ["q1", "q3"]) && (t_qubit in ["q1", "q3"])
+            return kron(kron(I, Swap),I) * kron(kron(M, I),I) * kron(kron(I, Swap),I)
+        elseif (c_qubit in ["q2", "q4"]) && (t_qubit in ["q2", "q4"])
+            return kron(I, kron(I, Swap)) * kron(I, kron(M, I)) * kron(I, kron(I, Swap))
+        elseif (c_qubit in ["q1", "q4"]) && (t_qubit in ["q1", "q4"])
+            return kron(I, kron(I, Swap)) * kron(kron(I, Swap),I) * kron(M, kron(I, I)) * kron(kron(I, Swap),I) * kron(I, kron(I, Swap))
+        else
+            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3]") 
+        end
+
+    elseif num_qubits == 5
+
+        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
+            return kron(kron(kron(M,I),I),I)
+        elseif (c_qubit in ["q2", "q3"]) && (t_qubit in ["q2", "q3"])
+            return kron(kron(kron(I,M),I),I)
+        elseif (c_qubit in ["q3", "q4"]) && (t_qubit in ["q3", "q4"])
+            return kron(kron(kron(I,I),M),I)
+        elseif (c_qubit in ["q4", "q5"]) && (t_qubit in ["q4", "q5"])
+            return kron(kron(kron(I,I),I),M)
+        elseif (c_qubit in ["q1", "q3"]) && (t_qubit in ["q1", "q3"])
+            return kron(kron(kron(I, Swap),I),I) * kron(kron(kron(M, I),I),I) * kron(kron(kron(I, Swap),I),I)
+        elseif (c_qubit in ["q2", "q4"]) && (t_qubit in ["q2", "q4"])
+            return kron(kron(I, kron(I, Swap)),I) * kron(kron(I, kron(M, I)),I) * kron(kron(I, kron(I, Swap)),I)
+        elseif (c_qubit in ["q3", "q5"]) && (t_qubit in ["q3", "q5"])
+            return kron(kron(I, kron(I, I)), Swap) * kron(kron(I, kron(I, M)),I) * kron(kron(I, kron(I, I)), Swap)
+        elseif (c_qubit in ["q1", "q4"]) && (t_qubit in ["q1", "q4"])
+            return kron(kron(I, kron(I, Swap)),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(M, kron(I, I)),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(I, kron(I, Swap)),I)
+        elseif (c_qubit in ["q2", "q5"]) && (t_qubit in ["q2", "q5"])
+            return kron(kron(I, kron(I, I)), Swap) * kron(kron(kron(I, I), Swap),I) * kron(kron(I, kron(M, I)),I) * kron(kron(kron(I, I), Swap),I) * kron(kron(I, kron(I, I)), Swap)
+        elseif (c_qubit in ["q1", "q5"]) && (t_qubit in ["q1", "q5"])
+            return kron(kron(I, kron(I, I)), Swap) * kron(kron(kron(I, I), Swap),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(M, kron(I, I)),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(kron(I, I), Swap),I) * kron(kron(I, kron(I, I)), Swap)
+        end
+
+    # Larger qubit circuits can be supported here.
+
+    end
+
+end
+
+function _parse_gates_with_kron_symbol(s::String)
+
+    gates = Vector{String}()
+    gate_id = string()
+ 
+    for i = 1:length(s)
+       if s[i] != kron_symbol
+          gate_id = gate_id * s[i]
+       else
+          push!(gates, gate_id)
+          (i != length(s)) && (gate_id = string())
+       end
+ 
+       if i == length(s) 
+          push!(gates, gate_id)
+       end
+    end
+ 
+    return gates
+ end

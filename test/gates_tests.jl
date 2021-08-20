@@ -104,33 +104,33 @@
     # 2 Qubit QFT (Ref: https://www.cs.bham.ac.uk/internal/courses/intro-mqc/current/lecture06_handout.pdf)
 
     H2 = QCO.get_full_sized_gate("H_2", 2);
-    SWAP = QCO.get_full_sized_gate("Swap", 2);
-    CU = QCO.get_full_sized_gate("CU3_21", 2, matrix = QCO.CU3RevGate(0, π/4, π/4));
+    SWAP = QCO.get_full_sized_gate("Swap_12", 2);
+    CU = QCO.get_full_sized_gate("CU3_21", 2, angle = [0, π/4, π/4]);
 
     @test isapprox(QCO.QFT2Gate(), H1 * CU * H2 * SWAP)
 
     # CRY Decomp (Ref: https://quantumcomputing.stackexchange.com/questions/2143/how-can-a-controlled-ry-be-made-from-cnots-and-rotations)
 
     CNOT12 = QCO.get_full_sized_gate("CNot_12", 2);
-    U3_negpi = QCO.get_full_sized_gate("U3", 2, matrix=QCO.U3Gate(-pi/2, 0, 0), qubit_location="q2");
-    U3_pi = QCO.get_full_sized_gate("U3", 2, matrix=QCO.U3Gate(pi/2, 0, 0), qubit_location="q2");
+    U3_negpi = QCO.get_full_sized_gate("U3_2", 2, angle=[-pi/2, 0, 0]);
+    U3_pi = QCO.get_full_sized_gate("U3_2", 2, angle=[pi/2, 0, 0]);
 
     @test isapprox(QCO.CRYGate(pi), CNOT12 * U3_negpi * CNOT12 * U3_pi, atol = tol_0)
 
     # Identity tests
 
     Iden = QCO.IGate(2);
-    CRXRev = QCO.get_full_sized_gate("CRX_21", 2, matrix=QCO.CRXRevGate(pi));
+    CRXRev = QCO.get_full_sized_gate("CRX_21", 2, angle=pi);
 
     @test isapprox(Iden, CRXRev * CRXRev * CRXRev * CRXRev, atol = tol_0)
 
     Iden = QCO.IGate(2);
-    CRYRev = QCO.get_full_sized_gate("CRY_21", 2, matrix=QCO.CRYRevGate(pi));
+    CRYRev = QCO.get_full_sized_gate("CRY_21", 2, angle=pi);
 
     @test isapprox(Iden, CRYRev * CRYRev * CRYRev * CRYRev, atol = tol_0)
 
     Iden = QCO.IGate(2);
-    CRZRev = QCO.get_full_sized_gate("CRZ_21", 2, matrix=QCO.CRZRevGate(pi));
+    CRZRev = QCO.get_full_sized_gate("CRZ_21", 2, angle=pi);
 
     @test isapprox(Iden, CRZRev * CRZRev * CRZRev * CRZRev, atol = tol_0)
 end

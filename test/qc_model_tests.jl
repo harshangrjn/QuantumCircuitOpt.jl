@@ -48,7 +48,7 @@ end
     "num_qubits" => 2, 
     "depth" => 2,    
     "elementary_gates" => ["U3_1", "U3_2", "Identity"],  
-    "target_gate" => QCO.kron_single_gate(2, QCO.U3Gate(0,0,π/4), "q1"),
+    "target_gate" => QCO.kron_single_qubit_gate(2, QCO.U3Gate(0,0,π/4), "q1"),
     "U_θ_discretization" => [0, π/2],
     "U_ϕ_discretization" => [0],
     "U_λ_discretization" => [0, π/4],
@@ -102,7 +102,7 @@ end
     "num_qubits" => 3, 
     "depth" => 2,    
     "elementary_gates" => ["CU3_31", "CU3_13", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CU3_31", 3, target_angle = [0, 0, pi/4]),
+    "target_gate" => QCO.get_full_sized_gate("CU3_31", 3, angle = [0, 0, pi/4]),
     "CU_θ_discretization" => [0, π/2],
     "CU_ϕ_discretization" => [0],
     "CU_λ_discretization" => [0, π/4],
@@ -129,7 +129,7 @@ end
     "num_qubits" => 2, 
     "depth" => 3,
     "elementary_gates" => ["RX_1", "RY_2", "RZ_1", "Identity"],  
-    "target_gate" => QCO.kron_single_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_gate(2, QCO.RZGate(π/4), "q1"),
+    "target_gate" => QCO.kron_single_qubit_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_qubit_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_qubit_gate(2, QCO.RZGate(π/4), "q1"),
     "RX_discretization" => [0, π/4],
     "RY_discretization" => [π/4],
     "RZ_discretization" => [π/2, π/4],
@@ -151,7 +151,7 @@ end
     "num_qubits" => 3, 
     "depth" => 3,
     "elementary_gates" => ["CRX_12", "CRY_23", "CRZ_31", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, matrix=QCO.CRXGate(pi/4)) * QCO.get_full_sized_gate("CRY_23", 3, matrix=QCO.CRYGate(pi/4)) * QCO.get_full_sized_gate("CRZ_31", 3, target_angle = pi/4),
+    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, angle = pi/4) * QCO.get_full_sized_gate("CRY_23", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_31", 3, angle=pi/4),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
@@ -173,7 +173,7 @@ end
     "num_qubits" => 3, 
     "depth" => 3,
     "elementary_gates" => ["CRX_31", "CRY_31", "CRZ_13", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_31", 3, target_angle=pi/4) * QCO.get_full_sized_gate("CRY_31", 3, target_angle=pi/4) * QCO.get_full_sized_gate("CRZ_13", 3, target_angle = pi/2),
+    "target_gate" => QCO.get_full_sized_gate("CRX_31", 3, angle=pi/4) * QCO.get_full_sized_gate("CRY_31", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_13", 3, angle = pi/2),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
@@ -196,7 +196,7 @@ end
     "num_qubits" => 3, 
     "depth" => 2,    
     "elementary_gates" => ["U3_1", "U3_2", "U3_3", "Identity"],  
-    "target_gate" => QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3"),
+    "target_gate" => QCO.kron_single_qubit_gate(3, QCO.RXGate(π/4), "q3"),
     "U_θ_discretization" => [0, π/4],
     "U_ϕ_discretization" => [0, -π/2],
     "U_λ_discretization" => [0, π/2],    
@@ -226,7 +226,7 @@ end
         "num_qubits" => 3, 
         "depth" => 2,    
         "elementary_gates" => ["CU3_12", "CU3_23", "CU3_13", "Identity"],  
-        "target_gate" => QCO.get_full_sized_gate("CRX_13", 3, target_angle = pi/4),
+        "target_gate" => QCO.get_full_sized_gate("CRX_13", 3, angle = pi/4),
         "CU_θ_discretization" => [0, π/4],
         "CU_ϕ_discretization" => [0, -π/2],
         "CU_λ_discretization" => [0, π/2],    
@@ -255,7 +255,7 @@ end
         "num_qubits" => 2, 
         "depth" => 3,    
         "elementary_gates" => ["H_1", "H_2"],  
-        "target_gate" => QCO.kron_single_gate(2, QCO.HGate(), "q1"),
+        "target_gate" => QCO.kron_single_qubit_gate(2, QCO.HGate(), "q1"),
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact"
         )
@@ -354,8 +354,8 @@ end
 @testset "Tests: constraint_redundant_gate_product_pairs" begin
     
     function target_gate()
-        T1 = QCO.get_full_sized_gate("U3", 2, matrix = QCO.U3Gate(0,π/2,π), qubit_location = "q2")
-        T2 = QCO.get_full_sized_gate("U3", 2, matrix = QCO.U3Gate(π/2,π/2,-π/2), qubit_location = "q1")
+        T1 = QCO.get_full_sized_gate("U3_2", 2, angle = [0,π/2,π])
+        T2 = QCO.get_full_sized_gate("U3_1", 2, angle = [π/2,π/2,-π/2])
         return T1*T2
     end
     

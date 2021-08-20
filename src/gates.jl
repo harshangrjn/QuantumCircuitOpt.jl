@@ -591,6 +591,41 @@ function CXGate()
 end
 
 @doc raw"""
+    CXRevGate()
+
+Two-qubit reverse controlled-X gate, with target and control on first and second qubits, respectively. 
+This is also the same as [CNotRevGate](@ref). 
+
+**Circuit Representation**
+```
+     ┌───┐
+q_0: ┤ X ├
+     └─┬─┘
+q_1: ──■──
+```
+
+**Matrix Representation**
+
+```math
+CXRev = I \otimes |0 \rangle\langle 0| + X \otimes |1 \rangle\langle 1| = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 0 \\
+        0 & 1 & 0 & 0
+    \end{pmatrix}
+```
+"""
+function CXRevGate()
+    
+    # I ⊗ |0⟩⟨0|
+    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
+    # X ⊗ |1⟩⟨1| 
+    control_1 = kron(QCO.XGate(), Array{Complex{Float64},2}([0 0; 0 1]))
+    
+    return control_0 + control_1
+end
+
+@doc raw"""
     CYGate()
 
 Two-qubit controlled [YGate](@ref). 
@@ -606,7 +641,7 @@ q_1: ┤ Y ├
 **Matrix Representation**
 
 ```math
-CY = \begin{pmatrix}
+CY = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Y = \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
     0 & 0 & 0 & -i \\
@@ -616,8 +651,46 @@ CY = \begin{pmatrix}
 """
 function CYGate()
 
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 -im; 0 0 im 0]) 
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    # |1⟩⟨1| ⊗ Y 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.YGate())
+    
+    return control_0 + control_1
+end
 
+@doc raw"""
+    CYRevGate()
+
+Two-qubit reverse controlled-Y gate, with target and control on first and second qubits, respectively. 
+
+**Circuit Representation**
+```
+     ┌───┐
+q_0: ┤ Y ├
+     └─┬─┘
+q_1: ──■──
+```
+
+**Matrix Representation**
+
+```math
+CYRev = I \otimes |0 \rangle\langle 0| + Y \otimes |1 \rangle\langle 1| = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 0 & 0 & -i \\
+        0 & 0 & 1 & 0 \\
+        0 & i & 0 & 0
+    \end{pmatrix}
+```
+"""
+function CYRevGate()
+    
+    # I ⊗ |0⟩⟨0|
+    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
+    # Y ⊗ |1⟩⟨1| 
+    control_1 = kron(QCO.YGate(), Array{Complex{Float64},2}([0 0; 0 1]))
+    
+    return control_0 + control_1
 end
 
 @doc raw"""
@@ -636,7 +709,7 @@ q_1: ┤ Z ├     ─■─
 **Matrix Representation**
 
 ```math
-CZ = \begin{pmatrix}
+CZ = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Z = \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
     0 & 0 & 1 & 0 \\
@@ -645,9 +718,47 @@ CZ = \begin{pmatrix}
 ```
 """
 function CZGate()
+    
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    # |1⟩⟨1| ⊗ Z 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.ZGate())
+    
+    return control_0 + control_1 
+end
 
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1]) 
+@doc raw"""
+    CZRevGate()
 
+Two-qubit reverse controlled-Z gate, with target and control on first and second qubits, respectively. 
+
+**Circuit Representation**
+```
+     ┌───┐
+q_0: ┤ Z ├
+     └─┬─┘
+q_1: ──■──
+```
+
+**Matrix Representation**
+
+```math
+CZRev = I \otimes |0\rangle\langle0| + Z \otimes |1\rangle\langle1| = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & -1
+    \end{pmatrix}
+```
+"""
+function CZRevGate()
+    
+    # I ⊗ |0⟩⟨0|
+    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
+    # Z ⊗ |1⟩⟨1| 
+    control_1 = kron(QCO.ZGate(), Array{Complex{Float64},2}([0 0; 0 1]))
+    
+    return control_0 + control_1
 end
 
 @doc raw"""
@@ -666,7 +777,7 @@ q_1: ┤ H ├
 **Matrix Representation**
 
 ```math
-CH = \begin{pmatrix}
+CH = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes H = \begin{pmatrix}
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 \\
 0 & 0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
@@ -676,14 +787,52 @@ CH = \begin{pmatrix}
 """
 function CHGate()
 
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1/sqrt(2) 1/sqrt(2); 0  0 1/sqrt(2) -1/sqrt(2)])
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    # |1⟩⟨1| ⊗ H 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.HGate())
+    
+    return control_0 + control_1 
+end
 
+@doc raw"""
+    CHRevGate()
+
+Two-qubit reverse controlled-H gate, with target and control on first and second qubits, respectively. 
+
+**Circuit Representation**
+```
+     ┌───┐
+q_0: ┤ H ├
+     └─┬─┘
+q_1: ──■──
+```
+
+**Matrix Representation**
+
+```math
+CHRev = I \otimes |0\rangle\langle 0| + H \otimes |1\rangle\langle 1| = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & \frac{1}{\sqrt{2}} & 0 & \frac{1}{\sqrt{2}} \\
+        0 & 0 & 1 & 0 \\
+        0 & \frac{1}{\sqrt{2}} & 0 & -\frac{1}{\sqrt{2}}
+    \end{pmatrix}
+```
+"""
+function CHRevGate()
+    
+    # I ⊗ |0⟩⟨0|
+    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
+    # H ⊗ |1⟩⟨1| 
+    control_1 = kron(QCO.HGate(), Array{Complex{Float64},2}([0 0; 0 1]))
+    
+    return control_0 + control_1
 end
 
 @doc raw"""
     CVGate()
 
-Two-qubit, controlled-V gate, which is also the same as Controlled square-root of X gate ([C2SXGate](@ref)).  
+Two-qubit, controlled-V gate, which is also the same as Controlled square-root of X gate ([CSXGate](@ref)).  
 
 **Circuit Representation**
 ```
@@ -706,7 +855,7 @@ CV = \begin{pmatrix}
 """
 function CVGate()
 
-    return QCO.C2SXGate() 
+    return QCO.CSXGate() 
 
 end
 
@@ -744,7 +893,7 @@ end
 @doc raw"""
     CVdaggerGate()
 
-Two-qubit hermitian conjugate of controlled-V gate, which is also the same as hermitian conjugate Controlled square-root of X gate ([C2SXGate](@ref)).  
+Two-qubit hermitian conjugate of controlled-V gate, which is also the same as hermitian conjugate Controlled square-root of X gate ([CSXGate](@ref)).  
 
 **Circuit Representation**
 ```
@@ -1232,9 +1381,9 @@ function iSwapGate()
 end
 
 @doc raw"""
-    C2SXGate()
+    CSXGate()
 
-Two-qubit controlled ([SXGate](@ref)), which is also the square root of the Pauli-[XGate](@ref). 
+Two-qubit controlled version of ([SXGate](@ref)). 
 
 **Circuit Representation**
 ```
@@ -1247,7 +1396,7 @@ q_1: ┤ sqrt(X) ├
 **Matrix Representation**
 
 ```math
-C2SXGate = \begin{pmatrix}
+CSXGate = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes SX = \begin{pmatrix}
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 \\
 0 & 0 & 0.5+0.5i & 0.5-0.5i \\
@@ -1255,10 +1404,48 @@ C2SXGate = \begin{pmatrix}
     \end{pmatrix}
 ```
 """
-function C2SXGate()
+function CSXGate()
 
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5+0.5im 0.5-0.5im; 0 0 0.5-0.5im 0.5+0.5im]) 
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    # |1⟩⟨1| ⊗ SX 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.SXGate())
+        
+    return control_0 + control_1 
+end
 
+@doc raw"""
+    CSXRevGate()
+
+Two-qubit controlled version of ([SXRevGate](@ref)). 
+
+**Circuit Representation**
+```
+     ┌─────────┐
+q_1: ┤ sqrt(X) ├
+     └────┬────┘
+q_0: ─────■────
+```
+
+**Matrix Representation**
+
+```math
+CSXRevGate = I \otimes |0\rangle\langle 0| + SX \otimes |1\rangle\langle 1| = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0.5+0.5i & 0 & 0.5-0.5i \\
+0 & 0 & 1 & 0 \\
+0 & 0.5-0.5i & 0 & 0.5+0.5i
+    \end{pmatrix}
+```
+"""
+function CSXRevGate()
+
+    # I ⊗ |0⟩⟨0|
+    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
+    # SX ⊗ |1⟩⟨1| 
+    control_1 = kron(QCO.SXGate(), Array{Complex{Float64},2}([0 0; 0 1]))
+    
+    return control_0 + control_1
 end
 
 

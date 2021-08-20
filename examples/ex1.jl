@@ -22,13 +22,13 @@ end
 
 function target_gate(gate::Int)
     if gate == 1
-        return QCO.kron_single_gate(2, QCO.U3Gate(0,0,π/4), "q1")
+        return QCO.kron_single_qubit_gate(2, QCO.U3Gate(0,0,π/4), "q1")
     elseif gate == 2
-        return QCO.kron_single_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_gate(2, QCO.RZGate(π/4), "q1")
+        return QCO.kron_single_qubit_gate(2, QCO.RXGate(π/4), "q1") * QCO.kron_single_qubit_gate(2, QCO.RYGate(π/4), "q2") * QCO.kron_single_qubit_gate(2, QCO.RZGate(π/4), "q1")
     elseif gate == 3
         return QCO.iSwapGate()
     elseif gate == 4
-        return QCO.kron_single_gate(3, QCO.RXGate(π/4), "q3")
+        return QCO.kron_single_qubit_gate(3, QCO.RXGate(π/4), "q3")
     elseif gate == 5
         return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1]) 
     end
