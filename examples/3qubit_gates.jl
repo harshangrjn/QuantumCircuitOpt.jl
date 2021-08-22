@@ -51,9 +51,33 @@ function decompose_toffoli()
     
 end
 
+function decompose_toffoli_using_kronecker()
+
+    println(">>>>> Toffoli gate using Kronecker <<<<<")
+ 
+    params = Dict{String, Any}(
+    
+    "num_qubits" => 3, 
+    "depth" => 12,    
+  
+    "elementary_gates" => ["T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_3", "I_1xT_2xT_3", "CNot_12xH_3", "T_1xTdagger_2xI_3", "Identity"], 
+    "target_gate" => QCO.ToffoliGate(),
+    
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
+    "relax_integrality" => false,
+    
+    "optimizer" => "cplex",
+    
+    )
+
+    return params
+    
+end
+
 function decompose_toffoli_using_Rotations()
 
-    println(">>>>> Toffoli gate <<<<<")
+    println(">>>>> Toffoli gate using rotations <<<<<")
  
     params = Dict{String, Any}(
     

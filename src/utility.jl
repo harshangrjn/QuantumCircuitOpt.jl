@@ -334,71 +334,35 @@ end
 """
     kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
 
-Given number of qubits of the circuit, the complex-valued gate and the qubit location ("q1","q2',"q3",...),
-kron_single_qubit_gate function returns a full-sized gate after applying appropriate kronecker products. 
+Given number of qubits of the circuit, the complex-valued one-qubit gate and the qubit location ("q1","q2',"q3",...),
+this function returns a full-sized gate after applying appropriate kronecker products. This function currently supports any number
+of qubits up to 9.  
 """
 function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
     
     if size(M)[1] != 2
-        Memento.error(_LOGGER, "Input gate should be 1 qubit")
+        Memento.error(_LOGGER, "Input should be an one-qubit gate")
+    end
+
+    if !(parse(Int, qubit_loc[2:end]) in 1:num_qubits)
+        Memento.error(_LOGGER, "Input qubit location, $qubit_loc, has to be ∈ [q1,...,q$num_qubits]")
     end
 
     I = QCO.IGate(1)
+    M_kron = 1
 
-    if num_qubits == 2     
-
-        if qubit_loc == "q1" 
-            return kron(M,I)
-        elseif qubit_loc == "q2"
-            return kron(I,M)
-        else
-            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2]") 
+    for i = 1:num_qubits
+        M_iter = I
+        if "q$i" == qubit_loc 
+            M_iter = M
         end
+        M_kron = kron(M_kron, M_iter)
+    end
 
-    elseif num_qubits == 3 
-        
-        if qubit_loc == "q1" 
-            return kron(kron(M,I),I)
-        elseif qubit_loc == "q2" 
-            return kron(kron(I,M),I)
-        elseif qubit_loc == "q3" 
-            return kron(kron(I,I),M)
-        else
-            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3]")
-        end
-
-    elseif num_qubits == 4 
-        
-        if qubit_loc == "q1" 
-            return kron(kron(kron(M,I),I),I)
-        elseif qubit_loc == "q2" 
-            return kron(kron(kron(I,M),I),I)
-        elseif qubit_loc == "q3" 
-            return kron(kron(kron(I,I),M),I)
-        elseif qubit_loc == "q4" 
-            return kron(kron(kron(I,I),I),M)
-        else
-            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3, q4]")
-        end
-
-    elseif num_qubits == 5
-        
-        if qubit_loc == "q1" 
-            return kron(kron(kron(kron(M,I),I),I),I)
-        elseif qubit_loc == "q2" 
-            return kron(kron(kron(kron(I,M),I),I),I)
-        elseif qubit_loc == "q3" 
-            return kron(kron(kron(kron(I,I),M),I),I)
-        elseif qubit_loc == "q4" 
-            return kron(kron(kron(kron(I,I),I),M),I)
-        elseif qubit_loc == "q5" 
-            return kron(kron(kron(kron(I,I),I),I),M)
-        else
-            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3, q4, q5]")
-        end
-    
-    # Larger qubit circuits can be supported here.
-
+    if size(M_kron)[1] == 2^(num_qubits)
+        return M_kron 
+    else 
+        Memento.error(_LOGGER, "Dimensions mismatch in evaluation of Kronecker of single-qubit gate")
     end
 
 end
@@ -406,7 +370,7 @@ end
 function kron_double_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit::String, t_qubit::String)
     
     if size(M)[1] != 4
-        Memento.error(_LOGGER, "Input gate should be in 2 qubits")
+        Memento.error(_LOGGER, "Input should be a two-qubit gate")
     end
 
     if c_qubit == t_qubit

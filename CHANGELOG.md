@@ -1,6 +1,9 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.2.1
+- Generalizing and condensing `kron_single_qubit_gate` function to handle any number of qubits (up to 9)
+
 ### v0.2.0
 - MAJOR framework updates which support gates upto *five* qubit gates. Framework is now flexible to generalize it to even larger qubit circuits, by updating functions `kron_single_qubit_gate` and `kron_double_qubit_gate`
 - Bug fixes and major re-factoring of `src/data.jl` to support any permutation of gates on qubits 
