@@ -684,9 +684,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CNotGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CNotGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CNotRevGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CNotRevGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CRX_" .* qubits_string_2
@@ -694,9 +694,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CRXGate(angle), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CRXGate(angle), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CRXRevGate(angle), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CRXRevGate(angle), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CRY_" .* qubits_string_2
@@ -704,9 +704,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CRYGate(angle), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CRYGate(angle), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CRYRevGate(angle), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CRYRevGate(angle), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CRZ_" .* qubits_string_2
@@ -714,9 +714,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CRZGate(angle), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CRZGate(angle), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CRZRevGate(angle), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CRZRevGate(angle), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CU3_" .* qubits_string_2
@@ -724,9 +724,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CU3Gate(angle[1], angle[2], angle[3]), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CU3Gate(angle[1], angle[2], angle[3]), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CU3RevGate(angle[1], angle[2], angle[3]), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CU3RevGate(angle[1], angle[2], angle[3]), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CV_" .* qubits_string_2
@@ -734,9 +734,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CVGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CVRevGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVRevGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CVdagger_" .* qubits_string_2
@@ -744,9 +744,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CVdaggerGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVdaggerGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CVRevdaggerGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVRevdaggerGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CH_" .* qubits_string_2
@@ -754,9 +754,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CHGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CHGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CHRevGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CHRevGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CX_" .* qubits_string_2
@@ -764,9 +764,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CXGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CXGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CXRevGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CXRevGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CY_" .* qubits_string_2
@@ -774,9 +774,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CYGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CYGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CYRevGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CYRevGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CZ_" .* qubits_string_2
@@ -784,9 +784,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CZGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CZGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CZRevGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CZRevGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "CSX_" .* qubits_string_2
@@ -794,22 +794,22 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         if c_qubit < t_qubit
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CSXGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CSXGate(), "q$c_qubit", "q$t_qubit")
         else
-            return QCO.kron_double_qubit_gate(num_qubits, QCO.CSXRevGate(), "q$c_qubit", "q$t_qubit")
+            return QCO.kron_two_qubit_gate(num_qubits, QCO.CSXRevGate(), "q$c_qubit", "q$t_qubit")
         end
 
     elseif input in "Swap_" .* qubits_string_2
         c_qubit = parse(Int, input[end-1])
         t_qubit = parse(Int, input[end])
 
-        return QCO.kron_double_qubit_gate(num_qubits, QCO.SwapGate(), "q$c_qubit", "q$t_qubit")
+        return QCO.kron_two_qubit_gate(num_qubits, QCO.SwapGate(), "q$c_qubit", "q$t_qubit")
 
     elseif input in "iSwap_" .* qubits_string_2
         c_qubit = parse(Int, input[end-1])
         t_qubit = parse(Int, input[end])
 
-        return QCO.kron_double_qubit_gate(num_qubits, QCO.iSwapGate(), "q$c_qubit", "q$t_qubit")
+        return QCO.kron_two_qubit_gate(num_qubits, QCO.iSwapGate(), "q$c_qubit", "q$t_qubit")
 
     else 
         Memento.error(_LOGGER, "Specified input elementary gates or the target gate does not exist in the predefined set of gates.")

@@ -335,8 +335,8 @@ end
     kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
 
 Given number of qubits of the circuit, the complex-valued one-qubit gate and the qubit location ("q1","q2',"q3",...),
-this function returns a full-sized gate after applying appropriate kronecker products. This function currently supports any number
-of qubits up to 9.  
+this function returns a full-sized gate after applying appropriate kronecker products. This function supports any number 
+integer-valued qubits.  
 """
 function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
     
@@ -344,8 +344,10 @@ function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2},
         Memento.error(_LOGGER, "Input should be an one-qubit gate")
     end
 
-    if !(parse(Int, qubit_loc[2:end]) in 1:num_qubits)
-        Memento.error(_LOGGER, "Input qubit location, $qubit_loc, has to be ∈ [q1,...,q$num_qubits]")
+    qubit = parse(Int, qubit_loc[2:end])
+
+    if !(qubit in 1:num_qubits)
+        Memento.error(_LOGGER, "Input qubit location, $qubit, has to be ∈ [q1,...,q$num_qubits]")
     end
 
     I = QCO.IGate(1)
@@ -353,7 +355,7 @@ function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2},
 
     for i = 1:num_qubits
         M_iter = I
-        if "q$i" == qubit_loc 
+        if i == qubit 
             M_iter = M
         end
         M_kron = kron(M_kron, M_iter)
@@ -367,83 +369,98 @@ function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2},
 
 end
 
-function kron_double_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit::String, t_qubit::String)
+
+"""
+    kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit_loc::String, t_qubit_loc::String)
+
+Given number of qubits of the circuit, the complex-valued two-qubit gate and the control and target qubit locations ("q1","q2',"q3",...),
+this function returns a full-sized gate after applying appropriate kronecker products. This function supports any number integer-valued qubits.  
+"""
+function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit_loc::String, t_qubit_loc::String)
     
     if size(M)[1] != 4
         Memento.error(_LOGGER, "Input should be a two-qubit gate")
     end
 
-    if c_qubit == t_qubit
-        Memento.error(_LOGGER, "Control and target qubits cannot be identical for multi-qubit elementary gates")
+    c_qubit = parse(Int, c_qubit_loc[2:end])
+    t_qubit = parse(Int, t_qubit_loc[2:end])
+
+    if !(c_qubit in 1:num_qubits) || !(t_qubit in 1:num_qubits)
+        Memento.error(_LOGGER, "Input control and target qubit locations have to be ∈ [q1,...,q$num_qubits]")
+    elseif isapprox(c_qubit, t_qubit, atol = 1E-6)
+        Memento.error(_LOGGER, "Control and target qubits cannot be identical for a multi-qubit elementary gate")
     end
 
     I = QCO.IGate(1)
     Swap = QCO.SwapGate()
 
-    if num_qubits == 2
-        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
-            return M
-        else
-            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2]") 
+    # If on adjacent qubits
+    if abs(c_qubit - t_qubit) == 1
+
+        M_kron = 1
+        for i = 1:(num_qubits-1)
+            M_iter = I
+            if (i in [c_qubit, t_qubit]) && (i+1 in [c_qubit, t_qubit])
+                M_iter = M
+            end
+            M_kron = kron(M_kron, M_iter)
         end
+
+    # If on non-adjacent qubits
+    # Assuming the qubit numbering starts at 1, and not 0
+    elseif abs(c_qubit - t_qubit) >= 2
+        ct = abs(c_qubit - t_qubit)
         
-    elseif num_qubits == 3     
+        M_sub_depth = 2*ct - 1 
+        M_sub_loc = ct
+        M_sub_swap_id = ct
+        M_sub = Matrix{Complex{Float64}}(LA.I, 2^(ct+1),2^(ct+1))
+        
+        # Idea is to represent gate_14 = swap_34 * swap_23 * gate_12 * swap_23 * swap_34
+        for d=1:M_sub_depth
+            M_sub_kron = 1 
+            swap_qubits = true
 
-        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
-            return kron(M,I)
-        elseif (c_qubit in ["q2", "q3"]) && (t_qubit in ["q2", "q3"])
-            return kron(I,M)
-        elseif (c_qubit in ["q1", "q3"]) && (t_qubit in ["q1", "q3"])
-            return kron(I, Swap) * kron(M, I) * kron(I, Swap)
-        else
-            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3]") 
+            for i=1:ct
+                M_sub_iter = I 
+
+                if (d == M_sub_loc) && (i == 1)
+                    M_sub_iter = M 
+                elseif !(d == M_sub_loc) && (i == M_sub_swap_id) && swap_qubits
+                    M_sub_iter = Swap
+                    if (d < M_sub_loc) && (M_sub_swap_id > 2)
+                        M_sub_swap_id -= 1
+                    elseif (d > M_sub_loc) 
+                        M_sub_swap_id += 1
+                    end
+                    swap_qubits = false
+                end
+
+                M_sub_kron = kron(M_sub_kron, M_sub_iter)
+            end
+
+            M_sub *= M_sub_kron
         end
 
+        M_kron = 1
+        i = 1 
+        while i <= num_qubits
+            M_iter = I 
+            if (i in [c_qubit, t_qubit])
+                M_iter = M_sub
+                i += (ct+1)
+            else 
+                i += 1
+            end
+            M_kron = kron(M_kron, M_iter)
+        end 
 
-    elseif num_qubits == 4
+    end
 
-        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
-            return kron(kron(M,I),I)
-        elseif (c_qubit in ["q2", "q3"]) && (t_qubit in ["q2", "q3"])
-            return kron(kron(I,M),I)
-        elseif (c_qubit in ["q3", "q4"]) && (t_qubit in ["q3", "q4"])
-            return kron(kron(I,I),M)
-        elseif (c_qubit in ["q1", "q3"]) && (t_qubit in ["q1", "q3"])
-            return kron(kron(I, Swap),I) * kron(kron(M, I),I) * kron(kron(I, Swap),I)
-        elseif (c_qubit in ["q2", "q4"]) && (t_qubit in ["q2", "q4"])
-            return kron(I, kron(I, Swap)) * kron(I, kron(M, I)) * kron(I, kron(I, Swap))
-        elseif (c_qubit in ["q1", "q4"]) && (t_qubit in ["q1", "q4"])
-            return kron(I, kron(I, Swap)) * kron(kron(I, Swap),I) * kron(M, kron(I, I)) * kron(kron(I, Swap),I) * kron(I, kron(I, Swap))
-        else
-            Memento.error(_LOGGER, "For num_qubits = $num_qubits, qubit location has to be ∈ [q1, q2, q3]") 
-        end
-
-    elseif num_qubits == 5
-
-        if (c_qubit in ["q1", "q2"]) && (t_qubit in ["q1", "q2"])
-            return kron(kron(kron(M,I),I),I)
-        elseif (c_qubit in ["q2", "q3"]) && (t_qubit in ["q2", "q3"])
-            return kron(kron(kron(I,M),I),I)
-        elseif (c_qubit in ["q3", "q4"]) && (t_qubit in ["q3", "q4"])
-            return kron(kron(kron(I,I),M),I)
-        elseif (c_qubit in ["q4", "q5"]) && (t_qubit in ["q4", "q5"])
-            return kron(kron(kron(I,I),I),M)
-        elseif (c_qubit in ["q1", "q3"]) && (t_qubit in ["q1", "q3"])
-            return kron(kron(kron(I, Swap),I),I) * kron(kron(kron(M, I),I),I) * kron(kron(kron(I, Swap),I),I)
-        elseif (c_qubit in ["q2", "q4"]) && (t_qubit in ["q2", "q4"])
-            return kron(kron(I, kron(I, Swap)),I) * kron(kron(I, kron(M, I)),I) * kron(kron(I, kron(I, Swap)),I)
-        elseif (c_qubit in ["q3", "q5"]) && (t_qubit in ["q3", "q5"])
-            return kron(kron(I, kron(I, I)), Swap) * kron(kron(I, kron(I, M)),I) * kron(kron(I, kron(I, I)), Swap)
-        elseif (c_qubit in ["q1", "q4"]) && (t_qubit in ["q1", "q4"])
-            return kron(kron(I, kron(I, Swap)),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(M, kron(I, I)),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(I, kron(I, Swap)),I)
-        elseif (c_qubit in ["q2", "q5"]) && (t_qubit in ["q2", "q5"])
-            return kron(kron(I, kron(I, I)), Swap) * kron(kron(kron(I, I), Swap),I) * kron(kron(I, kron(M, I)),I) * kron(kron(kron(I, I), Swap),I) * kron(kron(I, kron(I, I)), Swap)
-        elseif (c_qubit in ["q1", "q5"]) && (t_qubit in ["q1", "q5"])
-            return kron(kron(I, kron(I, I)), Swap) * kron(kron(kron(I, I), Swap),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(M, kron(I, I)),I) * kron(kron(kron(I, Swap),I),I) * kron(kron(kron(I, I), Swap),I) * kron(kron(I, kron(I, I)), Swap)
-        end
-
-    # Larger qubit circuits can be supported here.
-
+    if size(M_kron)[1] == 2^(num_qubits)
+        return M_kron 
+    else 
+        Memento.error(_LOGGER, "Dimensions mismatch in evaluation of Kronecker of two-qubit gate")
     end
 
 end
