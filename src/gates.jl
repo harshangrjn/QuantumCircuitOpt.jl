@@ -5,7 +5,7 @@
 @doc raw"""
     IGate(num_qubits::Int64)
 
-Identity gate corresponds to the regular identity matrix for a given number of qubits.
+Identity matrix for an input number of qubits.
 
 **Matrix Representation (num_qubits = 1)**
 
@@ -93,7 +93,7 @@ end
     U1Gate(λ::Number)
 
 Universal single-qubit rotation gate with one Euler angle, ``\lambda``. U1Gate represents rotation about the Z axis and 
-is the special case of [U3Gate](@ref). Also note that ``U1(\pi) = ``[ZGate](@ref), ``U1(\pi/2) = ``[SGate](@ref) and 
+is the special case of [U3Gate](@ref), which also known as the [PhaseGate](@ref). Also note that ``U1(\pi) = ``[ZGate](@ref), ``U1(\pi/2) = ``[SGate](@ref) and 
 ``U1(\pi/4) = ``[TGate](@ref).
 
 **Matrix Representation**
@@ -424,50 +424,12 @@ P(\lambda) = \begin{pmatrix}
 ```
 """
 function PhaseGate(λ::Number)
-    #input angles in radians
-    θ = 0
-    ϕ = 0
-
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in Phase gate is not within valid bounds")
-    end
-
-    return U3Gate(θ, ϕ, λ)
-
+    return U1Gate(λ)
 end
 
 #-------------------------------------#
 #            Two-qubit gates          #
 #-------------------------------------#
-@doc raw"""
-    NegIGate()
-
-Two-qubit negative Identity gate. 
-
-**Circuit Representation**
-```  ┌───────┐
-q_1: ┤ RZ(ϴ) ├
-     └───────┘
-q_0: ─────────
-```
-
-**Matrix Representation**
-
-```math
-NegI = \begin{pmatrix}
-    -1 & 0 & 0 & 0 \\
-    0 & -1 & 0 & 0 \\
-    0 & 0 & -1 & 0 \\
-    0 & 0 & 0 & -1
-    \end{pmatrix}
-```
-"""
-function NegIGate()
-
-    return Array{Complex{Float64},2}([-1 0 0 0; 0 -1 0 0; 0 0 -1 0; 0 0 0 -1]) 
-
-end
-
 @doc raw"""
     CNotGate()
 
@@ -546,7 +508,7 @@ q_1: ┤ X ├──■──
 **Matrix Representation**
 
 ```math
-DCNot = \begin{pmatrix}
+DCX = \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 0 & 0 & 1 \\
     0 & 1 & 0 & 0 \\
@@ -886,7 +848,7 @@ CVRev = \begin{pmatrix}
 """
 function CVRevGate()
 
-    return return Array{Complex{Float64},2}([1 0 0 0; 0 0.5+0.5im 0 0.5-0.5im; 0 0 1 0; 0 0.5-0.5im 0 0.5+0.5im])
+    return Array{Complex{Float64},2}([1 0 0 0; 0 0.5+0.5im 0 0.5-0.5im; 0 0 1 0; 0 0.5-0.5im 0 0.5+0.5im])
 
 end
 
@@ -946,7 +908,7 @@ CVRevdagger = \begin{pmatrix}
 """
 function CVRevdaggerGate()
 
-    return return Array{Complex{Float64},2}([1 0 0 0; 0 0.5-0.5im 0 0.5+0.5im; 0 0 1 0; 0 0.5+0.5im 0 0.5-0.5im])
+    return Array{Complex{Float64},2}([1 0 0 0; 0 0.5-0.5im 0 0.5+0.5im; 0 0 1 0; 0 0.5+0.5im 0 0.5-0.5im])
 
 end
 

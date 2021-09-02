@@ -9,6 +9,7 @@ const MOI = MathOptInterface
 const LA = LinearAlgebra
 const QCO = QuantumCircuitOpt
 const kron_symbol = 'x'
+const qubit_separator = '_'
 
 # Create our module level logger (this will get precompiled)
 const _LOGGER = Memento.getlogger(@__MODULE__)

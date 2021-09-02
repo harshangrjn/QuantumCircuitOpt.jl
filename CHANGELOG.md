@@ -2,9 +2,13 @@ QuantumCircuitOpt.jl Change Log
 ===============================
 
 ### v0.2.1
-- Framework updates which support upto *nine* qubit gates
+- Framework updates which support upto *nine* qubit circuit decompositions
 - Generalizing and condensing `kron_single_qubit_gate` function to handle any number of integer-valued qubits in `src/utility.jl`
 - Generalizing and condensing `kron_two_qubit_gate` function to handle any number of integer-valued qubits without explicit enumeration in `src/utility.jl`. Also, computes slightly faster with lesser memory on larger qubits than the previous version
+- Docs updates for missing inputs options
+- Enabling support for PhaseGate with discretizations in `src/data.jl`
+- Enabling support for DCXGate in `src/data.jl`
+- Minor clean ups and removal of redundant functions in `src/data.jl`
 
 ### v0.2.0
 - MAJOR framework updates which support gates upto *five* qubit gates. Framework is now flexible to generalize it to even larger qubit circuits, by updating functions `kron_single_qubit_gate` and `kron_two_qubit_gate`

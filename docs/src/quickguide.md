@@ -14,9 +14,16 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | `RX_discretization` | Vector of discretization angles (in radians) for `RXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RY_discretization` | Vector of discretization angles (in radians) for `RYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RZ_discretization` | Vector of discretization angles (in radians) for `RZGate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `Ph_discretization` | Vector of discretization angles (in radians) for `PhaseGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `U_θ_discretization` | Vector of discretization angles (in radians) for θ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `U_ϕ_discretization` | Vector of discretization angles (in radians) for ϕ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `U_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CRX_discretization` | Vector of discretization angles (in radians) for `CRXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CRY_discretization` | Vector of discretization angles (in radians) for `CRYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CRZ_discretization` | Vector of discretization angles (in radians) for `CRZGate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CU_θ_discretization` | Vector of discretization angles (in radians) for θ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CU_ϕ_discretization` | Vector of discretization angles (in radians) for ϕ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CU_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `objective` | Choose one of the following: (a) `"minimize_depth"`, which minimizes the total depth of decomposition. For this option, include `"Identity"` matrix in the above-mentioned `elementary_gates`, (b) `"minimize_cnot"`, which minimizes the number of CNOT gates in the decomposition. |
 | `decomposition_type` | Choose one of the following: (a) `"exact"`, which finds an exact decomposition if it exists, (b) `"approximate"`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. |
 | `optimizer` | Mixed-integer programming (MIP) optimizer. For various MIP solver options, check [solver.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/examples/solver.jl). |
@@ -68,7 +75,7 @@ If you prefer to decompose a target gate of your choice, update the `target_gate
 set of `elementary_gates` accordingly in the above sample code. For more such 2-qubit and 3-qubit gate decompositions, with and without the universal unitary in the elementary gates, refer to "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder. 
 
 !!! warning
-    Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input gates, target gate and the total depth of the decomposition. Hence, unlike local optimization methods in the literature, the run times for larger number of qubits and depths can be prohibitively slow since these problems are NP-hard. 
+    Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute. Hence, unlike local optimization methods, such as machine learning, in the literature, the run times for larger number of qubits and depths can be prohibitively slow.
 
 # Extracting results
 The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,

@@ -39,7 +39,6 @@
     H2 = kron(QCO.IGate(1), QCO.HGate())
     @test isapprox(QCO.MGate(), QCO.CNotRevGate() * H2 * S1_S2)
 
-    @test isapprox(QCO.NegIGate(), kron(QCO.RZGate(2*π), QCO.IGate(1)), atol = tol_0)
     Z1 = QCO.get_full_sized_gate("Z_1", 2);
     Z2 = QCO.get_full_sized_gate("Z_2", 2);
     T2 = QCO.get_full_sized_gate("T_2", 2);

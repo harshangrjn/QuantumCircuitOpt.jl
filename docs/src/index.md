@@ -43,10 +43,12 @@ This work was supported by Los Alamos National Laboratory's LDRD Early Career Re
 ## Citing QuantumCircuitOpt
 If you find QuantumCircuitOpt useful in your work, we request you to cite the following paper: 
 ```bibtex
-@inproceedings{NagarajanHijaziCoffrin2021,
-  title={Mixed-Integer Programming for Optimal Quantum Circuit Design},
-  author={Nagarajan, Harsha and Hijazi, Hassan and Coffrin, Carleton},
-  booktitle={Under preparation},
-  year={2021}
+@inproceedings{NagarajanLockwoodCoffrin2021,
+  title={QuantumCircuitOpt: An Open-source Framework for Provably Optimal Quantum Circuit Design},
+  author={Nagarajan, Harsha and Lockwood, Owen and Coffrin, Carleton},
+  booktitle={SC21: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
+  pages={1-7},
+  year={2021},
+  organization={IEEE Computer Society}
 }
 ```

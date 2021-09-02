@@ -485,3 +485,25 @@ function _parse_gates_with_kron_symbol(s::String)
  
     return gates
  end
+
+function _parse_qubit_numbers(s::String)
+
+    gates = Vector{String}()
+    gate_id = string()
+ 
+    for i = 1:length(s)
+       if s[i] != qubit_separator
+          gate_id = gate_id * s[i]
+       else
+          push!(gates, gate_id)
+          (i != length(s)) && (gate_id = string())
+       end
+ 
+       if i == length(s) 
+          push!(gates, gate_id)
+       end
+    end
+    
+    return parse.(Int, gates[2:end]) # Assuming 1st element is the gate type/name
+ end
+ 

@@ -127,3 +127,16 @@ end
     @test isapprox(M1^2, data["gates_dict"]["7"]["matrix"], atol = tol_0)
     @test isapprox(M2^2, data["gates_dict"]["3"]["matrix"], atol = tol_0)
 end
+
+@testset "Tests: _parse_qubit_numbers" begin
+    v1 = QCO._parse_qubit_numbers("RX_1")    
+    @test v1[1] == 1
+    
+    v2 = QCO._parse_qubit_numbers("CU3_51")    
+    @test v2[1] == 51
+
+    v3 = QCO._parse_qubit_numbers("CRZ_9_1")    
+    @test length(v3) == 2
+    @test v3[1] == 9
+    @test v3[2] == 1
+end

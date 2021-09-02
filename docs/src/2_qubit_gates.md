@@ -112,6 +112,10 @@ iSwapGate
 ```@docs
 CSXGate
 ```
+## CSXRevGate
+```@docs
+CSXRevGate
+```
 ## MGate
 ```@docs
 MGate
