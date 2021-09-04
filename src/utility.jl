@@ -58,12 +58,12 @@ matrices. Optional argument, `identity_pairs` can be set to `false` if identity 
 """
 function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
     
-    depth = length(keys(M))
+    num_gates = length(keys(M))
     commute_pairs = Array{Tuple{Int64,Int64},1}()
     commute_pairs_prodIdentity = Array{Tuple{Int64,Int64},1}()
 
-    for i = 1:(depth-1)
-        for j = (i+1):depth
+    for i = 1:(num_gates-1)
+        for j = (i+1):num_gates
             M_i = M["$i"]["matrix"]
             M_j = M["$j"]["matrix"]
 
@@ -99,7 +99,7 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
 
         if length(identity_idx) > 0
             for i = 1:length(identity_idx)
-                for j = 1:depth
+                for j = 1:num_gates 
                     if j != identity_idx[i]
                         push!(commute_pairs, (j, identity_idx[i]))
                     end
@@ -114,12 +114,12 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
 end
 
 function get_redundant_gate_product_pairs(M::Dict{String,Any})
-    depth = length(keys(M))
-    redundant_pairs = Array{Tuple{Int64,Int64},1}()
+    num_gates = length(keys(M))
+    redundant_pairs_idx = Array{Tuple{Int64,Int64},1}()
 
     # Non-Identity redundant pairs
-    for i = 1:(depth-1)
-        for j = (i+1):depth
+    for i = 1:(num_gates-1)
+        for j = (i+1):num_gates
             M_i = M["$i"]["matrix"]
             M_j = M["$j"]["matrix"]
 
@@ -127,16 +127,16 @@ function get_redundant_gate_product_pairs(M::Dict{String,Any})
                 continue
             end
             
-            for k = 1:depth
+            for k = 1:num_gates 
                 if (k != i) && (k != j) && !("Identity" in M["$k"]["type"])                
                     M_k = M["$k"]["matrix"]
                 
                     if isapprox(M_i*M_j, M_k, atol = 1E-4)
-                        push!(redundant_pairs, (i, j))
+                        push!(redundant_pairs_idx, (i, j))
                     end
 
                     if isapprox(M_j*M_i, M_k, atol = 1E-4)
-                        push!(redundant_pairs, (j, i))
+                        push!(redundant_pairs_idx, (j, i))
                     end
                 end
             end
@@ -144,7 +144,7 @@ function get_redundant_gate_product_pairs(M::Dict{String,Any})
         end
     end
 
-    return redundant_pairs
+    return redundant_pairs_idx
 end
 
 """
@@ -154,26 +154,52 @@ Given the dictionary of complex gates, this function returns the indices of matr
 or idempotent with other set of input gates, excluding the Identity gate.
 """
 function get_idempotent_gates(M::Dict{String,Any})
-    depth = length(keys(M))
-    idempotent_gates = Vector{Int64}()
+    num_gates = length(keys(M))
+    idempotent_gates_idx = Vector{Int64}()
 
-    # Excluding Identity gates in input 
-    for i=1:depth
+    # Excluding Identity gate in input 
+    for i = 1:num_gates
         M_i = M["$i"]["matrix"]
-        for j=1:depth
+        for j = 1:num_gates
             M_j = M["$j"]["matrix"]
             if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
                 continue
             end
 
             if isapprox(M_i^2, M_j, atol=1E-4)
-                push!(idempotent_gates, i)
+                push!(idempotent_gates_idx, i)
             end
 
         end
     end
 
-    return idempotent_gates
+    return idempotent_gates_idx
+end
+
+"""
+    get_involutory_gates(M::Dict{String,Any})
+
+Given the dictionary of complex gates, this function returns the indices of input gates 
+which are involutory, i.e, M[i]^2 = Identity, excluding the Identity gate. 
+"""
+function get_involutory_gates(M::Dict{String,Any})
+    num_gates = length(keys(M))
+    involutory_gates_idx = Vector{Int64}()
+
+    if num_gates > 0
+        n_r = size(M["1"]["matrix"])[1]
+        n_c = size(M["1"]["matrix"])[2]
+    end
+    Id = Matrix{ComplexF64}(LA.I, n_r, n_c)
+
+    # Excluding Identity gate in input 
+    for i=1:num_gates
+        if !("Identity" in M["$i"]["type"]) && (isapprox((M["$i"]["matrix"])^2, Id, atol=1E-5))
+            push!(involutory_gates_idx, i)
+        end
+    end
+
+    return involutory_gates_idx
 end
 
 """

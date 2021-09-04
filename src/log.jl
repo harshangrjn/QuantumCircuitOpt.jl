@@ -273,8 +273,8 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
                     status = false
                     continue
                 else
-                    gate_i = QCO.is_multi_qubit_gate(gates_sol[i])
-                    gate_iplus1 = QCO.is_multi_qubit_gate(gates_sol[i+1])
+                    gate_i = QCO.is_multi_qubit_gate(gates_sol[i], data["num_qubits"])
+                    gate_iplus1 = QCO.is_multi_qubit_gate(gates_sol[i+1], data["num_qubits"])
 
                     if !(gate_i) && !(gate_iplus1)
                         if (occursin('1', gates_sol[i]) && occursin('2', gates_sol[i+1])) || (occursin('2', gates_sol[i]) && occursin('1', gates_sol[i+1])) 
@@ -313,11 +313,13 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
     return gates_sol_compressed
 end
 
-function is_multi_qubit_gate(gate::String)
+function is_multi_qubit_gate(gate::String, num_qubits::Int64)
+    
+    _ , qubits_string_2 = QCO._get_qubit_strings(num_qubits)
     
     if startswith(gate, "CNot")
         return true
-    elseif occursin("12", gate) || occursin("21", gate) || occursin("13", gate) || occursin("31", gate) || occursin("23", gate) || occursin("32", gate)
+    elseif "$(QCO._parse_qubit_numbers(gate)[1])" in qubits_string_2
         return true
     elseif occursin(kron_symbol, gate)
         return true

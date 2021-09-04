@@ -7,6 +7,7 @@ using Cbc
 include("solver.jl")
 include("2qubit_gates.jl")
 include("3qubit_gates.jl")
+include("4qubit_gates.jl")
 include("5qubit_gates.jl")
 
 decompose_gates = ["decompose_hadamard", 
@@ -23,7 +24,7 @@ decompose_gates = ["decompose_hadamard",
                     "decompose_GroverDiffusionGate",
                     "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_RX_on_5qubits"]
+decompose_gates = ["decompose_CNot_41"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

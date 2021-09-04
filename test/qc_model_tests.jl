@@ -313,18 +313,17 @@ end
     )
 
     gates_dict = QCO.get_data(params)["gates_dict"]
-    
-    num_involutory_matrices = 0 
+    involutory_gates = QCO.get_involutory_gates(gates_dict)
+    @test length(involutory_gates) == 4 #excluding Identity gate
+     
     for i in keys(gates_dict)
-        if gates_dict[i]["isInvolutory"]
-            num_involutory_matrices += 1
-        end
-
         if ("S_1" in gates_dict[i]["type"]) || ("S_2" in gates_dict[i]["type"])
-            @test !(gates_dict[i]["isInvolutory"])
+            @test !(parse(Int, i) in involutory_gates)
+        end
+        if ("H_1" in gates_dict[i]["type"]) || ("H_2" in gates_dict[i]["type"]) || ("CNot_12" in gates_dict[i]["type"]) || ("CNot_21" in gates_dict[i]["type"]) 
+            @test (parse(Int, i) in involutory_gates)
         end
     end
-    @test num_involutory_matrices == 5
 
     result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL

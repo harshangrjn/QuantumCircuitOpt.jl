@@ -120,20 +120,21 @@ function toffoli_circuit()
             ] 
 end
 
-function decompose_cnot_13()
+function decompose_CNot_13()
 
     params = Dict{String, Any}(
     "num_qubits" => 3,
-    "depth" => 5,
+    "depth" => 8,
 
-    "elementary_gates" => ["CNot_12", "CNot_23", "Identity"],
+    # "elementary_gates" => ["CNot_12", "CNot_23", "Identity"],
+    "elementary_gates" => ["H_1", "H_3", "H_2", "CNot_21", "CNot_32", "Identity"],
     "target_gate" => QCO.get_full_sized_gate("CNot_13", 3),
 
-    "objective" => "minimize_cnot", 
+    "objective" => "minimize_depth", 
     "optimizer" => "cplex"   
     )
 
-    return
+    return params
 end
 
 function decompose_FredkinGate()
@@ -147,8 +148,8 @@ function decompose_FredkinGate()
     "target_gate" => QCO.CSwapGate(), #also Fredkin
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex",
+    "optimizer" => "cplex"
     )
     
-    return 
+    return params
 end

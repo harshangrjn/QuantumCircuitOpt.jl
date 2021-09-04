@@ -1,6 +1,13 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.2.2
+- Bug fix in `is_multi_qubit_gate` function in `src/log.jl` to handle any 2 qubit gates
+- Decomposition for 4-qubit CNot_41 added in `examples/4qubit_gates.jl`
+- Moved involutory gate evaluation from `data.jl` to  a `get_involutory_gates` function in `utility.jl` (to be consistent with other similar functions). `constraint_involutory_gates` function is updated accordingly to reflect these changes
+- Meaningful error messages in `data.jl` for input gates with missing continuous angle parameters
+- Updated unit tests on involutory gates
+
 ### v0.2.1
 - Framework updates which support upto *nine* qubit circuit decompositions
 - Generalizing and condensing `kron_single_qubit_gate` function to handle any number of integer-valued qubits in `src/utility.jl`

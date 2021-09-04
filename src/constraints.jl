@@ -207,23 +207,15 @@ function constraint_involutory_gates(qcm::QuantumCircuitModel)
     depth       = qcm.data["depth"]
     z_onoff_var = qcm.variables[:z_onoff_var]
 
-    num_involutory_gates = 0 
+    involutory_gates = QCO.get_involutory_gates(gates_dict)
+    
+    if !isempty(involutory_gates)
+        (length(involutory_gates) == 1) && (Memento.info(_LOGGER, "Detected $(length(involutory_gates)) involutory elementary gate"))
+        (length(involutory_gates) > 1)  && (Memento.info(_LOGGER, "Detected $(length(involutory_gates)) involutory elementary gates"))
 
-    for i in keys(gates_dict)
-        i_int = parse(Int64, i)
-        if gates_dict[i]["isInvolutory"]
-            
-            if !("Identity" in gates_dict[i]["type"])
-                JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[i_int, d] + z_onoff_var[i_int, d+1] <= 1)
-                num_involutory_gates += 1
-            end
-
+        for i = 1:length(involutory_gates)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[involutory_gates[i], d] + z_onoff_var[involutory_gates[i], d+1] <= 1)
         end
-    end
-
-    if num_involutory_gates > 0
-        (num_involutory_gates == 1) && (Memento.info(_LOGGER, "Detected $num_involutory_gates input involutory gate"))
-        (num_involutory_gates > 1)  && (Memento.info(_LOGGER, "Detected $num_involutory_gates input involutory gates"))
     end
 
     return
