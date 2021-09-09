@@ -11,7 +11,7 @@
     "decomposition_type" => "exact"
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation")
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "compact_formulation_1", all_valid_constraints = 2)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
