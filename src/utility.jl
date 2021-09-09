@@ -491,6 +491,12 @@ function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_
 
 end
 
+"""
+    _parse_gates_with_kron_symbol(s::String)
+
+Given a string with gates separated by kronecker symbols (x), this function parses and returns the vector of gates. For 
+example, if the input string is "H_1xCNot_23xT_4", the output will be Vector{String}(["H_1", "CNot_23", "T_4"]).
+"""
 function _parse_gates_with_kron_symbol(s::String)
 
     gates = Vector{String}()
@@ -512,8 +518,18 @@ function _parse_gates_with_kron_symbol(s::String)
     return gates
  end
 
+"""
+    _parse_qubit_numbers(s::String)
+
+Given a string representing a single gate with qubit numbers separated by symbol `_`, this function parses and returns the vector of qubits on
+which the input gate is located. For example, if the input string is "CRX_2_3", the output will be Vector{Int64}([2,3]).
+"""
 function _parse_qubit_numbers(s::String)
 
+    if occursin(kron_symbol, s)
+        Memento.error(_LOGGER, "Kron symbol is not supported for parsing qubit numbers in $s")
+    end
+    
     gates = Vector{String}()
     gate_id = string()
  
@@ -533,6 +549,11 @@ function _parse_qubit_numbers(s::String)
     return parse.(Int, gates[2:end]) # Assuming 1st element is the gate type/name
  end
  
+"""
+    is_gate_real(M::Array{Complex{Float64},2})
+
+Given a complex-valued 2D matrix, M, this function returns if M has purely real parts or not as it's elements. 
+"""
  function is_gate_real(M::Array{Complex{Float64},2})
     M_imag = imag(M)
     n_r = size(M_imag)[1]

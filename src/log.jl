@@ -39,7 +39,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         if isempty(R_gates_ids) && isempty(U_gates_ids)
             printstyled("  ","Total number of elementary gates: ", size(data["gates_real"])[3],"\n"; color = :cyan)
         else
-            printstyled("  ","Total number of elementary gates (including discretization): ",size(data["gates_real"])[3],"\n"; color = :cyan)
+            printstyled("  ","Total number of elementary gates (including discretization and after presolve): ",size(data["gates_real"])[3],"\n"; color = :cyan)
         end
         
         printstyled("  ","Maximum depth of decomposition: ", data["depth"],"\n"; color = :cyan)
@@ -325,9 +325,9 @@ function is_multi_qubit_gate(gate::String, num_qubits::Int64)
     
     if startswith(gate, "CNot")
         return true
-    elseif "$(QCO._parse_qubit_numbers(gate)[1])" in qubits_string_2
-        return true
     elseif occursin(kron_symbol, gate)
+        return true
+    elseif "$(QCO._parse_qubit_numbers(gate)[1])" in qubits_string_2
         return true
     elseif occursin("Swap", gate) || occursin("HCoin", gate)
         return true

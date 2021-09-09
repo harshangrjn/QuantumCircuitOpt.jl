@@ -123,6 +123,7 @@ function decompose_controlled_H_with_R()
   
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
+    "identify_real_gates" => true,
     
     "optimizer" => "cplex"
                                 
@@ -139,7 +140,7 @@ function decompose_magic_M()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 5,    
+        "depth" => 6,    
     
         "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "CNot_21", "Identity"], 
         "target_gate" => QCO.MGate(),   
@@ -370,9 +371,10 @@ function decompose_GroverDiffusionGate()
                   
         "objective" => "minimize_depth",
         "decomposition_type" => "exact", 
+        "identify_real_gates" => true,
         
         "optimizer" => "cplex"
-                                    
+     
         )
     
         return params
@@ -386,7 +388,7 @@ function decompose_iSwapGate()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 9,    
+        "depth" => 10,    
     
         "elementary_gates" => ["T_1", "T_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"],
         "target_gate" => QCO.iSwapGate(),   

@@ -33,7 +33,7 @@ function decompose_toffoli()
     params = Dict{String, Any}(
     
     "num_qubits" => 3, 
-    "depth" => 15,    
+    "depth" => 30,    
 
     "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),

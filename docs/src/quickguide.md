@@ -56,7 +56,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2, 
-"depth" => 3,    
+"depth" => 4,    
 "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
 "target_gate" => target_gate(),
        
@@ -103,8 +103,8 @@ For example, for the above controlled-Z gate decomposition, the processed output
 Quantum Circuit Model Data
 
   Number of qubits: 2
-  Total number of elementary gates (including discretization): 36
-  Maximum depth of decomposition: 3
+  Total number of elementary gates (including discretization): 19
+  Maximum depth of decomposition: 4
   Input elementary gates: ["U3_1", "U3_2", "CNot_12", "Identity"]
     U3 - θ discretization: [-90.0, 0.0, 90.0]
     U3 - ϕ discretization: [-90.0, 0.0, 90.0]
@@ -115,7 +115,7 @@ Optimal Circuit Decomposition
 
   U3_2(-90.0,0.0,0.0) * CNot_12 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 1.25 sec.
+  Optimizer run time: 1.74 sec.
 =============================================================================
 ```
 
