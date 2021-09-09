@@ -7,9 +7,11 @@ function decompose_CNot_41()
 
     "elementary_gates" => ["H_1", "H_2", "H_3", "CNot_13", "CNot_43", "Identity"],
     "target_gate" => QCO.get_full_sized_gate("CNot_41", 4),
+    "identify_real_gates" => true,
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"   
+    "optimizer" => "cplex"
+    
     )
 
     return params

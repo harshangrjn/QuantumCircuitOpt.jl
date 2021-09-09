@@ -39,7 +39,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         if isempty(R_gates_ids) && isempty(U_gates_ids)
             printstyled("  ","Total number of elementary gates: ", size(data["gates_real"])[3],"\n"; color = :cyan)
         else
-            printstyled("  ","Total number of elementary gates (including discretization): ",size(data["gates_real"])[3],"\n"; color = :cyan)
+            printstyled("  ","Total number of elementary gates (including discretization and after presolve): ",size(data["gates_real"])[3],"\n"; color = :cyan)
         end
         
         printstyled("  ","Maximum depth of decomposition: ", data["depth"],"\n"; color = :cyan)
@@ -242,7 +242,13 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
     end
 
     # This tolerance is very important for the final feasiblity check
-    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.real_to_complex_matrix(data["target_gate"]), atol = 1E-4))
+    if data["are_gates_real"]
+        target_gate = real(data["target_gate"])
+    else
+        target_gate = QCO.real_to_complex_matrix(data["target_gate"])
+    end
+    
+    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, target_gate, atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     
@@ -319,9 +325,9 @@ function is_multi_qubit_gate(gate::String, num_qubits::Int64)
     
     if startswith(gate, "CNot")
         return true
-    elseif "$(QCO._parse_qubit_numbers(gate)[1])" in qubits_string_2
-        return true
     elseif occursin(kron_symbol, gate)
+        return true
+    elseif "$(QCO._parse_qubit_numbers(gate)[1])" in qubits_string_2
         return true
     elseif occursin("Swap", gate) || occursin("HCoin", gate)
         return true

@@ -31,6 +31,7 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | Optional Inputs  | Description |
 | -----------: | :----------- |
 | `initial_gate` | Intitial-condition gate to the decomposition (gate at 0th depth) (default: `"Identity"`).  | 
+| `identify_real_gates` | This option identifies if all the elementary and target gates have only real entries and formulates a compact MIP formulation accordingly (default: `false`).  | 
 | `input_circuit` | Input circuit representing an ensemble of elementary gates which decomposes the given target gate. This input circuit, which serves as a warm-start, can accelerate the MIP solver's search for the incumbent solution. (default: empty circuit).  | 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_presolve` | This option enables or disables the presolve option in the chosen `optimizer` (default: `true`). Turning it off can lead to slower run times.|
@@ -55,7 +56,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2, 
-"depth" => 3,    
+"depth" => 4,    
 "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
 "target_gate" => target_gate(),
        
@@ -102,8 +103,8 @@ For example, for the above controlled-Z gate decomposition, the processed output
 Quantum Circuit Model Data
 
   Number of qubits: 2
-  Total number of elementary gates (including discretization): 36
-  Maximum depth of decomposition: 3
+  Total number of elementary gates (including discretization): 19
+  Maximum depth of decomposition: 4
   Input elementary gates: ["U3_1", "U3_2", "CNot_12", "Identity"]
     U3 - θ discretization: [-90.0, 0.0, 90.0]
     U3 - ϕ discretization: [-90.0, 0.0, 90.0]
@@ -114,7 +115,7 @@ Optimal Circuit Decomposition
 
   U3_2(-90.0,0.0,0.0) * CNot_12 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 1.25 sec.
+  Optimizer run time: 1.74 sec.
 =============================================================================
 ```
 

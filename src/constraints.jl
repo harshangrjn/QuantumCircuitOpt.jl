@@ -99,16 +99,21 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
     num_gates = size(qcm.data["gates_real"])[3]
+    are_gates_real = qcm.data["are_gates_real"]
 
-    for i=1:2:n_r
+    i_val = 2 - are_gates_real
+
+    for i=1:i_val:n_r
         for j=1:n_c
             for n=1:num_gates
                 for d=1:(depth-1)
                     
                     QCO.relaxation_bilinear(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff_var][n,(d+1)])
-                    if isodd(j)
-                        JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j,n,d]   ==  qcm.variables[:zU_var][i+1,j+1,n,d])
-                        JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d] == -qcm.variables[:zU_var][i+1,j,n,d])
+                    if !are_gates_real
+                        if isodd(j)
+                            JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j,n,d]   ==  qcm.variables[:zU_var][i+1,j+1,n,d])
+                            JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d] == -qcm.variables[:zU_var][i+1,j,n,d])
+                        end
                     end
 
                 end
@@ -255,6 +260,28 @@ function constraint_idempotent_gates(qcm::QuantumCircuitModel)
 
         for i = 1:length(idempotent_gates)
             JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[idempotent_gates[i], d] + z_onoff_var[idempotent_gates[i], d+1] <= 1)
+        end
+    end
+
+    return
+end
+
+function constraint_identity_gate_symmetry(qcm::QuantumCircuitModel)
+
+    gates_dict  = qcm.data["gates_dict"]
+    depth       = qcm.data["depth"]
+    z_onoff_var = qcm.variables[:z_onoff_var]
+
+    identity_idx = []
+    for i=1:length(keys(gates_dict))
+        if "Identity" in gates_dict["$i"]["type"]
+            push!(identity_idx, i)
+        end
+    end
+    
+    if !isempty(identity_idx)
+        for i = 1:length(identity_idx)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[identity_idx[i], d] <= z_onoff_var[identity_idx[i], d+1])
         end
     end
 
