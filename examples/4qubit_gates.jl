@@ -9,7 +9,7 @@ function decompose_CNot_41()
     "target_gate" => QCO.get_full_sized_gate("CNot_41", 4),
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"   
+    "optimizer" => "cplex"
     )
 
     return params

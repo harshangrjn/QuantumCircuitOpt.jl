@@ -533,3 +533,14 @@ function _parse_qubit_numbers(s::String)
     return parse.(Int, gates[2:end]) # Assuming 1st element is the gate type/name
  end
  
+ function is_gate_real(M::Array{Complex{Float64},2})
+    M_imag = imag(M)
+    n_r = size(M_imag)[1]
+    n_c = size(M_imag)[2]
+
+    if sum(isapprox.(M_imag, zeros(n_r, n_c), atol=1E-6)) == n_r*n_c
+        return true
+    else
+        return false
+    end
+ end

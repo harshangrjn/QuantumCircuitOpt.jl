@@ -24,7 +24,7 @@ decompose_gates = ["decompose_hadamard",
                     "decompose_GroverDiffusionGate",
                     "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_CNot_41"]
+decompose_gates = ["decompose_CNot_13"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

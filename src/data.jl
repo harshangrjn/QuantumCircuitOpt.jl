@@ -27,18 +27,6 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         Memento.error(_LOGGER, "Input elementary gates is empty. Enter at least two unique unitary gates")
     end
 
-    # Initial gate
-    if "initial_gate" in keys(params)
-        if params["initial_gate"] == "Identity"
-            initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
-        else 
-            Memento.error(_LOGGER, "Currently, only \"Identity\" is supported as an initial gate")
-            # Add code here to support non-identity as an initial gate. 
-        end
-    else
-        initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
-    end
-
     # Input Circuit
     if "input_circuit" in keys(params)
         input_circuit = params["input_circuit"]
@@ -93,9 +81,31 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
     end
 
-    gates_dict, target_real = QCO.get_quantum_gates(params, elementary_gates)
+    gates_dict, are_elementary_gates_real = QCO.get_elementary_gates_dictionary(params, elementary_gates)
 
-    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = eliminate_nonunique_gates(gates_dict, eliminate_identical_gates = eliminate_identical_gates)
+    target_real, is_target_real = QCO.get_target_gate(params, are_elementary_gates_real)
+
+    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = QCO.eliminate_nonunique_gates(gates_dict, eliminate_identical_gates = eliminate_identical_gates, are_elementary_gates_real = are_elementary_gates_real)
+
+    # Initial gate
+    if "initial_gate" in keys(params)
+        if params["initial_gate"] == "Identity"
+            if are_elementary_gates_real && is_target_real
+                initial_gate = real(QCO.IGate(num_qubits))
+            else
+                initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
+            end        
+        else 
+            Memento.error(_LOGGER, "Currently, only \"Identity\" is supported as an initial gate")
+            # Add code here to support non-identity as an initial gate. 
+        end
+    else
+        if are_elementary_gates_real && is_target_real
+            initial_gate = real(QCO.IGate(num_qubits))
+        else
+            initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
+        end        
+    end
     
     data = Dict{String, Any}("num_qubits" => num_qubits,
                              "depth" => depth,
@@ -106,6 +116,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
                              "cnot_idx" => cnot_idx,
                              "elementary_gates" => elementary_gates,
                              "target_gate" => target_real,
+                             "are_gates_real" => (are_elementary_gates_real && is_target_real),
                              "objective" => objective,
                              "decomposition_type" => decomposition_type,                         
                              "relax_integrality" => relax_integrality,
@@ -137,14 +148,22 @@ end
     eliminate_nonunique_gates(gates_dict::Dict{String, Any})
 
 """
-function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_identical_gates = false)
+function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_identical_gates = false, are_elementary_gates_real = false)
 
     num_gates = length(keys(gates_dict))
 
-    M_real = zeros(2*size(gates_dict["1"]["matrix"])[1], 2*size(gates_dict["1"]["matrix"])[2], num_gates)
+    if are_elementary_gates_real
+        M_real = zeros(size(gates_dict["1"]["matrix"])[1], size(gates_dict["1"]["matrix"])[2], num_gates)
+    else
+        M_real = zeros(2*size(gates_dict["1"]["matrix"])[1], 2*size(gates_dict["1"]["matrix"])[2], num_gates)
+    end
     
     for i=1:num_gates
-        M_real[:,:,i] = complex_to_real_matrix(gates_dict["$i"]["matrix"])
+        if are_elementary_gates_real
+            M_real[:,:,i] = real(gates_dict["$i"]["matrix"])
+        else 
+            M_real[:,:,i] = complex_to_real_matrix(gates_dict["$i"]["matrix"])
+        end
     end
 
     M_real_unique = M_real
@@ -310,16 +329,11 @@ end
 
 
 """
-    get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
+    get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool)
 
-Given a vector of input with the names of gates (see examples folder), `get_quantum_gates` function 
-returns the corresponding elementary gates in the three-dimensional complex matrix form. 
+Given the input params, this function returns the corresponding real version of the target_gate. 
 """ 
-function get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{String,1})
-
-    num_qubits = params["num_qubits"]
-
-    gates_dict = QCO.get_all_gates_dictionary(params, elementary_gates)
+function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool)
 
     if !("target_gate" in keys(params)) || isempty(params["target_gate"])
         Memento.error(_LOGGER, "Target gate not found in the input data")
@@ -328,11 +342,22 @@ function get_quantum_gates(params::Dict{String, Any}, elementary_gates::Array{St
     if (size(params["target_gate"])[1] != size(params["target_gate"])[2]) || (size(params["target_gate"])[1] != 2^params["num_qubits"])
         Memento.error(_LOGGER, "Dimensions of target gate do not match the input num_qubits")
     end
- 
-    return gates_dict, complex_to_real_matrix(params["target_gate"])
+    
+    is_target_real = QCO.is_gate_real(params["target_gate"])
+
+    if are_elementary_gates_real
+        if !is_target_real
+            Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts")
+        else 
+            return real(params["target_gate"]), is_target_real
+        end
+    else
+        return complex_to_real_matrix(params["target_gate"]), is_target_real
+    end
+
 end
 
-function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::Array{String,1})
+function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_gates::Array{String,1})
 
     num_qubits = params["num_qubits"]
 
@@ -432,7 +457,16 @@ function get_all_gates_dictionary(params::Dict{String, Any}, elementary_gates::A
 
     end
 
-    return gates_dict
+    are_elementary_gates_real = true
+
+    for i in keys(gates_dict)
+        if !(QCO.is_gate_real(gates_dict[i]["matrix"]))
+            are_elementary_gates_real = false
+            continue
+        end
+    end
+
+    return gates_dict, are_elementary_gates_real
 end
 
 function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{String,1}, R_gates_idx::Vector{Int64})

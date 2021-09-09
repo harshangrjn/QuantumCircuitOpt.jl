@@ -76,7 +76,7 @@ function constraint_QCModel(qcm::QuantumCircuitModel,
     QCO.constraint_gate_intermediate_products(qcm)
     QCO.constraint_gate_product_linearization(qcm)
     QCO.constraint_gate_target_condition(qcm)
-    QCO.constraint_complex_to_real_symmetry(qcm)
+    (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm))
 
     QCO.constraint_QCModel_valid(qcm, 
                                 all_valid_constraints,
@@ -113,7 +113,7 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel,
     QCO.constraint_gate_intermediate_products_compact(qcm)
     QCO.constraint_gate_product_linearization(qcm)
     QCO.constraint_gate_target_condition_compact(qcm)
-    QCO.constraint_complex_to_real_symmetry_compact(qcm)
+    (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry_compact(qcm))
 
     QCO.constraint_QCModel_valid(qcm, 
                                  all_valid_constraints,

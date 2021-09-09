@@ -99,16 +99,21 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
     num_gates = size(qcm.data["gates_real"])[3]
+    are_gates_real = qcm.data["are_gates_real"]
 
-    for i=1:2:n_r
+    i_val = 2 - are_gates_real
+
+    for i=1:i_val:n_r
         for j=1:n_c
             for n=1:num_gates
                 for d=1:(depth-1)
                     
                     QCO.relaxation_bilinear(qcm.model, qcm.variables[:zU_var][i,j,n,d], qcm.variables[:U_var][i,j,d], qcm.variables[:z_onoff_var][n,(d+1)])
-                    if isodd(j)
-                        JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j,n,d]   ==  qcm.variables[:zU_var][i+1,j+1,n,d])
-                        JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d] == -qcm.variables[:zU_var][i+1,j,n,d])
+                    if !are_gates_real
+                        if isodd(j)
+                            JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j,n,d]   ==  qcm.variables[:zU_var][i+1,j+1,n,d])
+                            JuMP.@constraint(qcm.model, qcm.variables[:zU_var][i,j+1,n,d] == -qcm.variables[:zU_var][i+1,j,n,d])
+                        end
                     end
 
                 end
@@ -260,3 +265,24 @@ function constraint_idempotent_gates(qcm::QuantumCircuitModel)
 
     return
 end
+
+# function constraint_zero_imaginary_parts(qcm::QuantumCircuitModel)
+
+#     U_var = qcm.variables[:U_var]
+#     zU_var = qcm.variables[:zU_var]
+#     n_r = size(U_var)[1]
+#     n_c = size(U_var)[2]
+#     depth = size(U_var)[3]
+#     num_gates = size(zU_var)[3]
+
+#     for i=1:2:n_r
+#         for j=1:2:n_c
+#             JuMP.@constraint(qcm.model, [k=1:depth], U_var[i,j+1,k] == 0)
+#             JuMP.@constraint(qcm.model, [k=1:depth], U_var[i+1,j,k] == 0)
+#             JuMP.@constraint(qcm.model, [k=1:depth, l=1:num_gates], zU_var[i,j+1,l,k] == 0)
+#             JuMP.@constraint(qcm.model, [k=1:depth, l=1:num_gates], zU_var[i+1,j,l,k] == 0)
+#         end
+#     end 
+
+#     return 
+# end

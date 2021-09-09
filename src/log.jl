@@ -242,7 +242,13 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
     end
 
     # This tolerance is very important for the final feasiblity check
-    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, QCO.real_to_complex_matrix(data["target_gate"]), atol = 1E-4))
+    if data["are_gates_real"]
+        target_gate = real(data["target_gate"])
+    else
+        target_gate = QCO.real_to_complex_matrix(data["target_gate"])
+    end
+    
+    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, target_gate, atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     
