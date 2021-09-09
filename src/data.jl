@@ -81,7 +81,17 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
     end
 
+    if "identify_real_gates" in keys(params)
+        identify_real_gates = params["identify_real_gates"]
+    else
+        identify_real_gates = false
+    end
+
     gates_dict, are_elementary_gates_real = QCO.get_elementary_gates_dictionary(params, elementary_gates)
+
+    if !identify_real_gates
+        are_elementary_gates_real = false
+    end
 
     target_real, is_target_real = QCO.get_target_gate(params, are_elementary_gates_real)
 
@@ -122,6 +132,10 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
                              "relax_integrality" => relax_integrality,
                              "time_limit" => time_limit
                              )
+
+    if data["are_gates_real"]
+        Memento.info(_LOGGER, "Detected all-real elementary and target gates")
+    end
     
     # Rotation and Universal gate angle discretizations
     data = QCO._populate_data_angle_discretization!(data, params)

@@ -1,6 +1,11 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.2.3
+- Enabling support for Identity-gate symmetry-breaking constraints - improved run times 
+- Enabling support for `identify_real_gates` which applies a compact MIP formulation (turned-off default)
+- Updated unit tests and docs to reflect the above changes
+
 ### v0.2.2
 - Bug fix in `is_multi_qubit_gate` function in `src/log.jl` to handle any 2 qubit gates
 - Decomposition for 4-qubit CNot_41 added in `examples/4qubit_gates.jl`

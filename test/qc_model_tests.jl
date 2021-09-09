@@ -4,6 +4,7 @@
     "num_qubits" => 2, 
     "depth" => 5,
     "elementary_gates" => ["H_1", "H_2", "CNot_12", "Identity"],  
+    "identify_real_gates" => true,
     "target_gate" => QCO.CNotRevGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"
@@ -389,6 +390,7 @@ end
     "depth" => 3,    
     "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
     "target_gate" => QCO.CZGate(),
+    "identify_real_gates" => true,
     "U_θ_discretization" => [-π/2, 0, π/2],
     "U_ϕ_discretization" => [0, π/2],
     "U_λ_discretization" => [0, π/2])

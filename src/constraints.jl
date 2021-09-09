@@ -223,8 +223,6 @@ function constraint_involutory_gates(qcm::QuantumCircuitModel)
         end
     end
 
-    JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[end,d] <= z_onoff_var[end,d+1])
-
     return
 end
 
@@ -268,23 +266,24 @@ function constraint_idempotent_gates(qcm::QuantumCircuitModel)
     return
 end
 
-# function constraint_zero_imaginary_parts(qcm::QuantumCircuitModel)
+function constraint_identity_gate_symmetry(qcm::QuantumCircuitModel)
 
-#     U_var = qcm.variables[:U_var]
-#     zU_var = qcm.variables[:zU_var]
-#     n_r = size(U_var)[1]
-#     n_c = size(U_var)[2]
-#     depth = size(U_var)[3]
-#     num_gates = size(zU_var)[3]
+    gates_dict  = qcm.data["gates_dict"]
+    depth       = qcm.data["depth"]
+    z_onoff_var = qcm.variables[:z_onoff_var]
 
-#     for i=1:2:n_r
-#         for j=1:2:n_c
-#             JuMP.@constraint(qcm.model, [k=1:depth], U_var[i,j+1,k] == 0)
-#             JuMP.@constraint(qcm.model, [k=1:depth], U_var[i+1,j,k] == 0)
-#             JuMP.@constraint(qcm.model, [k=1:depth, l=1:num_gates], zU_var[i,j+1,l,k] == 0)
-#             JuMP.@constraint(qcm.model, [k=1:depth, l=1:num_gates], zU_var[i+1,j,l,k] == 0)
-#         end
-#     end 
+    identity_idx = []
+    for i=1:length(keys(gates_dict))
+        if "Identity" in gates_dict["$i"]["type"]
+            push!(identity_idx, i)
+        end
+    end
+    
+    if !isempty(identity_idx)
+        for i = 1:length(identity_idx)
+            JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[identity_idx[i], d] <= z_onoff_var[identity_idx[i], d+1])
+        end
+    end
 
-#     return 
-# end
+    return
+end

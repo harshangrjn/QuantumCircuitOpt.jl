@@ -140,3 +140,11 @@ end
     @test v3[1] == 9
     @test v3[2] == 1
 end
+
+@testset "Tests: is_gate_real" begin
+    M_test = [0 1E-7im -1E-7im; 1E-10im 0 0; -1E-8im -1E-10im 0]
+    @test QCO.is_gate_real(M_test)
+    
+    M_test = [0 1E-7im -1E-7im; 1E-10im 0 0; -1E-8im -1E-5im 0]
+    @test !QCO.is_gate_real(M_test)
+end
