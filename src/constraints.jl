@@ -223,6 +223,8 @@ function constraint_involutory_gates(qcm::QuantumCircuitModel)
         end
     end
 
+    JuMP.@constraint(qcm.model, [d=1:(depth-1)], z_onoff_var[end,d] <= z_onoff_var[end,d+1])
+
     return
 end
 
