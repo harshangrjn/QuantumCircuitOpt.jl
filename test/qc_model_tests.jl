@@ -4,6 +4,7 @@
     "num_qubits" => 2, 
     "depth" => 5,
     "elementary_gates" => ["H_1", "H_2", "CNot_12", "Identity"],  
+    "initial_gate" => "Identity",
     "identify_real_gates" => true,
     "target_gate" => QCO.CNotRevGate(),
     "objective" => "minimize_depth", 
