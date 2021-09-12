@@ -1527,47 +1527,40 @@ function GroverDiffusionGate()
 end
 
 @doc raw"""
-    fSimGate(θ::Number, ϕ::Number)
+    SycamoreGate()
 
-Two-qubit parameterized Fermionic Simulation (fSim) gate, used in Google's hardware. 
-Reference: [arxiv.org/pdf/2001.08343.pdf](https://arxiv.org/pdf/2001.08343.pdf)
+Two-qubit Sycamore Gate, native to Google's hardware.
+Reference: [quantumai.google/cirq/google/devices](https://quantumai.google/cirq/google/devices)
 
 **Circuit Representation**
 ```
-q_0: ──────■──────
-     ┌─────┴─────┐
-q_1: ┤ fSim(ϴ,φ) ├
-     └───────────┘
+     ┌──────┐
+q_0: ┤      ├
+     │ SYC  │   
+q_1: ┤      ├ 
+     └──────┘ 
 ```
 
 **Matrix Representation**
 
 ```math
 
-fSim(\theta, \phi) = \begin{pmatrix}
+SycamoreGate() = \begin{pmatrix}
 1 & 0 & 0 & 0 \\
-0 & cos(\theta) & -isin(\theta) & 0 \\
-0 & -isin(\theta) & cos(\theta) & 0 \\ 
-0 & 0 & 0 & e^{-i \phi}
+0 & 0 & -i & 0 \\
+0 & -i & 0 & 0 \\ 
+0 & 0 & 0 & e^{-i \frac{\pi}{6}}
 \end{pmatrix}
 
 ```
 """
-function fSimGate(θ::Number, ϕ::Number)
+function SycamoreGate()
 
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in fSimGate is not within valid bounds")
-    end
-    if !(-2*π <= ϕ <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle in fSimGate is not within valid bounds")
-    end
+    return  Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 0 -im 0    
+                                      0 -im 0 0
+                                      0 0 0 cos(pi/6)-(sin(pi/6))im])
 
-    fSim = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 cos(θ) sin(θ) * -im 0    
-                                      0 sin(θ) * -im cos(θ) 0
-                                      0 0 0 cos(ϕ)-(sin(ϕ))im])
-
-    return round_complex_values(fSim)
 end
 
 #---------------------------------------#
