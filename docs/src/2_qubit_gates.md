@@ -132,3 +132,7 @@ HCoinGate
 ```@docs
 GroverDiffusionGate
 ```
+## fSimGate
+```@docs
+fSimGate
+```
