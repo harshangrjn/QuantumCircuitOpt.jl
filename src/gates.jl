@@ -1526,6 +1526,50 @@ function GroverDiffusionGate()
 
 end
 
+@doc raw"""
+    fSimGate(θ::Number, ϕ::Number)
+
+Two-qubit parameterized Fermionic Simulation (fSim) gate, used in Google's hardware. 
+Reference: [arxiv.org/pdf/2001.08343.pdf](https://arxiv.org/pdf/2001.08343.pdf)
+
+**Circuit Representation**
+```
+q_0: ──────■──────
+     ┌─────┴─────┐
+q_1: ┤ fSim(ϴ,φ) ├
+     └───────────┘
+```
+
+**Matrix Representation**
+
+```math
+
+fSim(\theta, \phi) = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & cos(\theta) & -isin(\theta) & 0 \\
+0 & -isin(\theta) & cos(\theta) & 0 \\ 
+0 & 0 & 0 & e^{-i \phi}
+\end{pmatrix}
+
+```
+"""
+function fSimGate(θ::Number, ϕ::Number)
+
+    if !(-2*π <= θ <= 2*π)
+        Memento.error(_LOGGER, "θ angle in fSimGate is not within valid bounds")
+    end
+    if !(-2*π <= ϕ <= 2*π)
+        Memento.error(_LOGGER, "ϕ angle in fSimGate is not within valid bounds")
+    end
+
+    fSim = Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 cos(θ) sin(θ) * -im 0    
+                                      0 sin(θ) * -im cos(θ) 0
+                                      0 0 0 cos(ϕ)-(sin(ϕ))im])
+
+    return round_complex_values(fSim)
+end
+
 #---------------------------------------#
 #            Three-qubit gates          #
 #---------------------------------------#
