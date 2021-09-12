@@ -165,7 +165,7 @@
     @test isapprox(QCO.get_full_sized_gate("iSwap_35", 5), QCO.get_full_sized_gate("iSwap_53", 5), atol = tol_0)
 
     # fSim test, from https://quantumai.google/cirq/google/devices
-    @test isapprox(QCO.fSimGate(-pi/4, 0), QCO.iSwapGate()^0.5, atol= tol_0)
+    @test isapprox(QCO.fSimGate(-pi/4, 0), QCO.iSwapGate()^0.5, atol = tol_0)
 
 end
 
