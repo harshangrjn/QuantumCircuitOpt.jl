@@ -904,15 +904,11 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
         return QCO.kron_two_qubit_gate(num_qubits, QCO.iSwapGate(), "q$c_qubit", "q$t_qubit")
     
-    elseif input in "fSim_" .* qubits_string_2
+    elseif input in "Sycamore_" .* qubits_string_2
         c_qubit = parse(Int, input[end-1])
         t_qubit = parse(Int, input[end])
 
-        if (angle != nothing) && (length(angle) > 0)
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.fSimGate(angle[1], angle[2]), "q$c_qubit", "q$t_qubit")
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
+        return QCO.kron_two_qubit_gate(num_qubits, QCO.SycamoreGate(), "q$c_qubit", "q$t_qubit")
 
     elseif input in "DCX_" .* qubits_string_2
         c_qubit = parse(Int, input[end-1])
@@ -1054,6 +1050,9 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
 
         elseif kron_gates[i] in "iSwap_" .* qubits_string_2
                 M = kron(M, QCO.iSwapGate())
+
+            elseif kron_gates[i] in "Sycamore_" .* qubits_string_2
+                M = kron(M, QCO.SycamoreGate())
 
         elseif kron_gates[i] in "DCX_" .* qubits_string_2
                 M = kron(M, QCO.DCXGate())
