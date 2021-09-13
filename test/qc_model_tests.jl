@@ -30,6 +30,7 @@ end
         "num_qubits" => 2,
         "depth" => 4,        
         "elementary_gates" => ["CNot_12", "CNot_21", "Identity"],
+        "identify_real_gates" => true,
         "target_gate" => QCO.SwapGate(),  
         "objective" => "minimize_cnot", 
         "decomposition_type" => "exact"                      
