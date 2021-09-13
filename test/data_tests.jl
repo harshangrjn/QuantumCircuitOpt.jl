@@ -34,13 +34,13 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 2,
-    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CZ_12", "CH_12", "CV_12", "Phase_1", "Phase_2", "DCX_12"],
+    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CZ_12", "CH_12", "CV_12", "Phase_1", "Phase_2", "DCX_12", "Sycamore_12"],
     "Ph_discretization" => [π],
     "target_gate" => QCO.IGate(2),               
     )
 
     data = QCO.get_data(params, eliminate_identical_gates = false)
-    @test length(keys(data["gates_dict"])) == 24
+    @test length(keys(data["gates_dict"])) == 25
     
     # kron gates
     params = Dict{String, Any}(

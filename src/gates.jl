@@ -1529,7 +1529,7 @@ end
 @doc raw"""
     SycamoreGate()
 
-Two-qubit Sycamore Gate, native to Google's hardware.
+Two-qubit Sycamore Gate, native to Google's universal quantum processor.
 Reference: [quantumai.google/cirq/google/devices](https://quantumai.google/cirq/google/devices)
 
 **Circuit Representation**

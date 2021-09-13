@@ -35,7 +35,7 @@ function decompose_toffoli()
     "num_qubits" => 3, 
     "depth" => 15,    
 
-    "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"], 
+    "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_1", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
     "input_circuit" => toffoli_circuit(),
     
