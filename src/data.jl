@@ -755,6 +755,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
     #----------------------;
     #   Two qubit gates    ;
     #----------------------;
+
     elseif input in "CNot_" .* qubits_string_2
         c_qubit = parse(Int, input[end-1])
         t_qubit = parse(Int, input[end])
@@ -902,6 +903,12 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         t_qubit = parse(Int, input[end])
 
         return QCO.kron_two_qubit_gate(num_qubits, QCO.iSwapGate(), "q$c_qubit", "q$t_qubit")
+    
+    elseif input in "Sycamore_" .* qubits_string_2
+        c_qubit = parse(Int, input[end-1])
+        t_qubit = parse(Int, input[end])
+
+        return QCO.kron_two_qubit_gate(num_qubits, QCO.SycamoreGate(), "q$c_qubit", "q$t_qubit")
 
     elseif input in "DCX_" .* qubits_string_2
         c_qubit = parse(Int, input[end-1])
@@ -1043,6 +1050,9 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
 
         elseif kron_gates[i] in "iSwap_" .* qubits_string_2
                 M = kron(M, QCO.iSwapGate())
+
+            elseif kron_gates[i] in "Sycamore_" .* qubits_string_2
+                M = kron(M, QCO.SycamoreGate())
 
         elseif kron_gates[i] in "DCX_" .* qubits_string_2
                 M = kron(M, QCO.DCXGate())

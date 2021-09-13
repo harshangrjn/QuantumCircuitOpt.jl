@@ -164,5 +164,7 @@
     @test isapprox(QCO.get_full_sized_gate("iSwap_23", 4), QCO.get_full_sized_gate("iSwap_32", 4), atol = tol_0)
     @test isapprox(QCO.get_full_sized_gate("iSwap_35", 5), QCO.get_full_sized_gate("iSwap_53", 5), atol = tol_0)
 
+    @test isapprox(QCO.SycamoreGate()^12, QCO.IGate(2), atol = tol_0)
+
 end
 

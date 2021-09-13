@@ -132,3 +132,7 @@ HCoinGate
 ```@docs
 GroverDiffusionGate
 ```
+## SycamoreGate
+```@docs
+SycamoreGate
+```

@@ -1526,6 +1526,43 @@ function GroverDiffusionGate()
 
 end
 
+@doc raw"""
+    SycamoreGate()
+
+Two-qubit Sycamore Gate, native to Google's hardware.
+Reference: [quantumai.google/cirq/google/devices](https://quantumai.google/cirq/google/devices)
+
+**Circuit Representation**
+```
+     ┌──────┐
+q_0: ┤      ├
+     │ SYC  │   
+q_1: ┤      ├ 
+     └──────┘ 
+```
+
+**Matrix Representation**
+
+```math
+
+SycamoreGate() = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & -i & 0 \\
+0 & -i & 0 & 0 \\ 
+0 & 0 & 0 & e^{-i \frac{\pi}{6}}
+\end{pmatrix}
+
+```
+"""
+function SycamoreGate()
+
+    return  Array{Complex{Float64},2}([ 1 0 0 0            
+                                      0 0 -im 0    
+                                      0 -im 0 0
+                                      0 0 0 cos(pi/6)-(sin(pi/6))im])
+
+end
+
 #---------------------------------------#
 #            Three-qubit gates          #
 #---------------------------------------#
