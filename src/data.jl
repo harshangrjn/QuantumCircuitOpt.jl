@@ -176,7 +176,7 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_iden
         if are_elementary_gates_real
             M_real[:,:,i] = real(gates_dict["$i"]["matrix"])
         else 
-            M_real[:,:,i] = complex_to_real_gate(gates_dict["$i"]["matrix"])
+            M_real[:,:,i] = QCO.complex_to_real_gate(gates_dict["$i"]["matrix"])
         end
     end
 
@@ -275,11 +275,11 @@ end
 
 function _populate_data_angle_discretization!(data::Dict{String, Any}, params::Dict{String, Any})
 
-    R_gates_idx   = QCO._get_R_gates_idx(data["elementary_gates"])
-    U3_gates_idx  = QCO._get_U3_gates_idx(data["elementary_gates"])
+    R_gates_idx     = QCO._get_R_gates_idx(data["elementary_gates"])
+    U3_gates_idx    = QCO._get_U3_gates_idx(data["elementary_gates"])
     Phase_gates_idx = QCO._get_Phase_gates_idx(data["elementary_gates"])
-    CR_gates_idx  = QCO._get_CR_gates_idx(data["elementary_gates"])
-    CU3_gates_idx = QCO._get_CU3_gates_idx(data["elementary_gates"])
+    CR_gates_idx    = QCO._get_CR_gates_idx(data["elementary_gates"])
+    CU3_gates_idx   = QCO._get_CU3_gates_idx(data["elementary_gates"])
     
     if !isempty(union(R_gates_idx, U3_gates_idx, Phase_gates_idx, CR_gates_idx, CU3_gates_idx)) 
         
@@ -366,7 +366,7 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
             return real(params["target_gate"]), is_target_real
         end
     else
-        return complex_to_real_gate(params["target_gate"]), is_target_real
+        return QCO.complex_to_real_gate(params["target_gate"]), is_target_real
     end
 
 end
@@ -375,12 +375,12 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
 
     num_qubits = params["num_qubits"]
 
-    R_gates_idx   = QCO._get_R_gates_idx(elementary_gates)
-    U3_gates_idx  = QCO._get_U3_gates_idx(elementary_gates)
-    Phase_gates_idx  = QCO._get_Phase_gates_idx(elementary_gates)
-    CR_gates_idx  = QCO._get_CR_gates_idx(elementary_gates)
-    CU3_gates_idx = QCO._get_CU3_gates_idx(elementary_gates)
-    kron_gates_idx = QCO._get_kron_gates_idx(elementary_gates)
+    R_gates_idx     = QCO._get_R_gates_idx(elementary_gates)
+    U3_gates_idx    = QCO._get_U3_gates_idx(elementary_gates)
+    Phase_gates_idx = QCO._get_Phase_gates_idx(elementary_gates)
+    CR_gates_idx    = QCO._get_CR_gates_idx(elementary_gates)
+    CU3_gates_idx   = QCO._get_CU3_gates_idx(elementary_gates)
+    kron_gates_idx  = QCO._get_kron_gates_idx(elementary_gates)
 
     R_complex_dict = Dict{}
     if !isempty(R_gates_idx)
