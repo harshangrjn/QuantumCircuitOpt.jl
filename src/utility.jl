@@ -203,12 +203,12 @@ function get_involutory_gates(M::Dict{String,Any})
 end
 
 """
-    complex_to_real_matrix(M::Array{Complex{Float64},2})
+    complex_to_real_gate(M::Array{Complex{Float64},2})
 
-Given a complex-valued 2D matrix of size NxN, complex_to_real_matrix function returns a real-valued matrix 
-of size 2Nx2N. 
+Given a complex-valued 2D gate of size NxN, this function returns a real-valued gate 
+of dimensions 2Nx2N. 
 """
-function complex_to_real_matrix(M::Array{Complex{Float64},2})
+function complex_to_real_gate(M::Array{Complex{Float64},2})
 
     n = size(M)[1]
     M_real = zeros(2*n, 2*n)
@@ -243,17 +243,17 @@ function complex_to_real_matrix(M::Array{Complex{Float64},2})
 end
 
 """
-    real_to_complex_matrix(M::Array{Complex{Float64},2})
+    real_to_complex_gate(M::Array{Complex{Float64},2})
 
-Given a real-valued 2D matrix of size 2Nx2N, real_to_complex_matrix function returns a complex-valued matrix 
-of size NxN, if the input matrix is in a valid complex matrix form. 
+Given a real-valued gate of size 2Nx2N, this function returns a complex-valued gate 
+of size NxN, if the input gate is in a valid complex form. 
 """
-function real_to_complex_matrix(M::Array{Float64,2})
+function real_to_complex_gate(M::Array{Float64,2})
     
     n = size(M)[1]
 
     if !iseven(n)
-        Memento.error(_LOGGER, "Input real matrix can admit only even numbered columns and rows")
+        Memento.error(_LOGGER, "Input gate can admit only even numbered columns and rows")
     end
     
     M_complex = zeros(Complex{Float64}, (Int(n/2), Int(n/2)))
@@ -279,8 +279,8 @@ end
 """
     round_complex_values(M::Array{Complex{Float64},2})
 
-Given a complex-valued 2D matrix, round_complex_values function returns a complex-valued matrix which 
-rounds the valuest closest to 0 and 1. This is useful to avoid numerical issues. 
+Given a complex-valued gate, round_complex_values function returns a complex-valued gate which 
+rounds the values closest to 0 and 1. This is useful to avoid numerical issues. 
 """
 function round_complex_values(M::Array{Complex{Float64},2})
     # round values close to 0 (within toleranes) for both real and imaginary values

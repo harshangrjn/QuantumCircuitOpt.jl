@@ -245,7 +245,7 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
     if data["are_gates_real"]
         target_gate = real(data["target_gate"])
     else
-        target_gate = QCO.real_to_complex_matrix(data["target_gate"])
+        target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
     if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, target_gate, atol = 1E-4))

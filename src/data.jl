@@ -103,7 +103,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
             if are_elementary_gates_real && is_target_real
                 initial_gate = real(QCO.IGate(num_qubits))
             else
-                initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
+                initial_gate = QCO.complex_to_real_gate(QCO.IGate(num_qubits))
             end        
         else 
             Memento.error(_LOGGER, "Currently, only \"Identity\" is supported as an initial gate")
@@ -113,7 +113,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         if are_elementary_gates_real && is_target_real
             initial_gate = real(QCO.IGate(num_qubits))
         else
-            initial_gate = QCO.complex_to_real_matrix(QCO.IGate(num_qubits))
+            initial_gate = QCO.complex_to_real_gate(QCO.IGate(num_qubits))
         end        
     end
     
@@ -176,7 +176,7 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_iden
         if are_elementary_gates_real
             M_real[:,:,i] = real(gates_dict["$i"]["matrix"])
         else 
-            M_real[:,:,i] = complex_to_real_matrix(gates_dict["$i"]["matrix"])
+            M_real[:,:,i] = complex_to_real_gate(gates_dict["$i"]["matrix"])
         end
     end
 
@@ -366,7 +366,7 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
             return real(params["target_gate"]), is_target_real
         end
     else
-        return complex_to_real_matrix(params["target_gate"]), is_target_real
+        return complex_to_real_gate(params["target_gate"]), is_target_real
     end
 
 end

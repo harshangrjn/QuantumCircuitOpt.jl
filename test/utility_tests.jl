@@ -13,12 +13,12 @@ l = [-2, -1, 0, 2]
 u = [-1,  2, 3, 2]
 
 @testset "Tests: complex to real matrix function" begin
-    test_M_r = QCO.complex_to_real_matrix(M_c)
+    test_M_r = QCO.complex_to_real_gate(M_c)
     @test test_M_r == M_r
 end
 
 @testset "Tests: real to complex matrix function" begin
-    test_M_c = QCO.real_to_complex_matrix(M_r)
+    test_M_c = QCO.real_to_complex_gate(M_r)
     @test test_M_c == M_c
 end
 

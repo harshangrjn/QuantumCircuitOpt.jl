@@ -42,7 +42,7 @@ mutable struct GateData
     function GateData(gate_type::String, num_qubits::Int64)
         type = gate_type
         complex = QCO.get_full_sized_gate(type, num_qubits)
-        real = QCO.complex_to_real_matrix(complex)
+        real = QCO.complex_to_real_gate(complex)
         inverse = inv(real)
         isreal = iszero(imag(complex))
         gate = new(type, complex, real, inverse, isreal)
