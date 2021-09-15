@@ -11,10 +11,10 @@ Dev version: [![Documentation](https://github.com/harshangrjn/QuantumCircuitOpt.
 
 
 <!-- # QuantumCircuitOpt.jl -->
-**QuantumCircuitOpt.jl** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of the architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to nine qubits_.
+**QuantumCircuitOpt** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of the architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to nine qubits_.
 
 ## Installation
-QuantumCircuitOpt.jl is a registered package and can be installed by entering the following in the Julia REPL-mode:
+QuantumCircuitOpt is a registered package and can be installed by entering the following in the Julia REPL-mode:
 ```julia
 import Pkg
 Pkg.add("QuantumCircuitOpt")
@@ -70,13 +70,16 @@ QuantumCircuitOpt is being actively developed and suggestions or other forms of 
 ## Acknowledgement
 This work was supported by Los Alamos National Laboratory's LDRD Early Career Research Award, *"20190590ECR: Discrete Optimization Algorithms for Provable Optimal Quantum Circuit Design"*. The primary developer of this package is [Harsha Nagarajan](http://harshanagarajan.com) ([@harshangrjn](https://github.com/harshangrjn)). 
 
-<!-- ## Citation
-If you find QuantumCircuitOpt.jl useful in your work, we request you to cite the following paper: 
+## Citation
+If you find QuantumCircuitOpt useful in your work, we request you to cite the following accepted paper (yet to appear online): 
 ```bibtex
-@inproceedings{NagarajanHijaziCoffrin2021,
-  title={Mixed-Integer Programming for Optimal Quantum Circuit Design},
-  author={Nagarajan, Harsha and Hijazi, Hassan and Coffrin, Carleton},
-  booktitle={Under preparation},
-  year={2021}
+@inproceedings{NagarajanLockwoodCoffrin2021,
+  title={{QuantumCircuitOpt}: An Open-source Framework for Provably Optimal Quantum Circuit Design},
+  author={Nagarajan, Harsha and Lockwood, Owen and Coffrin, Carleton},
+  booktitle={SC21: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
+  series={Workshop on Quantum Computing Software},
+  pages={1-7},
+  year={2021},
+  organization={IEEE Computer Society}
 }
-``` -->
+```
