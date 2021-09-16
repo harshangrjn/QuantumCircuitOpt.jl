@@ -18,7 +18,7 @@ const _LOGGER = Memento.getlogger(@__MODULE__)
 # NOTE: If this line is not included then the precompiled `QuantumCircuitOpt._LOGGER` won't be registered at runtime.
 __init__() = Memento.register(_LOGGER)
 
-"Suppresses information and warning messages output by QuantumCircuitOpt, for fine grained control use the Memento package"
+"Suppresses information and warning messages output by QuantumCircuitOpt, for fine grained control use of the Memento package"
 function silence()
     Memento.info(_LOGGER, "Suppressing information and warning messages for the rest of this session.  Use the Memento package for more fine-grained control of logging.")
     Memento.setlevel!(Memento.getlogger(QuantumCircuitOpt), "error")

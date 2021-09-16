@@ -1,3 +1,9 @@
+"""
+    auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1})
+
+Given a vector of JuMP variables (maximum 4 variables), this function returns the worst-case 
+bounds, the product of these input variables can admit.  
+"""
 function auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1}) 
 
     v_l = [JuMP.lower_bound(v[1]), JuMP.upper_bound(v[1])]
@@ -28,7 +34,7 @@ end
 """
     gate_element_bounds(M::Array{Float64,3})
 
-Given a set of elementary gates, {G_1, G_2, ... G_n}, this function evaluates 
+Given a set of elementary gates, `{G1, G2, ... ,Gn}`, this function evaluates 
 the range of every co-ordinate of the superimposed gates, over all possible gates.  
 """
 function gate_element_bounds(M::Array{Float64,3}) 
@@ -110,15 +116,14 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
     end 
 
     return commute_pairs, commute_pairs_prodIdentity
-
 end
 
 """
     get_redundant_gate_product_pairs(M::Dict{String,Any})
 
 Given a dictionary of elementary quantum gates, this function returns all pairs of gates whose product is 
-one of the input elementary gates. For example, let G_{basis} = {G_1, G_2, G_3} be the elementary gates. If G_1*G_2 ∈ G_{basis}, 
-then (1,2) is considered as a redundant pair. 
+one of the input elementary gates. For example, let `G_basis = {G1, G2, G3}` be the elementary gates. If `G1*G2 ∈ G_basis`, 
+then `(1,2)` is considered as a redundant pair. 
 """
 function get_redundant_gate_product_pairs(M::Dict{String,Any})
     num_gates = length(keys(M))
@@ -186,8 +191,8 @@ end
 """
     get_involutory_gates(M::Dict{String,Any})
 
-Given the dictionary of complex gates, this function returns the indices of input gates 
-which are involutory, i.e, M[i]^2 = Identity, excluding the Identity gate. 
+Given the dictionary of complex gates ``G_1, G_2, ..., G_n``, this function returns the indices of these gates 
+which are involutory, i.e, ``G_i^2 = Identity```, excluding the Identity gate. 
 """
 function get_involutory_gates(M::Dict{String,Any})
     num_gates = length(keys(M))
@@ -270,10 +275,15 @@ function real_to_complex_gate(M::Array{Float64,2})
         for j = collect(1:2:n)
 
             if !isapprox(M[i,j], M[i+1, j+1], atol = 1E-5) || !isapprox(M[i+1,j], -M[i,j+1], atol = 1E-5)
-                Memento.error(_LOGGER, "Input real matrix cannot be converted into a valid complex matrix form")
+                Memento.error(_LOGGER, "Input real form of the complex gate is invalid")
             end
 
-            M_complex[ii,jj] = complex(M[i,j], M[i,j+1])
+            M_re = M[i,j]
+            M_im = M[i,j+1]
+            (isapprox(M_re, 0, atol=1E-6)) && (M_re = 0)
+            (isapprox(M_im, 0, atol=1E-6)) && (M_im = 0)
+            
+            M_complex[ii,jj] = complex(M_re, M_im)
             jj += 1
         end
         jj = 1
@@ -308,23 +318,23 @@ function round_complex_values(M::Array{Complex{Float64},2})
 
                 # Real components
                 if isapprox(real(M[i,j]), 0, atol=1E-6)
-                    Mij_r = 0
+                    Mij_re = 0
                 elseif isapprox(real(M[i,j]), 1, atol=1E-6)
-                    Mij_r = 1
+                    Mij_re = 1
                 else 
-                    Mij_r = real(M[i,j])
+                    Mij_re = real(M[i,j])
                 end
                 
                 # Imaginary components
                 if isapprox(imag(M[i,j]), 0, atol=1E-6)
-                    Mij_i = 0
+                    Mij_im = 0
                 elseif isapprox(imag(M[i,j]), 1, atol=1E-6)
-                    Mij_i = 1
+                    Mij_im = 1
                 else 
-                    Mij_i = imag(M[i,j])
+                    Mij_im = imag(M[i,j])
                 end
 
-                M_round[i,j] = Mij_r + (Mij_i)im
+                M_round[i,j] = complex(Mij_re, Mij_im)
                 
             end
         end
@@ -510,7 +520,7 @@ end
     _parse_gates_with_kron_symbol(s::String)
 
 Given a string with gates separated by kronecker symbols (x), this function parses and returns the vector of gates. For 
-example, if the input string is "H_1xCNot_23xT_4", the output will be Vector{String}(["H_1", "CNot_23", "T_4"]).
+example, if the input string is `H_1xCNot_23xT_4`, the output will be `Vector{String}(["H_1", "CNot_23", "T_4"])`.
 """
 function _parse_gates_with_kron_symbol(s::String)
 
@@ -537,7 +547,7 @@ function _parse_gates_with_kron_symbol(s::String)
     _parse_qubit_numbers(s::String)
 
 Given a string representing a single gate with qubit numbers separated by symbol `_`, this function parses and returns the vector of qubits on
-which the input gate is located. For example, if the input string is "CRX_2_3", the output will be Vector{Int64}([2,3]).
+which the input gate is located. For example, if the input string is `CRX_2_3`, the output will be `Vector{Int64}([2,3])`.
 """
 function _parse_qubit_numbers(s::String)
 

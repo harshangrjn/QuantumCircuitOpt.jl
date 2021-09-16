@@ -1,3 +1,9 @@
+"""
+    visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
+
+Given dictionaries of results and data, and assuming that the optimization model had a feasible solution, 
+this function aids in visualizing the optimal circuit decomposition.
+"""
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
     if data["relax_integrality"]
