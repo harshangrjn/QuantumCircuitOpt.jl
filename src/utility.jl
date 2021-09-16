@@ -28,7 +28,7 @@ end
 """
     gate_element_bounds(M::Array{Float64,3})
 
-Given a set of elementary gates, {G_1, G_2, ... G_n}, `gate_element_bounds` function evaluates 
+Given a set of elementary gates, {G_1, G_2, ... G_n}, this function evaluates 
 the range of every co-ordinate of the superimposed gates, over all possible gates.  
 """
 function gate_element_bounds(M::Array{Float64,3}) 
@@ -53,8 +53,8 @@ end
 """
     get_commutative_gate_pairs(M::Dict{String,Any}; identity_pairs = true)
 
-Given a dictionary of gates, as processed in `src/data.jl`, `get_commutative_gate_pairs` outputs all pairs of commuting 
-matrices. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
+Given a dictionary of elementary quantum gates, this function returns all pairs of commuting 
+gates. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
 """
 function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
     
@@ -113,6 +113,13 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
 
 end
 
+"""
+    get_redundant_gate_product_pairs(M::Dict{String,Any})
+
+Given a dictionary of elementary quantum gates, this function returns all pairs of gates whose product is 
+one of the input elementary gates. For example, let G_{basis} = {G_1, G_2, G_3} be the elementary gates. If G_1*G_2 ∈ G_{basis}, 
+then (1,2) is considered as a redundant pair. 
+"""
 function get_redundant_gate_product_pairs(M::Dict{String,Any})
     num_gates = length(keys(M))
     redundant_pairs_idx = Array{Tuple{Int64,Int64},1}()
@@ -150,7 +157,7 @@ end
 """
     get_idempotent_gates(M::Dict{String,Any})
 
-Given the dictionary of complex gates, this function returns the indices of matrices which are self-idempotent 
+Given the dictionary of complex quantum gates, this function returns the indices of matrices which are self-idempotent 
 or idempotent with other set of input gates, excluding the Identity gate.
 """
 function get_idempotent_gates(M::Dict{String,Any})
@@ -205,7 +212,7 @@ end
 """
     complex_to_real_gate(M::Array{Complex{Float64},2})
 
-Given a complex-valued 2D gate of size NxN, this function returns a real-valued gate 
+Given a complex-valued two-dimensional quantum gate of size NxN, this function returns a real-valued gate 
 of dimensions 2Nx2N. 
 """
 function complex_to_real_gate(M::Array{Complex{Float64},2})
@@ -245,7 +252,7 @@ end
 """
     real_to_complex_gate(M::Array{Complex{Float64},2})
 
-Given a real-valued gate of size 2Nx2N, this function returns a complex-valued gate 
+Given a real-valued two-dimensional quantum gate of size 2Nx2N, this function returns a complex-valued gate 
 of size NxN, if the input gate is in a valid complex form. 
 """
 function real_to_complex_gate(M::Array{Float64,2})
@@ -279,7 +286,7 @@ end
 """
     round_complex_values(M::Array{Complex{Float64},2})
 
-Given a complex-valued gate, round_complex_values function returns a complex-valued gate which 
+Given a complex-valued gate, this function returns a complex-valued gate which 
 rounds the values closest to 0 and 1. This is useful to avoid numerical issues. 
 """
 function round_complex_values(M::Array{Complex{Float64},2})
@@ -329,7 +336,7 @@ end
 """
     unique_idx(x::AbstractArray{T})
 
-unique_idx returns the indices of unique elements in a given array of scalar or vector inputs. Overall, 
+This function returns the indices of unique elements in a given array of scalar or vector inputs. Overall, 
 this function computes faster than Julia's built-in `findfirst` command. 
 """
 function unique_idx(x::AbstractArray{T}) where T
@@ -349,7 +356,7 @@ end
 """
     unique_matrices(M::Array{Float64, 3})
 
-unique_matrices returns the unique set of matrices and the corresponding indices 
+This function returns the unique set of matrices and the corresponding indices 
 of unique matrices from the given set of matrices.  
 """
 function unique_matrices(M::Array{Float64, 3})
@@ -560,7 +567,7 @@ function _parse_qubit_numbers(s::String)
 """
     is_gate_real(M::Array{Complex{Float64},2})
 
-Given a complex-valued 2D matrix, M, this function returns if M has purely real parts or not as it's elements. 
+Given a complex-valued quantum gate, M, this function returns if M has purely real parts or not as it's elements. 
 """
  function is_gate_real(M::Array{Complex{Float64},2})
     M_imag = imag(M)

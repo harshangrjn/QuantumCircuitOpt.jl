@@ -4,7 +4,8 @@ QuantumCircuitOpt.jl Change Log
 - Enabling support for 2-qubit Sycamore gate, native to Google's quantum processor
 - Citation for the SC21 paper (accepted)
 - Clean-up in real to complex matrix conversion and vice-versa in `src/utility.jl` 
-- Updated docs and tests to reflect the above changes
+- Better rounding in `relaxation_bilinear` function
+- Updated docs with more function references to reflect the above changes
 
 ### v0.2.3
 - Enabling support for Identity-gate symmetry-breaking constraints - improved run times 

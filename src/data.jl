@@ -1,5 +1,11 @@
 import LinearAlgebra: I
 
+"""
+    get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
+
+Given the user input `params` dictionary, this function returns a dictionary of processed data which contains all the 
+necessary information to formulate the optimization model for the circuit design problem. 
+"""
 function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     
     # Number of qubits
@@ -345,7 +351,8 @@ end
 """
     get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool)
 
-Given the input params, this function returns the corresponding real version of the target_gate. 
+Given the user input `params` dictionary and a boolean if all the input elementary gates are real, 
+this function returns the corresponding real version of the target gate. 
 """ 
 function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool)
 
@@ -666,10 +673,12 @@ function get_discretized_three_angle_gates(gate_type::String, M3::Dict{String, A
 end
 
 """
-    get_full_sized_gate(input::String, num_qubits::Int64; target_gate = nothing)
+    get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
-For a given string and number of qubits in the input specified input, this function returns a full 
-sized gate with respect to the input number of qubits. 
+Given an input string representing the gate and number of qubits of the circuit, this function returns a full-sized 
+gate with respect to the input number of qubits. For example, if `num_qubits = 3` and the input gate in `H_3` 
+(Hadamard on third qubit), then this function returns `IGate ⨷ IGate ⨷ HGate`, where IGate and HGate are single qubit Identity and Hadamard gates, respectively.  
+Note that `angle` vector is an optional input which is necessary when the input gate is parametrized by Euler angles. 
 """
 function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
@@ -922,6 +931,14 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
 end
 
+"""
+    get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
+
+Given an input string with kronecker symbols representing the gate and number of qubits of the circuit, this function returns a full-sized 
+gate with respect to the input number of qubits. For example, if `num_qubits = 3` and the input gate in `I_1xT_1xH_3`, 
+then this function returns `IGate ⨷ TGate ⨷ HGate`, where IGate, TGate and HGate are single-qubit Identity, T and Hadamard gates, respectively.  
+Note that this function currently does not support an input gate parametrized with Euler angles. 
+"""
 function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
 
     qubits_string_1, qubits_string_2 = QCO._get_qubit_strings(num_qubits)

@@ -32,6 +32,16 @@ z <= JuMP.upper_bound(x)*y + JuMP.lower_bound(y)*x - JuMP.upper_bound(x)*JuMP.lo
 function relaxation_bilinear(m::JuMP.Model, xy::JuMP.VariableRef, x::JuMP.VariableRef, y::JuMP.VariableRef)
     lb_x, ub_x = variable_domain(x)
     lb_y, ub_y = variable_domain(y)
+
+    (isapprox(lb_x, 0, atol = 1E-6)) && (lb_x = 0)
+    (isapprox(lb_y, 0, atol = 1E-6)) && (lb_y = 0)
+    (isapprox(lb_x, 1, atol = 1E-6)) && (lb_x = 1)
+    (isapprox(lb_y, 1, atol = 1E-6)) && (lb_y = 1)
+
+    (isapprox(ub_x, 0, atol = 1E-6)) && (ub_x = 0)
+    (isapprox(ub_y, 0, atol = 1E-6)) && (ub_y = 0)
+    (isapprox(ub_x, 1, atol = 1E-6)) && (ub_x = 1)
+    (isapprox(ub_y, 1, atol = 1E-6)) && (ub_y = 1)
     
     if (lb_x == 0) && (ub_x == 1) && ((lb_y != 0) || (ub_y != 1))
       
@@ -48,13 +58,12 @@ function relaxation_bilinear(m::JuMP.Model, xy::JuMP.VariableRef, x::JuMP.Variab
       JuMP.@constraint(m, xy <= ub_x*y)
 
     elseif (lb_x == 0) && (ub_x == 1) && (lb_y == 0) && (ub_y == 1)
-      
+  
       JuMP.@constraint(m, xy <= x)
       JuMP.@constraint(m, xy <= y)
       JuMP.@constraint(m, xy >= x + y - 1)
 
     else
-      
       JuMP.@constraint(m, xy >= lb_x*y + lb_y*x - lb_x*lb_y)
       JuMP.@constraint(m, xy >= ub_x*y + ub_y*x - ub_x*ub_y)
       JuMP.@constraint(m, xy <= lb_x*y + ub_y*x - lb_x*ub_y)

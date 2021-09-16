@@ -26,10 +26,10 @@ Pkg.add("QuantumCircuitOpt")
 - Hit `]` to open the project environment and run `test` to run unit tests. If
   you see an error because of missing packages, run `resolve`.
 
-On how to use this package, check the Documentation's [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/quickguide/#Sample-circuit-decomposition) and the "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder for more such decompositions.
+On how to use this package, check the Documentation's [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/quickguide/#Sample-circuit-decomposition) and the "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder for more such circuit decompositions.
 
 ## Sample Circuit Synthesis
-Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate the universal rotation gate with three discretized Euler angles, (θ,ϕ,λ) :
+Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate and an universal rotation gate with three discretized Euler angles, (θ,ϕ,λ):
 
 ```julia
 import QuantumCircuitOpt as QCO
@@ -70,8 +70,8 @@ QuantumCircuitOpt is being actively developed and suggestions or other forms of 
 ## Acknowledgement
 This work was supported by Los Alamos National Laboratory's LDRD Early Career Research Award, *"20190590ECR: Discrete Optimization Algorithms for Provable Optimal Quantum Circuit Design"*. The primary developer of this package is [Harsha Nagarajan](http://harshanagarajan.com) ([@harshangrjn](https://github.com/harshangrjn)). 
 
-## Citation
-If you find QuantumCircuitOpt useful in your work, we request you to cite the following accepted paper (yet to appear online): 
+## Citing QuantumCircuitOpt
+If you find QuantumCircuitOpt useful in your work, we request you to cite the following paper (accepted and yet to appear online): 
 ```bibtex
 @inproceedings{NagarajanLockwoodCoffrin2021,
   title={{QuantumCircuitOpt}: An Open-source Framework for Provably Optimal Quantum Circuit Design},

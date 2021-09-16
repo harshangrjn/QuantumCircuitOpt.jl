@@ -257,7 +257,7 @@ end
 """
     get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{String,1})
 
-This function returns a decomposition of gates after compressing adjacent pair of gates represented on two separate qubits. 
+Given the data dictionary and the sequence of gates from the solution, this function returns a decomposition of gates after compressing adjacent pair of gates represented on two separate qubits. 
 For example, gates H1 and H2 appearing in a sequence will be compressed to H1xH2 (kron(H1,H2)). This functionality is currently supported only for
 two qubit circuits. 
 """

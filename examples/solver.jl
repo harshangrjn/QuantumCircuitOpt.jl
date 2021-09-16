@@ -1,8 +1,7 @@
 """
     get_solver(params::Dict{String,Any})
 
-This function returns the JuMP optimizer with its appropriate attributes, based on 
-user-defined inputs in `params` dictionary.  
+Given the user input `params` dictionary, this function returns the JuMP optimizer with its appropriate attributes.   
 """
 function get_solver(params::Dict{String,Any})
     optimizers_list = ["gurobi", "cplex", "cbc", "ipopt", "juniper", "alpine", "glpk"]
