@@ -28,8 +28,8 @@ end
 """
     GateData
 The composite mutable struct, `GateData`, type of the gate, the complex matrix form 
-    of the gate, full sized real form of the gate, inverse of the gate and a boolean which
-    states if the gate has all real entries.
+of the gate, full sized real form of the gate, inverse of the gate and a boolean which
+states if the gate has all real entries.
 """
 mutable struct GateData 
     type::String

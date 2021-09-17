@@ -54,7 +54,7 @@ function U3Gate(θ::Number, ϕ::Number, λ::Number)
     U3 = Array{Complex{Float64},2}([           cos(θ/2)               -(cos(λ) + (sin(λ))im)*sin(θ/2) 
                                     (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)])
 
-    return round_complex_values(U3)
+    return QCO.round_complex_values(U3)
 end
 
 @doc raw"""
@@ -144,7 +144,7 @@ function RXGate(θ::Number)
 
     RX = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
     
-    return round_complex_values(RX)
+    return QCO.round_complex_values(RX)
 end
 
 @doc raw"""
@@ -171,7 +171,7 @@ function RYGate(θ::Number)
 
     RY = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
     
-    return round_complex_values(RY)
+    return QCO.round_complex_values(RY)
 end
 
 @doc raw"""
@@ -199,7 +199,7 @@ function RZGate(θ::Number)
 
     RZ = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
     
-    return round_complex_values(RZ)
+    return QCO.round_complex_values(RZ)
 end
 
 @doc raw"""
@@ -969,7 +969,7 @@ function CRXGate(θ::Number)
                                       0 0  cos(θ/2)  -(sin(θ/2))im 
                                       0 0  -(sin(θ/2))im  cos(θ/2)])
 
-    return round_complex_values(CRX)
+    return QCO.round_complex_values(CRX)
 end
 
 @doc raw"""
@@ -1007,7 +1007,7 @@ function CRXRevGate(θ::Number)
                                       0 0 1 0
                                       0 -(sin(θ/2))im 0 cos(θ/2)])
 
-    return round_complex_values(CRXRev)
+    return QCO.round_complex_values(CRXRev)
 end
 
 @doc raw"""
@@ -1049,7 +1049,7 @@ function CRYGate(θ::Number)
                                       0 0  cos(θ/2)  -(sin(θ/2)) 
                                       0 0  (sin(θ/2))  cos(θ/2)])
 
-    return round_complex_values(CRY)
+    return QCO.round_complex_values(CRY)
 end
 
 @doc raw"""
@@ -1091,7 +1091,7 @@ function CRYRevGate(θ::Number)
                                       0 0 1 0
                                       0 (sin(θ/2)) 0 cos(θ/2)])
 
-    return round_complex_values(CRYRev)
+    return QCO.round_complex_values(CRYRev)
 end
 
 @doc raw"""
@@ -1133,7 +1133,7 @@ function CRZGate(θ::Number)
                                       0 0  (cos(θ/2) - (sin(θ/2))im)  0 
                                       0 0  0  (cos(θ/2) + (sin(θ/2))im)])
 
-    return round_complex_values(CRZ)
+    return QCO.round_complex_values(CRZ)
 end
 
 @doc raw"""
@@ -1175,7 +1175,7 @@ function CRZRevGate(θ::Number)
                                       0 0 1 0 
                                       0 0  0  (cos(θ/2) + (sin(θ/2))im)])
 
-    return round_complex_values(CRZRev)
+    return QCO.round_complex_values(CRZRev)
 end
 
 @doc raw"""
@@ -1224,7 +1224,7 @@ function CU3Gate(θ::Number, ϕ::Number, λ::Number)
                                       0 0  cos(θ/2)  -(cos(λ)+(sin(λ))im)*sin(θ/2) 
                                       0 0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
 
-    return round_complex_values(CU3)
+    return QCO.round_complex_values(CU3)
 end
 
 @doc raw"""
@@ -1273,7 +1273,7 @@ function CU3RevGate(θ::Number, ϕ::Number, λ::Number)
                                       0 0 1 0 
                                       0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2) 0 (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
 
-    return round_complex_values(CU3Rev)
+    return QCO.round_complex_values(CU3Rev)
 end
 
 @doc raw"""

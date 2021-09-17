@@ -83,9 +83,6 @@ function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
                     JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d])
                 end
 
-                # JuMP.@constraint(qcm.model, qcm.variables[:M_var][i,j,d]   ==  qcm.variables[:M_var][i+1,j+1,d])
-                # JuMP.@constraint(qcm.model, qcm.variables[:M_var][i,j+1,d] == -qcm.variables[:M_var][i+1,j,d])
-
             end
         end
     end

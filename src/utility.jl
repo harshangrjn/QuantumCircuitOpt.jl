@@ -191,8 +191,8 @@ end
 """
     get_involutory_gates(M::Dict{String,Any})
 
-Given the dictionary of complex gates ``G_1, G_2, ..., G_n``, this function returns the indices of these gates 
-which are involutory, i.e, ``G_i^2 = Identity```, excluding the Identity gate. 
+Given the dictionary of complex gates `G_1, G_2, ..., G_n`, this function returns the indices of these gates 
+which are involutory, i.e, `G_i^2 = Identity`, excluding the Identity gate. 
 """
 function get_involutory_gates(M::Dict{String,Any})
     num_gates = length(keys(M))

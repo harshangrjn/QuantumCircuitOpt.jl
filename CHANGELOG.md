@@ -1,6 +1,6 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
-### Staged 
+### v0.2.4 
 - Enabling support for 2-qubit Sycamore gate, native to Google's quantum processor
 - Citation for the SC21 paper (accepted)
 - Clean-up in real to complex matrix conversion and vice-versa in `src/utility.jl` 
