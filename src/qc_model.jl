@@ -5,7 +5,8 @@ function build_QCModel(data::Dict{String, Any};
                        involutory_gate_constraints = true,
                        redundant_gate_pair_constraints = true,
                        idempotent_gate_constraints = false,
-                       identity_gate_symmetry_constraints = true)
+                       identity_gate_symmetry_constraints = true,
+                       convex_hull_complex_gate_constraints = false)
 
     if !(all_valid_constraints in [-1,0,1])
         Memento.warn(_LOGGER, "Invalid all_valid_constraints; choose a value ∈ [-1,0,1]. Setting it to default value of 0.")
@@ -29,20 +30,23 @@ function build_QCModel(data::Dict{String, Any};
                                involutory_gate_constraints,
                                redundant_gate_pair_constraints,
                                idempotent_gate_constraints,
-                               identity_gate_symmetry_constraints
+                               identity_gate_symmetry_constraints,
+                               convex_hull_complex_gate_constraints
                               )
 
     # minimal variables and constraints, but not a convex-hull formulation per depth
     elseif model_type == "compact_formulation" 
         
         QCO.variable_QCModel_compact(m_qc)
+                                     
         QCO.constraint_QCModel_compact(m_qc, 
                                    all_valid_constraints,
                                    commute_gate_constraints, 
                                    involutory_gate_constraints,
                                    redundant_gate_pair_constraints,
                                    idempotent_gate_constraints,
-                                   identity_gate_symmetry_constraints
+                                   identity_gate_symmetry_constraints,
+                                   convex_hull_complex_gate_constraints
                                    )
 
     end
@@ -53,7 +57,7 @@ function build_QCModel(data::Dict{String, Any};
 end
 
 function variable_QCModel(qcm::QuantumCircuitModel)
-    QCO.variable_matrix_per_depth(qcm)
+    QCO.variable_gates_per_depth(qcm)
     QCO.variable_gates_onoff(qcm)
     QCO.variable_sequential_gate_products(qcm)
     QCO.variable_gate_products_copy(qcm)
@@ -72,10 +76,11 @@ function constraint_QCModel(qcm::QuantumCircuitModel,
                             involutory_gate_constraints::Bool,
                             redundant_gate_pair_constraints::Bool,
                             idempotent_gate_constraints::Bool,
-                            identity_gate_symmetry_constraints::Bool)
+                            identity_gate_symmetry_constraints::Bool,
+                            convex_hull_complex_gate_constraints::Bool)
     
     QCO.constraint_single_gate_per_depth(qcm)
-    QCO.constraint_disjunction_of_gates_per_depth(qcm)
+    QCO.constraint_gates_onoff_per_depth(qcm)
     QCO.constraint_gate_initial_condition(qcm)
     QCO.constraint_gate_intermediate_products(qcm)
     QCO.constraint_gate_product_linearization(qcm)
@@ -88,7 +93,8 @@ function constraint_QCModel(qcm::QuantumCircuitModel,
                                 involutory_gate_constraints,
                                 redundant_gate_pair_constraints,
                                 idempotent_gate_constraints, 
-                                identity_gate_symmetry_constraints)
+                                identity_gate_symmetry_constraints,
+                                convex_hull_complex_gate_constraints)
 
     return
 end
@@ -112,7 +118,8 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel,
                                     involutory_gate_constraints::Bool,
                                     redundant_gate_pair_constraints::Bool,
                                     idempotent_gate_constraints::Bool,
-                                    identity_gate_symmetry_constraints::Bool)
+                                    identity_gate_symmetry_constraints::Bool,
+                                    convex_hull_complex_gate_constraints::Bool)
 
     QCO.constraint_single_gate_per_depth(qcm)
     QCO.constraint_gate_initial_condition_compact(qcm)
@@ -127,7 +134,8 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel,
                                  involutory_gate_constraints,
                                  redundant_gate_pair_constraints,
                                  idempotent_gate_constraints,
-                                 identity_gate_symmetry_constraints)
+                                 identity_gate_symmetry_constraints,
+                                 convex_hull_complex_gate_constraints)
 
     return
 end
@@ -138,7 +146,8 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel,
                                   involutory_gate_constraints::Bool,
                                   redundant_gate_pair_constraints::Bool,
                                   idempotent_gate_constraints::Bool,
-                                  identity_gate_symmetry_constraints::Bool)
+                                  identity_gate_symmetry_constraints::Bool,
+                                  convex_hull_complex_gate_constraints::Bool)
 
     if all_valid_constraints != -1
 
@@ -148,13 +157,15 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel,
             QCO.constraint_redundant_gate_product_pairs(qcm)
             QCO.constraint_idempotent_gates(qcm)
             QCO.constraint_identity_gate_symmetry(qcm)
+            QCO.constraint_convex_hull_complex_gates(qcm)
             
         elseif all_valid_constraints == 0 
-            commute_gate_constraints           && QCO.constraint_commutative_gate_pairs(qcm)
-            involutory_gate_constraints        && QCO.constraint_involutory_gates(qcm)
-            redundant_gate_pair_constraints    && QCO.constraint_redundant_gate_product_pairs(qcm)
-            idempotent_gate_constraints        && QCO.constraint_idempotent_gates(qcm)
-            identity_gate_symmetry_constraints && QCO.constraint_identity_gate_symmetry(qcm)
+            commute_gate_constraints             && QCO.constraint_commutative_gate_pairs(qcm)
+            involutory_gate_constraints          && QCO.constraint_involutory_gates(qcm)
+            redundant_gate_pair_constraints      && QCO.constraint_redundant_gate_product_pairs(qcm)
+            idempotent_gate_constraints          && QCO.constraint_idempotent_gates(qcm)
+            identity_gate_symmetry_constraints   && QCO.constraint_identity_gate_symmetry(qcm)
+            convex_hull_complex_gate_constraints && QCO.constraint_convex_hull_complex_gates(qcm)
         end
 
     end
@@ -223,6 +234,7 @@ function run_QCModel(params::Dict{String, Any},
                      redundant_gate_pair_constraints = true,
                      idempotent_gate_constraints = false,
                      identity_gate_symmetry_constraints = true,
+                     convex_hull_complex_gate_constraints = false,
                      visualize_solution = true, 
                      eliminate_identical_gates = true)
 
@@ -236,7 +248,8 @@ function run_QCModel(params::Dict{String, Any},
                                   involutory_gate_constraints = involutory_gate_constraints,
                                   redundant_gate_pair_constraints = redundant_gate_pair_constraints,
                                   idempotent_gate_constraints = idempotent_gate_constraints,
-                                  identity_gate_symmetry_constraints = identity_gate_symmetry_constraints)
+                                  identity_gate_symmetry_constraints = identity_gate_symmetry_constraints,
+                                  convex_hull_complex_gate_constraints = convex_hull_complex_gate_constraints)
 
     result_qc = QCO.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
 

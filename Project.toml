@@ -1,7 +1,7 @@
 name = "QuantumCircuitOpt"
 uuid = "88128e30-b60a-4e54-ab02-1050a5f92a36"
 authors = ["Harsha Nagarajan"]
-version = "0.2.4"
+version = "0.2.5"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -9,12 +9,14 @@ JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 Memento = "f28f55f0-a522-5efc-85c2-fe41dfb9b2d9"
+QHull = "a8468747-bd6f-53ef-9e5c-744dbc5c59e7"
 
 [compat]
 DataStructures = "~0.17, ~0.18"
 JuMP = "^0.21.0"
 MathOptInterface = "~0.9, 0.10"
 Memento = "~1.0, ~1.1, 1"
+QHull = "~0.2"
 julia = "^1"
 
 [extras]

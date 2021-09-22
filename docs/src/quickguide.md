@@ -14,16 +14,16 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | `RX_discretization` | Vector of discretization angles (in radians) for `RXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RY_discretization` | Vector of discretization angles (in radians) for `RYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RZ_discretization` | Vector of discretization angles (in radians) for `RZGate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `Ph_discretization` | Vector of discretization angles (in radians) for `PhaseGate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `U_θ_discretization` | Vector of discretization angles (in radians) for θ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `U_ϕ_discretization` | Vector of discretization angles (in radians) for ϕ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `U_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `Phase_discretization` | Vector of discretization angles (in radians) for `PhaseGate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `U3_θ_discretization` | Vector of discretization angles (in radians) for θ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `U3_ϕ_discretization` | Vector of discretization angles (in radians) for ϕ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `U3_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `U3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `CRX_discretization` | Vector of discretization angles (in radians) for `CRXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `CRY_discretization` | Vector of discretization angles (in radians) for `CRYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `CRZ_discretization` | Vector of discretization angles (in radians) for `CRZGate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `CU_θ_discretization` | Vector of discretization angles (in radians) for θ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `CU_ϕ_discretization` | Vector of discretization angles (in radians) for ϕ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `CU_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CU3_θ_discretization` | Vector of discretization angles (in radians) for θ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CU3_ϕ_discretization` | Vector of discretization angles (in radians) for ϕ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
+| `CU3_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `objective` | Choose one of the following: (a) `"minimize_depth"`, which minimizes the total depth of decomposition. For this option, include `"Identity"` matrix in the above-mentioned `elementary_gates`, (b) `"minimize_cnot"`, which minimizes the number of CNOT gates in the decomposition. |
 | `decomposition_type` | Choose one of the following: (a) `"exact"`, which finds an exact decomposition if it exists, (b) `"approximate"`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. |
 | `optimizer` | Mixed-integer programming (MIP) optimizer. For various MIP solver options, check [solver.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/examples/solver.jl). |
@@ -57,12 +57,12 @@ end
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "depth" => 4,    
-"elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
+"elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        
-"U_θ_discretization" => [-π/2, 0, π/2],
-"U_ϕ_discretization" => [-π/2, 0, π/2],
-"U_λ_discretization" => [-π/2, 0, π/2],
+"U3_θ_discretization" => [-π/2, 0, π/2],
+"U3_ϕ_discretization" => [-π/2, 0, π/2],
+"U3_λ_discretization" => [-π/2, 0, π/2],
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",
@@ -105,7 +105,7 @@ Quantum Circuit Model Data
   Number of qubits: 2
   Total number of elementary gates (including discretization): 19
   Maximum depth of decomposition: 4
-  Input elementary gates: ["U3_1", "U3_2", "CNot_12", "Identity"]
+  Input elementary gates: ["U3_1", "U3_2", "CNot_1_2", "Identity"]
     U3 - θ discretization: [-90.0, 0.0, 90.0]
     U3 - ϕ discretization: [-90.0, 0.0, 90.0]
     U3 - λ discretization: [-90.0, 0.0, 90.0]

@@ -293,11 +293,13 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
     
         if !isempty(R_gates_idx) 
             for i in R_gates_idx
-                if startswith(data["elementary_gates"][i], "RX")
+                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
+
+                if gate_type == "RX"
                     data["discretization"]["RX"] = Float64.(params["RX_discretization"])
-                elseif startswith(data["elementary_gates"][i], "RY")
+                elseif gate_type == "RY"
                     data["discretization"]["RY"] = Float64.(params["RY_discretization"])
-                elseif startswith(data["elementary_gates"][i], "RZ")
+                elseif gate_type == "RZ"
                     data["discretization"]["RZ"] = Float64.(params["RZ_discretization"])
                 end
             end
@@ -305,29 +307,35 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
 
         if !isempty(U3_gates_idx)
             for i in U3_gates_idx
-                if startswith(data["elementary_gates"][i], "U3")
-                    data["discretization"]["U3_θ"] = Float64.(params["U_θ_discretization"])
-                    data["discretization"]["U3_ϕ"] = Float64.(params["U_ϕ_discretization"])
-                    data["discretization"]["U3_λ"] = Float64.(params["U_λ_discretization"])
+                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
+
+                if gate_type == "U3"
+                    data["discretization"]["U3_θ"] = Float64.(params["U3_θ_discretization"])
+                    data["discretization"]["U3_ϕ"] = Float64.(params["U3_ϕ_discretization"])
+                    data["discretization"]["U3_λ"] = Float64.(params["U3_λ_discretization"])
                 end
             end
         end
 
         if !isempty(Phase_gates_idx)
             for i in Phase_gates_idx
-                if startswith(data["elementary_gates"][i], "Phase")
-                    data["discretization"]["Phase"] = Float64.(params["Ph_discretization"])
+                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
+
+                if gate_type == "Phase"
+                    data["discretization"]["Phase"] = Float64.(params["Phase_discretization"])
                 end
             end
         end
 
         if !isempty(CR_gates_idx) 
             for i in CR_gates_idx
-                if startswith(data["elementary_gates"][i], "CRX")
+                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
+
+                if gate_type == "CRX"
                     data["discretization"]["CRX"] = Float64.(params["CRX_discretization"])
-                elseif startswith(data["elementary_gates"][i], "CRY")
+                elseif gate_type == "CRY"
                     data["discretization"]["CRY"] = Float64.(params["CRY_discretization"])
-                elseif startswith(data["elementary_gates"][i], "CRZ")
+                elseif gate_type == "CRZ"
                     data["discretization"]["CRZ"] = Float64.(params["CRZ_discretization"])
                 end
             end
@@ -335,10 +343,12 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
 
         if !isempty(CU3_gates_idx)
             for i in CU3_gates_idx
-                if startswith(data["elementary_gates"][i], "CU3")
-                    data["discretization"]["CU3_θ"] = Float64.(params["CU_θ_discretization"])
-                    data["discretization"]["CU3_ϕ"] = Float64.(params["CU_ϕ_discretization"])
-                    data["discretization"]["CU3_λ"] = Float64.(params["CU_λ_discretization"])
+                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
+
+                if gate_type == "CU3"
+                    data["discretization"]["CU3_θ"] = Float64.(params["CU3_θ_discretization"])
+                    data["discretization"]["CU3_ϕ"] = Float64.(params["CU3_ϕ_discretization"])
+                    data["discretization"]["CU3_λ"] = Float64.(params["CU3_λ_discretization"])
                 end
             end
         end
@@ -506,12 +516,15 @@ function get_all_R_gates(params::Dict{String, Any}, elementary_gates::Array{Stri
             end
             
             # This implies that discretizations are the same for all gates, checks only for RX/RY/RZ discretization
-            if isempty(params[string(gate_type[1:2],"_discretization")])
+            gate_name = QCO._parse_gate_string(gate_type, type=true)
+            angle = params[string(gate_name,"_discretization")]
+
+            if isempty(params[string(gate_name,"_discretization")])
                 Memento.error(_LOGGER, "Empty discretization angles for $(gate_type) gate. Input at least one angle")
             end        
 
             R_complex["$(gate_type)"] = Dict{String, Any}()    
-            R_complex["$(gate_type)"] = QCO.get_discretized_one_angle_gates(gate_type, R_complex[gate_type], Float64.(params[string(gate_type[1:2],"_discretization")]), params["num_qubits"])
+            R_complex["$(gate_type)"] = QCO.get_discretized_one_angle_gates(gate_type, R_complex[gate_type], Float64.(angle), params["num_qubits"])
 
         end
     end
@@ -534,7 +547,8 @@ function get_all_Phase_gates(params::Dict{String, Any}, elementary_gates::Array{
                 Memento.error(_LOGGER, "Input Phase gate type ($(gate_type)) is not supported.")
             end
             
-            angle = params[string(gate_type[1:2],"_discretization")]
+            gate_name = QCO._parse_gate_string(gate_type, type=true)
+            angle = params[string(gate_name,"_discretization")]
 
             if isempty(angle)
                 Memento.error(_LOGGER, "Empty discretization angles for $(gate_type) gate. Input at least one angle")
@@ -557,18 +571,22 @@ function get_all_CR_gates(params::Dict{String, Any}, elementary_gates::Array{Str
         for i=1:length(CR_gates_idx)
 
             gate_type = elementary_gates[CR_gates_idx[i]]
+            gate_name = QCO._parse_gate_string(gate_type, type=true)
+
             # CRP_12
-            if !(startswith(gate_type, "CRX") || startswith(gate_type, "CRY") || startswith(gate_type, "CRZ"))
+            if !(gate_name == "CRX" || gate_name == "CRY" || gate_name == "CRZ")
                 Memento.error(_LOGGER, "Input controlled-rotation (CR) gate type ($(gate_type)) is not supported.")
             end
             
             # This implies that discretizations are the same for all gates, checks only for RX/RY/RZ discretization
-            if isempty(params[string(gate_type[1:3],"_discretization")])
+            if isempty(params[string(gate_name,"_discretization")])
                 Memento.error(_LOGGER, "Empty discretization angles for $(gate_type) gate. Input a rotation angle")
+            else
+                angle = params[string(gate_name,"_discretization")]
             end        
 
             CR_complex["$(gate_type)"] = Dict{String, Any}()    
-            CR_complex["$(gate_type)"] = QCO.get_discretized_one_angle_gates(gate_type, CR_complex[gate_type], Float64.(params[string(gate_type[1:3],"_discretization")]), params["num_qubits"])
+            CR_complex["$(gate_type)"] = QCO.get_discretized_one_angle_gates(gate_type, CR_complex[gate_type], Float64.(angle), params["num_qubits"])
 
         end
     end
@@ -584,16 +602,18 @@ function get_all_U3_gates(params::Dict{String, Any}, elementary_gates::Array{Str
         
         for i=1:length(U3_gates_idx)
             gate_name = elementary_gates[U3_gates_idx[i]]
-            if startswith(gate_name, "U3")        
+            gate_type = QCO._parse_gate_string(gate_name, type = true)
+
+            if gate_type == "U3"        
                 U3_complex[gate_name] = Dict{String, Any}()    
                 
                 for angle in ["θ", "ϕ", "λ"]
-                    if isempty(params["U_$(angle)_discretization"])
+                    if isempty(params["$(gate_type)_$(angle)_discretization"])
                         Memento.error(_LOGGER, "Empty $(angle) discretization angle for U3 gate. Input at least one angle")
                     end
                 end
 
-                U3_complex[gate_name] = QCO.get_discretized_three_angle_gates(gate_name, U3_complex[gate_name], Float64.(float(params["U_θ_discretization"])), collect(float(params["U_ϕ_discretization"])), collect(float(params["U_λ_discretization"])), params["num_qubits"])
+                U3_complex[gate_name] = QCO.get_discretized_three_angle_gates(gate_name, U3_complex[gate_name], Float64.(float(params["U3_θ_discretization"])), collect(float(params["U3_ϕ_discretization"])), collect(float(params["U3_λ_discretization"])), params["num_qubits"])
             end
 
         end
@@ -610,16 +630,18 @@ function get_all_CU3_gates(params::Dict{String, Any}, elementary_gates::Array{St
         
         for i=1:length(CU3_gates_idx)
             gate_name = elementary_gates[CU3_gates_idx[i]]
-            if startswith(gate_name, "CU3")        
+            gate_type = QCO._parse_gate_string(gate_name, type = true)
+
+            if gate_type == "CU3"        
                 CU3_complex[gate_name] = Dict{String, Any}()    
                 
                 for angle in ["θ", "ϕ", "λ"]
-                    if isempty(params["CU_$(angle)_discretization"])
+                    if isempty(params["$(gate_type)_$(angle)_discretization"])
                         Memento.error(_LOGGER, "Empty $(angle) discretization angle for CU3 gate. Input at least one angle")
                     end
                 end
 
-                CU3_complex[gate_name] = QCO.get_discretized_three_angle_gates(gate_name, CU3_complex[gate_name], Float64.(float(params["CU_θ_discretization"])), collect(float(params["CU_ϕ_discretization"])), collect(float(params["CU_λ_discretization"])), params["num_qubits"])
+                CU3_complex[gate_name] = QCO.get_discretized_three_angle_gates(gate_name, CU3_complex[gate_name], Float64.(float(params["CU3_θ_discretization"])), collect(float(params["CU3_ϕ_discretization"])), collect(float(params["CU3_λ_discretization"])), params["num_qubits"])
             end
 
         end
@@ -637,9 +659,14 @@ function get_discretized_one_angle_gates(gate_type::String, M1::Dict{String, Any
             M1["angle_$i"] = Dict{String, Any}("angle" => angles,
                                              "$(num_qubits)qubit_rep" => Dict{String, Any}() )
             
-            qubit_loc = QCO._parse_qubit_numbers(gate_type)[1]
+            qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
+            if length(qubit_loc) == 1
+                qubit_loc_str = string(qubit_loc[1])
+            elseif length(qubit_loc) == 2 
+                qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
+            end
             
-            M1["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+            M1["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
         end
     end 
 
@@ -660,9 +687,14 @@ function get_discretized_three_angle_gates(gate_type::String, M3::Dict{String, A
                                                            "λ" => angles[3],
                                                            "$(num_qubits)qubit_rep" => Dict{String, Any}()
                                                           )
-                qubit_loc = QCO._parse_qubit_numbers(gate_type)[1]                
+                qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
+                if length(qubit_loc) == 1
+                    qubit_loc_str = string(qubit_loc[1])
+                elseif length(qubit_loc) == 2 
+                    qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
+                end             
 
-                M3["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+                M3["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
 
                 counter += 1
             end
@@ -682,251 +714,99 @@ Note that `angle` vector is an optional input which is necessary when the input 
 """
 function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
+    if num_qubits > 10
+        Memento.error(_LOGGER, "Greater than 10 qubits is currently not supported")
+    end
+
     if input == "Identity"
         return QCO.IGate(num_qubits)
     end
 
-    if num_qubits > 5
-        Memento.error(_LOGGER, "Gates with greater than 5 qubits are not currently supported")
+    gate_type, qubit_loc = QCO._parse_gate_string(input, type = true, qubits = true)
+
+    if !(gate_type in union(ONE_QUBIT_GATES, TWO_QUBIT_GATES))
+        Memento.error(_LOGGER, "Specified $input gate does not exist in the predefined set of gates")
     end
 
-    qubits_string_1, qubits_string_2 = QCO._get_qubit_strings(num_qubits)
+    if isempty(qubit_loc) && !(input == "Identity")
+        Memento.error(_LOGGER, "A valid qubit location has to be specified for the input $input gate")
+    elseif !issubset(qubit_loc, 1:num_qubits)
+        Memento.error(_LOGGER, "Specified qubits for $input gate do not lie in [1,...,$num_qubits]")
+    end
+
+    if (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
+        Memento.error(_LOGGER, "Input $input gate cannot have identical control and target qubits") 
+    end
     
     #----------------------;
     #   One qubit gates    ;
     #----------------------; 
-    if input in "H_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.HGate(), "q$(input[end])")
+    if length(qubit_loc) == 1 
 
-    elseif input in "T_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.TGate(), "q$(input[end])")
+        if gate_type in ONE_QUBIT_GATES_CONSTANTS
+            
+            return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(), "q$(qubit_loc[1])")
 
-    elseif input in "Tdagger_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.TdaggerGate(), "q$(input[end])")
+        elseif gate_type in ONE_QUBIT_GATES_ANGLE_PARAMETERS
 
-    elseif input in "S_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.SGate(), "q$(input[end])")
+            if (angle != nothing) && (length(angle) > 0)
+                
+                if length(angle) == 1 
+                    return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle), "q$(qubit_loc[1])")
+                elseif length(angle) == 2 
+                    return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2]), "q$(qubit_loc[1])")
+                elseif length(angle) == 3
+                    return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2], angle[3]), "q$(qubit_loc[1])")
+                end
+
+            else 
+                Memento.error(_LOGGER, "Enter a valid angle parameter for the input $input gate")
+            end
+
+        end
     
-    elseif input in "Sdagger_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.SdaggerGate(), "q$(input[end])")
-
-    elseif input in "SX_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.SXGate(), "q$(input[end])")
-
-    elseif input in "SXdagger_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.SXdaggerGate(), "q$(input[end])")
-
-    elseif input in "X_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.XGate(), "q$(input[end])")
-
-    elseif input in "Y_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.YGate(), "q$(input[end])")
-
-    elseif input in "Z_" .* qubits_string_1
-        return QCO.kron_single_qubit_gate(num_qubits, QCO.ZGate(), "q$(input[end])") 
-    
-    # Gates with continuous angle parameters
-    elseif input in "RX_" .* qubits_string_1
-        if (angle != nothing) && (length(angle) > 0)
-            return QCO.kron_single_qubit_gate(num_qubits, QCO.RXGate(angle), "q$(input[end])")
-        else 
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
-
-    elseif input in "RY_" .* qubits_string_1
-        if (angle != nothing) && (length(angle) > 0)
-            return QCO.kron_single_qubit_gate(num_qubits, QCO.RYGate(angle), "q$(input[end])")
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
-
-    elseif input in "RZ_" .* qubits_string_1
-        if (angle != nothing) && (length(angle) > 0)
-            return QCO.kron_single_qubit_gate(num_qubits, QCO.RZGate(angle), "q$(input[end])")
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
-
-    elseif input in "U3_" .* qubits_string_1
-        if (angle != nothing) && (length(angle) > 0)
-            return QCO.kron_single_qubit_gate(num_qubits, QCO.U3Gate(angle[1], angle[2], angle[3]), "q$(input[end])")
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
-
-    elseif input in "Phase_" .* qubits_string_1
-        if (angle != nothing) && (length(angle) > 0)
-            return QCO.kron_single_qubit_gate(num_qubits, QCO.PhaseGate(angle), "q$(input[end])")
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
-
     #----------------------;
     #   Two qubit gates    ;
-    #----------------------;
+    #----------------------; 
+    elseif length(qubit_loc) == 2 
 
-    elseif input in "CNot_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
+        if gate_type in TWO_QUBIT_GATES_CONSTANTS
 
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CNotGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CNotRevGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "CRX_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-        
-        if (angle != nothing) && (length(angle) > 0)
-            if c_qubit < t_qubit
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CRXGate(angle), "q$c_qubit", "q$t_qubit")
+            if (qubit_loc[1] < qubit_loc[2]) || (gate_type in TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
+                return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
             else
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CRXRevGate(angle), "q$c_qubit", "q$t_qubit")
+                return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
             end
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
 
-    elseif input in "CRY_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
+        elseif gate_type in TWO_QUBIT_GATES_ANGLE_PARAMETERS
+            
+            if (angle != nothing) && (length(angle) > 0)
+                
+                if length(angle) == 1 
+                    if (qubit_loc[1] < qubit_loc[2])
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                    else
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(angle), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                    end
+                elseif length(angle) == 2 
+                    if (qubit_loc[1] < qubit_loc[2])
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                    else
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(angle[1], angle[2]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                    end
+                elseif length(angle) == 3
+                    if (qubit_loc[1] < qubit_loc[2])
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2], angle[3]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                    else
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(angle[1], angle[2], angle[3]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                    end
+                end
 
-        if (angle != nothing) && (length(angle) > 0)
-            if c_qubit < t_qubit
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CRYGate(angle), "q$c_qubit", "q$t_qubit")
-            else
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CRYRevGate(angle), "q$c_qubit", "q$t_qubit")
+            else 
+                Memento.error(_LOGGER, "Enter a valid angle parameter for the input $input gate")
             end
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
+
         end
-
-    elseif input in "CRZ_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if (angle != nothing) && (length(angle) > 0)
-            if c_qubit < t_qubit
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CRZGate(angle), "q$c_qubit", "q$t_qubit")
-            else
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CRZRevGate(angle), "q$c_qubit", "q$t_qubit")
-            end
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
-
-    elseif input in "CU3_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if (angle != nothing) && (length(angle) > 0)
-            if c_qubit < t_qubit
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CU3Gate(angle[1], angle[2], angle[3]), "q$c_qubit", "q$t_qubit")
-            else
-                return QCO.kron_two_qubit_gate(num_qubits, QCO.CU3RevGate(angle[1], angle[2], angle[3]), "q$c_qubit", "q$t_qubit")
-            end
-        else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $(input) gate")
-        end
-
-    elseif input in "CV_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVRevGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "CVdagger_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVdaggerGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CVRevdaggerGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "CH_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CHGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CHRevGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "CX_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CXGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CXRevGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "CY_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CYGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CYRevGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "CZ_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CZGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CZRevGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "CSX_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        if c_qubit < t_qubit
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CSXGate(), "q$c_qubit", "q$t_qubit")
-        else
-            return QCO.kron_two_qubit_gate(num_qubits, QCO.CSXRevGate(), "q$c_qubit", "q$t_qubit")
-        end
-
-    elseif input in "Swap_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        return QCO.kron_two_qubit_gate(num_qubits, QCO.SwapGate(), "q$c_qubit", "q$t_qubit")
-
-    elseif input in "iSwap_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        return QCO.kron_two_qubit_gate(num_qubits, QCO.iSwapGate(), "q$c_qubit", "q$t_qubit")
-    
-    elseif input in "Sycamore_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        return QCO.kron_two_qubit_gate(num_qubits, QCO.SycamoreGate(), "q$c_qubit", "q$t_qubit")
-
-    elseif input in "DCX_" .* qubits_string_2
-        c_qubit = parse(Int, input[end-1])
-        t_qubit = parse(Int, input[end])
-
-        return QCO.kron_two_qubit_gate(num_qubits, QCO.DCXGate(), "q$c_qubit", "q$t_qubit")
-
-    else 
-        Memento.error(_LOGGER, "Specified elementary/target gate $(input) does not exist in the predefined set of gates.")
     end
 
 end
@@ -941,144 +821,45 @@ Note that this function currently does not support an input gate parametrized wi
 """
 function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
 
-    qubits_string_1, qubits_string_2 = QCO._get_qubit_strings(num_qubits)
-
+    qubits_string_1, qubits_string_2 = QCO._get_qubit_strings(num_qubits)    
     kron_gates = QCO._parse_gates_with_kron_symbol(input)
     
     M = 1
 
     for i = 1:length(kron_gates)
         
-        if kron_gates[i] in "I_" .* qubits_string_1
-            M = kron(M, QCO.IGate(1))
-            
-        elseif kron_gates[i] in "H_" .* qubits_string_1
-            M = kron(M, QCO.HGate())
+        gate_type, qubit_loc = QCO._parse_gate_string(kron_gates[i], type = true, qubits = true)
 
-        elseif kron_gates[i] in "T_" .* qubits_string_1
-            M = kron(M, QCO.TGate())
+        if !(gate_type in union(ONE_QUBIT_GATES_CONSTANTS, TWO_QUBIT_GATES_CONSTANTS))
+            Memento.error(_LOGGER, "Specified $input gate is not supported in conjunction with the Kronecker product operation")
+        end
     
-        elseif kron_gates[i] in "Tdagger_" .* qubits_string_1
-            M = kron(M, QCO.TdaggerGate())
+        if isempty(qubit_loc)
+            Memento.error(_LOGGER, "A valid qubit location has to be specified for the input $input gate")
+        elseif !issubset(qubit_loc, 1:num_qubits)
+            Memento.error(_LOGGER, "Specified qubits for $input gate do not lie in [1,...,$num_qubits]")
+        end
     
-        elseif kron_gates[i] in "S_" .* qubits_string_1
-            M = kron(M, QCO.SGate())
-        
-        elseif kron_gates[i] in "Sdagger_" .* qubits_string_1
-            M = kron(M, QCO.SdaggerGate())
-    
-        elseif kron_gates[i] in "SX_" .* qubits_string_1
-            M = kron(M, QCO.SXGate())
-    
-        elseif kron_gates[i] in "SXdagger_" .* qubits_string_1
-            M = kron(M, QCO.SXdaggerGate())
-    
-        elseif kron_gates[i] in "X_" .* qubits_string_1
-            M = kron(M, QCO.XGate())
-    
-        elseif kron_gates[i] in "Y_" .* qubits_string_1
-            M = kron(M, QCO.YGate())
-    
-        elseif kron_gates[i] in "Z_" .* qubits_string_1
-            M = kron(M, QCO.ZGate())
-
-        elseif kron_gates[i] in "CNot_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CNotGate())
-            else
-                M = kron(M, QCO.CNotRevGate())
-            end
-    
-        elseif kron_gates[i] in "CV_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CVGate())
-            else
-                M = kron(M, QCO.CVRevGate())
-            end
-
-        elseif kron_gates[i] in "CVdagger_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CVdaggerGate())
-            else
-                M = kron(M, QCO.CVRevdaggerGate())
-            end
-
-        elseif kron_gates[i] in "CH_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CHGate())
-            else
-                M = kron(M, QCO.CHRevGate())
-            end
-
-        elseif kron_gates[i] in "CX_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CXGate())
-            else
-                M = kron(M, QCO.CXRevGate())
-            end
-
-        elseif kron_gates[i] in "CY_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CYGate())
-            else
-                M = kron(M, QCO.CYRevGate())
-            end
-
-        elseif kron_gates[i] in "CZ_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CZGate())
-            else
-                M = kron(M, QCO.CZRevGate())
-            end
-
-        elseif kron_gates[i] in "CSX_" .* qubits_string_2
-            c_qubit = parse(Int, kron_gates[i][end-1])
-            t_qubit = parse(Int, kron_gates[i][end])
-    
-            if c_qubit < t_qubit
-                M = kron(M, QCO.CSXGate())
-            else
-                M = kron(M, QCO.CSXRevGate())
-            end
-
-        elseif kron_gates[i] in "Swap_" .* qubits_string_2
-                M = kron(M, QCO.SwapGate())
-
-        elseif kron_gates[i] in "iSwap_" .* qubits_string_2
-                M = kron(M, QCO.iSwapGate())
-
-            elseif kron_gates[i] in "Sycamore_" .* qubits_string_2
-                M = kron(M, QCO.SycamoreGate())
-
-        elseif kron_gates[i] in "DCX_" .* qubits_string_2
-                M = kron(M, QCO.DCXGate())
-
-        else
-            # Gate with angle parameters is not supported yet
-            Memento.error(_LOGGER, "Specified $(kron_gates[i]) gate is not supported in conjunction with the Kronecker symbol in $(input) elementary gate")
+        if (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
+            Memento.error(_LOGGER, "Input $input gate cannot have identical control and target qubits") 
         end
 
+        # One qubit gates
+        if (length(qubit_loc) == 1) && (gate_type in ONE_QUBIT_GATES_CONSTANTS)
+            if (gate_type == "I") || (gate_type == "Identity")
+                M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))(1))
+            else 
+                M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))())
+            end
+        
+        # Two qubit gates
+        elseif (length(qubit_loc) == 2) && (gate_type in TWO_QUBIT_GATES_CONSTANTS)
+            if (qubit_loc[1] < qubit_loc[2]) || (gate_type in TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
+                M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))())
+            else
+                M = kron(M, getfield(QCO, Symbol(gate_type, "RevGate"))())
+            end
+        end
     end
 
     if size(M)[1] == 2^(num_qubits)
@@ -1091,11 +872,11 @@ end
 
 function _get_qubit_strings(num_qubits::Int)
     qubits_string_1 = string.(1:num_qubits)
-    qubits_string_2 = []
+    qubits_string_2 = Vector{String}()
     
     for i=1:num_qubits
         for j=1:num_qubits
-            (i != j) && (push!(qubits_string_2, qubits_string_1[i] .* qubits_string_1[j]))
+            (i != j) && (push!(qubits_string_2, qubits_string_1[i] .* qubit_separator .* qubits_string_1[j]))
         end
     end
 

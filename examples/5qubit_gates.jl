@@ -7,12 +7,12 @@ function decompose_RX_on_5qubits()
     "num_qubits" => 5, 
     "depth" => 3,    
 
-    "elementary_gates" => ["H_1xCNot_23xI_4xI_5", "RX_2", "CU3_34", "Identity"], 
+    "elementary_gates" => ["H_1xCNot_2_3xI_4xI_5", "RX_2", "CU3_3_4", "Identity"], 
     "target_gate" => QCO.kron_two_qubit_gate(5, QCO.CRXGate(π/4), "q3", "q4"),
        
-    "CU_θ_discretization" => [0, π/4],
-    "CU_ϕ_discretization" => [0, -π/2],
-    "CU_λ_discretization" => [0, π/2],    
+    "CU3_θ_discretization" => [0, π/4],
+    "CU3_ϕ_discretization" => [0, -π/2],
+    "CU3_λ_discretization" => [0, π/2],    
 
     "RX_discretization" => [π/2],
  

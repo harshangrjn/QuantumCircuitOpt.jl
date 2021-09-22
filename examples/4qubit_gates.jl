@@ -5,8 +5,8 @@ function decompose_CNot_41()
     "num_qubits" => 4,
     "depth" => 10,
 
-    "elementary_gates" => ["H_1", "H_2", "H_3", "CNot_13", "CNot_43", "Identity"],
-    "target_gate" => QCO.get_full_sized_gate("CNot_41", 4),
+    "elementary_gates" => ["H_1", "H_2", "H_3", "CNot_1_3", "CNot_4_3", "Identity"],
+    "target_gate" => QCO.get_full_sized_gate("CNot_4_1", 4),
     "identify_real_gates" => true,
 
     "objective" => "minimize_depth", 

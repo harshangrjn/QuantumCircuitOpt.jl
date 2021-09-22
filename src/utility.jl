@@ -41,18 +41,21 @@ function gate_element_bounds(M::Array{Float64,3})
 
     M_l = zeros(size(M)[1], size(M)[2])
     M_u = zeros(size(M)[1], size(M)[2])
+
     for i = 1:size(M)[1]
         for j = 1:size(M)[2]
+
             M_l[i,j] = minimum(M[i,j,:])
             M_u[i,j] = maximum(M[i,j,:])
+
             if M_l[i,j] > M_u[i,j]
-                Memento.error(_LOGGER, "lower bound cannot be greater than upper bound in the elements of input elementary gates")
-            end
-            if (M_l[i,j] in [-Inf, Inf]) || (M_u[i,j] in [-Inf, Inf])
-                Memento.error(_LOGGER, "one of the input elementary gates has at least one unbounded entry, which is invalid")
+                Memento.error(_LOGGER, "Lower and upper bound conflict in the elements of input elementary gates")
+            elseif (M_l[i,j] in [-Inf, Inf]) || (M_u[i,j] in [-Inf, Inf])
+                Memento.error(_LOGGER, "Unbounded entry detected in the input elementary gates")
             end
         end
     end
+
     return M_l, M_u
 end
 
@@ -299,15 +302,12 @@ end
 Given a complex-valued gate, this function returns a complex-valued gate which 
 rounds the values closest to 0 and 1. This is useful to avoid numerical issues. 
 """
-function round_complex_values(M::Array{Complex{Float64},2})
-    # round values close to 0 (within toleranes) for both real and imaginary values
-    # Input can be a vector (>= 1 element) or a matrix of complex values
-   
+function round_complex_values(M::Array{Complex{Float64},2})   
     if size(M)[1] == 0
         Memento.error(_LOGGER, "Input cannot be a scalar")
     end
 
-    if (length(size(M)) == 2)
+    if length(size(M)) == 2
         n_r = size(M)[1]
         n_c = size(M)[2]
 
@@ -315,32 +315,27 @@ function round_complex_values(M::Array{Complex{Float64},2})
         
         for i=1:n_r
             for j=1:n_c 
-
-                # Real components
-                if isapprox(real(M[i,j]), 0, atol=1E-6)
-                    Mij_re = 0
-                elseif isapprox(real(M[i,j]), 1, atol=1E-6)
-                    Mij_re = 1
-                else 
-                    Mij_re = real(M[i,j])
-                end
-                
-                # Imaginary components
-                if isapprox(imag(M[i,j]), 0, atol=1E-6)
-                    Mij_im = 0
-                elseif isapprox(imag(M[i,j]), 1, atol=1E-6)
-                    Mij_im = 1
-                else 
-                    Mij_im = imag(M[i,j])
-                end
-
-                M_round[i,j] = complex(Mij_re, Mij_im)
-                
+                M_round[i,j] = complex(QCO.round_real_value(real(M[i,j])), QCO.round_real_value(imag(M[i,j])))
             end
         end
+        return M_round
     end
     
-    return M_round
+end
+
+"""
+    round_real_value(x::Float64)
+
+Given a real-valued number, this function returns a real-value which rounds the values closest to 0 and 1. 
+"""
+function round_real_value(x::Float64)
+    if isapprox(abs(x), 0, atol=1E-6)
+        x = 0
+    elseif isapprox(x, 1, atol=1E-6)
+        x = 1
+    end  
+
+    return x
 end
 
 """
@@ -520,7 +515,7 @@ end
     _parse_gates_with_kron_symbol(s::String)
 
 Given a string with gates separated by kronecker symbols (x), this function parses and returns the vector of gates. For 
-example, if the input string is `H_1xCNot_23xT_4`, the output will be `Vector{String}(["H_1", "CNot_23", "T_4"])`.
+example, if the input string is `H_1xCNot_2_3xT_4`, the output will be `Vector{String}(["H_1", "CNot_2_3", "T_4"])`.
 """
 function _parse_gates_with_kron_symbol(s::String)
 
@@ -544,12 +539,12 @@ function _parse_gates_with_kron_symbol(s::String)
  end
 
 """
-    _parse_qubit_numbers(s::String)
+    _parse_gate_string(s::String)
 
 Given a string representing a single gate with qubit numbers separated by symbol `_`, this function parses and returns the vector of qubits on
 which the input gate is located. For example, if the input string is `CRX_2_3`, the output will be `Vector{Int64}([2,3])`.
 """
-function _parse_qubit_numbers(s::String)
+function _parse_gate_string(s::String; type=false, qubits=false)
 
     if occursin(kron_symbol, s)
         Memento.error(_LOGGER, "Kron symbol is not supported for parsing qubit numbers in $s")
@@ -571,7 +566,14 @@ function _parse_qubit_numbers(s::String)
        end
     end
     
-    return parse.(Int, gates[2:end]) # Assuming 1st element is the gate type/name
+    if type && qubits
+        return gates[1], parse.(Int, gates[2:end]) # Assuming 1st element is the gate type/name
+    elseif type 
+        return gates[1]
+    elseif qubits 
+        return parse.(Int, gates[2:end])
+    end
+
  end
  
 """
@@ -579,7 +581,7 @@ function _parse_qubit_numbers(s::String)
 
 Given a complex-valued quantum gate, M, this function returns if M has purely real parts or not as it's elements. 
 """
- function is_gate_real(M::Array{Complex{Float64},2})
+function is_gate_real(M::Array{Complex{Float64},2})
     M_imag = imag(M)
     n_r = size(M_imag)[1]
     n_c = size(M_imag)[2]
@@ -589,4 +591,28 @@ Given a complex-valued quantum gate, M, this function returns if M has purely re
     else
         return false
     end
+ end
+
+"""
+    _get_constraint_slope_intercept(vertex1::Vector{Float64}, vertex2::Vector{Float64})
+
+Given co-ordinates of two points in a plane, this function returns the slope (m) and intercept (c) of the 
+line joining these two points. 
+"""
+function _get_constraint_slope_intercept(vertex1::Vector{Float64}, vertex2::Vector{Float64})
+    
+    if isapprox.(vertex1, vertex2, atol=1E-6) == [true, true]
+        Memento.warn(_LOGGER, "Invalid slope and intercept for two identical vertices")
+        return
+    end
+
+    if isapprox(vertex1[1], vertex2[1], atol = 1E-6)
+        return Inf, Inf 
+    else
+        m = QCO.round_real_value((vertex2[2] - vertex1[2]) / (vertex2[1] - vertex1[1]))
+        c = QCO.round_real_value(vertex1[2] - (m * vertex1[1]))
+
+        return m,c
+    end
+
  end

@@ -3,7 +3,7 @@
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 5,
-    "elementary_gates" => ["H_1", "H_2", "CNot_12", "Identity"],  
+    "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
     "initial_gate" => "Identity",
     "identify_real_gates" => true,
     "target_gate" => QCO.CNotRevGate(),
@@ -29,7 +29,7 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 2,
         "depth" => 4,        
-        "elementary_gates" => ["CNot_12", "CNot_21", "Identity"],
+        "elementary_gates" => ["CNot_1_2", "CNot_2_1", "Identity"],
         "identify_real_gates" => true,
         "target_gate" => QCO.SwapGate(),  
         "objective" => "minimize_cnot", 
@@ -52,9 +52,9 @@ end
     "depth" => 2,    
     "elementary_gates" => ["U3_1", "U3_2", "Identity"],  
     "target_gate" => QCO.kron_single_qubit_gate(2, QCO.U3Gate(0,0,π/4), "q1"),
-    "U_θ_discretization" => [0, π/2],
-    "U_ϕ_discretization" => [0],
-    "U_λ_discretization" => [0, π/4],
+    "U3_θ_discretization" => [0, π/2],
+    "U3_ϕ_discretization" => [0],
+    "U3_λ_discretization" => [0, π/4],
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"                  
     )
@@ -77,11 +77,11 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 2,    
-    "elementary_gates" => ["CU3_12", "CU3_21", "Identity"],  
+    "elementary_gates" => ["CU3_1_2", "CU3_2_1", "Identity"],  
     "target_gate" => QCO.CU3Gate(0, 0, π/4),
-    "CU_θ_discretization" => [0, π/2],
-    "CU_ϕ_discretization" => [0],
-    "CU_λ_discretization" => [0, π/4],
+    "CU3_θ_discretization" => [0, π/2],
+    "CU3_ϕ_discretization" => [0],
+    "CU3_λ_discretization" => [0, π/4],
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"                  
     )
@@ -96,7 +96,7 @@ end
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
-    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_12"
+    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1_2"
 end
 
 @testset "Tests: Minimum depth Rev CU3(0,0,π/4) gate" begin
@@ -104,11 +104,11 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 3, 
     "depth" => 2,    
-    "elementary_gates" => ["CU3_31", "CU3_13", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CU3_31", 3, angle = [0, 0, pi/4]),
-    "CU_θ_discretization" => [0, π/2],
-    "CU_ϕ_discretization" => [0],
-    "CU_λ_discretization" => [0, π/4],
+    "elementary_gates" => ["CU3_3_1", "CU3_1_3", "Identity"],  
+    "target_gate" => QCO.get_full_sized_gate("CU3_3_1", 3, angle = [0, 0, pi/4]),
+    "CU3_θ_discretization" => [0, π/2],
+    "CU3_ϕ_discretization" => [0],
+    "CU3_λ_discretization" => [0, π/4],
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"                  
     )
@@ -123,7 +123,7 @@ end
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
     @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
-    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_31"
+    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_3_1"
 end
 
 @testset "Tests: Minimum depth RX, RY, RZ gate decomposition" begin
@@ -153,8 +153,8 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 3, 
     "depth" => 3,
-    "elementary_gates" => ["CRX_12", "CRY_23", "CRZ_31", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_12", 3, angle = pi/4) * QCO.get_full_sized_gate("CRY_23", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_31", 3, angle=pi/4),
+    "elementary_gates" => ["CRX_1_2", "CRY_2_3", "CRZ_3_1", "Identity"],  
+    "target_gate" => QCO.get_full_sized_gate("CRX_1_2", 3, angle = pi/4) * QCO.get_full_sized_gate("CRY_2_3", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_3_1", 3, angle=pi/4),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
@@ -175,8 +175,8 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 3, 
     "depth" => 3,
-    "elementary_gates" => ["CRX_31", "CRY_31", "CRZ_13", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_31", 3, angle=pi/4) * QCO.get_full_sized_gate("CRY_31", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_13", 3, angle = pi/2),
+    "elementary_gates" => ["CRX_3_1", "CRY_3_1", "CRZ_1_3", "Identity"],  
+    "target_gate" => QCO.get_full_sized_gate("CRX_3_1", 3, angle=pi/4) * QCO.get_full_sized_gate("CRY_3_1", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_1_3", 3, angle = pi/2),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
@@ -200,9 +200,9 @@ end
     "depth" => 2,    
     "elementary_gates" => ["U3_1", "U3_2", "U3_3", "Identity"],  
     "target_gate" => QCO.kron_single_qubit_gate(3, QCO.RXGate(π/4), "q3"),
-    "U_θ_discretization" => [0, π/4],
-    "U_ϕ_discretization" => [0, -π/2],
-    "U_λ_discretization" => [0, π/2],    
+    "U3_θ_discretization" => [0, π/4],
+    "U3_ϕ_discretization" => [0, -π/2],
+    "U3_λ_discretization" => [0, π/2],    
     "objective" => "minimize_cnot", 
     "decomposition_type" => "exact"                   
     )
@@ -228,11 +228,11 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 3, 
         "depth" => 2,    
-        "elementary_gates" => ["CU3_12", "CU3_23", "CU3_13", "Identity"],  
-        "target_gate" => QCO.get_full_sized_gate("CRX_13", 3, angle = pi/4),
-        "CU_θ_discretization" => [0, π/4],
-        "CU_ϕ_discretization" => [0, -π/2],
-        "CU_λ_discretization" => [0, π/2],    
+        "elementary_gates" => ["CU3_1_2", "CU3_2_3", "CU3_1_3", "Identity"],  
+        "target_gate" => QCO.get_full_sized_gate("CRX_1_3", 3, angle = pi/4),
+        "CU3_θ_discretization" => [0, π/4],
+        "CU3_ϕ_discretization" => [0, -π/2],
+        "CU3_λ_discretization" => [0, π/2],    
         "objective" => "minimize_cnot", 
         "decomposition_type" => "exact"                  
     )
@@ -245,7 +245,7 @@ end
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     if isapprox(sum(result_qc["solution"]["z_onoff_var"][18,:]), 1, atol=tol_0)
-        @test data["gates_dict"]["18"]["qubit_loc"] == "qubit_13"
+        @test data["gates_dict"]["18"]["qubit_loc"] == "qubit_1_3"
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["θ"]),  45, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["ϕ"]), -90, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["λ"]),  90, atol=tol_0)
@@ -279,7 +279,7 @@ end
 @testset "Tests: JuMP set_start_value for z_onoff_var variables" begin
     function input_circuit()
         # [(depth, gate)]
-        return [(1, "CNot_21"), 
+        return [(1, "CNot_2_1"), 
                 (2, "S_1"), 
                 (3, "H_2"), 
                 (4, "S_2")
@@ -289,7 +289,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 4,
-    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCO.MGate(),
     "input_circuit" => input_circuit(),
     "objective" => "minimize_depth", 
@@ -309,7 +309,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 4,
-    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"
@@ -323,7 +323,7 @@ end
         if ("S_1" in gates_dict[i]["type"]) || ("S_2" in gates_dict[i]["type"])
             @test !(parse(Int, i) in involutory_gates)
         end
-        if ("H_1" in gates_dict[i]["type"]) || ("H_2" in gates_dict[i]["type"]) || ("CNot_12" in gates_dict[i]["type"]) || ("CNot_21" in gates_dict[i]["type"]) 
+        if ("H_1" in gates_dict[i]["type"]) || ("H_2" in gates_dict[i]["type"]) || ("CNot_1_2" in gates_dict[i]["type"]) || ("CNot_2_1" in gates_dict[i]["type"]) 
             @test (parse(Int, i) in involutory_gates)
         end
     end
@@ -340,7 +340,7 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2,
     "depth" => 5,
-    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_12", "CNot_21", "Identity"], 
+    "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
@@ -366,9 +366,9 @@ end
                "depth" => 2,    
                "elementary_gates" => ["U3_1", "U3_2", "Identity"], 
                "target_gate" => target_gate(),   
-               "U_θ_discretization" => [0, π/2],
-               "U_ϕ_discretization" => [π/2],
-               "U_λ_discretization" => [-π/2, π], 
+               "U3_θ_discretization" => [0, π/2],
+               "U3_ϕ_discretization" => [π/2],
+               "U3_λ_discretization" => [-π/2, π], 
                "objective" => "minimize_depth")
 
     data = QCO.get_data(params)
@@ -390,18 +390,18 @@ end
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "depth" => 3,    
-    "elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
+    "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
     "target_gate" => QCO.CZGate(),
     "identify_real_gates" => true,
-    "U_θ_discretization" => [-π/2, 0, π/2],
-    "U_ϕ_discretization" => [0, π/2],
-    "U_λ_discretization" => [0, π/2])
+    "U3_θ_discretization" => [-π/2, 0, π/2],
+    "U3_ϕ_discretization" => [0, π/2],
+    "U3_λ_discretization" => [0, π/2])
 
     data = QCO.get_data(params)
     idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"])
     @test length(idempotent_pairs) == 2
 
-    result_qc = QCO.run_QCModel(params, CBC, all_valid_constraints = 1)
+    result_qc = QCO.run_QCModel(params, CBC, idempotent_gate_constraints=true, convex_hull_complex_gate_constraints = false)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3.0, atol = tol_0)

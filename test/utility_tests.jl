@@ -72,7 +72,7 @@ end
        "num_qubits" => 2, 
        "depth" => 5,    
 
-       "elementary_gates" => ["H_1", "H_2", "CNot_12", "Identity"],  
+       "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
        "target_gate" => QCO.CNotRevGate()
        )
     
@@ -96,7 +96,7 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 3, 
         "depth" => 15,    
-        "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"], 
+        "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_2", "Tdagger_3", "Identity"], 
         "target_gate" => QCO.ToffoliGate()
         )
     data = QCO.get_data(params)
@@ -110,7 +110,7 @@ end
     params = Dict{String, Any}(
         "num_qubits" => 2, 
         "depth" => 14,    
-        "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_21", "CNot_12", "Identity"], 
+        "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => -QCO.HCoinGate())
 
     data = QCO.get_data(params)
@@ -128,14 +128,14 @@ end
     @test isapprox(M2^2, data["gates_dict"]["3"]["matrix"], atol = tol_0)
 end
 
-@testset "Tests: _parse_qubit_numbers" begin
-    v1 = QCO._parse_qubit_numbers("RX_1")    
+@testset "Tests: _parse_gate_string" begin
+    v1 = QCO._parse_gate_string("RX_1", qubits=true)    
     @test v1[1] == 1
     
-    v2 = QCO._parse_qubit_numbers("CU3_51")    
+    v2 = QCO._parse_gate_string("CU3_51", qubits=true)    
     @test v2[1] == 51
 
-    v3 = QCO._parse_qubit_numbers("CRZ_9_1")    
+    v3 = QCO._parse_gate_string("CRZ_9_1", qubits=true)    
     @test length(v3) == 2
     @test v3[1] == 9
     @test v3[2] == 1

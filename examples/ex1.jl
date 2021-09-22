@@ -13,7 +13,7 @@ include("3qubit_gates.jl")
 #-------------------------------#
 function input_circuit()
          # [(depth, gate)]
-    return [(1, "CNot_21"), 
+    return [(1, "CNot_2_1"), 
             (2, "S_1"), 
             (3, "H_2"), 
             (4, "S_2")
@@ -38,8 +38,8 @@ params = Dict{String, Any}(
 "num_qubits" => 3,
 "depth" => 7,
 
-# "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_12", "CNot_13", "CNot_23", "Tdagger_2", "Tdagger_3", "Identity"],
-"elementary_gates" => ["CV_12", "CV_23", "CV_13", "CVdagger_12", "CVdagger_23", "CVdagger_13", "CNot_12", "CNot_32", "CNot_23", "CNot_13", "Identity"],
+# "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_2", "Tdagger_3", "Identity"],
+"elementary_gates" => ["CV_1_2", "CV_2_3", "CV_1_3", "CVdagger_1_2", "CVdagger_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
 
 "target_gate" => QCO.CSwapGate(),
 
@@ -49,9 +49,9 @@ params = Dict{String, Any}(
 # "RY_discretization" => [π/4],
 # "RZ_discretization" => [2*π],
 
-# "U_θ_discretization" => [-π/4, 0, π/4],
-# "U_ϕ_discretization" => [-π/2, 0, π/2],
-# "U_λ_discretization" => [-π/2, 0, π/4],
+# "U3_θ_discretization" => [-π/4, 0, π/4],
+# "U3_ϕ_discretization" => [-π/2, 0, π/2],
+# "U3_λ_discretization" => [-π/2, 0, π/4],
 
 "objective" => "minimize_depth", 
 "optimizer" => "cplex",

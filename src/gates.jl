@@ -1,3 +1,31 @@
+#IMPORTANT: Update these lists below whenever a 1 or 2 qubit gate is added to this file.
+
+const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "RX", "RY", "RZ", "Phase"]
+
+const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z", "S", 
+                                              "Sdagger", "T", "Tdagger", "SX", "SXdagger"]
+
+const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", "CRZ", "CRZRev", 
+                                              "CU3", "CU3Rev"]
+
+# Gates invariant to qubit flip
+const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "iSwap", "Sycamore", "DCX", "W", "M", 
+                                              "QFT2", "HCoin", "GroverDiffusion"]
+
+# Gates non-invariant to qubit flip
+const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = ["CNot", "CNotRev", "CX", "CXRev", "CY", "CYRev", "CZ", 
+                                              "CZRev", "CH", "CHRev", "CV", "CVRev", "CVdagger", 
+                                              "CVdaggerRev", "CSX", "CSXRev"]
+
+const ONE_QUBIT_GATES           = union(ONE_QUBIT_GATES_CONSTANTS, 
+                                        ONE_QUBIT_GATES_ANGLE_PARAMETERS)
+
+const TWO_QUBIT_GATES_CONSTANTS = union(TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC, 
+                                        TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC)
+
+const TWO_QUBIT_GATES           = union(TWO_QUBIT_GATES_CONSTANTS, 
+                                        TWO_QUBIT_GATES_ANGLE_PARAMETERS)
+
 #----------------------------------------#
 #            Single-qubit gates          #
 #----------------------------------------#
@@ -883,7 +911,7 @@ end
 
 
 @doc raw"""
-    CVRevdaggerGate()
+    CVdaggerRevGate()
 
 Two-qubit hermitian conjugate of reverse controlled-V gate, with target and control on first and second qubits, respectively. 
 
@@ -898,7 +926,7 @@ q_1: ──■──
 **Matrix Representation**
 
 ```math
-CVRevdagger = \begin{pmatrix}
+CVdaggerRev = \begin{pmatrix}
         1 & 0 & 0 & 0 \\
         0 & 0.5-0.5i & 0 & 0.5+0.5i \\
         0 & 0 & 1 & 0 \\
@@ -906,7 +934,7 @@ CVRevdagger = \begin{pmatrix}
     \end{pmatrix}
 ```
 """
-function CVRevdaggerGate()
+function CVdaggerRevGate()
 
     return Array{Complex{Float64},2}([1 0 0 0; 0 0.5-0.5im 0 0.5+0.5im; 0 0 1 0; 0 0.5+0.5im 0 0.5-0.5im])
 

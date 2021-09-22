@@ -44,12 +44,12 @@ end
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "depth" => 4,    
-"elementary_gates" => ["U3_1", "U3_2", "CNot_12", "Identity"], 
+"elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        
-"U_θ_discretization" => collect(-π/2:π/2:π/2),
-"U_ϕ_discretization" => collect(-π/2:π/2:π/2),
-"U_λ_discretization" => collect(-π/2:π/2:π/2),    
+"U3_θ_discretization" => collect(-π/2:π/2:π/2),
+"U3_ϕ_discretization" => collect(-π/2:π/2:π/2),
+"U3_λ_discretization" => collect(-π/2:π/2:π/2),    
 
 "objective" => "minimize_depth", 
 "decomposition_type" => "exact",

@@ -2,29 +2,25 @@
 # Initialize all variables of the QuantumCircuitModel here  #
 #-----------------------------------------------------------#
 
-function variable_matrix_per_depth(qcm::QuantumCircuitModel)
+function variable_gates_per_depth(qcm::QuantumCircuitModel)
     
     tol_0 = 1E-6
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
     depth   = qcm.data["depth"]
 
-    if n_r != n_c
-        Memento.warn(_LOGGER, "number of rows and columns have to be equal for unitary quantum gates")
-    end
+    M_l, M_u = QCO.gate_element_bounds(qcm.data["gates_real"])
 
-    M_real_l, M_real_u = QCO.gate_element_bounds(qcm.data["gates_real"])
-
-    qcm.variables[:M_var] = JuMP.@variable(qcm.model, M_real_l[i,j] <= M_var[i=1:n_r, j=1:n_c, 1:depth] <= M_real_u[i,j])
+    qcm.variables[:G_var] = JuMP.@variable(qcm.model, M_l[i,j] <= G_var[i=1:n_r, j=1:n_c, 1:depth] <= M_u[i,j])
 
     num_vars_fixed = 0
 
     for i=1:n_r
         for j=1:n_c
 
-            if isapprox(M_real_l[i,j], M_real_u[i,j], atol=tol_0)
+            if isapprox(M_l[i,j], M_u[i,j], atol=tol_0)
                 for d=1:depth
-                    JuMP.fix(M_var[i,j,d], M_real_l[i,j]; force=true)
+                    JuMP.fix(G_var[i,j,d], M_l[i,j]; force=true)
                 end
                 num_vars_fixed += 1
             end
@@ -32,8 +28,8 @@ function variable_matrix_per_depth(qcm::QuantumCircuitModel)
         end
     end
 
-    if num_vars_fixed > 1 
-        Memento.info(_LOGGER, "$num_vars_fixed of $(n_r * n_c) entries in the given set of gates have equal lower and upper bounds.")
+    if num_vars_fixed > 0
+        Memento.info(_LOGGER, "$num_vars_fixed of $(n_r * n_c) entries are constants in the given set of gates.")
     end
     
     return

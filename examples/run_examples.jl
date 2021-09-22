@@ -13,8 +13,8 @@ include("5qubit_gates.jl")
 decompose_gates = ["decompose_hadamard", 
                     "decompose_S", 
                     "decompose_magic_M",  
-                    "decompose_cnot_21", 
-                    "decompose_cnot_21_with_U", 
+                    "decompose_revcnot", 
+                    "decompose_revcnot_with_U", 
                     "decompose_controlled_Z",
                     "decompose_magic_M_using_SHCnot",
                     "decompose_swap",
@@ -24,7 +24,7 @@ decompose_gates = ["decompose_hadamard",
                     "decompose_GroverDiffusionGate",
                     "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_toffoli"]
+decompose_gates = ["decompose_S"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -36,6 +36,8 @@ for gates in decompose_gates
     qcm_optimizer = get_solver(params)
     global result_qc = QCO.run_QCModel(params, 
                                        qcm_optimizer, 
-                                       model_type = "compact_formulation")
+                                       model_type = "compact_formulation",
+                                       identity_gate_symmetry_constraints = false,
+                                       convex_hull_complex_gate_constraints = false)
 end
 

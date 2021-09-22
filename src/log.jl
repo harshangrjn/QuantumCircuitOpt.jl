@@ -285,8 +285,8 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
                     status = false
                     continue
                 else
-                    gate_i = QCO.is_multi_qubit_gate(gates_sol[i], data["num_qubits"])
-                    gate_iplus1 = QCO.is_multi_qubit_gate(gates_sol[i+1], data["num_qubits"])
+                    gate_i = QCO.is_multi_qubit_gate(gates_sol[i])
+                    gate_iplus1 = QCO.is_multi_qubit_gate(gates_sol[i+1])
 
                     if !(gate_i) && !(gate_iplus1)
                         if (occursin('1', gates_sol[i]) && occursin('2', gates_sol[i+1])) || (occursin('2', gates_sol[i]) && occursin('1', gates_sol[i+1])) 
@@ -325,20 +325,20 @@ function get_compressed_decomposition(data::Dict{String, Any}, gates_sol::Array{
     return gates_sol_compressed
 end
 
-function is_multi_qubit_gate(gate::String, num_qubits::Int64)
+function is_multi_qubit_gate(gate::String)
     
-    _ , qubits_string_2 = QCO._get_qubit_strings(num_qubits)
+    if occursin(kron_symbol, gate)
+        return true
+    end
+
+    qubit_loc = QCO._parse_gate_string(gate, qubits = true)
     
-    if startswith(gate, "CNot")
+    if length(qubit_loc) > 1 
         return true
-    elseif occursin(kron_symbol, gate)
-        return true
-    elseif "$(QCO._parse_qubit_numbers(gate)[1])" in qubits_string_2
-        return true
-    elseif occursin("Swap", gate) || occursin("HCoin", gate)
-        return true
+    elseif length(qubit_loc) == 1 
+        return false 
     else 
-        return false
+        Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
     end
 
 end
