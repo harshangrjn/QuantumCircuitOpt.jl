@@ -36,8 +36,6 @@ for gates in decompose_gates
     qcm_optimizer = get_solver(params)
     global result_qc = QCO.run_QCModel(params, 
                                        qcm_optimizer, 
-                                       model_type = "compact_formulation",
-                                       identity_gate_symmetry_constraints = false,
-                                       convex_hull_complex_gate_constraints = false)
+                                       model_type = "compact_formulation")
 end
 

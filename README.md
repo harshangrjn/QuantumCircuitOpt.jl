@@ -11,7 +11,7 @@ Dev version: [![Documentation](https://github.com/harshangrjn/QuantumCircuitOpt.
 
 
 <!-- # QuantumCircuitOpt.jl -->
-**QuantumCircuitOpt** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of the architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to nine qubits_.
+**QuantumCircuitOpt** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of the architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to ten qubits_.
 
 ## Installation
 QuantumCircuitOpt is a registered package and can be installed by entering the following in the Julia REPL-mode:
