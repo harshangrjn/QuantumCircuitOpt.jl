@@ -401,7 +401,7 @@ end
     idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"])
     @test length(idempotent_pairs) == 2
 
-    result_qc = QCO.run_QCModel(params, CBC, idempotent_gate_constraints=true, convex_hull_complex_gate_constraints = false)
+    result_qc = QCO.run_QCModel(params, CBC, all_valid_constraints = 1)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3.0, atol = tol_0)

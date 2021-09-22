@@ -148,3 +148,26 @@ end
     M_test = [0 1E-7im -1E-7im; 1E-10im 0 0; -1E-8im -1E-5im 0]
     @test !QCO.is_gate_real(M_test)
 end
+
+@testset "Tests: _get_constraint_slope_intercept" begin
+    v1 = [0.0, 0.0]
+    v2 = [1.0, 1.0]
+    m,c = QCO._get_constraint_slope_intercept(v1, v2)
+    @test m == 1 
+    @test c == 0 
+
+    m,c = QCO._get_constraint_slope_intercept(v2, v1)
+    @test m == 1 
+    @test c == 0 
+
+    v2 = [0, 0.5]
+    m,c = QCO._get_constraint_slope_intercept(v1, v2)
+    @test !isfinite(m)
+    @test !isfinite(c)
+
+    v1 = [1.0, 2.0]
+    v2 = [-3.0, 4.0]
+    m,c = QCO._get_constraint_slope_intercept(v1, v2)
+    @test m == -0.5 
+    @test c == 2.5
+end
