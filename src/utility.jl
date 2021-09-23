@@ -640,3 +640,21 @@ For example, for a 2-qubit gate `CRZ_1_2`, output is `true`.
     end
 
 end
+
+function _verify_θ_bounds(angle::Number)
+    if !(-π <= angle <= π)
+        Memento.error(_LOGGER, "θ angle is not within valid bounds")
+    end
+end
+
+function _verify_ϕ_bounds(angle::Number)
+    if !(-2*π <= angle <= 2*π)
+        Memento.error(_LOGGER, "ϕ angle is not within valid bounds")
+    end
+end
+
+function _verify_λ_bounds(angle::Number)
+    if !(-2*π <= angle <= 2*π)
+        Memento.error(_LOGGER, "λ angle is not within valid bounds")
+    end
+end

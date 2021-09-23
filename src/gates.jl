@@ -69,15 +69,9 @@ U3(\theta, \phi, \lambda) =
 """
 function U3Gate(θ::Number, ϕ::Number, λ::Number)
 
-    if !(-π <= θ <= π)
-        Memento.error(_LOGGER, "θ angle in U3Gate is not within valid bounds")
-    end
-    if !(-2*π <= ϕ <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle in U3Gate is not within valid bounds")
-    end
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in U3Gate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
+    QCO._verify_ϕ_bounds(ϕ)
+    QCO._verify_λ_bounds(λ)
 
     U3 = Array{Complex{Float64},2}([           cos(θ/2)               -(cos(λ) + (sin(λ))im)*sin(θ/2) 
                                     (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)])
@@ -102,18 +96,10 @@ U2(\phi, \lambda) = \frac{1}{\sqrt{2}}
 ```
 """
 function U2Gate(ϕ::Number, λ::Number)
-
-    if !(-2*π <= ϕ <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle in U2Gate is not within valid bounds")
-    end
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in U2Gate is not within valid bounds")
-    end
     
     θ = π/2
 
-    U2 = QCO.U3Gate(θ, ϕ, λ)
-    
+    U2 = QCO.U3Gate(θ, ϕ, λ)    
     return U2
 end
 
@@ -136,15 +122,10 @@ U1(\lambda) =
 """
 function U1Gate(λ::Number)
 
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in U1Gate is not within valid bounds")
-    end
-    
     θ = 0
     ϕ = 0
 
     U1 = QCO.U3Gate(θ, ϕ, λ)
-    
     return U1
 end
 
@@ -166,9 +147,7 @@ RX(\theta) = exp(-i \th X) =
 """
 function RXGate(θ::Number)
 
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in RXGate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
 
     RX = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
     
@@ -193,9 +172,7 @@ RY(\theta) = exp(-i \th Y) =
 """
 function RYGate(θ::Number)
 
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in RYGate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
 
     RY = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
     
@@ -221,9 +198,7 @@ RZ(\theta) = exp(-i\th Z) =
 """
 function RZGate(θ::Number)
 
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in RZGate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
 
     RZ = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
     
@@ -907,6 +882,7 @@ CVdagger = \begin{pmatrix}
 function CVdaggerGate()
 
     return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5-0.5im 0.5+0.5im; 0 0 0.5+0.5im 0.5-0.5im])
+
 end
 
 
@@ -1068,9 +1044,7 @@ CRY(\theta)\ q_1, q_0 =
 """
 function CRYGate(θ::Number)
     
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in CRYGate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
 
     CRY = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 1 0 0       
@@ -1110,9 +1084,7 @@ CRYRev(\theta)\ q_1, q_0 =
 """
 function CRYRevGate(θ::Number)
     
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in CRYGate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
 
     CRYRev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 cos(θ/2) 0 -(sin(θ/2))      
@@ -1152,9 +1124,7 @@ CRZ(\theta)\ q_1, q_0 =
 """
 function CRZGate(θ::Number)
     
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in CRZGate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
 
     CRZ = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 1 0 0       
@@ -1194,9 +1164,7 @@ CRZRev(\theta)\ q_1, q_0 =
 """
 function CRZRevGate(θ::Number)
     
-    if !(-2*π <= θ <= 2*π)
-        Memento.error(_LOGGER, "θ angle in CRZGate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
 
     CRZRev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 (cos(θ/2) - (sin(θ/2))im) 0 0       
@@ -1237,15 +1205,9 @@ CU3(\theta, \phi, \lambda)\ q_1, q_0 =
 """
 function CU3Gate(θ::Number, ϕ::Number, λ::Number)
 
-    if !(-π <= θ <= π)
-        Memento.error(_LOGGER, "θ angle in CU3Gate is not within valid bounds")
-    end
-    if !(-2*π <= ϕ <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle in CU3Gate is not within valid bounds")
-    end
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in CU3Gate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
+    QCO._verify_ϕ_bounds(ϕ)
+    QCO._verify_λ_bounds(λ)
 
     CU3 = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 1 0 0       
@@ -1286,15 +1248,9 @@ CU3(\theta, \phi, \lambda)\ q_1, q_0 =
 """
 function CU3RevGate(θ::Number, ϕ::Number, λ::Number)
 
-    if !(-π <= θ <= π)
-        Memento.error(_LOGGER, "θ angle in CU3Gate is not within valid bounds")
-    end
-    if !(-2*π <= ϕ <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle in CU3Gate is not within valid bounds")
-    end
-    if !(-2*π <= λ <= 2*π)
-        Memento.error(_LOGGER, "λ angle in CU3Gate is not within valid bounds")
-    end
+    QCO._verify_θ_bounds(θ)
+    QCO._verify_ϕ_bounds(ϕ)
+    QCO._verify_λ_bounds(λ)
 
     CU3Rev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 cos(θ/2) 0 -(cos(λ)+(sin(λ))im)*sin(θ/2)    
