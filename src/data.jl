@@ -724,7 +724,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
     gate_type, qubit_loc = QCO._parse_gate_string(input, type = true, qubits = true)
 
-    if !(gate_type in union(ONE_QUBIT_GATES, TWO_QUBIT_GATES))
+    if !(gate_type in union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES))
         Memento.error(_LOGGER, "Specified $input gate does not exist in the predefined set of gates")
     end
 
@@ -743,11 +743,11 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
     #----------------------; 
     if length(qubit_loc) == 1 
 
-        if gate_type in ONE_QUBIT_GATES_CONSTANTS
+        if gate_type in QCO.ONE_QUBIT_GATES_CONSTANTS
             
             return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(), "q$(qubit_loc[1])")
 
-        elseif gate_type in ONE_QUBIT_GATES_ANGLE_PARAMETERS
+        elseif gate_type in QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS
 
             if (angle != nothing) && (length(angle) > 0)
                 
@@ -770,15 +770,15 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
     #----------------------; 
     elseif length(qubit_loc) == 2 
 
-        if gate_type in TWO_QUBIT_GATES_CONSTANTS
+        if gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS
 
-            if (qubit_loc[1] < qubit_loc[2]) || (gate_type in TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
+            if (qubit_loc[1] < qubit_loc[2]) || (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
                 return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
             else
                 return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
             end
 
-        elseif gate_type in TWO_QUBIT_GATES_ANGLE_PARAMETERS
+        elseif gate_type in QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS
             
             if (angle != nothing) && (length(angle) > 0)
                 
@@ -830,7 +830,7 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
         
         gate_type, qubit_loc = QCO._parse_gate_string(kron_gates[i], type = true, qubits = true)
 
-        if !(gate_type in union(ONE_QUBIT_GATES_CONSTANTS, TWO_QUBIT_GATES_CONSTANTS))
+        if !(gate_type in union(QCO.ONE_QUBIT_GATES_CONSTANTS, QCO.TWO_QUBIT_GATES_CONSTANTS))
             Memento.error(_LOGGER, "Specified $input gate is not supported in conjunction with the Kronecker product operation")
         end
     
@@ -845,7 +845,7 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
         end
 
         # One qubit gates
-        if (length(qubit_loc) == 1) && (gate_type in ONE_QUBIT_GATES_CONSTANTS)
+        if (length(qubit_loc) == 1) && (gate_type in QCO.ONE_QUBIT_GATES_CONSTANTS)
             if (gate_type == "I") || (gate_type == "Identity")
                 M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))(1))
             else 
@@ -853,8 +853,8 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
             end
         
         # Two qubit gates
-        elseif (length(qubit_loc) == 2) && (gate_type in TWO_QUBIT_GATES_CONSTANTS)
-            if (qubit_loc[1] < qubit_loc[2]) || (gate_type in TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
+        elseif (length(qubit_loc) == 2) && (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS)
+            if (qubit_loc[1] < qubit_loc[2]) || (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
                 M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))())
             else
                 M = kron(M, getfield(QCO, Symbol(gate_type, "RevGate"))())

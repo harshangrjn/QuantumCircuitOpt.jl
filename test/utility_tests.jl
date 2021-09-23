@@ -170,4 +170,6 @@ end
     m,c = QCO._get_constraint_slope_intercept(v1, v2)
     @test m == -0.5 
     @test c == 2.5
+
+    QCO._get_constraint_slope_intercept(v1, v1)
 end

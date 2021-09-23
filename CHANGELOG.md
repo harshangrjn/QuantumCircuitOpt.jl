@@ -4,6 +4,7 @@ QuantumCircuitOpt.jl Change Log
 ### v0.2.5
 - Major updates in input gate convention for two qubit gates. For example, `CNot_12` becomes `CNot_1_2`. This update now makes the package flexible to be able to compute on any number of qubit circuits. `CNot_2_10` is a valid input for a 10 qubit circuit
 - Major clean up in `data.jl` with generalized parsing in `get_full_sized_gate` and `get_full_sized_kron_symbol_gate` functions
+- Clean up of `log.jl` to make it generic and consistent with above changes 
 - Enabling support for convex hull-based cuts on complex variables at every depth (improved run times in CPLEX, default = turned off)
 - Added `constraint_convex_hull_complex_gates` function in support with depndency of QHull.jl 
 - Added `round_real_value` function and cleaned up `round_complex_values` in `utility.jl`

@@ -17,14 +17,14 @@ const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = ["CNot", "CNotRev", "CX", "CXRev", 
                                               "CZRev", "CH", "CHRev", "CV", "CVRev", "CVdagger", 
                                               "CVdaggerRev", "CSX", "CSXRev"]
 
-const ONE_QUBIT_GATES           = union(ONE_QUBIT_GATES_CONSTANTS, 
-                                        ONE_QUBIT_GATES_ANGLE_PARAMETERS)
+const ONE_QUBIT_GATES           = union(QCO.ONE_QUBIT_GATES_CONSTANTS, 
+                                        QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS)
 
-const TWO_QUBIT_GATES_CONSTANTS = union(TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC, 
-                                        TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC)
+const TWO_QUBIT_GATES_CONSTANTS = union(QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC, 
+                                        QCO.TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC)
 
-const TWO_QUBIT_GATES           = union(TWO_QUBIT_GATES_CONSTANTS, 
-                                        TWO_QUBIT_GATES_ANGLE_PARAMETERS)
+const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS, 
+                                        QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
 
 #----------------------------------------#
 #            Single-qubit gates          #
@@ -112,7 +112,7 @@ function U2Gate(ϕ::Number, λ::Number)
     
     θ = π/2
 
-    U2 = U3Gate(θ, ϕ, λ)
+    U2 = QCO.U3Gate(θ, ϕ, λ)
     
     return U2
 end
@@ -143,7 +143,7 @@ function U1Gate(λ::Number)
     θ = 0
     ϕ = 0
 
-    U1 = U3Gate(θ, ϕ, λ)
+    U1 = QCO.U3Gate(θ, ϕ, λ)
     
     return U1
 end
@@ -452,7 +452,7 @@ P(\lambda) = \begin{pmatrix}
 ```
 """
 function PhaseGate(λ::Number)
-    return U1Gate(λ)
+    return QCO.U1Gate(λ)
 end
 
 #-------------------------------------#

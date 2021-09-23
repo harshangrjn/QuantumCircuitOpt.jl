@@ -60,9 +60,9 @@ CVRevGate
 ```@docs
 CVdaggerGate
 ```
-## CVRevdaggerGate
+## CVdaggerRevGate
 ```@docs
-CVRevdaggerGate
+CVdaggerRevGate
 ```
 ## WGate
 ```@docs

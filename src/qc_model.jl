@@ -40,14 +40,14 @@ function build_QCModel(data::Dict{String, Any};
         QCO.variable_QCModel_compact(m_qc)
                                      
         QCO.constraint_QCModel_compact(m_qc, 
-                                   all_valid_constraints,
-                                   commute_gate_constraints, 
-                                   involutory_gate_constraints,
-                                   redundant_gate_pair_constraints,
-                                   idempotent_gate_constraints,
-                                   identity_gate_symmetry_constraints,
-                                   convex_hull_complex_gate_constraints
-                                   )
+                                       all_valid_constraints,
+                                       commute_gate_constraints, 
+                                       involutory_gate_constraints,
+                                       redundant_gate_pair_constraints,
+                                       idempotent_gate_constraints,
+                                       identity_gate_symmetry_constraints,
+                                       convex_hull_complex_gate_constraints
+                                      )
 
     end
 

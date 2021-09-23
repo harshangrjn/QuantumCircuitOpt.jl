@@ -11,20 +11,23 @@ include("4qubit_gates.jl")
 include("5qubit_gates.jl")
 
 decompose_gates = ["decompose_hadamard", 
-                    "decompose_S", 
-                    "decompose_magic_M",  
-                    "decompose_revcnot", 
-                    "decompose_revcnot_with_U", 
-                    "decompose_controlled_Z",
-                    "decompose_magic_M_using_SHCnot",
-                    "decompose_swap",
-                    "decompose_controlled_V",
-                    "decompose_W",
-                    "decompose_W_using_HCnot",
-                    "decompose_GroverDiffusionGate",
-                    "decompose_RX_on_q3"]
+                   "decompose_controlled_Z",
+                   "decompose_controlled_V",
+                   "decompose_controlled_H",
+                   "decompose_controlled_H_with_R",
+                   "decompose_magic_M", 
+                   "decompose_magic_M_using_SHCnot",
+                   "decompose_S", 
+                   "decompose_revcnot", 
+                   "decompose_revcnot_with_U", 
+                   "decompose_swap",
+                   "decompose_W",
+                   "decompose_W_using_HCnot",
+                   "decompose_GroverDiffusionGate",
+                   "decompose_iSwapGate",
+                   "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_S"]
+decompose_gates = ["decompose_magic_M"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
