@@ -616,3 +616,27 @@ function _get_constraint_slope_intercept(vertex1::Vector{Float64}, vertex2::Vect
     end
 
  end
+
+"""
+    is_multi_qubit_gate(gate::String)
+
+Given the input gate string, this function returns a boolean if the input gate is a multi qubit gate or not. 
+For example, for a 2-qubit gate `CRZ_1_2`, output is `true`. 
+"""
+ function is_multi_qubit_gate(gate::String)
+    
+    if occursin(kron_symbol, gate)
+        return true
+    end
+
+    qubit_loc = QCO._parse_gate_string(gate, qubits = true)
+    
+    if length(qubit_loc) > 1 
+        return true
+    elseif length(qubit_loc) == 1 
+        return false 
+    else 
+        Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
+    end
+
+end

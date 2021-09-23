@@ -1,3 +1,7 @@
+#-----------------------------------------------------------#
+# Build optimization model for circuit decomsposition here  #
+#-----------------------------------------------------------#
+
 function build_QCModel(data::Dict{String, Any}; 
                        model_type = "compact_formulation",
                        all_valid_constraints = 0, 

@@ -266,7 +266,7 @@ end
 """
     get_compressed_decomposition(num_qubits::Int64, gates_sol::Array{String,1})
 
-Given the data dictionary and the sequence of gates from the solution, this function returns a 
+Given the number of qubits and the sequence of gates from the solution, this function returns a 
 decomposition of gates after compressing adjacent pair of gates represented on two separate qubits. 
 For example, gates H1 and H2 appearing in a sequence will be compressed to H1xH2 (kron(H1,H2)). 
 This functionality is currently supported only for two qubit circuits and gates without angle parameters. 
@@ -340,22 +340,4 @@ function get_compressed_decomposition(num_qubits::Int64, gates_sol::Array{String
     end
 
     return gates_sol_compressed
-end
-
-function is_multi_qubit_gate(gate::String)
-    
-    if occursin(kron_symbol, gate)
-        return true
-    end
-
-    qubit_loc = QCO._parse_gate_string(gate, qubits = true)
-    
-    if length(qubit_loc) > 1 
-        return true
-    elseif length(qubit_loc) == 1 
-        return false 
-    else 
-        Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
-    end
-
 end
