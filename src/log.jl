@@ -29,11 +29,6 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         gates_sol, gates_sol_compressed = QCO.get_postprocessed_decomposition(results, data)
     end
 
-    R_gates_idx   = QCO._get_R_gates_idx(data["elementary_gates"])
-    U3_gates_idx  = QCO._get_U3_gates_idx(data["elementary_gates"])
-    CR_gates_idx  = QCO._get_CR_gates_idx(data["elementary_gates"])
-    CU3_gates_idx = QCO._get_CU3_gates_idx(data["elementary_gates"])
-
     if !isempty(gates_sol_compressed)
 
         printstyled("\n","=============================================================================","\n"; color = :cyan)
@@ -42,60 +37,16 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         
         printstyled("\n","  ","Number of qubits: ", data["num_qubits"], "\n"; color = :cyan)
         
-        if isempty(R_gates_idx) && isempty(U3_gates_idx)
-            printstyled("  ","Total number of elementary gates: ", size(data["gates_real"])[3],"\n"; color = :cyan)
-        else
-            printstyled("  ","Total number of elementary gates (including discretization and after presolve): ",size(data["gates_real"])[3],"\n"; color = :cyan)
-        end
+        printstyled("  ","Total number of elementary gates (after presolve): ",size(data["gates_real"])[3],"\n"; color = :cyan)
         
         printstyled("  ","Maximum depth of decomposition: ", data["depth"],"\n"; color = :cyan)
         
         printstyled("  ","Input elementary gates: ", data["elementary_gates"],"\n"; color = :cyan)
 
-        if !isempty(R_gates_idx) 
-            for i in R_gates_idx
-                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
-
-                if gate_type == "RX"
-                    printstyled("    ","RX discretization: ", ceil.(rad2deg.(data["discretization"]["RX"]), digits = 1),"\n"; color = :cyan)
-                elseif gate_type == "RY"
-                    printstyled("    ","RY discretization: ", ceil.(rad2deg.(data["discretization"]["RY"]), digits = 1),"\n"; color = :cyan)
-                elseif gate_type == "RZ"
-                    printstyled("    ","RZ discretization: ", ceil.(rad2deg.(data["discretization"]["RZ"]), digits = 1),"\n"; color = :cyan)
-                end
-
+        if "discretization" in keys(data)
+            for i in keys(data["discretization"])
+                printstyled("    ","$i discretization: ", ceil.(rad2deg.(data["discretization"][i]), digits = 1),"\n"; color = :cyan)
             end
-        end
-
-        if !isempty(U3_gates_idx)
-            # Assuming that the Euler angle discretizations are identical on U3 gates of all qubits.
-            printstyled("    ","U3 - θ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_θ"]), digits = 1),"\n"; color = :cyan)
-            printstyled("    ","U3 - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_ϕ"]), digits = 1),"\n"; color = :cyan)
-            printstyled("    ","U3 - λ discretization: ", ceil.(rad2deg.(data["discretization"]["U3_λ"]), digits = 1),"\n"; color = :cyan)
-
-        end
-
-        if !isempty(CR_gates_idx) 
-            for i in CR_gates_idx
-                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
-
-                if gate_type == "CRX"
-                    printstyled("    ","CRX discretization: ", ceil.(rad2deg.(data["discretization"]["CRX"]), digits = 1),"\n"; color = :cyan)
-                elseif gate_type == "CRY"
-                    printstyled("    ","CRY discretization: ", ceil.(rad2deg.(data["discretization"]["CRY"]), digits = 1),"\n"; color = :cyan)
-                elseif gate_type == "CRZ"
-                    printstyled("    ","CRZ discretization: ", ceil.(rad2deg.(data["discretization"]["CRZ"]), digits = 1),"\n"; color = :cyan)
-                end
-
-            end
-        end
-
-        if !isempty(CU3_gates_idx)
-            # Assuming that the Euler angle discretizations are identical on U3 gates of all qubits.
-            printstyled("    ","CU3 - θ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_θ"]), digits = 1),"\n"; color = :cyan)
-            printstyled("    ","CU3 - ϕ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_ϕ"]), digits = 1),"\n"; color = :cyan)
-            printstyled("    ","CU3 - λ discretization: ", ceil.(rad2deg.(data["discretization"]["CU3_λ"]), digits = 1),"\n"; color = :cyan)
-
         end
         
         # printstyled("  ","Input target gate: ", data["target_gate"]["type"],"\n"; color = :cyan)
