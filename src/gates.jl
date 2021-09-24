@@ -1,4 +1,7 @@
-#IMPORTANT: Update these lists below whenever a 1 or 2 qubit gate is added to this file.
+#=
+IMPORTANT: Update the lists below whenever a 1 or 2 qubit gate is added to this file. 
+           Update QCO._get_angle_gates_idx in src/data.jl if gates with angle parameters are added to this file.
+=#
 
 const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "RX", "RY", "RZ", "Phase"]
 

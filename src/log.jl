@@ -181,9 +181,9 @@ function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{
         end
     end
     
-    validate_circuit_decomposition(data, id_sequence)
+    QCO.validate_circuit_decomposition(data, id_sequence)
 
-    gates_sol_compressed = get_compressed_decomposition(data["num_qubits"], gates_sol)
+    gates_sol_compressed = QCO.get_compressed_decomposition(data["num_qubits"], gates_sol)
 
     return gates_sol, gates_sol_compressed
 end
