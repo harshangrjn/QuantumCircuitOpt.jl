@@ -1,6 +1,11 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+
+### Staged
+- Added decomposition of quantum full-adder, double-toffoli and double-peres gates to `4qubit_gates.jl`
+- Added decomposition of toffoli gate using controlled gates and miller gate to `3qubit_gates.jl`
+
 ### v0.2.5
 - Major updates in input gate convention for two qubit gates. For example, `CNot_12` becomes `CNot_1_2`. This update now makes the package flexible to be able to compute on any number of qubit circuits. `CNot_2_10` is a valid input for a 10 qubit circuit
 - Major clean up in `data.jl` including generalized parsing in `get_full_sized_gate` and `get_full_sized_kron_symbol_gate` functions

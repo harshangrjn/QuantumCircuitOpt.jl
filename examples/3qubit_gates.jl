@@ -75,17 +75,18 @@ function decompose_toffoli_using_kronecker()
     
 end
 
-function decompose_toffoli_using_Rotations()
+function decompose_toffoli_with_controlled_gates()
 
-    println(">>>>> Toffoli gate using rotations <<<<<")
+    # Reference: https://doi.org/10.1109/TCAD.2005.858352
+    println(">>>>> Toffoli gate with controlled gates <<<<<")
  
     params = Dict{String, Any}(
     
     "num_qubits" => 3,
-    "depth" => 10,
+    "depth" => 5,
 
-    "elementary_gates" => ["RZ_3", "CNot_1_3", "CNot_2_3", "Identity"],
-    "RZ_discretization" => [-π/2, π/2, π/4],
+    "elementary_gates" => ["CV_1_3", "CV_2_3", "CV_1_2", "CVdagger_1_3", "CVdagger_2_3", "CVdagger_1_2", "CNot_2_1", "CNot_1_2", "Identity"],
+    # "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_2_1", "Identity"], 
 
     "target_gate" => QCO.ToffoliGate(),
     
@@ -120,7 +121,7 @@ function toffoli_circuit()
             ] 
 end
 
-function decompose_CNot_13()
+function decompose_CNot_1_3()
 
     params = Dict{String, Any}(
     "num_qubits" => 3,
@@ -163,9 +164,9 @@ function decompose_toffoli_left()
         Tdagger_3 = QCO.get_full_sized_gate("Tdagger_3", 3)
         T_3 = QCO.get_full_sized_gate("T_3", 3)
         cnot_23 = QCO.get_full_sized_gate("CNot_2_3", 3)
-        cnot_13 = QCO.get_full_sized_gate("CNot_1_3", 3)
+        CNot_1_3 = QCO.get_full_sized_gate("CNot_1_3", 3)
 
-        return H_3 * cnot_23 * Tdagger_3 * cnot_13 * T_3 * cnot_23 * Tdagger_3
+        return H_3 * cnot_23 * Tdagger_3 * CNot_1_3 * T_3 * cnot_23 * Tdagger_3
     end
 
     params = Dict{String, Any}(
@@ -192,10 +193,10 @@ function decompose_toffoli_right()
         T_1 = QCO.get_full_sized_gate("T_1", 3)
         T_2 = QCO.get_full_sized_gate("T_2", 3)
         T_3 = QCO.get_full_sized_gate("T_3", 3)
-        cnot_12 = QCO.get_full_sized_gate("CNot_1_2", 3)
-        cnot_13 = QCO.get_full_sized_gate("CNot_1_3", 3)
+        CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 3)
+        CNot_1_3 = QCO.get_full_sized_gate("CNot_1_3", 3)
 
-        return cnot_13 * T_2 * T_3 * cnot_12 * H_3 * T_1 * Tdagger_2 * cnot_12
+        return CNot_1_3 * T_2 * T_3 * CNot_1_2 * H_3 * T_1 * Tdagger_2 * CNot_1_2
     end
 
     params = Dict{String, Any}(
@@ -210,4 +211,33 @@ function decompose_toffoli_right()
     )
     
     return params
+end
+
+function decompose_miller()
+    # Reference: https://doi.org/10.1109/TCAD.2005.858352
+
+    function target_gate()
+        CV_1_3 = QCO.get_full_sized_gate("CV_1_3", 3)
+        CV_2_3 = QCO.get_full_sized_gate("CV_2_3", 3)
+        CVdagger_2_3 = QCO.get_full_sized_gate("CVdagger_2_3", 3)
+        CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 3)
+        CNot_3_1 = QCO.get_full_sized_gate("CNot_3_1", 3)
+        CNot_3_2 = QCO.get_full_sized_gate("CNot_3_2", 3)
+
+        return CNot_3_1 * CNot_3_2 * CV_2_3 * CNot_1_2 * CVdagger_2_3 * CV_1_3 * CNot_3_1 * CNot_1_2
+    end
+
+    params = Dict{String, Any}(
+        "num_qubits" => 3,
+        "depth" => 8,
+    
+        "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
+        "target_gate" => target_gate(), 
+    
+        "objective" => "minimize_depth", 
+        "optimizer" => "cplex"
+        )
+        
+        return params
+
 end
