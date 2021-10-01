@@ -234,7 +234,7 @@ function decompose_miller()
         "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
         "target_gate" => target_gate(), 
     
-        "objective" => "minimize_depth", 
+        "objective" => "minimize_cnot", 
         "optimizer" => "cplex"
         )
         

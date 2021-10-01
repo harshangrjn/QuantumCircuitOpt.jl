@@ -27,7 +27,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_iSwapGate",
                    "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_magic_M"]
+decompose_gates = ["decompose_double_toffoli"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -36,7 +36,8 @@ result_qc = Dict{String,Any}()
 
 for gates in decompose_gates 
     params = getfield(Main, Symbol(gates))()
-    qcm_optimizer = get_solver(params)
+    # qcm_optimizer = get_solver(params)
+    qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer)
     global result_qc = QCO.run_QCModel(params, 
                                        qcm_optimizer, 
                                        model_type = "compact_formulation",

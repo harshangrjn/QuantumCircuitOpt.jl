@@ -37,15 +37,14 @@ function decompose_controlled_Z()
 
     "elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
     "target_gate" => QCO.CZGate(),
-       
-    "U3_θ_discretization" => [-π/2, 0, π/2],
-    "U3_ϕ_discretization" => [-π/2, 0, π/2],
-    "U3_λ_discretization" => [-π/2, 0, π/2],
+
+    "U3_θ_discretization" => -π/2:π/2:π/2,
+    "U3_ϕ_discretization" => -π/2:π/2:π/2,
+    "U3_λ_discretization" => -π/2:π/2:π/2,
 
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cplex",
     "optimizer_presolve" => false
                                 
     )
@@ -347,9 +346,10 @@ function decompose_HCoinGate()
                   
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact", 
+        "identify_real_gates" => true,
         
         "optimizer" => "cplex",
-        # "MIP_feasiblity_emphasis" => true
+        
                                     
         )
     

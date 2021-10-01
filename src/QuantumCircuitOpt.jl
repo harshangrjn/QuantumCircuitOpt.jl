@@ -4,7 +4,6 @@ import JuMP
 import LinearAlgebra
 import Memento
 import MathOptInterface
-import QHull
 
 const MOI = MathOptInterface
 const LA = LinearAlgebra

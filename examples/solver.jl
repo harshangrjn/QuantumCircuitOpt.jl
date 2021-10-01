@@ -8,11 +8,11 @@ function get_solver(params::Dict{String,Any})
 
     # Optimizer
     if !("optimizer" in keys(params))
-        Memento.error(Memento.getlogger(@__MODULE__), "Input a valid MIP optimizer")
+        error("Input a valid MIP optimizer")
     end
 
     if !(params["optimizer"] in optimizers_list)
-        Memento.error(Memento.getlogger(@__MODULE__), "Specified optimizer does not belong in the pre-defined list. Add your optimizer separately with it's attributes")
+        error("Specified optimizer does not belong in the pre-defined list. Add your optimizer separately with it's attributes")
     end
 
     if "optimizer_presolve" in keys(params)
