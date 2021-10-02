@@ -337,16 +337,13 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
                     push!(vertices_coord, (re, im))
                 end
                 
-                # if (isapprox(minimum([x[1] for x in vertices_coord]), maximum([x[1] for x in vertices_coord]), atol = 1E-6)) || (isapprox(minimum([x[2] for x in vertices_coord]), maximum([x[2] for x in vertices_coord]), atol = 1E-6))
-                #     continue
-                # end
+                if (isapprox(minimum([x[1] for x in vertices_coord]), maximum([x[1] for x in vertices_coord]), atol = 1E-6)) || (isapprox(minimum([x[2] for x in vertices_coord]), maximum([x[2] for x in vertices_coord]), atol = 1E-6))
+                    continue
+                end
 
                 vertices = Vector{Tuple{<:Number, <:Number}}()
-
-                if length(vertices_coord) == 1
-                    continue 
                 
-                elseif length(vertices_coord) == 2 
+                if length(vertices_coord) == 2 
                     
                     for l in vertices_coord
                         push!(vertices, (l[1], l[2]))
