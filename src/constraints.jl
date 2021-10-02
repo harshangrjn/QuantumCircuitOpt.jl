@@ -336,24 +336,26 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
                     push!(vertices_coord, (re, im))
                 end
-
-                if (isapprox(minimum([x[1] for x in vertices_coord]), maximum([x[1] for x in vertices_coord]), atol = 1E-6)) || (isapprox(minimum([x[2] for x in vertices_coord]), maximum([x[2] for x in vertices_coord]), atol = 1E-6))
-                    continue
-                end
+                
+                # if (isapprox(minimum([x[1] for x in vertices_coord]), maximum([x[1] for x in vertices_coord]), atol = 1E-6)) || (isapprox(minimum([x[2] for x in vertices_coord]), maximum([x[2] for x in vertices_coord]), atol = 1E-6))
+                #     continue
+                # end
 
                 vertices = Vector{Tuple{<:Number, <:Number}}()
 
-                if length(vertices_coord) == 2 
-
+                if length(vertices_coord) == 1
+                    continue 
+                
+                elseif length(vertices_coord) == 2 
+                    
                     for l in vertices_coord
                         push!(vertices, (l[1], l[2]))
                     end
 
                     slope, intercept = QCO._get_constraint_slope_intercept(vertices[1], vertices[2])
-                    
+
                     if !isinf(slope)
                         if isapprox(abs(slope), 0, atol=1E-6)
-
                             JuMP.@constraint(qcm.model, [d=1:depth], 
                                             sum(gates_real[(2*I-1),(2*J), n_g] * z_onoff_var[n_g,d] for n_g = 1:num_gates) - intercept == 0)
                         else
@@ -382,7 +384,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
                     num_ex_pt = size(vertices_convex_hull)[1]
                     
-                    # Add convex hull facets if num_ex_pt == 2
+                    # Add the convex hull facet if num_ex_pt == 2
 
                     if num_ex_pt >= 3 
 

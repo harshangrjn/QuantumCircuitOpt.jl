@@ -48,8 +48,8 @@ Using some of the above-described user input options, here is a sample optimizat
 
 ```julia
 import QuantumCircuitOpt as QCO
-import JuMP
-import CPLEX
+using JuMP
+using Gurobi
 
 # Target: CZGate
 function target_gate()
@@ -69,7 +69,7 @@ params = Dict{String, Any}(
 "objective" => "minimize_depth"
 )
 
-qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer) 
+qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer) 
 QCO.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 

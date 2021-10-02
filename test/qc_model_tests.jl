@@ -38,7 +38,7 @@ end
         "decomposition_type" => "exact"                      
         )
 
-    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation")
+    result_qc = QCO.run_QCModel(params, CBC, model_type = "balas_formulation", all_valid_constraints = 1)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
@@ -403,7 +403,7 @@ end
     idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"])
     @test length(idempotent_pairs) == 2
 
-    result_qc = QCO.run_QCModel(params, CBC, all_valid_constraints = 1)
+    result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
@@ -414,4 +414,19 @@ end
         end
     end
 
+end
+
+@testset "Tests: constraint_convex_hull_complex_gates" begin
+    params = Dict{String, Any}(
+    "num_qubits" => 2, 
+    "depth" => 2,    
+    "elementary_gates" => ["CY_1_2", "CY_2_1"], 
+    "target_gate" => QCO.CYGate() * QCO.CYRevGate())
+
+    data = QCO.get_data(params)
+    result_qc = QCO.run_QCModel(params, CBC, convex_hull_complex_gate_constraints = true)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 0.0, atol = tol_0)
 end
