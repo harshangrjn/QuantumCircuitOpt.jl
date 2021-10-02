@@ -1,7 +1,7 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### Staged
+### v0.2.6
 - Enabling support for convex hull evaluation (Graham's algorithm) within QCOpt (`QCO.convex_hull()`)
 - Dropping dependency on QHull.jl
 - Added decomposition of quantum full-adder, double-toffoli and double-peres gates to `4qubit_gates.jl`
