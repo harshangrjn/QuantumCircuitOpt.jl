@@ -285,6 +285,27 @@ function constraint_identity_gate_symmetry(qcm::QuantumCircuitModel)
     return
 end
 
+function constraint_cnot_gate_bounds(qcm::QuantumCircuitModel)
+
+    cnot_idx    = qcm.data["cnot_idx"]
+    depth       = qcm.data["depth"]
+    z_onoff_var = qcm.variables[:z_onoff_var]
+
+    if !isempty(cnot_idx)
+        if "cnot_lower_bound" in keys(qcm.data)
+            JuMP.@constraint(qcm.model, sum(z_onoff_var[n,d] for n in cnot_idx, d=1:depth) >= qcm.data["cnot_lower_bound"])
+            Memento.info(_LOGGER, "Applied CNot-gate lower bound constraint")
+        end
+        
+        if "cnot_upper_bound" in keys(qcm.data)
+            JuMP.@constraint(qcm.model, sum(z_onoff_var[n,d] for n in cnot_idx, d=1:depth) <= qcm.data["cnot_upper_bound"])
+            Memento.info(_LOGGER, "Applied CNot-gate upper bound constraint")
+        end
+    end
+
+    return
+end
+
 function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
     if !qcm.data["are_gates_real"] 

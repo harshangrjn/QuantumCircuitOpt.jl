@@ -7,6 +7,8 @@
     "initial_gate" => "Identity",
     "identify_real_gates" => true,
     "target_gate" => QCO.CNotRevGate(),
+    "set_cnot_lower_bound" => 1,
+    "set_cnot_upper_bound" => 1,
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"
     )

@@ -160,6 +160,9 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
             data["slack_penalty"] = 1E3
         end
     end
+
+    # CNOT lower/upper bound
+    data = QCO._get_cnot_bounds!(data, params)
                          
     return data
 end
@@ -235,7 +238,7 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
 
         if !isempty(one_angle_gates)
             for i in one_angle_gates
-                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)          
+                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
 
                 data["discretization"][gate_type] = Float64.(params["$(gate_type)_discretization"])
             end
@@ -739,10 +742,29 @@ function _get_cnot_idx(gates_dict::Dict{String, Any})
     
     cnot_idx = Int64[]
 
-    # Note: The below objective minimizes both cnot_12 and cnot_21 in the decomposition
+    # Counts for both (CNot_i_j and CNot_j_i) or (CX_i_j and CX_j_i)
     for i in keys(gates_dict)
-        if !isempty(findall(x -> startswith(x, "CNot"), gates_dict[i]["type"]))
-            push!(cnot_idx, parse(Int64, i))
+        # Input gates with kron symbols
+        if occursin(kron_symbol, gates_dict[i]["type"][1])
+            gate_types = QCO._parse_gates_with_kron_symbol(gates_dict[i]["type"][1])
+            
+            for j = 1:length(gate_types)
+                gate_type = QCO._parse_gate_string(gate_types[j], type = true)
+                if gate_type in ["CNot", "CX"]
+                    push!(cnot_idx, parse(Int64, i))
+                end
+            end
+        else
+
+        # Single input gate per depth
+            if "Identity" in gates_dict[i]["type"]
+                continue
+            end
+
+            gate_type = QCO._parse_gate_string(gates_dict[i]["type"][1], type = true)
+            if gate_type in ["CNot", "CX"]
+                push!(cnot_idx, parse(Int64, i))
+            end
         end
     end
     
@@ -762,4 +784,34 @@ function _get_angle_gates_idx(elementary_gates::Array{String,1})
     three_angle_gates = union(U3_gates_idx, CU3_gates_idx)
 
     return one_angle_gates, three_angle_gates
+end
+
+function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
+
+    cnot_lb = 0
+    cnot_ub = data["depth"]
+    
+    if "set_cnot_lower_bound" in keys(params)
+        cnot_lb = params["set_cnot_lower_bound"]
+    end
+
+    if "set_cnot_upper_bound" in keys(params)
+        cnot_ub = params["set_cnot_upper_bound"]
+    end
+
+    if cnot_lb < cnot_ub 
+        if cnot_lb > 0
+            data["cnot_lower_bound"] = params["set_cnot_lower_bound"]
+        end
+        if cnot_ub < data["depth"]
+            data["cnot_upper_bound"] = params["set_cnot_upper_bound"]
+        end
+    elseif isapprox(cnot_lb, cnot_ub, atol=1E-6)
+        data["cnot_lower_bound"] = cnot_lb
+        data["cnot_upper_bound"] = cnot_ub
+    else
+        Memento.warn(_LOGGER, "Invalid CNot-gate lower/upper bound")
+    end
+
+    return data 
 end

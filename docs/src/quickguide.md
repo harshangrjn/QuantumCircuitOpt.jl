@@ -31,6 +31,8 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | Optional Inputs  | Description |
 | -----------: | :----------- |
 | `initial_gate` | Intitial-condition gate to the decomposition (gate at 0th depth) (default: `"Identity"`).  | 
+| `set_cnot_lower_bound` | This option sets a lower bound on the total number of CNot or CX gates which an optimal decomposition can admit.  |
+| `set_cnot_upper_bound` | This option sets an upper bound on the total number of CNot/CX gates which an optimal decomposition can admit. Note that both `set_cnot_lower_bound` and `set_cnot_upper_bound` can also be set to an identitcal value to fix the number of CNot/CX gates in the optimal decomposition.|
 | `identify_real_gates` | This option identifies if all the elementary and target gates have only real entries and formulates a compact MIP formulation accordingly (default: `false`).  | 
 | `input_circuit` | Input circuit representing an ensemble of elementary gates which decomposes the given target gate. This input circuit, which serves as a warm-start, can accelerate the MIP solver's search for the incumbent solution. (default: empty circuit).  | 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |

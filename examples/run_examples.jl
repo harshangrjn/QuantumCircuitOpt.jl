@@ -1,6 +1,7 @@
 import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
+using Gurobi
 using LinearAlgebra
 using Cbc
 
@@ -27,7 +28,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_iSwapGate",
                    "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_double_toffoli"]
+decompose_gates = ["decompose_toffoli_using_kronecker"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -36,11 +37,15 @@ result_qc = Dict{String,Any}()
 
 for gates in decompose_gates 
     params = getfield(Main, Symbol(gates))()
-    # qcm_optimizer = get_solver(params)
-    qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer)
+    
+    qcm_optimizer = get_solver(params)
+    # qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer)
+    # qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer)
+    
     global result_qc = QCO.run_QCModel(params, 
                                        qcm_optimizer, 
                                        model_type = "compact_formulation",
+                                       identity_gate_symmetry_constraints = true,
                                        convex_hull_complex_gate_constraints = true)
 end
 

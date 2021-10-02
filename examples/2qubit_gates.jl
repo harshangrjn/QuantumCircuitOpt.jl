@@ -42,9 +42,12 @@ function decompose_controlled_Z()
     "U3_ϕ_discretization" => -π/2:π/2:π/2,
     "U3_λ_discretization" => -π/2:π/2:π/2,
 
+    "set_cnot_lower_bound" => 1,
+
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    
+
+    "optimizer" => "gurobi",
     "optimizer_presolve" => false
                                 
     )
@@ -60,15 +63,17 @@ function decompose_controlled_V()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "depth" => 7,    
+    "depth" => 7,
 
     "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "CNot_1_2", "CNot_2_1", "Identity"],
     "target_gate" => QCO.CVGate(),
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
+
+    "set_cnot_lower_bound" => 2,
     
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
                                 
     )
 
@@ -119,12 +124,15 @@ function decompose_controlled_H_with_R()
     "RX_discretization" => [], 
     "RY_discretization" => [-π/4, π/4, π/2, -π/2], 
     "RZ_discretization" => [], 
+
+    "set_cnot_lower_bound" => 1,
+    "set_cnot_upper_bound" => 2,
   
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     "identify_real_gates" => true,
     
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
                                 
     )
 
@@ -150,8 +158,10 @@ function decompose_magic_M()
           
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact",
+
+        "set_cnot_lower_bound" => 1,
         
-        "optimizer" => "cplex"
+        "optimizer" => "gurobi"
                                     
         )
     

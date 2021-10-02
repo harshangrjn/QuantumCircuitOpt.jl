@@ -17,7 +17,7 @@ function decompose_RX_on_q3()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cplex",
+    "optimizer" => "gurobi",
     "optimizer_presolve" => false, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
     
     )
@@ -38,12 +38,15 @@ function decompose_toffoli()
     "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
     "input_circuit" => toffoli_circuit(),
+
+    "set_cnot_lower_bound" => 6,
+    "set_cnot_upper_bound" => 6,
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     "relax_integrality" => false,
     
-    "optimizer" => "cplex",
+    "optimizer" => "gurobi",
     
     )
 
@@ -58,7 +61,7 @@ function decompose_toffoli_using_kronecker()
     params = Dict{String, Any}(
     
     "num_qubits" => 3, 
-    "depth" => 12,    
+    "depth" => 12,
   
     "elementary_gates" => ["T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_3", "I_1xT_2xT_3", "CNot_1_2xH_3", "T_1xTdagger_2xI_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
@@ -66,8 +69,10 @@ function decompose_toffoli_using_kronecker()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     "relax_integrality" => false,
+
+    "set_cnot_lower_bound" => 6,
     
-    "optimizer" => "cplex",
+    "optimizer" => "gurobi",
     
     )
 
@@ -94,7 +99,7 @@ function decompose_toffoli_with_controlled_gates()
     "decomposition_type" => "exact",
     "relax_integrality" => false,
     
-    "optimizer" => "cplex",
+    "optimizer" => "gurobi",
     )
 
     return params
@@ -132,7 +137,7 @@ function decompose_CNot_1_3()
     "target_gate" => QCO.get_full_sized_gate("CNot_1_3", 3),
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"   
+    "optimizer" => "gurobi"   
     )
 
     return params
@@ -149,7 +154,7 @@ function decompose_FredkinGate()
     "target_gate" => QCO.CSwapGate(), #also Fredkin
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
     )
     
     return params
@@ -177,7 +182,7 @@ function decompose_toffoli_left()
     "target_gate" => target_gate(), 
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
     )
     
     return params
@@ -207,7 +212,7 @@ function decompose_toffoli_right()
     "target_gate" => target_gate(), 
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
     )
     
     return params
@@ -235,7 +240,7 @@ function decompose_miller()
         "target_gate" => target_gate(), 
     
         "objective" => "minimize_cnot", 
-        "optimizer" => "cplex"
+        "optimizer" => "gurobi"
         )
         
         return params
