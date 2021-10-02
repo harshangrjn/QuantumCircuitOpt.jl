@@ -78,6 +78,9 @@ set of `elementary_gates` accordingly in the above sample code. For more such 2-
 !!! warning
     Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute. Hence, unlike local optimization methods, such as machine learning, in the literature, the run times for larger number of qubits and depths can be prohibitively slow.
 
+!!! tip
+    Run times of QuantumCircuitOpt's mathematical formulations are significantly lower using [Gurobi](https://www.gurobi.com) as the mixed-integer programming (MIP) solver. Note that this solver's individual usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
+
 # Extracting results
 The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
 
