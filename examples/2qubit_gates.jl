@@ -71,7 +71,7 @@ function decompose_controlled_V()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
 
-    "set_cnot_lower_bound" => 2,
+    "set_cnot_lower_bound" => 1,
     
     "optimizer" => "gurobi"
                                 
@@ -158,8 +158,6 @@ function decompose_magic_M()
           
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact",
-
-        "set_cnot_lower_bound" => 1,
         
         "optimizer" => "gurobi"
                                     
