@@ -8,9 +8,9 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | Necessary Inputs  | Description |
 | -----------: | :----------- |
 | `num_qubits`      | Number of qubits of the circuit (≥ 2).  |
-| `depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2)   |
+| `maximum_depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2)   |
 | `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QuantumCircuitOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
-| `target_gate` | Target gate which you wish to decompose using the above-mentioned `elementary_gates`.|
+| `target_gate` | Target unitary gate which you wish to decompose using the above-mentioned `elementary_gates`.|
 | `RX_discretization` | Vector of discretization angles (in radians) for `RXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RY_discretization` | Vector of discretization angles (in radians) for `RYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RZ_discretization` | Vector of discretization angles (in radians) for `RZGate`, if this gate is part of the above-mentioned `elementary_gates`.|
@@ -58,7 +58,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2, 
-"depth" => 4,    
+"maximum_depth" => 4,    
 "elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        

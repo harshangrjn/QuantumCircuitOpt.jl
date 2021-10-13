@@ -19,13 +19,13 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     end
 
     # Depth
-    if "depth" in keys(params)
-        if params["depth"] < 2 
+    if "maximum_depth" in keys(params)
+        if params["maximum_depth"] < 2 
             Memento.error(_LOGGER, "Minimum depth of 2 is necessary")
         end
-        depth = params["depth"]
+        maximum_depth = params["maximum_depth"]
     else
-        Memento.error(_LOGGER, "Depth of decomposition has to be specified by the user")
+        Memento.error(_LOGGER, "Maximum depth of the decomposition has to be specified by the user")
     end
 
     # Elementary gates
@@ -43,7 +43,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     
     input_circuit_dict = Dict{String,Any}()
 
-    if length(input_circuit) > 0 && (length(input_circuit) <= params["depth"])
+    if length(input_circuit) > 0 && (length(input_circuit) <= params["maximum_depth"])
         
         input_circuit_dict = QCO.get_input_circuit_dict(input_circuit, params)
 
@@ -124,7 +124,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     end
     
     data = Dict{String, Any}("num_qubits" => num_qubits,
-                             "depth" => depth,
+                             "maximum_depth" => maximum_depth,
                              "gates_dict" => gates_dict_unique,
                              "gates_real" => M_real_unique,
                              "initial_gate" => initial_gate,
@@ -789,7 +789,7 @@ end
 function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
 
     cnot_lb = 0
-    cnot_ub = data["depth"]
+    cnot_ub = data["maximum_depth"]
     
     if "set_cnot_lower_bound" in keys(params)
         cnot_lb = params["set_cnot_lower_bound"]
@@ -803,7 +803,7 @@ function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
         if cnot_lb > 0
             data["cnot_lower_bound"] = params["set_cnot_lower_bound"]
         end
-        if cnot_ub < data["depth"]
+        if cnot_ub < data["maximum_depth"]
             data["cnot_upper_bound"] = params["set_cnot_upper_bound"]
         end
     elseif isapprox(cnot_lb, cnot_ub, atol=1E-6)

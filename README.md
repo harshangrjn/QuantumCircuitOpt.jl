@@ -43,7 +43,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2, 
-"depth" => 4,    
+"maximum_depth" => 4,    
 "elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        

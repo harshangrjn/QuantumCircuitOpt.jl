@@ -70,7 +70,7 @@ end
 @testset "Tests: commuting matrices" begin
     params = Dict{String, Any}(
        "num_qubits" => 2, 
-       "depth" => 5,    
+       "maximum_depth" => 5,    
 
        "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
        "target_gate" => QCO.CNotRevGate()
@@ -95,7 +95,7 @@ end
      
     params = Dict{String, Any}(
         "num_qubits" => 3, 
-        "depth" => 15,    
+        "maximum_depth" => 15,    
         "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_2", "Tdagger_3", "Identity"], 
         "target_gate" => QCO.ToffoliGate()
         )
@@ -109,7 +109,7 @@ end
     
     params = Dict{String, Any}(
         "num_qubits" => 2, 
-        "depth" => 14,    
+        "maximum_depth" => 14,    
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => -QCO.HCoinGate())
 

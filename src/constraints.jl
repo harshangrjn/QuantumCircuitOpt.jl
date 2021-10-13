@@ -5,7 +5,7 @@
 function constraint_single_gate_per_depth(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth     = qcm.data["depth"]
+    depth     = qcm.data["maximum_depth"]
     
     JuMP.@constraint(qcm.model, [d=1:depth], sum(qcm.variables[:z_onoff_var][n,d] for n=1:num_gates) == 1)
     
@@ -15,7 +15,7 @@ end
 function constraint_gates_onoff_per_depth(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth     = qcm.data["depth"]
+    depth     = qcm.data["maximum_depth"]
 
     JuMP.@constraint(qcm.model, [d=1:depth], qcm.variables[:G_var][:,:,d] .== 
                                     sum(qcm.variables[:z_onoff_var][n,d] * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
@@ -36,7 +36,7 @@ end
 function constraint_gate_intermediate_products(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth     = qcm.data["depth"]
+    depth     = qcm.data["maximum_depth"]
 
     JuMP.@constraint(qcm.model, [d=1:(depth-1)], qcm.variables[:U_var][:,:,d] .== 
                                 sum(qcm.variables[:V_var][:,:,n,d] * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
@@ -52,7 +52,7 @@ end
 
 function constraint_gate_target_condition(qcm::QuantumCircuitModel)
 
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
     num_gates = size(qcm.data["gates_real"])[3]
     decomposition_type = qcm.data["decomposition_type"]
     
@@ -70,7 +70,7 @@ end
 
 function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
 
-    depth  = qcm.data["depth"]
+    depth  = qcm.data["maximum_depth"]
     n_r    = size(qcm.data["gates_real"])[1]
     n_c    = size(qcm.data["gates_real"])[2]
 
@@ -92,7 +92,7 @@ end
 
 function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
 
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
     num_gates = size(qcm.data["gates_real"])[3]
@@ -134,7 +134,7 @@ end
 function constraint_gate_intermediate_products_compact(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
     
     JuMP.@constraint(qcm.model, [d=2:(depth-1)], qcm.variables[:U_var][:,:,d] .== 
                                         sum((qcm.variables[:zU_var][:,:,n,(d-1)]) * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
@@ -144,7 +144,7 @@ end
 
 function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
 
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
     num_gates = size(qcm.data["gates_real"])[3]
     decomposition_type = qcm.data["decomposition_type"]
 
@@ -164,7 +164,7 @@ end
 
 function constraint_complex_to_real_symmetry_compact(qcm::QuantumCircuitModel)
 
-    depth  = qcm.data["depth"]
+    depth  = qcm.data["maximum_depth"]
     n_r    = size(qcm.data["gates_real"])[1]
     n_c    = size(qcm.data["gates_real"])[2]
 
@@ -176,7 +176,7 @@ end
 
 function constraint_commutative_gate_pairs(qcm::QuantumCircuitModel)
     
-    depth  = qcm.data["depth"]
+    depth  = qcm.data["maximum_depth"]
     z_onoff_var  = qcm.variables[:z_onoff_var]
 
     commute_pairs, commute_pairs_prodIdentity = QCO.get_commutative_gate_pairs(qcm.data["gates_dict"])
@@ -206,7 +206,7 @@ end
 function constraint_involutory_gates(qcm::QuantumCircuitModel)
 
     gates_dict  = qcm.data["gates_dict"]
-    depth       = qcm.data["depth"]
+    depth       = qcm.data["maximum_depth"]
     z_onoff_var = qcm.variables[:z_onoff_var]
 
     involutory_gates = QCO.get_involutory_gates(gates_dict)
@@ -226,7 +226,7 @@ end
 function constraint_redundant_gate_product_pairs(qcm::QuantumCircuitModel)
 
     gates_dict  = qcm.data["gates_dict"]
-    depth       = qcm.data["depth"]
+    depth       = qcm.data["maximum_depth"]
     z_onoff_var = qcm.variables[:z_onoff_var]
 
     redundant_pairs = QCO.get_redundant_gate_product_pairs(gates_dict)
@@ -246,7 +246,7 @@ end
 function constraint_idempotent_gates(qcm::QuantumCircuitModel)
 
     gates_dict  = qcm.data["gates_dict"]
-    depth       = qcm.data["depth"]
+    depth       = qcm.data["maximum_depth"]
     z_onoff_var = qcm.variables[:z_onoff_var]
 
     idempotent_gates = QCO.get_idempotent_gates(gates_dict)
@@ -266,7 +266,7 @@ end
 function constraint_identity_gate_symmetry(qcm::QuantumCircuitModel)
 
     gates_dict  = qcm.data["gates_dict"]
-    depth       = qcm.data["depth"]
+    depth       = qcm.data["maximum_depth"]
     z_onoff_var = qcm.variables[:z_onoff_var]
 
     identity_idx = []
@@ -288,7 +288,7 @@ end
 function constraint_cnot_gate_bounds(qcm::QuantumCircuitModel)
 
     cnot_idx    = qcm.data["cnot_idx"]
-    depth       = qcm.data["depth"]
+    depth       = qcm.data["maximum_depth"]
     z_onoff_var = qcm.variables[:z_onoff_var]
 
     if !isempty(cnot_idx)
@@ -318,7 +318,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
         gates_dict = qcm.data["gates_dict"]
 
         num_gates = size(gates_real)[3]
-        depth     = qcm.data["depth"]
+        depth     = qcm.data["maximum_depth"]
         n_r       = size(gates_dict["1"]["matrix"])[1]
         n_c       = size(gates_dict["1"]["matrix"])[2]
 

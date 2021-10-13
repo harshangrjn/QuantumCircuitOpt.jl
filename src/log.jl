@@ -39,7 +39,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         
         printstyled("  ","Total number of elementary gates (after presolve): ",size(data["gates_real"])[3],"\n"; color = :cyan)
         
-        printstyled("  ","Maximum depth of decomposition: ", data["depth"],"\n"; color = :cyan)
+        printstyled("  ","Maximum depth of decomposition: ", data["maximum_depth"],"\n"; color = :cyan)
         
         printstyled("  ","Input elementary gates: ", data["elementary_gates"],"\n"; color = :cyan)
 
@@ -137,7 +137,7 @@ function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{
     gates_sol = Array{String,1}()
     id_sequence = Array{Int64,1}()
 
-    for d = 1:data["depth"]
+    for d = 1:data["maximum_depth"]
         id = findall(isone.(round.(abs.(results["solution"]["z_onoff_var"][:,d]), digits=3)))[1]
         push!(id_sequence, id)
 

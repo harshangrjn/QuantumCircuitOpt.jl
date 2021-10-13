@@ -14,7 +14,7 @@ function decompose_controlled_Z()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "depth" => 4,
+    "maximum_depth" => 4,
 
     "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
     "target_gate" => QCOpt.CZGate(),
@@ -37,7 +37,7 @@ function decompose_controlled_V()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "depth" => 7,
+    "maximum_depth" => 7,
 
     "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
     "target_gate" => QCOpt.CVGate(),
@@ -56,7 +56,7 @@ function decompose_controlled_H()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "depth" => 5,    
+    "maximum_depth" => 5,    
 
     "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCOpt.CHGate(),
@@ -79,7 +79,7 @@ function decompose_magic_using_U3_CNot_2_1()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 5,    
+        "maximum_depth" => 5,    
     
         "elementary_gates" => ["U3_1", "U3_2", "CNot_2_1", "Identity"], 
         "target_gate" => QCOpt.MGate(),   
@@ -101,7 +101,7 @@ function decompose_iSwapGate()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 10,    
+        "maximum_depth" => 10,    
     
         "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.iSwapGate(),   
@@ -120,7 +120,7 @@ function decompose_GroverDiffusion_using_Clifford()
     params = Dict{String, Any}(
     
         "num_qubits" => 2,
-        "depth" => 6,    
+        "maximum_depth" => 6,    
     
         "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "S_1", "S_2", "T_1", "T_2", "Y_1", "Y_2", "CNot_1_2", "Identity"], 
         
@@ -141,7 +141,7 @@ function decompose_GroverDiffusion_using_U3()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 10,    
+        "maximum_depth" => 10,    
     
         "elementary_gates" => ["U3_1", "CNot_1_2", "Identity"], 
 
@@ -166,7 +166,7 @@ function decompose_magic_using_SH_CNot_1_2()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 10,    
+        "maximum_depth" => 10,    
     
         "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.MGate(),
@@ -185,7 +185,7 @@ function decompose_magic_using_SH_CNot_2_1()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 10,    
+        "maximum_depth" => 10,    
     
         "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_2_1", "Identity"], 
         "target_gate" => QCOpt.MGate(),
@@ -203,7 +203,7 @@ function decompose_magic_using_U3_CNot_1_2()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "depth" => 5,    
+        "maximum_depth" => 5,    
     
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.MGate(),   
@@ -226,7 +226,7 @@ function decompose_toffoli_with_controlled_gates()
     params = Dict{String, Any}(
     
     "num_qubits" => 3,
-    "depth" => 5,
+    "maximum_depth" => 5,
 
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CV_1_2", "CVdagger_1_3", "CVdagger_2_3", "CVdagger_1_2", "CNot_2_1", "CNot_1_2", "Identity"],
 
@@ -246,7 +246,7 @@ function decompose_Fredkin()
 
     params = Dict{String, Any}(
     "num_qubits" => 3,
-    "depth" => 7,
+    "maximum_depth" => 7,
 
     # Reference: https://doi.org/10.1103/PhysRevA.53.2855
     "elementary_gates" => ["CV_1_2", "CV_2_3", "CV_1_3", "CVdagger_1_2", "CVdagger_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
@@ -279,7 +279,7 @@ function decompose_double_toffoli()
 
     params = Dict{String, Any}(
     "num_qubits" => 4,
-    "depth" => 7,
+    "maximum_depth" => 7,
 
     "elementary_gates" => ["CV_1_2", "CV_2_4", "CV_3_4", "CVdagger_1_2", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_3", "CNot_3_2", "CNot_2_3", "Identity"],
     "target_gate" => target_gate(),
@@ -314,7 +314,7 @@ function decompose_quantum_fulladder()
 
     params = Dict{String, Any}(
         "num_qubits" => num_qubits,
-        "depth" => 7,
+        "maximum_depth" => 7,
     
         "elementary_gates" => ["CV_1_2", "CV_4_2", "CV_3_2", "CVdagger_1_2", "CVdagger_4_2", "CVdagger_3_2", "CNot_3_1", "CNot_4_3", "CNot_2_4", "CNot_4_1", "Identity"],
         

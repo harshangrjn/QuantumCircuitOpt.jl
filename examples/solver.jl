@@ -40,8 +40,8 @@ function get_solver(params::Dict{String,Any})
         optimizer_log = true
     end
 
-    if "depth" in keys(params)
-        optimizer_optim_gap = ((params["depth"] - 1E-4) - (params["depth"]-1))/(params["depth"]-1)
+    if "maximum_depth" in keys(params)
+        optimizer_optim_gap = ((params["maximum_depth"] - 1E-4) - (params["maximum_depth"]-1))/(params["maximum_depth"]-1)
     else
         optimizer_optim_gap = 1E-4
     end

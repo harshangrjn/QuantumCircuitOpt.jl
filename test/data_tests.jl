@@ -33,7 +33,7 @@ end
     # 2-qubit gates
     params = Dict{String, Any}(
     "num_qubits" => 2,
-    "depth" => 2,
+    "maximum_depth" => 2,
     "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "Sdagger_1", "Sdagger_2", "SX_1", "SX_2", "SXdagger_1", "SXdagger_2", "X_1", "X_2", "Y_1", "Y_2", "Z_1", "Z_2", "CZ_1_2", "CH_1_2", "CV_1_2", "Phase_1", "Phase_2", "CSX_1_2", "DCX_1_2", "Sycamore_1_2"],
     "Phase_discretization" => [π],
     "target_gate" => QCO.IGate(2),               
@@ -45,7 +45,7 @@ end
     # kron gates
     params = Dict{String, Any}(
     "num_qubits" => 3,
-    "depth" => 2,
+    "maximum_depth" => 2,
     "elementary_gates" => ["I_1xH_2xT_3", "Tdagger_1xS_2xSdagger_3", "SX_1xSXdagger_2xX_3", "Y_1xCNot_2_3", "CNot_2_1xZ_3", "CV_2_1xI_3", "I_1xCV_2_3", "CVdagger_2_1xI_3", "I_1xCVdagger_2_3", "CX_2_1xI_3", "I_1xCX_2_3", "CY_2_1xI_3", "I_1xCY_2_3", "CZ_2_1xI_3", "I_1xCZ_2_3", "CH_2_1xI_3", "I_1xCH_2_3", "CSX_2_1xI_3", "I_1xCSX_2_3", "Swap_2_1xI_3", "I_1xiSwap_2_3", "DCX_2_1xI_3", "I_1xSycamore_2_3"],
     "target_gate" => QCO.IGate(3),         
     )
@@ -56,7 +56,7 @@ end
     # 3-qubit gates
     params = Dict{String, Any}(
     "num_qubits" => 3,
-    "depth" => 2,
+    "maximum_depth" => 2,
     "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "Sdagger_3", "SX_3", "SXdagger_3", "X_3", "Y_3", "Z_3", "CNot_1_2", "CNot_2_3", "CNot_2_1", "CNot_3_2", "CNot_1_3", "CNot_3_1"],
     "target_gate" => QCO.IGate(3)
     )
@@ -64,7 +64,7 @@ end
     # 4-qubit gates
     params = Dict{String, Any}(
         "num_qubits" => 4,
-        "depth" => 2,
+        "maximum_depth" => 2,
         "elementary_gates" => ["CU3_1_3", "CRX_3_4", "CNot_2_4", "CH_1_4"],
         "CRX_discretization" => [π],
         "CU3_θ_discretization" => [π/2],
@@ -78,7 +78,7 @@ end
     #5-qubit gates
     params = Dict{String, Any}(
         "num_qubits" => 5,
-        "depth" => 2,
+        "maximum_depth" => 2,
         "elementary_gates" => ["H_1", "T_2", "Tdagger_3", "Sdagger_4", "SX_5", "CX_1_2", "CX_2_1", "CY_1_2", "CY_2_1", "CRX_2_3", "CNot_3_4", "CH_5_4", "CRY_1_3", "CRZ_2_4", "CV_3_5", "CZ_4_1", "CSX_5_1"],
         "CRX_discretization" => [π],
         "CRY_discretization" => [π],
@@ -103,7 +103,7 @@ end
 
     params = Dict{String, Any}(
     "num_qubits" => 2,
-    "depth" => 5,
+    "maximum_depth" => 5,
     "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCO.MGate(),
     "input_circuit" => input_circuit_1(),
