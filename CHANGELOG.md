@@ -1,15 +1,17 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### v0.2.6
+### v0.3.0
 - Enabling support for convex hull evaluation (Graham's algorithm) within QCOpt (`QCO.convex_hull()`)
 - Dropping dependency on QHull.jl
 - Added decomposition of quantum full-adder, double-toffoli and double-peres gates to `4qubit_gates.jl`
 - Added decomposition of toffoli gate using controlled gates and miller gate to `3qubit_gates.jl`
+- Added decomposition of QFT2 gates using R gates to `2qubits_gates.jl`
 - Issue #37 fixed and more meaningful messages for input gate parsing
 - Updated unit tests to cover `convex_hull` function
 - Bug fix in `_get_cnot_idx` to account for gates with kronecker symbols
-- Inlcuded `CXGate` for evaluation of `_get_cnot_idx` in `data.jl`
+- Inculded `CXGate` for evaluation of `_get_cnot_idx` in `data.jl`
+- Separate files added in the `examples` folder for SC21 paper's results
 
 ### v0.2.5
 - Major updates in input gate convention for two qubit gates. For example, `CNot_12` becomes `CNot_1_2`. This update now makes the package flexible to be able to compute on any number of qubit circuits. `CNot_2_10` is a valid input for a 10 qubit circuit

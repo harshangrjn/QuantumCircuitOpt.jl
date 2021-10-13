@@ -42,14 +42,14 @@
     Z1 = QCO.get_full_sized_gate("Z_1", 2);
     Z2 = QCO.get_full_sized_gate("Z_2", 2);
     T2 = QCO.get_full_sized_gate("T_2", 2);
-    Y2 = QCO.get_full_sized_gate("Y_2", 2);
+    Y_2 = QCO.get_full_sized_gate("Y_2", 2);
     cnot_12 = QCO.get_full_sized_gate("CNot_1_2", 2);
     cnot_21 = QCO.get_full_sized_gate("CNot_2_1", 2);
     Sdagger1 = QCO.get_full_sized_gate("Sdagger_1", 2);
     Tdagger1 = QCO.get_full_sized_gate("Tdagger_1", 2);
     SX1 = QCO.get_full_sized_gate("SX_1", 2);
     SXdagger2 = QCO.get_full_sized_gate("SXdagger_2", 2);
-    @test isapprox(-QCO.HCoinGate(), Z2 * cnot_21 * SXdagger2 * Y2 * cnot_21 * Tdagger1 * Z1 * T2 * Sdagger1 * cnot_12 * Sdagger1 * SX1 * cnot_21 * cnot_12, atol = tol_0)
+    @test isapprox(-QCO.HCoinGate(), Z2 * cnot_21 * SXdagger2 * Y_2 * cnot_21 * Tdagger1 * Z1 * T2 * Sdagger1 * cnot_12 * Sdagger1 * SX1 * cnot_21 * cnot_12, atol = tol_0)
 
     CV_23 = QCO.get_full_sized_gate("CV_2_3", 3);
     cnot_12 = QCO.get_full_sized_gate("CNot_1_2", 3);
@@ -61,10 +61,10 @@
     CVdagger_31 = QCO.get_full_sized_gate("CVdagger_3_1", 3);
     @test isapprox(QCO.IGate(3), CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_31 * CVdagger_31 * CVdagger_31 * CVdagger_31, atol = tol_0)
 
-    H2 = QCO.get_full_sized_gate("H_2", 2);
-    T1 = QCO.get_full_sized_gate("T_1", 2);
+    H_2 = QCO.get_full_sized_gate("H_2", 2);
+    T_1 = QCO.get_full_sized_gate("T_1", 2);
     Tdagger2 = QCO.get_full_sized_gate("Tdagger_2", 2);
-    @test isapprox(QCO.CVdaggerGate(), H2 * Tdagger1 * cnot_21 * T1 * Tdagger2 * cnot_21 * H2, atol = tol_0)
+    @test isapprox(QCO.CVdaggerGate(), H_2 * Tdagger1 * cnot_21 * T_1 * Tdagger2 * cnot_21 * H_2, atol = tol_0)
 
     cnot_12 = QCO.get_full_sized_gate("CNot_1_2", 2);
     @test isapprox(QCO.CVGate(), cnot_12 * QCO.CVdaggerGate(), atol = tol_0)
@@ -93,20 +93,18 @@
     @test isapprox(CV_13 * cnot_21 * CVdagger_13 * cnot_21 * CV_23, CVdagger_13 * cnot_21 * CV_13 * cnot_21 * CVdagger_23, atol = tol_0)
 
     # 2-qubit Grover's diffusion operator (Ref: https://arxiv.org/pdf/1804.03719.pdf)
-    H1 = QCO.get_full_sized_gate("H_1", 2);
-    X1 = QCO.get_full_sized_gate("X_1", 2); 
-    X2 = QCO.get_full_sized_gate("X_2", 2);
-    cnot_12 = QCO.get_full_sized_gate("CNot_1_2", 2);
+    H_1 = QCO.get_full_sized_gate("H_1", 2);
+    X_2 = QCO.get_full_sized_gate("X_2", 2);
+    CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 2);
 
-    @test isapprox(QCO.GroverDiffusionGate(), H1 * H2 * X1 * X2 * H2 * cnot_12 * H2 * X1 * X2 * H1 * H2, atol=tol_0)
+    @test isapprox(QCO.GroverDiffusionGate(), Y_2 * H_1 * X_2 * CNot_1_2 * H_1 * Y_2, atol=tol_0)
 
     # 2 Qubit QFT (Ref: https://www.cs.bham.ac.uk/internal/courses/intro-mqc/current/lecture06_handout.pdf)
 
-    H2 = QCO.get_full_sized_gate("H_2", 2);
     SWAP = QCO.get_full_sized_gate("Swap_1_2", 2);
     CU = QCO.get_full_sized_gate("CU3_2_1", 2, angle = [0, π/4, π/4]);
 
-    @test isapprox(QCO.QFT2Gate(), H1 * CU * H2 * SWAP)
+    @test isapprox(QCO.QFT2Gate(), H_1 * CU * H_2 * SWAP)
 
     # CRY Decomp (Ref: https://quantumcomputing.stackexchange.com/questions/2143/how-can-a-controlled-ry-be-made-from-cnots-and-rotations)
 

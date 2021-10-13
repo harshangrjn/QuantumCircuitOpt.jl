@@ -19,8 +19,8 @@ function decompose_RX_on_5qubits()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cplex",
-    "optimizer_presolve" => false, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
+    "optimizer" => "gurobi",
+    "optimizer_presolve" => true, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
     
     )
 

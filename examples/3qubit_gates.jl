@@ -33,7 +33,7 @@ function decompose_toffoli()
     params = Dict{String, Any}(
     
     "num_qubits" => 3, 
-    "depth" => 15,    
+    "depth" => 15, 
 
     "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
@@ -60,7 +60,7 @@ function decompose_toffoli_using_kronecker()
  
     params = Dict{String, Any}(
     
-    "num_qubits" => 3, 
+    "num_qubits" => 3,
     "depth" => 12,
   
     "elementary_gates" => ["T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_3", "I_1xT_2xT_3", "CNot_1_2xH_3", "T_1xTdagger_2xI_3", "Identity"], 
@@ -239,7 +239,7 @@ function decompose_miller()
         "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
         "target_gate" => target_gate(), 
     
-        "objective" => "minimize_cnot", 
+        "objective" => "minimize_depth", 
         "optimizer" => "gurobi"
         )
         

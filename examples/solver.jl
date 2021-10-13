@@ -98,9 +98,6 @@ function get_cplex_epgap(optimizer_presolve::Bool, optimizer_log::Bool, optimize
 end
 
 function get_gurobi(optimizer_presolve::Bool, optimizer_log::Bool)
-    if optimizer_presolve 
-        presolve_val = -1
-    end
     gurobi = JuMP.optimizer_with_attributes(Gurobi.Optimizer, 
                                             MOI.Silent() => !optimizer_log, 
                                             "Presolve" => optimizer_presolve) 
