@@ -53,6 +53,8 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         
         printstyled("  ","Type of decomposition: ", data["decomposition_type"],"\n"; color = :cyan)
 
+        printstyled("  ","MIP optimizer: ", results["optimizer"],"\n"; color = :cyan)
+
         printstyled("\n","Optimal Circuit Decomposition","\n","\n"; color = :red)
         
         print("  ")

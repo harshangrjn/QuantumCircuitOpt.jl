@@ -403,7 +403,7 @@ end
     idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"])
     @test length(idempotent_pairs) == 2
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, CBC, idempotent_gate_constraints = true)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
@@ -417,16 +417,30 @@ end
 end
 
 @testset "Tests: constraint_convex_hull_complex_gates" begin
-    params = Dict{String, Any}(
-    "num_qubits" => 2, 
-    "maximum_depth" => 2,    
-    "elementary_gates" => ["CY_1_2", "CY_2_1"], 
-    "target_gate" => QCO.CYGate() * QCO.CYRevGate())
+    
+    function target_gate()
+        num_qubits = 4
+        CV_1_4 = QCO.get_full_sized_gate("CV_1_4", num_qubits);
+        CV_2_4 = QCO.get_full_sized_gate("CV_2_4", num_qubits);
+        CV_3_4 = QCO.get_full_sized_gate("CV_3_4", num_qubits);
+        CVdagger_3_4 = QCO.get_full_sized_gate("CVdagger_3_4", num_qubits);        
+        CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", num_qubits);
+        CNot_2_3 = QCO.get_full_sized_gate("CNot_2_3", num_qubits);
 
-    data = QCO.get_data(params)
+        return CV_2_4 * CNot_1_2 * CV_3_4 * CV_1_4 * CNot_2_3 * CVdagger_3_4
+    end
+
+    params = Dict{String, Any}(
+    "num_qubits" => 4,
+    "maximum_depth" => 2,
+    "elementary_gates" => ["CV_1_4", "CV_2_4", "CV_3_4", "CVdagger_3_4", "CNot_1_2", "CNot_2_3", "Identity"],
+    "target_gate" => target_gate(),
+    "relax_integrality" => true
+    )
+
     result_qc = QCO.run_QCModel(params, CBC, convex_hull_complex_gate_constraints = true)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test isapprox(result_qc["objective"], 0.0, atol = tol_0)
+    @test isapprox(result_qc["objective"], 0.8275862068965518, atol = tol_0)
 end

@@ -69,7 +69,8 @@ function decompose_controlled_V()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "gurobi"
+    "optimizer" => "gurobi",
+    "relax_integrality" => true
                                 
     )
 
@@ -202,7 +203,7 @@ function decompose_magic_using_SHCnot()
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact",
            
-        "optimizer" => "gurobi"               
+        "optimizer" => "gurobi"      
         )
     
         return params 
@@ -354,8 +355,7 @@ function decompose_W_using_HCnot()
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact", 
         
-        "optimizer" => "gurobi",
-                                    
+        "optimizer" => "gurobi" 
         )
     
         return params
