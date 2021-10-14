@@ -5,7 +5,7 @@ function decompose_RX_on_5qubits()
     params = Dict{String, Any}(
     
     "num_qubits" => 5, 
-    "depth" => 3,    
+    "maximum_depth" => 3,    
 
     "elementary_gates" => ["H_1xCNot_2_3xI_4xI_5", "RX_2", "CU3_3_4", "Identity"], 
     "target_gate" => QCO.kron_two_qubit_gate(5, QCO.CRXGate(π/4), "q3", "q4"),
@@ -19,8 +19,8 @@ function decompose_RX_on_5qubits()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "cplex",
-    "optimizer_presolve" => false, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
+    "optimizer" => "gurobi",
+    "optimizer_presolve" => true, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
     
     )
 

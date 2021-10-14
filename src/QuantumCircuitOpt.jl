@@ -4,7 +4,6 @@ import JuMP
 import LinearAlgebra
 import Memento
 import MathOptInterface
-# import QHull
 
 const MOI = MathOptInterface
 const LA = LinearAlgebra
@@ -34,6 +33,7 @@ include("data.jl")
 include("gates.jl")
 include("types.jl")
 include("utility.jl")
+include("chull.jl")
 include("relaxations.jl")
 include("qc_model.jl")
 include("variables.jl")

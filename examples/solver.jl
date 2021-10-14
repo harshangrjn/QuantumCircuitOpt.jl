@@ -8,11 +8,11 @@ function get_solver(params::Dict{String,Any})
 
     # Optimizer
     if !("optimizer" in keys(params))
-        Memento.error(Memento.getlogger(@__MODULE__), "Input a valid MIP optimizer")
+        error("Input a valid MIP optimizer")
     end
 
     if !(params["optimizer"] in optimizers_list)
-        Memento.error(Memento.getlogger(@__MODULE__), "Specified optimizer does not belong in the pre-defined list. Add your optimizer separately with it's attributes")
+        error("Specified optimizer does not belong in the pre-defined list. Add your optimizer separately with it's attributes")
     end
 
     if "optimizer_presolve" in keys(params)
@@ -40,8 +40,8 @@ function get_solver(params::Dict{String,Any})
         optimizer_log = true
     end
 
-    if "depth" in keys(params)
-        optimizer_optim_gap = ((params["depth"] - 1E-4) - (params["depth"]-1))/(params["depth"]-1)
+    if "maximum_depth" in keys(params)
+        optimizer_optim_gap = ((params["maximum_depth"] - 1E-4) - (params["maximum_depth"]-1))/(params["maximum_depth"]-1)
     else
         optimizer_optim_gap = 1E-4
     end
@@ -98,9 +98,6 @@ function get_cplex_epgap(optimizer_presolve::Bool, optimizer_log::Bool, optimize
 end
 
 function get_gurobi(optimizer_presolve::Bool, optimizer_log::Bool)
-    if optimizer_presolve 
-        presolve_val = -1
-    end
     gurobi = JuMP.optimizer_with_attributes(Gurobi.Optimizer, 
                                             MOI.Silent() => !optimizer_log, 
                                             "Presolve" => optimizer_presolve) 

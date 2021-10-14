@@ -60,7 +60,7 @@ function gate_element_bounds(M::Array{Float64,3})
 end
 
 """
-    get_commutative_gate_pairs(M::Dict{String,Any}; identity_pairs = true)
+    get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
 
 Given a dictionary of elementary quantum gates, this function returns all pairs of commuting 
 gates. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
@@ -324,11 +324,11 @@ function round_complex_values(M::Array{Complex{Float64},2})
 end
 
 """
-    round_real_value(x::Float64)
+    round_real_value(x::T) where T <: Number
 
 Given a real-valued number, this function returns a real-value which rounds the values closest to 0 and 1. 
 """
-function round_real_value(x::Float64)
+function round_real_value(x::T) where T <: Number
     if isapprox(abs(x), 0, atol=1E-6)
         x = 0
     elseif isapprox(x, 1, atol=1E-6)
@@ -561,7 +561,7 @@ function _parse_gate_string(s::String; type=false, qubits=false)
           (i != length(s)) && (gate_id = string())
        end
  
-       if i == length(s) 
+       if (i == length(s)) && (s[i] != qubit_separator)
           push!(gates, gate_id)
        end
     end
@@ -594,12 +594,12 @@ function is_gate_real(M::Array{Complex{Float64},2})
  end
 
 """
-    _get_constraint_slope_intercept(vertex1::Vector{Float64}, vertex2::Vector{Float64})
+    _get_constraint_slope_intercept(vertex1::Vector{<:Number}, vertex2::Vector{<:Number})
 
 Given co-ordinates of two points in a plane, this function returns the slope (m) and intercept (c) of the 
 line joining these two points. 
 """
-function _get_constraint_slope_intercept(vertex1::Vector{Float64}, vertex2::Vector{Float64})
+function _get_constraint_slope_intercept(vertex1::Tuple{<:Number, <:Number}, vertex2::Tuple{<:Number, <:Number})
     
     if isapprox.(vertex1, vertex2, atol=1E-6) == [true, true]
         Memento.warn(_LOGGER, "Invalid slope and intercept for two identical vertices")
@@ -642,7 +642,7 @@ For example, for a 2-qubit gate `CRZ_1_2`, output is `true`.
 end
 
 function _verify_θ_bounds(angle::Number)
-    if !(-π <= angle <= π)
+    if !(-2*π <= angle <= 2*π)
         Memento.error(_LOGGER, "θ angle is not within valid bounds")
     end
 end

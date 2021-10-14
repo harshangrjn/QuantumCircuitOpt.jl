@@ -19,13 +19,13 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     end
 
     # Depth
-    if "depth" in keys(params)
-        if params["depth"] < 2 
+    if "maximum_depth" in keys(params)
+        if params["maximum_depth"] < 2 
             Memento.error(_LOGGER, "Minimum depth of 2 is necessary")
         end
-        depth = params["depth"]
+        maximum_depth = params["maximum_depth"]
     else
-        Memento.error(_LOGGER, "Depth of decomposition has to be specified by the user")
+        Memento.error(_LOGGER, "Maximum depth of the decomposition has to be specified by the user")
     end
 
     # Elementary gates
@@ -43,7 +43,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     
     input_circuit_dict = Dict{String,Any}()
 
-    if length(input_circuit) > 0 && (length(input_circuit) <= params["depth"])
+    if length(input_circuit) > 0 && (length(input_circuit) <= params["maximum_depth"])
         
         input_circuit_dict = QCO.get_input_circuit_dict(input_circuit, params)
 
@@ -124,7 +124,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     end
     
     data = Dict{String, Any}("num_qubits" => num_qubits,
-                             "depth" => depth,
+                             "maximum_depth" => maximum_depth,
                              "gates_dict" => gates_dict_unique,
                              "gates_real" => M_real_unique,
                              "initial_gate" => initial_gate,
@@ -160,6 +160,9 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
             data["slack_penalty"] = 1E3
         end
     end
+
+    # CNOT lower/upper bound
+    data = QCO._get_cnot_bounds!(data, params)
                          
     return data
 end
@@ -235,7 +238,7 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
 
         if !isempty(one_angle_gates)
             for i in one_angle_gates
-                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)          
+                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
 
                 data["discretization"][gate_type] = Float64.(params["$(gate_type)_discretization"])
             end
@@ -508,7 +511,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         Memento.error(_LOGGER, "Specified $input gate does not exist in the predefined set of gates")
     end
 
-    QCO._catch_qubit_loc_errors(qubit_loc, num_qubits, input)
+    QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input)
     
     #----------------------;
     #   One qubit gates    ;
@@ -525,8 +528,6 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
                 
                 if length(angle) == 1 
                     return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle), "q$(qubit_loc[1])")
-                # elseif length(angle) == 2 
-                #     return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2]), "q$(qubit_loc[1])")
                 elseif length(angle) == 3
                     return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2], angle[3]), "q$(qubit_loc[1])")
                 end
@@ -560,12 +561,6 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
                     else
                         return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(angle), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
                     end
-                # elseif length(angle) == 2 
-                #     if (qubit_loc[1] < qubit_loc[2])
-                #         return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
-                #     else
-                #         return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(angle[1], angle[2]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
-                #     end
                 elseif length(angle) == 3
                     if (qubit_loc[1] < qubit_loc[2])
                         return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2], angle[3]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
@@ -605,7 +600,7 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
             Memento.error(_LOGGER, "Specified $input gate is not supported in conjunction with the Kronecker product operation")
         end
     
-        QCO._catch_qubit_loc_errors(qubit_loc, num_qubits, input)
+        QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input)
 
         # One qubit gates
         if (length(qubit_loc) == 1) && (gate_type in QCO.ONE_QUBIT_GATES_CONSTANTS)
@@ -675,12 +670,12 @@ function get_input_circuit_dict(input_circuit::Vector{Tuple{Int64,String}}, para
 end 
 
 """
-    _catch_qubit_loc_errors(qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
+    _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
 
 Given an input gate string, number of qubits of the circuit and the qubit locations for the input gate, 
-this function catches and throws any errors, should the input qubits for given gate are invalid. 
+this function catches and throws any errors, should the input gate type and qubits are invalid. 
 """
-function _catch_qubit_loc_errors(qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
+function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
 
     if isempty(qubit_loc)
         Memento.error(_LOGGER, "A valid qubit location has to be specified for the input $input_gate gate")
@@ -688,6 +683,14 @@ function _catch_qubit_loc_errors(qubit_loc::Vector{Int64}, num_qubits::Int64, in
         Memento.error(_LOGGER, "Specified qubits for $input_gate gate do not lie in [1,...,$num_qubits]")
     elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
         Memento.error(_LOGGER, "Input $input_gate gate cannot have identical control and target qubits") 
+    elseif length(qubit_loc) > 2 
+        Memento.error(_LOGGER, "Only 1- and 2-qubit elementary gates are currently supported")
+    end
+
+    if (gate_type in QCO.TWO_QUBIT_GATES) && (length(qubit_loc) != 2)
+        Memento.error(_LOGGER, "Input two qubits for $input_gate, which is a 2-qubit gate")
+    elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) != 1)
+        Memento.error(_LOGGER, "Input only one qubit for $input_gate, which is a 1-qubit gate")
     end
 
 end
@@ -739,10 +742,29 @@ function _get_cnot_idx(gates_dict::Dict{String, Any})
     
     cnot_idx = Int64[]
 
-    # Note: The below objective minimizes both cnot_12 and cnot_21 in the decomposition
+    # Counts for both (CNot_i_j and CNot_j_i) or (CX_i_j and CX_j_i)
     for i in keys(gates_dict)
-        if !isempty(findall(x -> startswith(x, "CNot"), gates_dict[i]["type"]))
-            push!(cnot_idx, parse(Int64, i))
+        # Input gates with kron symbols
+        if occursin(kron_symbol, gates_dict[i]["type"][1])
+            gate_types = QCO._parse_gates_with_kron_symbol(gates_dict[i]["type"][1])
+            
+            for j = 1:length(gate_types)
+                gate_type = QCO._parse_gate_string(gate_types[j], type = true)
+                if gate_type in ["CNot", "CX"]
+                    push!(cnot_idx, parse(Int64, i))
+                end
+            end
+        else
+
+        # Single input gate per depth
+            if "Identity" in gates_dict[i]["type"]
+                continue
+            end
+
+            gate_type = QCO._parse_gate_string(gates_dict[i]["type"][1], type = true)
+            if gate_type in ["CNot", "CX"]
+                push!(cnot_idx, parse(Int64, i))
+            end
         end
     end
     
@@ -762,4 +784,34 @@ function _get_angle_gates_idx(elementary_gates::Array{String,1})
     three_angle_gates = union(U3_gates_idx, CU3_gates_idx)
 
     return one_angle_gates, three_angle_gates
+end
+
+function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
+
+    cnot_lb = 0
+    cnot_ub = data["maximum_depth"]
+    
+    if "set_cnot_lower_bound" in keys(params)
+        cnot_lb = params["set_cnot_lower_bound"]
+    end
+
+    if "set_cnot_upper_bound" in keys(params)
+        cnot_ub = params["set_cnot_upper_bound"]
+    end
+
+    if cnot_lb < cnot_ub 
+        if cnot_lb > 0
+            data["cnot_lower_bound"] = params["set_cnot_lower_bound"]
+        end
+        if cnot_ub < data["maximum_depth"]
+            data["cnot_upper_bound"] = params["set_cnot_upper_bound"]
+        end
+    elseif isapprox(cnot_lb, cnot_ub, atol=1E-6)
+        data["cnot_lower_bound"] = cnot_lb
+        data["cnot_upper_bound"] = cnot_ub
+    else
+        Memento.warn(_LOGGER, "Invalid CNot-gate lower/upper bound")
+    end
+
+    return data 
 end
