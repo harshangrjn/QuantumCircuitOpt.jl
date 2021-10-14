@@ -7,7 +7,7 @@ function variable_gates_per_depth(qcm::QuantumCircuitModel)
     tol_0 = 1E-6
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
 
     M_l, M_u = QCO.gate_element_bounds(qcm.data["gates_real"])
 
@@ -37,7 +37,7 @@ end
 
 function variable_gates_onoff(qcm::QuantumCircuitModel)
     num_gates = size(qcm.data["gates_real"])[3]
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
 
     qcm.variables[:z_onoff_var] = JuMP.@variable(qcm.model, z_onoff_var[1:num_gates,1:depth], Bin)
 
@@ -62,7 +62,7 @@ function variable_gates_onoff(qcm::QuantumCircuitModel)
 end
 
 function variable_sequential_gate_products(qcm::QuantumCircuitModel)
-    depth  = qcm.data["depth"]
+    depth  = qcm.data["maximum_depth"]
     n_r    = size(qcm.data["gates_real"])[1]
     n_c    = size(qcm.data["gates_real"])[2]
 
@@ -72,7 +72,7 @@ function variable_sequential_gate_products(qcm::QuantumCircuitModel)
 end
 
 function variable_gate_products_copy(qcm::QuantumCircuitModel)
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
     num_gates = size(qcm.data["gates_real"])[3]
@@ -85,7 +85,7 @@ end
 function variable_gate_products_linearization(qcm::QuantumCircuitModel)
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
-    depth   = qcm.data["depth"]
+    depth   = qcm.data["maximum_depth"]
     num_gates = size(qcm.data["gates_real"])[3]
 
     qcm.variables[:zU_var] = JuMP.@variable(qcm.model, -1 <= zU_var[1:n_r, 1:n_c, 1:num_gates, 1:(depth-1)] <= 1)

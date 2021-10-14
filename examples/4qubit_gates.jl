@@ -3,14 +3,14 @@ function decompose_CNot_41()
 
     params = Dict{String, Any}(
     "num_qubits" => num_qubits,
-    "depth" => 10,
+    "maximum_depth" => 10,
 
     "elementary_gates" => ["H_1", "H_2", "H_3", "CNot_1_3", "CNot_4_3", "Identity"],
     "target_gate" => QCO.get_full_sized_gate("CNot_4_1", 4),
     "identify_real_gates" => true,
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
     
     )
 
@@ -23,7 +23,7 @@ function decompose_quantum_fulladder()
     
     num_qubits = 4
 
-    function target_gate_1()    
+    function target_gate_1()
 
         CV_1_2 = QCO.get_full_sized_gate("CV_1_2", num_qubits);
         CV_4_2 = QCO.get_full_sized_gate("CV_4_2", num_qubits);
@@ -38,16 +38,15 @@ function decompose_quantum_fulladder()
 
     params = Dict{String, Any}(
         "num_qubits" => num_qubits,
-        "depth" => 7,
+        "maximum_depth" => 7,
     
-        # "elementary_gates" => ["CV_1_2", "CV_4_2", "CVdagger_1_2", "CVdagger_3_2", "CNot_3_1", "CNot_4_3", "CNot_2_4", "CNot_4_1", "Identity"],
         "elementary_gates" => ["CV_1_2", "CV_4_2", "CV_3_2", "CVdagger_1_2", "CVdagger_4_2", "CVdagger_3_2", "CNot_3_1", "CNot_4_3", "CNot_2_4", "CNot_4_1", "Identity"],
         
         "target_gate" => target_gate_1(),
         "identify_real_gates" => true,
     
         "objective" => "minimize_depth",  
-        "optimizer" => "cplex"
+        "optimizer" => "gurobi"
         
         )
     
@@ -72,13 +71,13 @@ function decompose_double_toffoli()
 
     params = Dict{String, Any}(
     "num_qubits" => 4,
-    "depth" => 7,
+    "maximum_depth" => 7,
 
-    "elementary_gates" => ["CV_2_4", "CV_3_4", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_3", "CNot_3_2", "CNot_2_3", "Identity"],
+    "elementary_gates" => ["CV_1_2", "CV_2_4", "CV_3_4", "CVdagger_1_2", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_3", "CNot_3_2", "CNot_2_3", "Identity"],
     "target_gate" => target_gate(),
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
     )
     
     return params
@@ -103,14 +102,13 @@ function decompose_double_peres()
 
     params = Dict{String, Any}(
     "num_qubits" => 4,
-    "depth" => 7,
+    "maximum_depth" => 7,
 
-    "elementary_gates" => ["CV_1_4", "CV_2_4", "CV_3_4", "CVdagger_3_4", "CNot_1_2", "CNot_2_3", "Identity"],
-    "target_gate" => target_gate(), 
-    "identify_real_gates" => true,
+    "elementary_gates" => ["CV_1_4", "CV_2_4", "CV_3_4", "CVdagger_1_4", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_2", "CNot_2_3", "Identity"],
+    "target_gate" => target_gate(),
 
     "objective" => "minimize_depth", 
-    "optimizer" => "cplex"
+    "optimizer" => "gurobi"
     )
     
     return params

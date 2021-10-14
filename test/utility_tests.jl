@@ -70,7 +70,7 @@ end
 @testset "Tests: commuting matrices" begin
     params = Dict{String, Any}(
        "num_qubits" => 2, 
-       "depth" => 5,    
+       "maximum_depth" => 5,    
 
        "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
        "target_gate" => QCO.CNotRevGate()
@@ -95,7 +95,7 @@ end
      
     params = Dict{String, Any}(
         "num_qubits" => 3, 
-        "depth" => 15,    
+        "maximum_depth" => 15,    
         "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_2", "Tdagger_3", "Identity"], 
         "target_gate" => QCO.ToffoliGate()
         )
@@ -109,7 +109,7 @@ end
     
     params = Dict{String, Any}(
         "num_qubits" => 2, 
-        "depth" => 14,    
+        "maximum_depth" => 14,    
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => -QCO.HCoinGate())
 
@@ -172,22 +172,4 @@ end
     @test c == 2.5
 
     QCO._get_constraint_slope_intercept(v1, v1)
-end
-
-@testset "Tests: convex_hull" begin
-    points_1a = [(0.5, 0.0), (0.0, 0.0), (1, 0), (0,1), (-0.5, 0), (0.0, 0.5)]
-    points_1b = [(0.0, 0.0), (1, 0), (0,1), (-0.5, 0), (0.5, 0.0), (0.0, 0.5)]
-    points_2a = [(0.5, 0.0), (0.0, 0.0), (1, 0), (0,1), (-0.5, 0), (0.0, 0.5), (0.5, -0.5)]
-    points_2b = [(0.5, 0.0), (0.5, -0.5), (0.0, 0.0), (0,1), (-0.5, 0), (0.0, 0.5), (1, 0)]
-
-    points_3a = [(0,0)]
-    points_3b = [(-0.5,-0.5), (0.5,0.5)]
-    points_3c = [(-0.5, -0.5), (0.5, 0.5), (0, 0), (0.25, 0.25)]
-
-    @test QCO.convex_hull(points_1a) == QCO.convex_hull(points_1b)
-    @test QCO.convex_hull(points_2a) == QCO.convex_hull(points_2b)
-    @test QCO.convex_hull(points_3a) == points_3a
-    @test QCO.convex_hull(points_3b) == points_3b
-    @test QCO.convex_hull(points_3c) == points_3b
-    
 end

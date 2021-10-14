@@ -33,8 +33,8 @@ Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit
 
 ```julia
 import QuantumCircuitOpt as QCO
-import JuMP
-import CPLEX
+using JuMP
+using Gurobi
 
 # Target: CZGate
 function target_gate()
@@ -43,7 +43,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2, 
-"depth" => 4,    
+"maximum_depth" => 4,    
 "elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        
@@ -54,7 +54,7 @@ params = Dict{String, Any}(
 "objective" => "minimize_depth"
 )
 
-qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer) 
+qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer) 
 QCO.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 

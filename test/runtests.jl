@@ -17,6 +17,7 @@ tol_0 = 1E-6
 @testset "QuantumCircuitOpt" begin
 
     include("utility_tests.jl")
+    include("chull_tests.jl")
     include("gates_tests.jl")
     include("types_tests.jl")
     include("data_tests.jl")

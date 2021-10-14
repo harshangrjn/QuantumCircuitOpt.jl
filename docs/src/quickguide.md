@@ -8,9 +8,9 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | Necessary Inputs  | Description |
 | -----------: | :----------- |
 | `num_qubits`      | Number of qubits of the circuit (≥ 2).  |
-| `depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2)   |
+| `maximum_depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2)   |
 | `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QuantumCircuitOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
-| `target_gate` | Target gate which you wish to decompose using the above-mentioned `elementary_gates`.|
+| `target_gate` | Target unitary gate which you wish to decompose using the above-mentioned `elementary_gates`.|
 | `RX_discretization` | Vector of discretization angles (in radians) for `RXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RY_discretization` | Vector of discretization angles (in radians) for `RYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RZ_discretization` | Vector of discretization angles (in radians) for `RZGate`, if this gate is part of the above-mentioned `elementary_gates`.|
@@ -31,6 +31,8 @@ To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/Quant
 | Optional Inputs  | Description |
 | -----------: | :----------- |
 | `initial_gate` | Intitial-condition gate to the decomposition (gate at 0th depth) (default: `"Identity"`).  | 
+| `set_cnot_lower_bound` | This option sets a lower bound on the total number of CNot or CX gates which an optimal decomposition can admit.  |
+| `set_cnot_upper_bound` | This option sets an upper bound on the total number of CNot/CX gates which an optimal decomposition can admit. Note that both `set_cnot_lower_bound` and `set_cnot_upper_bound` can also be set to an identitcal value to fix the number of CNot/CX gates in the optimal decomposition.|
 | `identify_real_gates` | This option identifies if all the elementary and target gates have only real entries and formulates a compact MIP formulation accordingly (default: `false`).  | 
 | `input_circuit` | Input circuit representing an ensemble of elementary gates which decomposes the given target gate. This input circuit, which serves as a warm-start, can accelerate the MIP solver's search for the incumbent solution. (default: empty circuit).  | 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
@@ -46,8 +48,8 @@ Using some of the above-described user input options, here is a sample optimizat
 
 ```julia
 import QuantumCircuitOpt as QCO
-import JuMP
-import CPLEX
+using JuMP
+using Gurobi
 
 # Target: CZGate
 function target_gate()
@@ -56,7 +58,7 @@ end
 
 params = Dict{String, Any}(
 "num_qubits" => 2, 
-"depth" => 4,    
+"maximum_depth" => 4,    
 "elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        
@@ -67,7 +69,7 @@ params = Dict{String, Any}(
 "objective" => "minimize_depth"
 )
 
-qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer) 
+qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer) 
 QCO.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
@@ -75,6 +77,9 @@ set of `elementary_gates` accordingly in the above sample code. For more such 2-
 
 !!! warning
     Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute. Hence, unlike local optimization methods, such as machine learning, in the literature, the run times for larger number of qubits and depths can be prohibitively slow.
+
+!!! tip
+    Run times of QuantumCircuitOpt's mathematical formulations are significantly lower using [Gurobi](https://www.gurobi.com) as the mixed-integer programming (MIP) solver. Note that this solver's individual usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
 
 # Extracting results
 The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
