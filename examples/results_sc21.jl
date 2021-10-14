@@ -4,7 +4,7 @@ Quantum Circuit Design" can be reproduced by executing this file.
 
 Version of QCOpt: v0.3.0
 
-Last updated: Oct 12, 2021
+Last updated: Oct 13, 2021
 =#
 
 import QuantumCircuitOpt as QCOpt
@@ -28,7 +28,7 @@ table_I_gates = ["decompose_controlled_Z",
 
 result_with_VC = Dict{String,Any}()
 result_without_VC = Dict{String,Any}()
-run_times = zeros(length(table_I_gates),2)
+run_times_tab1 = zeros(length(table_I_gates),2)
 
 k = 1
 for gates in table_I_gates 
@@ -37,12 +37,12 @@ for gates in table_I_gates
     global result_with_VC = QCOpt.run_QCModel(params, 
                                               qcm_optimizer, 
                                               all_valid_constraints = 0)
-    run_times[k,1] = result_with_VC["solve_time"]
+    run_times_tab1[k,1] = result_with_VC["solve_time"]
 
     global result_without_VC = QCOpt.run_QCModel(params, 
                                                  qcm_optimizer, 
                                                  all_valid_constraints = -1)
-    run_times[k,2] = result_without_VC["solve_time"]
+    run_times_tab1[k,2] = result_without_VC["solve_time"]
     global k += 1 
 end
 

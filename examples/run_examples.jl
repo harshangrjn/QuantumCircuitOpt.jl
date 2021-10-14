@@ -27,7 +27,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_iSwapGate",
                    "decompose_RX_on_q3"]
 
-# decompose_gates = ["decompose_W"]
+# decompose_gates = ["decompose_toffoli_right"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -45,6 +45,6 @@ for gates in decompose_gates
     global result_qc = QCO.run_QCModel(params, 
                                        qcm_optimizer, 
                                        model_type = "compact_formulation",
-                                       convex_hull_complex_gate_constraints = false)
+                                       convex_hull_gate_constraints = false)
 end
 

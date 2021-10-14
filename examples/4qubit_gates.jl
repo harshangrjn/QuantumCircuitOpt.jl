@@ -104,9 +104,8 @@ function decompose_double_peres()
     "num_qubits" => 4,
     "maximum_depth" => 7,
 
-    "elementary_gates" => ["CV_1_4", "CV_2_4", "CV_3_4", "CVdagger_3_4", "CNot_1_2", "CNot_2_3", "Identity"],
-    "target_gate" => target_gate(), 
-    "identify_real_gates" => true,
+    "elementary_gates" => ["CV_1_4", "CV_2_4", "CV_3_4", "CVdagger_1_4", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_2", "CNot_2_3", "Identity"],
+    "target_gate" => target_gate(),
 
     "objective" => "minimize_depth", 
     "optimizer" => "gurobi"

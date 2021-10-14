@@ -154,7 +154,7 @@ function decompose_FredkinGate()
     "target_gate" => QCO.CSwapGate(), #also Fredkin
 
     "objective" => "minimize_depth", 
-    "optimizer" => "gurobi",
+    "optimizer" => "gurobi"
     )
     
     return params

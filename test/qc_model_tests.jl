@@ -438,7 +438,7 @@ end
     "relax_integrality" => true
     )
 
-    result_qc = QCO.run_QCModel(params, CBC, convex_hull_complex_gate_constraints = true)
+    result_qc = QCO.run_QCModel(params, CBC, convex_hull_gate_constraints = true)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
