@@ -59,7 +59,7 @@ end
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "maximum_depth" => 4,    
-"elementary_gates" => ["U3_2", "CNot_1_2", "Identity"], 
+"elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        
 "U3_θ_discretization" => -π/2:π/2:π/2,
@@ -69,17 +69,17 @@ params = Dict{String, Any}(
 "objective" => "minimize_depth"
 )
 
-qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer) 
+qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "presolve" => 0) 
 QCO.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
 set of `elementary_gates` accordingly in the above sample code. For more such 2-qubit and 3-qubit gate decompositions, with and without the universal unitary in the elementary gates, refer to "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder. 
 
 !!! warning
-    Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute. Hence, unlike local optimization methods, such as machine learning, in the literature, the run times for larger number of qubits and depths can be prohibitively slow.
+    Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute in the size of `num_qubits`, `maximum_depth` and `elementary_gates`.
 
 !!! tip
-    Run times of QuantumCircuitOpt's mathematical formulations are significantly lower using [Gurobi](https://www.gurobi.com) as the mixed-integer programming (MIP) solver. Note that this solver's individual usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
+    Run times of QuantumCircuitOpt's mathematical formulations are significantly faster using [Gurobi](https://www.gurobi.com) as the mixed-integer programming (MIP) solver. Note that this solver's individual-usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
 
 # Extracting results
 The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
@@ -106,19 +106,20 @@ For example, for the above controlled-Z gate decomposition, the processed output
 Quantum Circuit Model Data
 
   Number of qubits: 2
-  Total number of elementary gates (including discretization): 19
+  Total number of elementary gates (after presolve): 36
   Maximum depth of decomposition: 4
   Input elementary gates: ["U3_1", "U3_2", "CNot_1_2", "Identity"]
-    U3 - θ discretization: [-90.0, 0.0, 90.0]
-    U3 - ϕ discretization: [-90.0, 0.0, 90.0]
-    U3 - λ discretization: [-90.0, 0.0, 90.0]
+    U3_θ discretization: [-90.0, 0.0, 90.0]
+    U3_ϕ discretization: [-90.0, 0.0, 90.0]
+    U3_λ discretization: [-90.0, 0.0, 90.0]
   Type of decomposition: exact
+  MIP optimizer: Gurobi
 
 Optimal Circuit Decomposition
 
-  U3_2(-90.0,0.0,0.0) * CNot_12 * U3_2(90.0,0.0,0.0) = Target gate
+  U3_2(-90.0,0.0,0.0) * CNot_1_2 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 1.74 sec.
+  Optimizer run time: 2.78 sec.
 =============================================================================
 ```
 
