@@ -71,7 +71,7 @@ This work was supported by Los Alamos National Laboratory's LDRD Early Career Re
 ## Citing QuantumCircuitOpt
 If you find QuantumCircuitOpt useful in your work, we request you to cite the following paper (accepted and yet to appear online): 
 ```bibtex
-@inproceedings{NagarajanLockwoodCoffrin2021,
+@inproceedings{QCOpt_SC2021,
   title={{QuantumCircuitOpt}: An Open-source Framework for Provably Optimal Quantum Circuit Design},
   author={Nagarajan, Harsha and Lockwood, Owen and Coffrin, Carleton},
   booktitle={SC21: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
