@@ -486,8 +486,8 @@ function decompose_iSwapGate()
     
 end
 
-function decompose_qft2()
-    println(">>>>> QFT2 Gate <<<<<")
+function decompose_qft2_using_R()
+    println(">>>>> QFT2 Gate using R and CNOT gates <<<<<")
 
     params = Dict{String, Any}(
     
@@ -505,6 +505,27 @@ function decompose_qft2()
         
         "optimizer" => "gurobi",
         "time_limit" => 500,
+                                    
+        )
+    
+        return params
+end
+
+function decompose_qft2_using_HT()
+    println(">>>>> QFT2 Gate using H, T, CNOT gates <<<<<")
+
+    params = Dict{String, Any}(
+    
+        "num_qubits" => 2, 
+        "maximum_depth" =>8,    
+    
+        "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
+        "target_gate" => QCO.QFT2Gate(),   
+
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact", 
+        
+        "optimizer" => "gurobi"
                                     
         )
     
