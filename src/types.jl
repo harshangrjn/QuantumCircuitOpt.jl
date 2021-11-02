@@ -51,32 +51,3 @@ mutable struct GateData
     end
 
 end
-
-# mutable struct OptimizerOptions
-#     log_level :: Int
-#     time_limit :: Float64
-#     tol :: Float64
-#     silent :: Bool
-#     binary_relax :: Bool
-#     mip_gap :: Float64
-
-#     mip_solver :: Any 
-#     nlp_solver :: Any 
-#     minlp_solver :: Any
-# end
-
-# function get_default_options()
-#     log_level = 1
-#     time_limit = 10800
-#     tol = 1E-6
-#     silent = true
-#     binary_relax = false
-#     mip_gap = 1E-4
-
-#     mip_solver = nothing
-#     nlp_solver = nothing 
-#     minlp_solver = nothing
-
-#     return OptimizerOptions(log_level, time_limit, tol, silent, binary_relax, 
-#                             mip_gap, mip_solver, nlp_solver, minlp_solver)
-# end

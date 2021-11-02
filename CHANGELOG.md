@@ -1,9 +1,11 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### Staged
+### v0.3.1
 - Added decomposition of the QFT2 gate using H, T and CNOT gates to `2qubits_gates.jl`
 - Added CITATION.bib 
+- Added QCOpt's framework to quick start guide in docs
+- Minor updates in README
 
 ### v0.3.0
 - Enabling support for convex hull evaluation (Graham's algorithm) within QCOpt (`QCO.convex_hull()`)

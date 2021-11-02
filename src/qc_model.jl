@@ -4,7 +4,7 @@
 
 function build_QCModel(data::Dict{String, Any}; 
                        model_type = "compact_formulation",
-                       all_valid_constraints = 0, 
+                       all_valid_constraints = 0,
                        commute_gate_constraints = true,
                        involutory_gate_constraints = true,
                        redundant_gate_pair_constraints = true,

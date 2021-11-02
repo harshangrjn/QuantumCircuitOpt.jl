@@ -1,6 +1,9 @@
+# Testing file for creating useful circuit decompositions
+
 import QuantumCircuitOpt as QCO
 using JuMP
 using CPLEX
+using Gurobi
 
 # using Cbc
 
@@ -44,14 +47,6 @@ params = Dict{String, Any}(
 "target_gate" => QCO.CSwapGate(),
 
 # "input_circuit" => toffoli_circuit(),
-
-# "RX_discretization" => [0, π/4],
-# "RY_discretization" => [π/4],
-# "RZ_discretization" => [2*π],
-
-# "U3_θ_discretization" => [-π/4, 0, π/4],
-# "U3_ϕ_discretization" => [-π/2, 0, π/2],
-# "U3_λ_discretization" => [-π/2, 0, π/4],
 
 "objective" => "minimize_depth", 
 "optimizer" => "cplex",

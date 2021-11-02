@@ -269,14 +269,10 @@ function decompose_revcnot_with_U()
         "maximum_depth" => 5,    
     
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
-        "target_gate" => QCO.CNotRevGate(),   
-           
-        # "U3_θ_discretization" => [-π/2, π/2],
-        # "U3_ϕ_discretization" => [0, π/2],
-        # "U3_λ_discretization" => [0],
+        "target_gate" => QCO.CNotRevGate(),
 
-        "U3_θ_discretization" => -π/2:π/2:π/2,
-        "U3_ϕ_discretization" => 0:π/4:π/2,
+        "U3_θ_discretization" => -π:π/4:π,
+        "U3_ϕ_discretization" => [0],
         "U3_λ_discretization" => [0],
           
         "objective" => "minimize_depth", 
@@ -517,7 +513,7 @@ function decompose_qft2_using_HT()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" =>8,    
+        "maximum_depth" => 8,    
     
         "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCO.QFT2Gate(),   

@@ -32,7 +32,7 @@ On how to use this package, check the Documentation's [quick start guide](https:
 Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate and an universal rotation gate with three discretized Euler angles, (θ,ϕ,λ):
 
 ```julia
-import QuantumCircuitOpt as QCO
+import QuantumCircuitOpt as QCOpt
 using JuMP
 using Gurobi
 
@@ -47,15 +47,15 @@ params = Dict{String, Any}(
 "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
 "target_gate" => target_gate(),
        
-"U3_θ_discretization" => -π/2:π/2:π/2,
-"U3_ϕ_discretization" => -π/2:π/2:π/2,
-"U3_λ_discretization" => -π/2:π/2:π/2,
+"U3_θ_discretization" => -π:π/2:π,
+"U3_ϕ_discretization" => -π:π/2:π,
+"U3_λ_discretization" => -π:π/2:π,
 
 "objective" => "minimize_depth"
 )
 
 qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "presolve" => 0) 
-QCO.run_QCModel(params, qcm_optimizer)
+QCOpt.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
 set of `elementary_gates` accordingly in the above sample code. 
