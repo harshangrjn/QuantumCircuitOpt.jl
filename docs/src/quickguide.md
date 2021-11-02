@@ -8,8 +8,8 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 
 ```@raw html
 <align="center"/>
-<img width="550px" class="display-light-only" src="assets/QCOpt_framework.png" alt="assets/QCOpt_framework.png"/>
-<img width="550px" class="display-dark-only" src="assets/QCOpt_framework_dark.png" alt="assets/QCOpt_framework.png"/>
+<img width="550px" class="display-light-only" src="../assets/QCOpt_framework.png" alt="../assets/QCOpt_framework.png"/>
+<img width="550px" class="display-dark-only" src="../assets/QCOpt_framework_dark.png" alt="../assets/QCOpt_framework.png"/>
 ```
 
 ## Getting started
