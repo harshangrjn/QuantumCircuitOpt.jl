@@ -54,7 +54,7 @@ params = Dict{String, Any}(
 "objective" => "minimize_depth"
 )
 
-qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "presolve" => 0) 
+qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "presolve" => 1) 
 QCOpt.run_QCModel(params, qcm_optimizer)
 ```
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
