@@ -2,7 +2,7 @@
 
 
 ## Framework
-Building on the recent success of [Julia](https://julialang.org), [JuMP](https://github.com/jump-dev/JuMP.jl) and mixed-integer programming (MIP) solvers, [QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) (or QCOpt), is an open-source toolkit for quantum circuit design. As illustrated in the figure below, QCOpt is written in Julia, a relatively new and fast dynamic programming language used for technical computing with support for extensible type system and meta-programming. At a high level, QCOpt provides an abstraction layer to achieve two primary goals:
+Building on the recent success of [Julia](https://julialang.org), [JuMP](https://github.com/jump-dev/JuMP.jl) and mixed-integer programming (MIP) solvers, [QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) (or QCOpt), is an open-source toolkit for optimal quantum circuit design. As illustrated in the figure below, QCOpt is written in Julia, a relatively new and fast dynamic programming language used for technical computing with support for extensible type system and meta-programming. At a high level, QCOpt provides an abstraction layer to achieve two primary goals:
 1. To capture user-specified inputs, such as a desired quantum computation and the available hardware gates, and build a JuMP model of an MIP formulation, and 
 2. To extract, analyze and post-process the solution from the JuMP model to provide exact and approximate circuit decompositions, up to a global phase and machine precision.
 
@@ -13,14 +13,14 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 ```
 
 ## Getting started
-To get started, install [QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QuantumCircuitOpt also needs a MIP solver such as [CPLEX](https://github.com/jump-dev/CPLEX.jl) or [Gurobi](https://github.com/jump-dev/Gurobi.jl). If you prefer an open-source MIP solver, install [CBC](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) from the Julia package manager, though be warned that the run times of QuantumCircuitOpt can be substantially slower using these open-source MIP solvers. 
+To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QCOpt also needs a MIP solver such as [CPLEX](https://github.com/jump-dev/CPLEX.jl) or [Gurobi](https://github.com/jump-dev/Gurobi.jl). If you prefer an open-source MIP solver, install [CBC](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) from the Julia package manager, though be warned that the run times of QCOpt can be substantially slower using these open-source MIP solvers. 
 
 # User inputs
 | Necessary Inputs  | Description |
 | -----------: | :----------- |
 | `num_qubits`      | Number of qubits of the circuit (≥ 2).  |
 | `maximum_depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2)   |
-| `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QuantumCircuitOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
+| `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QCOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
 | `target_gate` | Target unitary gate which you wish to decompose using the above-mentioned `elementary_gates`.|
 | `RX_discretization` | Vector of discretization angles (in radians) for `RXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `RY_discretization` | Vector of discretization angles (in radians) for `RYGate`, if this gate is part of the above-mentioned `elementary_gates`.|
@@ -87,18 +87,18 @@ If you prefer to decompose a target gate of your choice, update the `target_gate
 set of `elementary_gates` accordingly in the above sample code. For more such 2-qubit and 3-qubit gate decompositions, with and without the universal unitary in the elementary gates, refer to "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder. 
 
 !!! warning
-    Note that [QuantumCircuitOpt.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute in the size of `num_qubits`, `maximum_depth` and `elementary_gates`.
+    Note that [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute in the size of `num_qubits`, `maximum_depth` and `elementary_gates`.
 
 !!! tip
-    Run times of QuantumCircuitOpt's mathematical formulations are significantly faster using [Gurobi](https://www.gurobi.com) as the mixed-integer programming (MIP) solver. Note that this solver's individual-usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
+    Run times of [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl)'s mathematical formulations are significantly faster using [Gurobi](https://www.gurobi.com) as the mixed-integer programming (MIP) solver. Note that this solver's individual-usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
 
 # Extracting results
-The run commands (for example, `run_QCModel`) in QuantumCircuitOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
+The run commands (for example, `run_QCModel`) in QCOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,
 
 ```julia
 results = QCOpt.run_QCModel(params, qcm_optimizer)
 ```
-For example, for decomposing the above controlled-Z gate, the QuantumCircuitOpt's runtime and the optimal objective value (minimum depth) can be accessed using,
+For example, for decomposing the above controlled-Z gate, the QCOpt's runtime and the optimal objective value (minimum depth) can be accessed using,
 ```julia
 results["solve_time"]
 results["objective"]
@@ -106,12 +106,12 @@ results["objective"]
 Also, `results["solution"]` contains detailed information about the solution produced by the optimization model, which can be utilized for further analysis. 
 
 # Visualizing results
-QuantumCircuitOpt currently supports the visualization of optimal circuit decompositions obtained from the results dictionary (from above), which can be executed using,
+QCOpt currently supports the visualization of optimal circuit decompositions obtained from the results dictionary (from above), which can be executed using,
 ```julia
 data = QCOpt.get_data(params)
 QCOpt.visualize_solution(results, data)
 ```
-For example, for the above controlled-Z gate decomposition, the processed output of QuantumCircuitOpt is as follows: 
+For example, for the above controlled-Z gate decomposition, the processed output of QCOpt is as follows: 
 ```
 =============================================================================
 Quantum Circuit Model Data

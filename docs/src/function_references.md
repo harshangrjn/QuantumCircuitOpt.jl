@@ -1,4 +1,4 @@
-# QuantumCircuitOpt.jl Function References
+# QuantumCircuitOpt Function References
 
 ```@autodocs
 Modules = [QuantumCircuitOpt]

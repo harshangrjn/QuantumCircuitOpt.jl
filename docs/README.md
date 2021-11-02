@@ -1,7 +1,7 @@
-# Documentation for QuantumCircuitOpt.jl
+# Documentation for QuantumCircuitOpt
 
 ## Installation
-QuantumCircuitOpt.jl's documentation is generated using [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl). To install it, run the following command in a Julia session:
+QuantumCircuitOpt's documentation is generated using [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl). To install it, run the following command in a Julia session:
 
 ```julia
 Pkg.add("Documenter")
