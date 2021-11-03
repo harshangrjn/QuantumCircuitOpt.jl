@@ -3,14 +3,7 @@
 #-----------------------------------------------------------#
 
 function build_QCModel(data::Dict{String, Any}; 
-                       model_type = "compact_formulation",
-                       all_valid_constraints = 0,
-                       commute_gate_constraints = true,
-                       involutory_gate_constraints = true,
-                       redundant_gate_pair_constraints = true,
-                       idempotent_gate_constraints = false,
-                       identity_gate_symmetry_constraints = true,
-                       convex_hull_gate_constraints = false)
+                       options = nothing)
 
     if !(all_valid_constraints in [-1,0,1])
         Memento.warn(_LOGGER, "Invalid all_valid_constraints; choose a value ∈ [-1,0,1]. Setting it to default value of 0.")
@@ -233,35 +226,24 @@ end
 
 function run_QCModel(params::Dict{String, Any}, 
                      qcm_optimizer::MOI.OptimizerWithAttributes; 
-                     model_type = "compact_formulation", 
-                     all_valid_constraints = 0,
-                     commute_gate_constraints = true, 
-                     involutory_gate_constraints = true, 
-                     redundant_gate_pair_constraints = true,
-                     idempotent_gate_constraints = false,
-                     identity_gate_symmetry_constraints = true,
-                     convex_hull_gate_constraints = false,
-                     visualize_solution = true, 
-                     eliminate_identical_gates = true)
+                     options = nothing)
 
-    data = QCO.get_data(params, 
-                        eliminate_identical_gates = eliminate_identical_gates)
+    data = QCO.get_data(params)
 
     model_qc  = QCO.build_QCModel(data, 
-                                  model_type = model_type, 
-                                  all_valid_constraints = all_valid_constraints,
-                                  commute_gate_constraints = commute_gate_constraints, 
-                                  involutory_gate_constraints = involutory_gate_constraints,
-                                  redundant_gate_pair_constraints = redundant_gate_pair_constraints,
-                                  idempotent_gate_constraints = idempotent_gate_constraints,
-                                  identity_gate_symmetry_constraints = identity_gate_symmetry_constraints,
-                                  convex_hull_gate_constraints = convex_hull_gate_constraints)
+                                  options = options)
 
     result_qc = QCO.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
 
-    if visualize_solution
+    if model_qc.options.visualize_solution
         QCO.visualize_solution(result_qc, data)
     end
 
     return result_qc
+end
+
+function set_qcmodel_params(qcm::QuantumCircuitModel, params::Dict{String, Any})
+
+
+    return 
 end

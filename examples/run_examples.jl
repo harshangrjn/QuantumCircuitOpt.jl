@@ -27,7 +27,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_iSwapGate",
                    "decompose_RX_on_q3"]
 
-# decompose_gates = ["decompose_controlled_Z"]
+decompose_gates = ["decompose_controlled_Z"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -36,15 +36,21 @@ result_qc = Dict{String,Any}()
 
 for gates in decompose_gates 
     params = getfield(Main, Symbol(gates))()
+    model_options = Dict{Symbol, Any}(:model_type => "compact_formulation",
+                                      :convex_hull_gate_constraints => false)
     
     qcm_optimizer = get_solver(params)
     # qcm_optimizer = JuMP.optimizer_with_attributes(Cbc.Optimizer)
     # qcm_optimizer = JuMP.optimizer_with_attributes(CPLEX.Optimizer)
     # qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "Presolve" => 1)
     
+    # global result_qc = QCO.run_QCModel(params, 
+    #                                    qcm_optimizer, 
+    #                                    model_type = "compact_formulation",
+    #                                    convex_hull_gate_constraints = false)
+
     global result_qc = QCO.run_QCModel(params, 
-                                       qcm_optimizer, 
-                                       model_type = "compact_formulation",
-                                       convex_hull_gate_constraints = false)
+                                       qcm_optimizer, options = model_options)
+
 end
 

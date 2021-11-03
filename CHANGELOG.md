@@ -1,6 +1,9 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### Staged
+- 
+
 ### v0.3.1
 - Added decomposition of the QFT2 gate using H, T and CNOT gates to `2qubits_gates.jl`
 - Added CITATION.bib 
