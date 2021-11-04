@@ -7,6 +7,7 @@ with defualt options set to the values provided by `get_default_options` functio
 """
 mutable struct QCModelOptions
     model_type                         :: String
+    
     all_valid_constraints              :: Int64
     commute_gate_constraints           :: Bool
     involutory_gate_constraints        :: Bool
@@ -16,23 +17,28 @@ mutable struct QCModelOptions
     idempotent_gate_constraints        :: Bool
     convex_hull_gate_constraints       :: Bool
 
-    # time_limit :: Float64
-    # relax_integrality :: Bool
-    # mip_gap :: Float64
-
+    time_limit                         :: Float64
+    relax_integrality                  :: Bool
 end
 
+"""
+    get_default_options()
+This function returns the default options for building the struct `QCModelOptions`.
+"""
 function get_default_options()
-    model_type                         = "compact_formulation"
-    all_valid_constraints              = 0
-    commute_gate_constraints           = true
-    involutory_gate_constraints        = true
-    redundant_gate_pair_constraints    = true
-    identity_gate_symmetry_constraints = true
-    visualize_solution                 = true
+    model_type                         = "compact_formulation" # compact_formulation, balas_formulation
+    all_valid_constraints              = 0    # -1, 0, 1
+    commute_gate_constraints           = true # true, false
+    involutory_gate_constraints        = true # true, false
+    redundant_gate_pair_constraints    = true # true, false
+    identity_gate_symmetry_constraints = true # true, false
+    visualize_solution                 = true # true, false
 
-    idempotent_gate_constraints        = false 
-    convex_hull_gate_constraints       = false
+    idempotent_gate_constraints        = false # true, false
+    convex_hull_gate_constraints       = false # true, false
+
+    time_limit                         = 10800 # float value
+    relax_integrality                  = false # true, false
 
     return QCModelOptions(model_type,
                           all_valid_constraints,
@@ -42,7 +48,9 @@ function get_default_options()
                           identity_gate_symmetry_constraints,
                           visualize_solution,
                           idempotent_gate_constraints,
-                          convex_hull_gate_constraints)
+                          convex_hull_gate_constraints,
+                          time_limit,
+                          relax_integrality)
 end
 
 """
@@ -57,14 +65,14 @@ mutable struct QuantumCircuitModel
     variables :: Dict{Symbol,Any}
     result    :: Dict{String,Any}
 
-    "Contructor for struct `QuantumCircuitModel`"
-    function QuantumCircuitModel(data::Dict{String,Any})
-        
-        data = data
-        model = JuMP.Model() 
-        options = QCO.get_default_options()
+    "Constructor for struct `QuantumCircuitModel`"
+    function QuantumCircuitModel(data::Dict{String,Any})     
+        data      = data
+        model     = JuMP.Model() 
+        options   = QCO.get_default_options()
         variables = Dict{Symbol,Any}()
-        result = Dict{String,Any}()
+        result    = Dict{String,Any}()
+        
         qcm = new(data, model, options, variables, result)
 
         return qcm
@@ -87,11 +95,12 @@ mutable struct GateData
 
     "Contructor for struct `Gate`"
     function GateData(gate_type::String, num_qubits::Int64)
-        type = gate_type
+        type    = gate_type
         complex = QCO.get_full_sized_gate(type, num_qubits)
-        real = QCO.complex_to_real_gate(complex)
+        real    = QCO.complex_to_real_gate(complex)
         inverse = inv(real)
-        isreal = iszero(imag(complex))
+        isreal  = iszero(imag(complex))
+        
         gate = new(type, complex, real, inverse, isreal)
 
         return gate

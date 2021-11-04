@@ -500,7 +500,6 @@ function decompose_qft2_using_R()
         "decomposition_type" => "approximate", 
         
         "optimizer" => "gurobi",
-        "time_limit" => 500,
                                     
         )
     

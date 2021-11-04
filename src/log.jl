@@ -6,16 +6,6 @@ this function aids in visualizing the optimal circuit decomposition.
 """
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
-    if data["relax_integrality"]
-        if results["primal_status"] == MOI.FEASIBLE_POINT 
-            Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
-        else
-            Memento.info(_LOGGER, "Infeasible primal status for the integrality-relaxed problem")
-        end
-
-        return
-    end
-
     if results["primal_status"] != MOI.FEASIBLE_POINT 
         
         if results["termination_status"] != MOI.TIME_LIMIT

@@ -64,22 +64,6 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     else
         objective = "minimize_depth"
     end
-    
-    # Relax Integrality 
-    if "relax_integrality" in keys(params)
-        relax_integrality = params["relax_integrality"]
-    else
-        # default value
-        relax_integrality = false
-    end
-
-    # Optimizer time limit (in seconds)
-    if "time_limit" in keys(params) && params["time_limit"] isa Number
-        time_limit = params["time_limit"]
-    else
-        # default value
-        time_limit = 10800
-    end
 
     elementary_gates = unique(params["elementary_gates"])
     
@@ -134,9 +118,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
                              "target_gate" => target_real,
                              "are_gates_real" => (are_elementary_gates_real && is_target_real),
                              "objective" => objective,
-                             "decomposition_type" => decomposition_type,                         
-                             "relax_integrality" => relax_integrality,
-                             "time_limit" => time_limit
+                             "decomposition_type" => decomposition_type
                              )
 
     if data["are_gates_real"]
@@ -259,7 +241,6 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
 
     return data
 end
-
 
 """
     get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool)

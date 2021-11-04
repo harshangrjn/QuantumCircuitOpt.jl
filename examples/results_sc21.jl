@@ -34,14 +34,18 @@ k = 1
 for gates in table_I_gates 
     params = getfield(Main, Symbol(gates))()
     
+    model_options = Dict{Symbol, Any}(:all_valid_constraints => 0)
+
     global result_with_VC = QCOpt.run_QCModel(params, 
-                                              qcm_optimizer, 
-                                              all_valid_constraints = 0)
+                                              qcm_optimizer;
+                                              options = model_options)
     run_times_tab1[k,1] = result_with_VC["solve_time"]
 
+    model_options = Dict{Symbol, Any}(:all_valid_constraints => -1)
+    
     global result_without_VC = QCOpt.run_QCModel(params, 
-                                                 qcm_optimizer, 
-                                                 all_valid_constraints = -1)
+                                                 qcm_optimizer;
+                                                 options = model_options)
     run_times_tab1[k,2] = result_without_VC["solve_time"]
     global k += 1 
 end
