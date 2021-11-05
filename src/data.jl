@@ -64,22 +64,6 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     else
         objective = "minimize_depth"
     end
-    
-    # Relax Integrality 
-    if "relax_integrality" in keys(params)
-        relax_integrality = params["relax_integrality"]
-    else
-        # default value
-        relax_integrality = false
-    end
-
-    # Optimizer time limit (in seconds)
-    if "time_limit" in keys(params) && params["time_limit"] isa Number
-        time_limit = params["time_limit"]
-    else
-        # default value
-        time_limit = 10800
-    end
 
     elementary_gates = unique(params["elementary_gates"])
     
@@ -87,21 +71,11 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
     end
 
-    if "identify_real_gates" in keys(params)
-        identify_real_gates = params["identify_real_gates"]
-    else
-        identify_real_gates = false
-    end
-
     gates_dict, are_elementary_gates_real = QCO.get_elementary_gates_dictionary(params, elementary_gates)
-
-    if !identify_real_gates
-        are_elementary_gates_real = false
-    end
 
     target_real, is_target_real = QCO.get_target_gate(params, are_elementary_gates_real)
 
-    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = QCO.eliminate_nonunique_gates(gates_dict, eliminate_identical_gates = eliminate_identical_gates, are_elementary_gates_real = are_elementary_gates_real)
+    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = QCO.eliminate_nonunique_gates(gates_dict, are_elementary_gates_real, eliminate_identical_gates = eliminate_identical_gates)
 
     # Initial gate
     if "initial_gate" in keys(params)
@@ -134,9 +108,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
                              "target_gate" => target_real,
                              "are_gates_real" => (are_elementary_gates_real && is_target_real),
                              "objective" => objective,
-                             "decomposition_type" => decomposition_type,                         
-                             "relax_integrality" => relax_integrality,
-                             "time_limit" => time_limit
+                             "decomposition_type" => decomposition_type
                              )
 
     if data["are_gates_real"]
@@ -151,16 +123,6 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         data["input_circuit"] = input_circuit_dict
     end
 
-    # Slack Penalty
-    if decomposition_type == "approximate"
-        if "slack_penalty" in keys(params)
-            data["slack_penalty"] = params["slack_penalty"]
-        else
-            # default value
-            data["slack_penalty"] = 1E3
-        end
-    end
-
     # CNOT lower/upper bound
     data = QCO._get_cnot_bounds!(data, params)
                          
@@ -171,10 +133,11 @@ end
     eliminate_nonunique_gates(gates_dict::Dict{String, Any})
 
 """
-function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_identical_gates = false, are_elementary_gates_real = false)
+function eliminate_nonunique_gates(gates_dict::Dict{String, Any}, are_elementary_gates_real::Bool; eliminate_identical_gates = false)
 
     num_gates = length(keys(gates_dict))
 
+    # This identifies if all the elementary gates have only real entries and returns compact matrices
     if are_elementary_gates_real
         M_real = zeros(size(gates_dict["1"]["matrix"])[1], size(gates_dict["1"]["matrix"])[2], num_gates)
     else
@@ -221,7 +184,6 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}; eliminate_iden
     cnot_idx = QCO._get_cnot_idx(gates_dict_unique)
 
     return gates_dict_unique, M_real_unique, identity_idx, cnot_idx
-
 end
 
 function _populate_data_angle_discretization!(data::Dict{String, Any}, params::Dict{String, Any})
@@ -260,7 +222,6 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
     return data
 end
 
-
 """
     get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool)
 
@@ -277,6 +238,7 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
         Memento.error(_LOGGER, "Dimensions of target gate do not match the input num_qubits")
     end
     
+    # This identifies if all the target gate has only real entries and returns a compact matrix
     is_target_real = QCO.is_gate_real(params["target_gate"])
 
     if are_elementary_gates_real
@@ -342,7 +304,7 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
                 end
             end
         
-        # Elementary gates which contain kronecker symbols
+        # Elementary gates which contain Kronecker symbols
         elseif i in kron_gates_idx
             M = QCO.get_full_sized_kron_symbol_gate(elementary_gates[i], num_qubits)
 

@@ -17,11 +17,7 @@ function decompose_RX_on_5qubits()
     "RX_discretization" => [π/2],
  
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi",
-    "optimizer_presolve" => true, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
-    
+    "decomposition_type" => "exact"
     )
 
     return params

@@ -152,8 +152,7 @@ function decompose_GroverDiffusion_using_U3()
         "target_gate" => QCOpt.GroverDiffusionGate(),
                   
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact", 
-        "identify_real_gates" => true)
+        "decomposition_type" => "exact")
     
         return params
     
@@ -233,8 +232,7 @@ function decompose_toffoli_with_controlled_gates()
     "target_gate" => QCOpt.ToffoliGate(),
     
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact"
-    )
+    "decomposition_type" => "exact")
 
     return params
     
@@ -253,8 +251,7 @@ function decompose_Fredkin()
     "target_gate" => QCOpt.CSwapGate(), #also Fredkin
 
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"
-    )
+    "decomposition_type" => "exact")
     
     return params
 end
@@ -285,8 +282,7 @@ function decompose_double_toffoli()
     "target_gate" => target_gate(),
 
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact"
-    )
+    "decomposition_type" => "exact")
     
     return params
 end
@@ -319,12 +315,8 @@ function decompose_quantum_fulladder()
         "elementary_gates" => ["CV_1_2", "CV_4_2", "CV_3_2", "CVdagger_1_2", "CVdagger_4_2", "CVdagger_3_2", "CNot_3_1", "CNot_4_3", "CNot_2_4", "CNot_4_1", "Identity"],
         
         "target_gate" => target_gate(),
-        "identify_real_gates" => true,
-    
-        "objective" => "minimize_depth",  
-        "optimizer" => "gurobi"
-        
-        )
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact")
     
         return params
 end

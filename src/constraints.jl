@@ -375,9 +375,9 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
                     # vertices_convex_hull = vertices[QHull.chull(vertices).vertices, :]
                     vertices_convex_hull = QCO.convex_hull(vertices)
 
-                    if length(vertices_convex_hull) == 2
-                        @show vertices_convex_hull
-                    end
+                    # if length(vertices_convex_hull) == 2
+                    #     @show vertices_convex_hull
+                    # end
 
                     num_ex_pt = size(vertices_convex_hull)[1]
                     

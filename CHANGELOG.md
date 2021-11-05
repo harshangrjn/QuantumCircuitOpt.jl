@@ -1,6 +1,14 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.3.5
+- Moved all the model options (including valid constraints) from `qc_model.jl` to `types.jl` into `QCModelOptions`, a struct form 
+- Streamlined default options for `QCModelOptions`
+- Moved `relax_integrality`, `time_limit`, `objective_slack_penalty` and `optimizer_log` options from `data.jl` to `QCModelOptions`
+- Removed `identify_real_gates`, `optimizer` and `optimizer_presolve` options from `params` and updated `solvers.jl`
+- Default recognition of real elementary and target gates, and implements a compact MIP
+- Updated docs and unit tests to reflect above changes
+
 ### v0.3.1
 - Added decomposition of the QFT2 gate using H, T and CNOT gates to `2qubits_gates.jl`
 - Added CITATION.bib 
