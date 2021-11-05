@@ -6,16 +6,6 @@ this function aids in visualizing the optimal circuit decomposition.
 """
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
-    if data["relax_integrality"]
-        if results["primal_status"] == MOI.FEASIBLE_POINT 
-            Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
-        else
-            Memento.info(_LOGGER, "Infeasible primal status for the integrality-relaxed problem")
-        end
-
-        return
-    end
-
     if results["primal_status"] != MOI.FEASIBLE_POINT 
         
         if results["termination_status"] != MOI.TIME_LIMIT
@@ -93,7 +83,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                     printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
                 
                 elseif data["decomposition_type"] == "approximate"
-                    printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - data["slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = :cyan)
+                    printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = :cyan)
                 end
             
             elseif !isempty(data["identity_idx"])
