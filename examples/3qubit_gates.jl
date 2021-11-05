@@ -16,9 +16,6 @@ function decompose_RX_on_q3()
  
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi"
-    # "optimizer_presolve" => false, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
     )
 
     return params
@@ -43,8 +40,6 @@ function decompose_toffoli()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi"
     )
 
     return params
@@ -67,8 +62,6 @@ function decompose_toffoli_using_kronecker()
     "decomposition_type" => "exact",
 
     "set_cnot_lower_bound" => 6,
-    
-    "optimizer" => "gurobi"
     )
 
     return params
@@ -92,8 +85,6 @@ function decompose_toffoli_with_controlled_gates()
     
     "objective" => "minimize_depth",
     "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi"
     )
 
     return params
@@ -130,8 +121,7 @@ function decompose_CNot_1_3()
     "elementary_gates" => ["H_1", "H_3", "H_2", "CNot_2_1", "CNot_3_2", "Identity"],
     "target_gate" => QCO.get_full_sized_gate("CNot_1_3", 3),
 
-    "objective" => "minimize_depth", 
-    "optimizer" => "gurobi"   
+    "objective" => "minimize_depth"
     )
 
     return params
@@ -147,8 +137,7 @@ function decompose_FredkinGate()
     "elementary_gates" => ["CV_1_2", "CV_2_3", "CV_1_3", "CVdagger_1_2", "CVdagger_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => QCO.CSwapGate(), #also Fredkin
 
-    "objective" => "minimize_depth", 
-    "optimizer" => "gurobi"
+    "objective" => "minimize_depth"
     )
     
     return params
@@ -175,8 +164,7 @@ function decompose_toffoli_left()
     "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => target_gate(), 
 
-    "objective" => "minimize_depth", 
-    "optimizer" => "gurobi"
+    "objective" => "minimize_depth"
     )
     
     return params
@@ -205,8 +193,7 @@ function decompose_toffoli_right()
     "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => target_gate(), 
 
-    "objective" => "minimize_depth", 
-    "optimizer" => "gurobi"
+    "objective" => "minimize_depth"
     )
     
     return params
@@ -233,8 +220,7 @@ function decompose_miller()
         "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
         "target_gate" => target_gate(), 
     
-        "objective" => "minimize_depth", 
-        "optimizer" => "gurobi"
+        "objective" => "minimize_depth"
         )
         
         return params

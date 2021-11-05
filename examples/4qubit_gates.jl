@@ -7,7 +7,6 @@ function decompose_CNot_41()
 
     "elementary_gates" => ["H_1", "H_2", "H_3", "CNot_1_3", "CNot_4_3", "Identity"],
     "target_gate" => QCO.get_full_sized_gate("CNot_4_1", 4),
-    "identify_real_gates" => true,
 
     "objective" => "minimize_depth", 
     "optimizer" => "gurobi"
@@ -43,7 +42,6 @@ function decompose_quantum_fulladder()
         "elementary_gates" => ["CV_1_2", "CV_4_2", "CV_3_2", "CVdagger_1_2", "CVdagger_4_2", "CVdagger_3_2", "CNot_3_1", "CNot_4_3", "CNot_2_4", "CNot_4_1", "Identity"],
         
         "target_gate" => target_gate_1(),
-        "identify_real_gates" => true,
     
         "objective" => "minimize_depth",  
         "optimizer" => "gurobi"
@@ -76,8 +74,7 @@ function decompose_double_toffoli()
     "elementary_gates" => ["CV_1_2", "CV_2_4", "CV_3_4", "CVdagger_1_2", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_3", "CNot_3_2", "CNot_2_3", "Identity"],
     "target_gate" => target_gate(),
 
-    "objective" => "minimize_depth", 
-    "optimizer" => "gurobi"
+    "objective" => "minimize_depth"
     )
     
     return params
@@ -107,8 +104,7 @@ function decompose_double_peres()
     "elementary_gates" => ["CV_1_4", "CV_2_4", "CV_3_4", "CVdagger_1_4", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_2", "CNot_2_3", "Identity"],
     "target_gate" => target_gate(),
 
-    "objective" => "minimize_depth", 
-    "optimizer" => "gurobi"
+    "objective" => "minimize_depth"
     )
     
     return params

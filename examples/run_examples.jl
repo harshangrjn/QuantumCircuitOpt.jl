@@ -1,10 +1,10 @@
 import QuantumCircuitOpt as QCO
 using JuMP
-using CPLEX
 using Gurobi
-using Cbc
+# using Cbc
+# using CPLEX
 
-include("solver.jl")
+include("optimizers.jl")
 include("2qubit_gates.jl")
 include("3qubit_gates.jl")
 include("4qubit_gates.jl")
@@ -28,7 +28,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_GroverDiffusion_using_Clifford"]
+decompose_gates = ["decompose_GroverDiffusion_using_HX"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -42,11 +42,6 @@ for gates in decompose_gates
     model_options = Dict{Symbol, Any}(:model_type => "compact_formulation",
                                       :convex_hull_gate_constraints => false)
     
-    # qcm_optimizer = get_solver(params)
-    # qcm_optimizer = JuMP.optimizer_with_attributes(Cbc.Optimizer)
-    qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "Presolve" => 1)
-
-    global result_qc = QCO.run_QCModel(params, qcm_optimizer)
-
+    qcopt_optimizer = get_gurobi()
+    global result_qc = QCO.run_QCModel(params, qcopt_optimizer)
 end
-

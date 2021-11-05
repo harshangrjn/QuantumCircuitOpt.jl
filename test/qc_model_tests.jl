@@ -5,7 +5,6 @@
     "maximum_depth" => 5,
     "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
     "initial_gate" => "Identity",
-    "identify_real_gates" => true,
     "target_gate" => QCO.CNotRevGate(),
     "set_cnot_lower_bound" => 1,
     "set_cnot_upper_bound" => 1,
@@ -35,7 +34,6 @@ end
         "num_qubits" => 2,
         "maximum_depth" => 4,        
         "elementary_gates" => ["CNot_1_2", "CNot_2_1", "Identity"],
-        "identify_real_gates" => true,
         "target_gate" => QCO.SwapGate(),  
         "objective" => "minimize_cnot", 
         "decomposition_type" => "exact"                      
@@ -417,7 +415,6 @@ end
     "maximum_depth" => 3,    
     "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
     "target_gate" => QCO.CZGate(),
-    "identify_real_gates" => true,
     "U3_θ_discretization" => [-π/2, 0, π/2],
     "U3_ϕ_discretization" => [0, π/2],
     "U3_λ_discretization" => [0, π/2])

@@ -15,11 +15,7 @@ function decompose_hadamard()
     "U3_λ_discretization" => [0, π],
  
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi",
-    "MIP_feasiblity_emphasis" => true
-    
+    "decomposition_type" => "exact"
     )
 
     return params
@@ -43,9 +39,7 @@ function decompose_controlled_Z()
     "U3_λ_discretization" => -π:π/2:π,
 
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-
-    "optimizer" => "gurobi"     
+    "decomposition_type" => "exact"  
     )
 
     return params
@@ -66,8 +60,6 @@ function decompose_controlled_V()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi"                           
     )
 
     return params
@@ -91,10 +83,7 @@ function decompose_controlled_H()
     "U3_λ_discretization" => [0],
     
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi",
-                                
+    "decomposition_type" => "exact"
     )
 
     return params
@@ -119,11 +108,7 @@ function decompose_controlled_H_with_R()
     "set_cnot_upper_bound" => 2,
   
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    "identify_real_gates" => true,
-    
-    "optimizer" => "gurobi"
-                                
+    "decomposition_type" => "exact"                        
     )
 
     return params
@@ -147,10 +132,7 @@ function decompose_magic()
         "U3_λ_discretization" => -π:π/2:π,
           
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",
-        
-        "optimizer" => "gurobi"
-                                    
+        "decomposition_type" => "exact"                           
         )
     
         return params
@@ -174,10 +156,7 @@ function decompose_magic_using_CNOT_1_2()
         "U3_λ_discretization" => -π:π/2:π,
           
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",
-        
-        "optimizer" => "gurobi"
-                                    
+        "decomposition_type" => "exact"                     
         )
     
         return params
@@ -197,9 +176,7 @@ function decompose_magic_using_SHCnot()
         "target_gate" => QCO.MGate(),
            
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",
-           
-        "optimizer" => "gurobi"      
+        "decomposition_type" => "exact"
         )
     
         return params 
@@ -222,10 +199,7 @@ function decompose_S()
         "U3_λ_discretization" => [0, π],
          
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",
-    
-        "optimizer" => "gurobi",
-                                    
+        "decomposition_type" => "exact"                   
         )
     
         return params
@@ -245,10 +219,7 @@ function decompose_revcnot()
     "target_gate" => QCO.CNotRevGate(),
  
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi",
-                                
+    "decomposition_type" => "exact"                
     )
 
     return params
@@ -272,10 +243,7 @@ function decompose_revcnot_with_U()
         "U3_λ_discretization" => [0],
           
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact", 
-        
-        "optimizer" => "gurobi",
-                              
+        "decomposition_type" => "exact"                 
         )
     
         return params
@@ -295,10 +263,7 @@ function decompose_swap()
         "target_gate" => QCO.SwapGate(),   
            
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact", 
-        
-        "optimizer" => "gurobi",
-                                    
+        "decomposition_type" => "exact"                 
         )
     
         return params
@@ -322,10 +287,7 @@ function decompose_W()
         "U3_λ_discretization" => [0, π/2],
                    
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact", 
-        
-        "optimizer" => "gurobi",
-        
+        "decomposition_type" => "exact"
         )
     
         return params
@@ -345,9 +307,7 @@ function decompose_W_using_HCnot()
         "target_gate" => QCO.WGate(),   
                   
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact", 
-        
-        "optimizer" => "gurobi" 
+        "decomposition_type" => "exact"
         )
     
         return params
@@ -367,10 +327,7 @@ function decompose_HCoinGate()
         "target_gate" => QCO.HCoinGate(),   
                   
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact", 
-        "identify_real_gates" => true,
-        
-        "optimizer" => "gurobi",    
+        "decomposition_type" => "exact"
         )
     
         return params
@@ -393,10 +350,7 @@ function decompose_GroverDiffusion_using_HX()
         "target_gate" => QCO.GroverDiffusionGate(),
                   
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact", 
-        "identify_real_gates" => true,
-        
-        "optimizer" => "gurobi"
+        "decomposition_type" => "exact"
         )
     
         return params
@@ -417,9 +371,7 @@ function decompose_GroverDiffusion_using_Clifford()
         "target_gate" => QCO.GroverDiffusionGate(),
 
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact",
-        
-        "optimizer" => "gurobi"
+        "decomposition_type" => "exact"
         )
     
         return params
@@ -445,10 +397,7 @@ function decompose_GroverDiffusion_using_U3()
         "target_gate" => QCO.GroverDiffusionGate(),
                   
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact", 
-        "identify_real_gates" => true,
-        
-        "optimizer" => "gurobi"
+        "decomposition_type" => "exact"
         )
     
         return params
@@ -468,10 +417,7 @@ function decompose_iSwapGate()
         "target_gate" => QCO.iSwapGate(),   
                   
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact", 
-        
-        "optimizer" => "gurobi"
-                                    
+        "decomposition_type" => "exact",                           
         )
     
         return params
@@ -493,10 +439,7 @@ function decompose_qft2_using_R()
         "RZ_discretization" => [-π/4, π/2, 3*π/4, 7*π/4],
                   
         "objective" => "minimize_depth",
-        "decomposition_type" => "approximate", 
-        
-        "optimizer" => "gurobi",
-                                    
+        "decomposition_type" => "approximate",                           
         )
     
         return params
@@ -515,9 +458,6 @@ function decompose_qft2_using_HT()
 
         "objective" => "minimize_depth",
         "decomposition_type" => "exact", 
-        
-        "optimizer" => "gurobi"
-                                    
         )
     
         return params

@@ -17,9 +17,7 @@ function decompose_RX_on_5qubits()
     "RX_discretization" => [π/2],
  
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
-    
-    "optimizer" => "gurobi"
+    "decomposition_type" => "exact"
     )
 
     return params
