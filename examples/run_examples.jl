@@ -28,7 +28,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_GroverDiffusion_using_HX"]
+# decompose_gates = ["decompose_GroverDiffusion_using_HX"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
