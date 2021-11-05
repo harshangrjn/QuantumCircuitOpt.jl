@@ -464,7 +464,8 @@ end
     )
     
     model_options = Dict{Symbol, Any}(:relax_integrality => true,
-                                      :convex_hull_gate_constraints => true)
+                                      :convex_hull_gate_constraints => true,
+                                      :optimizer_log => false)
 
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
