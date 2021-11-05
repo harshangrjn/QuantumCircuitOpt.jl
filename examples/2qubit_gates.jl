@@ -45,9 +45,7 @@ function decompose_controlled_Z()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
 
-    "optimizer" => "gurobi",
-    "optimizer_presolve" => true
-                                
+    "optimizer" => "gurobi"     
     )
 
     return params
@@ -69,9 +67,7 @@ function decompose_controlled_V()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "gurobi",
-    "relax_integrality" => true
-                                
+    "optimizer" => "gurobi"                           
     )
 
     return params
@@ -419,7 +415,7 @@ function decompose_GroverDiffusion_using_Clifford()
         "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "S_1", "S_2", "T_1", "T_2", "Y_1", "Y_2", "CNot_1_2", "Identity"], 
         
         "target_gate" => QCO.GroverDiffusionGate(),
-                  
+
         "objective" => "minimize_depth",
         "decomposition_type" => "exact",
         

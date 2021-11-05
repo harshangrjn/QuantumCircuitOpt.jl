@@ -42,9 +42,9 @@ for gates in decompose_gates
     model_options = Dict{Symbol, Any}(:model_type => "compact_formulation",
                                       :convex_hull_gate_constraints => false)
     
-    qcm_optimizer = get_solver(params)
+    # qcm_optimizer = get_solver(params)
     # qcm_optimizer = JuMP.optimizer_with_attributes(Cbc.Optimizer)
-    # qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "Presolve" => 1)
+    qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "Presolve" => 1)
 
     global result_qc = QCO.run_QCModel(params, qcm_optimizer)
 

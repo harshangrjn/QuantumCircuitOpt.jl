@@ -16,10 +16,12 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QCOpt also needs a MIP solver such as [CPLEX](https://github.com/jump-dev/CPLEX.jl) or [Gurobi](https://github.com/jump-dev/Gurobi.jl). If you prefer an open-source MIP solver, install [CBC](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) from the Julia package manager, though be warned that the run times of QCOpt can be substantially slower using these open-source MIP solvers. 
 
 # User inputs
+QCOpt takes two types of user-defined input specifications. The first type of input is a dictionary in Julia, which is a collection of key-value pairs, where every key is of the type `String`, which admits values of various types. Below is the list of allowable keys for the dictionary, given in column 1, and it's respective values with descriptions, given in column 2. This input dictionary is represented as `params` in all the [example](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) circuit decompositions. 
+
 | Necessary Inputs  | Description |
 | -----------: | :----------- |
 | `num_qubits`      | Number of qubits of the circuit (≥ 2).  |
-| `maximum_depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2)   |
+| `maximum_depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2).   |
 | `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QCOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
 | `target_gate` | Target unitary gate which you wish to decompose using the above-mentioned `elementary_gates`.|
 | `RX_discretization` | Vector of discretization angles (in radians) for `RXGate`, if this gate is part of the above-mentioned `elementary_gates`.|
@@ -35,7 +37,7 @@ To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt
 | `CU3_θ_discretization` | Vector of discretization angles (in radians) for θ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `CU3_ϕ_discretization` | Vector of discretization angles (in radians) for ϕ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
 | `CU3_λ_discretization` | Vector of discretization angles (in radians) for λ parameter in `CU3Gate`, if this gate is part of the above-mentioned `elementary_gates`.|
-| `objective` | Choose one of the following: (a) `"minimize_depth"`, which minimizes the total depth of decomposition. For this option, include `"Identity"` matrix in the above-mentioned `elementary_gates`, (b) `"minimize_cnot"`, which minimizes the number of CNOT gates in the decomposition. |
+| `objective` | Choose one of the following: (a) `"minimize_depth"`, which minimizes the total number of one- and two-qubit gates. For this option, include `"Identity"` matrix in the above-mentioned `elementary_gates`, (b) `"minimize_cnot"`, which minimizes the number of CNOT gates in the decomposition. |
 | `decomposition_type` | Choose one of the following: (a) `"exact"`, which finds an exact decomposition if it exists, (b) `"approximate"`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. |
 | `optimizer` | Mixed-integer programming (MIP) optimizer. For various MIP solver options, check [solver.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/examples/solver.jl). |
 
@@ -46,13 +48,26 @@ To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt
 | `set_cnot_upper_bound` | This option sets an upper bound on the total number of CNot/CX gates which an optimal decomposition can admit. Note that both `set_cnot_lower_bound` and `set_cnot_upper_bound` can also be set to an identitcal value to fix the number of CNot/CX gates in the optimal decomposition.|
 | `identify_real_gates` | This option identifies if all the elementary and target gates have only real entries and formulates a compact MIP formulation accordingly (default: `false`).  | 
 | `input_circuit` | Input circuit representing an ensemble of elementary gates which decomposes the given target gate. This input circuit, which serves as a warm-start, can accelerate the MIP solver's search for the incumbent solution. (default: empty circuit).  | 
-| `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_presolve` | This option enables or disables the presolve option in the chosen `optimizer` (default: `true`). Turning it off can lead to slower run times.|
+
+
+# Optimization model options
+The second set of inputs QCOpt takes is a dictionary in Julia, which is a collection of key-value pairs, where every key is of the type `Symbol`, which admits values of various types. Below is the list of allowable keys for this dictionary, given in column 1, and it's respective values with descriptions, given in column 2. This input dictionary is an optional one, as it's default values are already set in [`types.jl`](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/types.jl) correspnding to an optimal performance of QCOpt. Further, this dictionary is an optional input while executing these functions only: `build_QCModel` and `run_QCModel`.
+
+| Optional Inputs  | Description |
+| -----------: | :----------- |
+|`model_type`| The type of implemented MIP model to optimize in QCOpt (default: `compact_formulation`). | 
+|`commute_gate_constraints`| This option activates the valid constraints to eliminate pairs of commuting gates in the elementary (native) gates set (default: `true`)| 
+|`involutory_gate_constraints`| This option activates the valid constraints to eliminate pairs of involutory gates in the elementary (native) gates set (default: `true`)| 
+|`redundant_gate_pair_constraints`| This option activates the valid constraints to eliminate redundant pairs of gates in the elementary (native) gates set (default: `true`)| 
+|`identity_gate_symmetry_constraints`| This option activates the valid constraints to eliminate symmetry in the Identity gate in the decomposition (default: `true`)| 
+|`idempotent_gate_constraints`| This option activates the valid constraints to eliminate idempotent gates in the elementary (native) gates set (default: `false`)| 
+|`convex_hull_gate_constraints`| This option activates the valid constraints to apply convex hull of complex entries in the elementary (native) gates set (default: `false`)| 
+|`visualize_solution`| This option activates the visualization of the optimal circuit decomposition (default: `true`)| 
+| `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_log` | This option enables or disables console logging for the `optimizer` (default: `true`).|
-| `slack_penalty` | This option allows the user to set the penalty for minimizing the slack term in the objective, when `decomposition_type` is set to `"approximate"` (default: `1E3`).  |
-| `time_limit` | This option allows the user to set the maximum time limit for the optimizer in seconds (default: `10,800`).  |
-
-
+| `objective_slack_penalty` | This option sets the penalty for minimizing the slack term in the objective, when `decomposition_type` is set to `"approximate"` (default: `1E3`).  |
+| `time_limit` | This option allows sets the maximum time limit for the optimizer in seconds (default: `10,800`).  |
 
 # Sample circuit synthesis
 Using some of the above-described user input options, here is a sample optimization model to minimize the total depth of the decomposition for a 2-qubit controlled-Z gate. With entangling CNOT gate and the universal rotation gate with three discretized Euler angles, (θ,ϕ,λ), here is the sample code:

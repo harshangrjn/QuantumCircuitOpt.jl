@@ -26,6 +26,11 @@ function build_QCModel_result(qcm::QuantumCircuitModel, solve_time::Number)
         "solution" => solution,
     )
 
+    # Objective slack Penalty
+    if qcm.data["decomposition_type"] == "approximate"
+        result["objective_slack_penalty"] = qcm.options.objective_slack_penalty
+    end
+
     return result
 end
 

@@ -17,9 +17,8 @@ function decompose_RX_on_q3()
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     
-    "optimizer" => "gurobi",
-    "optimizer_presolve" => false, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
-    
+    "optimizer" => "gurobi"
+    # "optimizer_presolve" => false, #turning this true will give infeasiblity in cplex - most probably a bug in cplex's presolve
     )
 
     return params
@@ -44,10 +43,8 @@ function decompose_toffoli()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    "relax_integrality" => false,
     
-    "optimizer" => "gurobi",
-    
+    "optimizer" => "gurobi"
     )
 
     return params
@@ -68,12 +65,10 @@ function decompose_toffoli_using_kronecker()
     
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
-    "relax_integrality" => false,
 
     "set_cnot_lower_bound" => 6,
     
-    "optimizer" => "gurobi",
-    
+    "optimizer" => "gurobi"
     )
 
     return params
@@ -97,9 +92,8 @@ function decompose_toffoli_with_controlled_gates()
     
     "objective" => "minimize_depth",
     "decomposition_type" => "exact",
-    "relax_integrality" => false,
     
-    "optimizer" => "gurobi",
+    "optimizer" => "gurobi"
     )
 
     return params

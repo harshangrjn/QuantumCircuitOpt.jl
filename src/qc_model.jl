@@ -139,6 +139,10 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
 
     JuMP.set_time_limit_sec(qcm.model, qcm.options.time_limit)
 
+    if !qcm.options.optimizer_log
+        JuMP.set_silent(qcm.model)
+    end
+
     if JuMP.mode(qcm.model) != JuMP.DIRECT && optimizer !== nothing
         if qcm.model.moi_backend.state == MOI.Utilities.NO_OPTIMIZER
             JuMP.set_optimizer(qcm.model, optimizer)

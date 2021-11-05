@@ -13,8 +13,8 @@
     "decomposition_type" => "exact"
     )
 
-    model_options = Dict{Symbol, Any}(:model_type => "compact_formulation",
-                                      :all_valid_constraints => 2)
+    model_options = Dict{Symbol, Any}(:model_type => "compact_formulation_1", # Testing incorrect model_type
+                                      :all_valid_constraints => 2)            # Testing incorrect all_valid_constraints
 
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 

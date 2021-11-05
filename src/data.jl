@@ -133,16 +133,6 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         data["input_circuit"] = input_circuit_dict
     end
 
-    # Slack Penalty
-    if decomposition_type == "approximate"
-        if "slack_penalty" in keys(params)
-            data["slack_penalty"] = params["slack_penalty"]
-        else
-            # default value
-            data["slack_penalty"] = 1E3
-        end
-    end
-
     # CNOT lower/upper bound
     data = QCO._get_cnot_bounds!(data, params)
                          

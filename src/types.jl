@@ -19,6 +19,8 @@ mutable struct QCModelOptions
 
     time_limit                         :: Float64
     relax_integrality                  :: Bool
+    optimizer_log                      :: Bool
+    objective_slack_penalty            :: Float64
 end
 
 """
@@ -27,6 +29,7 @@ This function returns the default options for building the struct `QCModelOption
 """
 function get_default_options()
     model_type                         = "compact_formulation" # compact_formulation, balas_formulation
+    
     all_valid_constraints              = 0    # -1, 0, 1
     commute_gate_constraints           = true # true, false
     involutory_gate_constraints        = true # true, false
@@ -39,6 +42,8 @@ function get_default_options()
 
     time_limit                         = 10800 # float value
     relax_integrality                  = false # true, false
+    optimizer_log                      = true  # true, false
+    objective_slack_penalty            = 1E3   # > 0 value
 
     return QCModelOptions(model_type,
                           all_valid_constraints,
@@ -50,7 +55,9 @@ function get_default_options()
                           idempotent_gate_constraints,
                           convex_hull_gate_constraints,
                           time_limit,
-                          relax_integrality)
+                          relax_integrality,
+                          optimizer_log,
+                          objective_slack_penalty)
 end
 
 """

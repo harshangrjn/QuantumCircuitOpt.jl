@@ -18,7 +18,7 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n = 1:num_gates, d=1:depth if !(n in identity_idx)))
 
         elseif decomposition_type == "approximate"
-            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n = 1:num_gates, d=1:depth if !(n in identity_idx)) + qcm.data["slack_penalty"] * sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c))
+            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n = 1:num_gates, d=1:depth if !(n in identity_idx)) + qcm.options.objective_slack_penalty * sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c))
             
         end
 
@@ -64,7 +64,7 @@ function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n in cnot_idx, d=1:depth))
             
         elseif decomposition_type == "approximate"            
-            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n in cnot_idx, d=1:depth) + (qcm.data["slack_penalty"] * sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c)))
+            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_onoff_var][n,d] for n in cnot_idx, d=1:depth) + (qcm.options.objective_slack_penalty * sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c)))
 
         end
 
