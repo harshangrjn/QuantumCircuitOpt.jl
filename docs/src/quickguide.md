@@ -74,7 +74,7 @@ The second set of inputs for QCOpt contains all the optional specifications for 
 | `time_limit` | This option allows sets the maximum time limit for the optimizer in seconds (default: `10,800`).  |
 
 # Sample circuit synthesis
-Using the above-described, mandatory and optional, user inputs, here is a sample circuit decomposition to minimize the total depth for implementing a 2-qubit controlled-Z gate ([CZGate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CZGate)). With an entangling [CNOT](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CNotGate) gate and the one-qubit, universal rotation gate ([U3Gate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/1_qubit_gates/#U3Gate)) with three discretized Euler angles (θ,ϕ,λ), here is the sample code to obtain an optimal circuit implementation:
+Using the above-described mandatory and optional user inputs, here is a sample circuit decomposition to minimize the total depth for implementing a 2-qubit controlled-Z gate ([CZGate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CZGate)), with entangling [CNOT](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CNotGate) gate and the one-qubit, universal rotation gate ([U3Gate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/1_qubit_gates/#U3Gate)) with three discretized Euler angles (θ,ϕ,λ):
 
 ```julia
 import QuantumCircuitOpt as QCOpt
