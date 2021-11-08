@@ -18,14 +18,14 @@ To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt
 # User inputs
 QCOpt takes two types of user-defined input specifications. The first type of input contains all the necessary circuit specifications. This is given by a dictionary in Julia, which is a collection of key-value pairs, where every key is of the type `String`, which admits values of various types. Below is the list of allowable keys for the dictionary, given in column 1, and it's respective values with descriptions, given in column 2. This input dictionary is represented as `params` in all the [example](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) circuit decompositions. 
 
-| Mandatory circuit specification  | Description |
+| Mandatory circuit specifications  | Description |
 | -----------: | :----------- |
 | `num_qubits`      | Number of qubits of the circuit (≥ 2).  |
 | `maximum_depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2).   |
 | `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QCOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
 | `target_gate` | Target unitary gate which you wish to decompose using the above-mentioned `elementary_gates`.|
-| `objective` | Choose one of the following: (a) `"minimize_depth"`, which minimizes the total number of one- and two-qubit gates. For this option, include `"Identity"` matrix in the above-mentioned `elementary_gates`, (b) `"minimize_cnot"`, which minimizes the number of CNOT gates in the decomposition. (default: `"minimize_depth"`) |
-| `decomposition_type` | Choose one of the following: (a) `"exact"`, which finds an exact decomposition if it exists, (b) `"approximate"`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. (default: `"exact"`)|
+| `objective` | Choose one of the following: (a) `minimize_depth`, which minimizes the total number of one- and two-qubit gates. For this option, include `Identity` matrix in the above-mentioned `elementary_gates`, (b) `minimize_cnot`, which minimizes the number of CNOT gates in the decomposition. (default: `minimize_depth`) |
+| `decomposition_type` | Choose one of the following: (a) `exact`, which finds an exact decomposition if it exists, (b) `approximate`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. (default: `exact`)|
 
 If the above-specified `elementary_gates` contain gates with continuous angle parameters, then the following mandarotry input angle discretizations have to be specified in addition to the above inputs: 
 
@@ -47,18 +47,18 @@ If the above-specified `elementary_gates` contain gates with continuous angle pa
 
 In addition, here is a list of *optional* circuit specifications, which can be added to the above set of inputs, to accelerate the performance of the QCOpt package:
 
-| Optional circuit specification  | Description |
+| Optional circuit specifications  | Description |
 | -----------: | :----------- |
-| `initial_gate` | Intitial-condition gate to the decomposition (gate at 0th depth) (default: `"Identity"`).  | 
+| `initial_gate` | Intitial-condition gate to the decomposition (gate at 0th depth) (default: `Identity`).  | 
 | `set_cnot_lower_bound` | This option sets a lower bound on the total number of CNot or CX gates which an optimal decomposition can admit.  |
 | `set_cnot_upper_bound` | This option sets an upper bound on the total number of CNot/CX gates which an optimal decomposition can admit. Note that both `set_cnot_lower_bound` and `set_cnot_upper_bound` can also be set to an identitcal value to fix the number of CNot/CX gates in the optimal decomposition.|
 | `input_circuit` | Input circuit representing an ensemble of elementary gates which decomposes the given target gate. This input circuit, which serves as a warm-start, can accelerate the MIP solver's search for the incumbent solution. (default: empty circuit).  | 
 
 
-# Optimization model options
+# Optimization model inputs
 The second set of inputs for QCOpt contains all the optional specifications for the underlying optimization models. This is given by a dictionary in Julia, which is a collection of key-value pairs, where every key is of the type `Symbol`, which admits values of various types. Below is the list of allowable keys for this dictionary, given in column 1, and it's respective values with descriptions, given in column 2. This input dictionary is an optional one, as it's default values are already set in [`types.jl`](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/types.jl) correspnding to an optimal performance of the QCOpt package. Further, this dictionary is an optional argument while executing functions, `build_QCModel` and `run_QCModel` only.
 
-| Optional Inputs  | Description |
+| Optional model inputs  | Description |
 | -----------: | :----------- |
 |`model_type`| The type of implemented MIP model to optimize in QCOpt (default: `compact_formulation`). | 
 |`commute_gate_constraints`| This option activates the valid constraints to eliminate pairs of commuting gates in the elementary (native) gates set (default: `true`)| 
@@ -70,11 +70,11 @@ The second set of inputs for QCOpt contains all the optional specifications for 
 |`visualize_solution`| This option activates the visualization of the optimal circuit decomposition (default: `true`)| 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_log` | This option enables or disables console logging for the `optimizer` (default: `true`).|
-| `objective_slack_penalty` | This option sets the penalty for minimizing the slack term in the objective, when `decomposition_type` is set to `"approximate"` (default: `1E3`).  |
+| `objective_slack_penalty` | This option sets the penalty for minimizing the slack term in the objective, when `decomposition_type` is set to `approximate` (default: `1E3`).  |
 | `time_limit` | This option allows sets the maximum time limit for the optimizer in seconds (default: `10,800`).  |
 
 # Sample circuit synthesis
-Using some of the above-described user input options, here is a sample optimization model to minimize the total depth of the decomposition for a 2-qubit controlled-Z gate. With entangling CNOT gate and the universal rotation gate with three discretized Euler angles, (θ,ϕ,λ), here is the sample code:
+Using the above-described, mandatory and optional, user inputs, here is a sample circuit decomposition to minimize the total depth for implementing a 2-qubit controlled-Z gate ([CZGate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CZGate)). With an entangling [CNOT](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CNotGate) gate and the one-qubit, universal rotation gate ([U3Gate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/1_qubit_gates/#U3Gate)) with three discretized Euler angles (θ,ϕ,λ), here is the sample code to obtain an optimal circuit implementation:
 
 ```julia
 import QuantumCircuitOpt as QCOpt
@@ -86,30 +86,36 @@ function target_gate()
     return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1]) 
 end
 
+# Circuit specifications (mandatory)
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "maximum_depth" => 4,    
-"elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
+"elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"],
 "target_gate" => target_gate(),
+"objective" => "minimize_depth",
+"decomposition_type" => "exact",
        
 "U3_θ_discretization" => -π:π/2:π,
 "U3_ϕ_discretization" => -π:π/2:π,
 "U3_λ_discretization" => -π:π/2:π,
-
-"objective" => "minimize_depth"
 )
 
-qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "presolve" => 1) 
-QCOpt.run_QCModel(params, qcm_optimizer)
+# Optimization model inputs (optional)
+model_options = Dict{Symbol, Any}(:model_type => "compact_formulation",
+                                  :visualize_solution => true)
+
+qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "presolve" => 1)
+QCOpt.run_QCModel(params, qcm_optimizer; options = model_options)
 ```
+
 If you prefer to decompose a target gate of your choice, update the `target_gate()` function and the 
-set of `elementary_gates` accordingly in the above sample code. For more such 2-qubit and 3-qubit gate decompositions, with and without the universal unitary in the elementary gates, refer to "[examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)" folder. 
+set of `elementary_gates` accordingly in the above sample code. For more such circuit decompositions, with various types of elementary gates, refer to [examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) folder. 
 
 !!! warning
-    Note that [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute in the size of `num_qubits`, `maximum_depth` and `elementary_gates`.
+    Note that [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute in the size of `num_qubits`, `maximum_depth` and `elementary_gates`. 
 
 !!! tip
-    Run times of [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl)'s mathematical formulations are significantly faster using [Gurobi](https://www.gurobi.com) as the mixed-integer programming (MIP) solver. Note that this solver's individual-usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
+    Run times of [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl)'s mathematical optimization models are significantly faster using [Gurobi](https://www.gurobi.com) as the underlying mixed-integer programming (MIP) solver. Note that this solver's individual-usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
 
 # Extracting results
 The run commands (for example, `run_QCModel`) in QCOpt return detailed results in the form of a dictionary. This dictionary can be saved for further processing as follows,

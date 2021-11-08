@@ -29,7 +29,7 @@ Pkg.add("QuantumCircuitOpt")
 On how to use this package, check the Documentation's [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/quickguide/#Sample-circuit-decomposition) and the [examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) folder for more such circuit decompositions.
 
 ## Sample Circuit Synthesis
-Here is the a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate using the entangling CNOT gate and an universal rotation gate with three discretized Euler angles, (θ,ϕ,λ):
+Here is a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate ([CZGate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CZGate)) using the entangling [CNOT](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CNotGate) gate and an one-qubit universal rotation gate ([U3Gate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/1_qubit_gates/#U3Gate)) with three discretized Euler angles (θ,ϕ,λ):
 
 ```julia
 import QuantumCircuitOpt as QCOpt
@@ -44,14 +44,14 @@ end
 params = Dict{String, Any}(
 "num_qubits" => 2, 
 "maximum_depth" => 4,    
-"elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
+"elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"],
 "target_gate" => target_gate(),
+"objective" => "minimize_depth",
+"decomposition_type" => "exact",
        
 "U3_θ_discretization" => -π:π/2:π,
 "U3_ϕ_discretization" => -π:π/2:π,
 "U3_λ_discretization" => -π:π/2:π,
-
-"objective" => "minimize_depth"
 )
 
 qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "presolve" => 1) 
