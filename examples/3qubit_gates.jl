@@ -5,17 +5,15 @@ function decompose_RX_on_q3()
     params = Dict{String, Any}(
     
     "num_qubits" => 3, 
-    "maximum_depth" => 3,    
-
+    "maximum_depth" => 3,
     "elementary_gates" => ["U3_3", "Identity"], 
     "target_gate" => QCO.kron_single_qubit_gate(3, QCO.RXGate(π/4), "q3"),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
        
     "U3_θ_discretization" => [0, π/4],
     "U3_ϕ_discretization" => [0, -π/2],
-    "U3_λ_discretization" => [0, π/2],    
- 
-    "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
+    "U3_λ_discretization" => [0, π/2],
     )
 
     return params
@@ -24,22 +22,40 @@ end
 
 function decompose_toffoli()
 
+    function toffoli_circuit()
+        # [(depth, gate)]
+        return [(1, "T_1"),              
+                (2, "T_2"),                   
+                (3, "H_3"),              
+                (4, "CNot_2_3"),           
+                (5, "Tdagger_3"),        
+                (6, "CNot_1_3"),          
+                (7, "T_3"),               
+                (8, "CNot_2_3"),                 
+                (9, "Tdagger_3"),          
+                (10, "CNot_1_3"),           
+                (11, "T_3"),             
+                (12, "H_3"),             
+                (13, "CNot_1_2"),         
+                (14, "Tdagger_2"),       
+                (15, "CNot_1_2")          
+                ] 
+    end
+
     println(">>>>> Toffoli gate <<<<<")
  
     params = Dict{String, Any}(
     
     "num_qubits" => 3, 
-    "maximum_depth" => 15, 
-
+    "maximum_depth" => 15,
     "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
-    "input_circuit" => toffoli_circuit(),
-
-    "set_cnot_lower_bound" => 6,
-    "set_cnot_upper_bound" => 6,
-    
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
+
+    "input_circuit" => toffoli_circuit(),
+    "set_cnot_lower_bound" => 6,
+    "set_cnot_upper_bound" => 6,
     )
 
     return params
@@ -54,10 +70,8 @@ function decompose_toffoli_using_kronecker()
     
     "num_qubits" => 3,
     "maximum_depth" => 12,
-  
     "elementary_gates" => ["T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_3", "I_1xT_2xT_3", "CNot_1_2xH_3", "T_1xTdagger_2xI_3", "Identity"], 
     "target_gate" => QCO.ToffoliGate(),
-    
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
 
@@ -77,12 +91,9 @@ function decompose_toffoli_with_controlled_gates()
     
     "num_qubits" => 3,
     "maximum_depth" => 5,
-
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CV_1_2", "CVdagger_1_3", "CVdagger_2_3", "CVdagger_1_2", "CNot_2_1", "CNot_1_2", "Identity"],
     # "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_2_1", "Identity"], 
-
     "target_gate" => QCO.ToffoliGate(),
-    
     "objective" => "minimize_depth",
     "decomposition_type" => "exact",
     )
@@ -91,37 +102,15 @@ function decompose_toffoli_with_controlled_gates()
     
 end
 
-function toffoli_circuit()
-    # [(depth, gate)]
-    return [(1, "T_1"),              
-            (2, "T_2"),                   
-            (3, "H_3"),              
-            (4, "CNot_2_3"),           
-            (5, "Tdagger_3"),        
-            (6, "CNot_1_3"),          
-            (7, "T_3"),               
-            (8, "CNot_2_3"),                 
-            (9, "Tdagger_3"),          
-            (10, "CNot_1_3"),           
-            (11, "T_3"),             
-            (12, "H_3"),             
-            (13, "CNot_1_2"),         
-            (14, "Tdagger_2"),       
-            (15, "CNot_1_2")          
-            ] 
-end
-
 function decompose_CNot_1_3()
 
     params = Dict{String, Any}(
     "num_qubits" => 3,
     "maximum_depth" => 8,
-
     # "elementary_gates" => ["CNot_1_2", "CNot_2_3", "Identity"], 
     "elementary_gates" => ["H_1", "H_3", "H_2", "CNot_2_1", "CNot_3_2", "Identity"],
     "target_gate" => QCO.get_full_sized_gate("CNot_1_3", 3),
-
-    "objective" => "minimize_depth"
+    "objective" => "minimize_depth",
     )
 
     return params
@@ -132,11 +121,9 @@ function decompose_FredkinGate()
     params = Dict{String, Any}(
     "num_qubits" => 3,
     "maximum_depth" => 7,
-
     # Reference: https://doi.org/10.1103/PhysRevA.53.2855
     "elementary_gates" => ["CV_1_2", "CV_2_3", "CV_1_3", "CVdagger_1_2", "CVdagger_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => QCO.CSwapGate(), #also Fredkin
-
     "objective" => "minimize_depth"
     )
     
@@ -160,10 +147,8 @@ function decompose_toffoli_left()
     params = Dict{String, Any}(
     "num_qubits" => 3,
     "maximum_depth" => 7,
-
     "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
-    "target_gate" => target_gate(), 
-
+    "target_gate" => target_gate(),
     "objective" => "minimize_depth"
     )
     
@@ -189,10 +174,8 @@ function decompose_toffoli_right()
     params = Dict{String, Any}(
     "num_qubits" => 3,
     "maximum_depth" => 8,
-
     "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => target_gate(), 
-
     "objective" => "minimize_depth"
     )
     
@@ -214,15 +197,12 @@ function decompose_miller()
     end
 
     params = Dict{String, Any}(
-        "num_qubits" => 3,
-        "maximum_depth" => 8,
-    
-        "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
-        "target_gate" => target_gate(), 
-    
-        "objective" => "minimize_depth"
-        )
+    "num_qubits" => 3,
+    "maximum_depth" => 8,
+    "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
+    "target_gate" => target_gate(),
+    "objective" => "minimize_depth"
+    )
         
-        return params
-
+    return params
 end

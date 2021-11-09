@@ -6,16 +6,14 @@ function decompose_hadamard()
     
     "num_qubits" => 2, 
     "maximum_depth" => 3,    
-
     "elementary_gates" => ["U3_1", "CNot_1_2", "Identity"], 
     "target_gate" => QCO.get_full_sized_gate("H_1", 2),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
        
     "U3_θ_discretization" => [0, π/2],
     "U3_ϕ_discretization" => [0, π/2],
     "U3_λ_discretization" => [0, π],
- 
-    "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"
     )
 
     return params
@@ -29,17 +27,15 @@ function decompose_controlled_Z()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "maximum_depth" => 4,    
-
+    "maximum_depth" => 4,
     "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
     "target_gate" => QCO.CZGate(),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
 
     "U3_θ_discretization" => -π:π/2:π,
     "U3_ϕ_discretization" => -π:π/2:π,
     "U3_λ_discretization" => -π:π/2:π,
-
-    "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"  
     )
 
     return params
@@ -54,10 +50,8 @@ function decompose_controlled_V()
     
     "num_qubits" => 2, 
     "maximum_depth" => 7,
-
     "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
     "target_gate" => QCO.CVGate(),
-    
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact",
     )
@@ -73,17 +67,15 @@ function decompose_controlled_H()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "maximum_depth" => 5,    
-
+    "maximum_depth" => 5,
     "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCO.CHGate(),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact",
 
     "U3_θ_discretization" => -2*π:π/4:2*π,
     "U3_ϕ_discretization" => [0],
     "U3_λ_discretization" => [0],
-    
-    "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"
     )
 
     return params
@@ -97,18 +89,15 @@ function decompose_controlled_H_with_R()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "maximum_depth" => 5,    
-
+    "maximum_depth" => 5,
     "elementary_gates" => ["RY_1", "RY_2", "CNot_1_2", "Identity"], 
     "target_gate" => QCO.CHGate(),
-       
-    "RY_discretization" => [-π/4, π/4, π/2, -π/2], 
-
-    "set_cnot_lower_bound" => 1,
-    "set_cnot_upper_bound" => 2,
-  
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                        
+    "decomposition_type" => "exact",
+       
+    "RY_discretization" => [-π/4, π/4, π/2, -π/2],
+    "set_cnot_lower_bound" => 1,
+    "set_cnot_upper_bound" => 2                     
     )
 
     return params
@@ -122,17 +111,15 @@ function decompose_magic()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 4,    
-    
+        "maximum_depth" => 4,
         "elementary_gates" => ["U3_1", "U3_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.MGate(),   
+        "objective" => "minimize_depth", 
+        "decomposition_type" => "exact",
 
         "U3_θ_discretization" => -π:π/2:π,
         "U3_ϕ_discretization" => -π:π/2:π,
-        "U3_λ_discretization" => -π:π/2:π,
-          
-        "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"                           
+        "U3_λ_discretization" => -π:π/2:π,                         
         )
     
         return params
@@ -146,17 +133,15 @@ function decompose_magic_using_CNOT_1_2()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 5,    
-    
+        "maximum_depth" => 5,
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
-        "target_gate" => QCO.MGate(),   
+        "target_gate" => QCO.MGate(),
+        "objective" => "minimize_depth", 
+        "decomposition_type" => "exact",
            
         "U3_θ_discretization" => -π:π/2:π,
         "U3_ϕ_discretization" => -π:π:π,
-        "U3_λ_discretization" => -π:π/2:π,
-          
-        "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"                     
+        "U3_λ_discretization" => -π:π/2:π,            
         )
     
         return params
@@ -170,13 +155,11 @@ function decompose_magic_using_SHCnot()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 5,    
-    
+        "maximum_depth" => 5,
         "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"], 
         "target_gate" => QCO.MGate(),
-           
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"
+        "decomposition_type" => "exact",
         )
     
         return params 
@@ -189,17 +172,15 @@ function decompose_S()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 3,    
-    
+        "maximum_depth" => 3,
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.get_full_sized_gate("S_1", 2),
+        "objective" => "minimize_depth", 
+        "decomposition_type" => "exact",
            
         "U3_θ_discretization" => [0, π/4, π/2],
         "U3_ϕ_discretization" => [-π/2, 0, π/2],
-        "U3_λ_discretization" => [0, π],
-         
-        "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"                   
+        "U3_λ_discretization" => [0, π],           
         )
     
         return params
@@ -213,11 +194,9 @@ function decompose_revcnot()
     params = Dict{String, Any}(
     
     "num_qubits" => 2, 
-    "maximum_depth" => 5,    
-
+    "maximum_depth" => 5,
     "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
     "target_gate" => QCO.CNotRevGate(),
- 
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact"                
     )
@@ -234,16 +213,14 @@ function decompose_revcnot_with_U()
     
         "num_qubits" => 2, 
         "maximum_depth" => 5,    
-    
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.CNotRevGate(),
+        "objective" => "minimize_depth", 
+        "decomposition_type" => "exact",
 
         "U3_θ_discretization" => -π:π/4:π,
         "U3_ϕ_discretization" => [0],
         "U3_λ_discretization" => [0],
-          
-        "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"                 
         )
     
         return params
@@ -258,10 +235,8 @@ function decompose_swap()
     
         "num_qubits" => 2, 
         "maximum_depth" => 5,    
-    
         "elementary_gates" => ["CNot_2_1", "CNot_1_2", "Identity"], 
-        "target_gate" => QCO.SwapGate(),   
-           
+        "target_gate" => QCO.SwapGate(),
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact"                 
         )
@@ -277,17 +252,15 @@ function decompose_W()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 5,    
-    
+        "maximum_depth" => 5,
         "elementary_gates" => ["U3_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.WGate(),
+        "objective" => "minimize_depth", 
+        "decomposition_type" => "exact",
 
         "U3_θ_discretization" => [-π/4, 0, π/4],
         "U3_ϕ_discretization" => [0, π/4],
         "U3_λ_discretization" => [0, π/2],
-                   
-        "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"
         )
     
         return params
@@ -301,11 +274,9 @@ function decompose_W_using_HCnot()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 6,    
-    
+        "maximum_depth" => 6,
         "elementary_gates" => ["CH_1_2", "CNot_2_1", "CNot_1_2", "Identity"], 
-        "target_gate" => QCO.WGate(),   
-                  
+        "target_gate" => QCO.WGate(),
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact"
         )
@@ -322,10 +293,8 @@ function decompose_HCoinGate()
     
         "num_qubits" => 2, 
         "maximum_depth" => 10,
-    
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
-        "target_gate" => QCO.HCoinGate(),   
-                  
+        "target_gate" => QCO.HCoinGate(),  
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact"
         )
@@ -343,12 +312,9 @@ function decompose_GroverDiffusion_using_HX()
         #Reference: https://arxiv.org/pdf/1804.03719.pdf (Fig 6)
 
         "num_qubits" => 2, 
-        "maximum_depth" => 10,    
-    
+        "maximum_depth" => 10,
         "elementary_gates" => ["X_1", "X_1xX_2", "H_1xH_2", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
-        
-        "target_gate" => QCO.GroverDiffusionGate(),
-                  
+        "target_gate" => QCO.GroverDiffusionGate(),          
         "objective" => "minimize_depth",
         "decomposition_type" => "exact"
         )
@@ -364,12 +330,9 @@ function decompose_GroverDiffusion_using_Clifford()
     params = Dict{String, Any}(
     
         "num_qubits" => 2,
-        "maximum_depth" => 6,    
-    
+        "maximum_depth" => 6,
         "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "S_1", "S_2", "T_1", "T_2", "Y_1", "Y_2", "CNot_1_2", "Identity"], 
-        
         "target_gate" => QCO.GroverDiffusionGate(),
-
         "objective" => "minimize_depth",
         "decomposition_type" => "exact"
         )
@@ -386,18 +349,15 @@ function decompose_GroverDiffusion_using_U3()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 10,    
-    
+        "maximum_depth" => 10,
         "elementary_gates" => ["U3_1", "CNot_1_2", "Identity"], 
+        "target_gate" => QCO.GroverDiffusionGate(),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact",
 
         "U3_θ_discretization" => -π:π/2:π,
         "U3_ϕ_discretization" => -π:π/2:π,
         "U3_λ_discretization" => [0],
-        
-        "target_gate" => QCO.GroverDiffusionGate(),
-                  
-        "objective" => "minimize_depth",
-        "decomposition_type" => "exact"
         )
     
         return params
@@ -411,11 +371,9 @@ function decompose_iSwapGate()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 10,    
-    
+        "maximum_depth" => 10,
         "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"],
-        "target_gate" => QCO.iSwapGate(),   
-                  
+        "target_gate" => QCO.iSwapGate(),
         "objective" => "minimize_depth",
         "decomposition_type" => "exact",                           
         )
@@ -430,16 +388,14 @@ function decompose_qft2_using_R()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 10,    
-    
+        "maximum_depth" => 10,
         "elementary_gates" => ["RX_1", "RZ_1", "RZ_2", "CNot_1_2", "CNot_2_1", "Identity"],
-        "target_gate" => QCO.QFT2Gate(),   
+        "target_gate" => QCO.QFT2Gate(),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "approximate",
         
         "RX_discretization" => [π/2],
-        "RZ_discretization" => [-π/4, π/2, 3*π/4, 7*π/4],
-                  
-        "objective" => "minimize_depth",
-        "decomposition_type" => "approximate",                           
+        "RZ_discretization" => [-π/4, π/2, 3*π/4, 7*π/4],                      
         )
     
         return params
@@ -451,11 +407,9 @@ function decompose_qft2_using_HT()
     params = Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 8,    
-    
+        "maximum_depth" => 8,
         "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
-        "target_gate" => QCO.QFT2Gate(),   
-
+        "target_gate" => QCO.QFT2Gate(),
         "objective" => "minimize_depth",
         "decomposition_type" => "exact", 
         )

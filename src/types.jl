@@ -100,7 +100,7 @@ mutable struct GateData
     inverse :: Array{Float64,2}
     isreal  :: Bool
 
-    "Contructor for struct `Gate`"
+    "Constructor for struct `GateData`"
     function GateData(gate_type::String, num_qubits::Int64)
         type    = gate_type
         complex = QCO.get_full_sized_gate(type, num_qubits)
