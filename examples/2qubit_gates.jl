@@ -97,7 +97,7 @@ function decompose_controlled_H_with_R()
        
     "RY_discretization" => [-π/4, π/4, π/2, -π/2],
     "set_cnot_lower_bound" => 1,
-    "set_cnot_upper_bound" => 2                     
+    "set_cnot_upper_bound" => 2,           
     )
 
     return params
@@ -198,7 +198,7 @@ function decompose_revcnot()
     "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
     "target_gate" => QCO.CNotRevGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                
+    "decomposition_type" => "exact",       
     )
 
     return params
@@ -238,7 +238,7 @@ function decompose_swap()
         "elementary_gates" => ["CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.SwapGate(),
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"                 
+        "decomposition_type" => "exact",           
         )
     
         return params
@@ -278,7 +278,7 @@ function decompose_W_using_HCnot()
         "elementary_gates" => ["CH_1_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.WGate(),
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"
+        "decomposition_type" => "exact",
         )
     
         return params
@@ -296,7 +296,7 @@ function decompose_HCoinGate()
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.HCoinGate(),  
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"
+        "decomposition_type" => "exact",
         )
     
         return params
@@ -316,7 +316,7 @@ function decompose_GroverDiffusion_using_HX()
         "elementary_gates" => ["X_1", "X_1xX_2", "H_1xH_2", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
         "target_gate" => QCO.GroverDiffusionGate(),          
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact"
+        "decomposition_type" => "exact",
         )
     
         return params
@@ -334,7 +334,7 @@ function decompose_GroverDiffusion_using_Clifford()
         "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "S_1", "S_2", "T_1", "T_2", "Y_1", "Y_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCO.GroverDiffusionGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact"
+        "decomposition_type" => "exact",
         )
     
         return params

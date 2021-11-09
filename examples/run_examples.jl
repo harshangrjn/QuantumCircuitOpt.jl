@@ -24,6 +24,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_W",
                    "decompose_W_using_HCnot",
                    "decompose_GroverDiffusion_using_Clifford",
+                   "decompose_GroverDiffusion_using_U3",
                    "decompose_iSwapGate",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
