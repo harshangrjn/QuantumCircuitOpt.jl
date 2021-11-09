@@ -1,7 +1,7 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### v0.3.5
+### v0.3.2
 - Moved all the model options (including valid constraints) from `qc_model.jl` to `types.jl` into `QCModelOptions`, a struct form 
 - Streamlined default options for `QCModelOptions`
 - Moved `relax_integrality`, `time_limit`, `objective_slack_penalty` and `optimizer_log` options from `data.jl` to `QCModelOptions`
