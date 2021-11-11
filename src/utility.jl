@@ -675,7 +675,7 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
         end
         
         if isapprox(sum_det, size(data["gates_real"])[3], atol = 1E-6) 
-            Memento.error(_LOGGER, "Infeasible decomposition: det(elementary_gates) = 1, while det(target_gate) = -1")
+            Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
         end
     end
 end
