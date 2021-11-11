@@ -20,3 +20,11 @@ CCZGate
 ```@docs
 PeresGate
 ```
+## RCCXGate
+```@docs
+RCCXGate
+```
+## MargolusGate
+```@docs
+MargolusGate
+```

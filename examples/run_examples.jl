@@ -29,7 +29,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-# decompose_gates = ["decompose_GroverDiffusion_using_HX"]
+decompose_gates = ["decompose_margolus"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -41,7 +41,7 @@ for gates in decompose_gates
     params = getfield(Main, Symbol(gates))()
 
     model_options = Dict{Symbol, Any}(:model_type => "compact_formulation",
-                                      :convex_hull_gate_constraints => false)
+                                      :convex_hull_gate_constraints => true)
     
     qcopt_optimizer = get_gurobi()
     global result_qc = QCO.run_QCModel(params, qcopt_optimizer)

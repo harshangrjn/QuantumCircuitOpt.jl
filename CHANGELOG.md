@@ -1,6 +1,12 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.3.3 
+- Added determinant-based test to detect infeasibility in the pre-processing step
+- Added support for 3-qubit RCCXGate (relative Toffoli)
+- Added support for 3-qubit MargolusGate (simplified Toffoli)
+- Updated docs and unit tests to reflect above changes
+
 ### v0.3.2
 - Moved all the model options (including valid constraints) from `qc_model.jl` to `types.jl` into `QCModelOptions`, a struct form 
 - Streamlined default options for `QCModelOptions`

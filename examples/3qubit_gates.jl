@@ -206,3 +206,36 @@ function decompose_miller()
         
     return params
 end
+
+function decompose_relative_toffoli()
+    #Reference: https://arxiv.org/pdf/1508.03273.pdf
+
+    params = Dict{String, Any}(
+        "num_qubits" => 3,
+        "maximum_depth" => 9,
+        "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
+        "target_gate" => QCO.RCCXGate(),
+        "objective" => "minimize_depth",
+
+        "set_cnot_upper_bound" => 3
+        )
+            
+    return params 
+end
+
+function decompose_margolus()
+    #Reference: https://arxiv.org/pdf/quant-ph/0312225.pdf
+
+    params = Dict{String, Any}(
+        "num_qubits" => 3,
+        "maximum_depth" => 7,
+        "elementary_gates" => ["RY_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
+        "target_gate" => QCO.MargolusGate(),
+        "objective" => "minimize_depth",
+
+        "RY_discretization" => -π:π/4:π,
+        # "set_cnot_upper_bound" => 3
+        )
+
+    return params
+end

@@ -1729,3 +1729,73 @@ function PeresGate()
                                       0  0  0  0  1  0  0  0])
 
 end
+
+@doc raw"""
+    RCCXGate()
+
+Three-qubit relative (or simplified) Toffoli gate, or the CCX gate. This gate is equivalent to [ToffoliGate](@ref) upto relative phases. 
+The advantage of this gate is that it's implementation requires only three CNot (or CX) gates. 
+Reference: [https://arxiv.org/pdf/1508.03273.pdf](https://arxiv.org/pdf/1508.03273.pdf)
+
+**Matrix Representation**
+
+```math
+RCCXGate =
+            \begin{pmatrix}
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & -i \\
+            0 & 0 & 0 & 0 & 0 & 0 & i & 0 \\
+        \end{pmatrix}
+```
+"""
+function RCCXGate()
+
+    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                      0  1  0  0  0  0  0  0
+                                      0  0  1  0  0  0  0  0
+                                      0  0  0  1  0  0  0  0
+                                      0  0  0  0  1  0  0  0
+                                      0  0  0  0  0  -1  0  0
+                                      0  0  0  0  0  0  0  -im
+                                      0  0  0  0  0  0  im  0])
+end
+
+@doc raw"""
+    MargolusGate()
+
+Three-qubit Margolus gate, which is a simplified [ToffoliGate](@ref) and coincides with the Toffoli gate up 
+to a single change of sign. The advantage of this gate is that its implementation requires only three CNot (or CX) gates. 
+Reference: [https://arxiv.org/pdf/quant-ph/0312225.pdf](https://arxiv.org/pdf/quant-ph/0312225.pdf)
+
+**Matrix Representation**
+
+```math
+MargolusGate =
+            \begin{pmatrix}
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        \end{pmatrix}
+```
+"""
+function MargolusGate()
+
+    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                      0  1  0  0  0  0  0  0
+                                      0  0  1  0  0  0  0  0
+                                      0  0  0  1  0  0  0  0
+                                      0  0  0  0  1  0  0  0
+                                      0  0  0  0  0 -1  0  0
+                                      0  0  0  0  0  0  0  1
+                                      0  0  0  0  0  0  1  0])
+end

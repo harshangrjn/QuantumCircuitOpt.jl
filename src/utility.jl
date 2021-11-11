@@ -658,3 +658,18 @@ function _verify_λ_bounds(angle::Number)
         Memento.error(_LOGGER, "λ angle is not within valid bounds")
     end
 end
+
+function _determinant_test_for_infeasibility(data::Dict{String,Any})
+    det_target = LA.det(data["target_gate"])
+
+    if isapprox(det_target, -1, atol=1E-6)
+        sum_det = 0
+        for k = 1:size(data["gates_real"])[3]
+            sum_det += LA.det(data["gates_real"][:,:,k])
+        end
+        
+        if isapprox(sum_det, size(data["gates_real"])[3], atol = 1E-6) 
+            Memento.error(_LOGGER, "Infeasible decomposition: det(elementary_gates) = 1, while det(target_gate) = -1")
+        end
+    end
+end
