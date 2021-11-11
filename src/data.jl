@@ -118,6 +118,9 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     # Rotation and Universal gate angle discretizations
     data = QCO._populate_data_angle_discretization!(data, params)
 
+    # Determinant test for input gates
+    QCO._determinant_test_for_infeasibility(data)
+
     # Input circuit
     if length(keys(input_circuit_dict)) > 0
         data["input_circuit"] = input_circuit_dict

@@ -2,7 +2,7 @@ function decompose_RX_on_q3()
 
     println(">>>>> RX Gate on third qubit using U3Gate <<<<<")
  
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
     
     "num_qubits" => 3, 
     "maximum_depth" => 3,
@@ -16,8 +16,6 @@ function decompose_RX_on_q3()
     "U3_λ_discretization" => [0, π/2],
     )
 
-    return params
-    
 end
 
 function decompose_toffoli()
@@ -44,7 +42,7 @@ function decompose_toffoli()
 
     println(">>>>> Toffoli gate <<<<<")
  
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
     
     "num_qubits" => 3, 
     "maximum_depth" => 15,
@@ -58,15 +56,13 @@ function decompose_toffoli()
     "set_cnot_upper_bound" => 6,
     )
 
-    return params
-    
 end
 
 function decompose_toffoli_using_kronecker()
 
     println(">>>>> Toffoli gate using Kronecker <<<<<")
  
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
     
     "num_qubits" => 3,
     "maximum_depth" => 12,
@@ -78,8 +74,6 @@ function decompose_toffoli_using_kronecker()
     "set_cnot_lower_bound" => 6,
     )
 
-    return params
-    
 end
 
 function decompose_toffoli_with_controlled_gates()
@@ -87,7 +81,7 @@ function decompose_toffoli_with_controlled_gates()
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
     println(">>>>> Toffoli gate with controlled gates <<<<<")
  
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
     
     "num_qubits" => 3,
     "maximum_depth" => 5,
@@ -98,13 +92,12 @@ function decompose_toffoli_with_controlled_gates()
     "decomposition_type" => "exact",
     )
 
-    return params
-    
 end
 
 function decompose_CNot_1_3()
 
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
+
     "num_qubits" => 3,
     "maximum_depth" => 8,
     # "elementary_gates" => ["CNot_1_2", "CNot_2_3", "Identity"], 
@@ -113,12 +106,11 @@ function decompose_CNot_1_3()
     "objective" => "minimize_depth",
     )
 
-    return params
 end
 
 function decompose_FredkinGate()
 
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
     "num_qubits" => 3,
     "maximum_depth" => 7,
     # Reference: https://doi.org/10.1103/PhysRevA.53.2855
@@ -126,8 +118,7 @@ function decompose_FredkinGate()
     "target_gate" => QCO.CSwapGate(), #also Fredkin
     "objective" => "minimize_depth"
     )
-    
-    return params
+
 end
 
 function decompose_toffoli_left()
@@ -144,15 +135,15 @@ function decompose_toffoli_left()
         return H_3 * cnot_23 * Tdagger_3 * CNot_1_3 * T_3 * cnot_23 * Tdagger_3
     end
 
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
+
     "num_qubits" => 3,
     "maximum_depth" => 7,
     "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => target_gate(),
     "objective" => "minimize_depth"
     )
-    
-    return params
+
 end
 
 function decompose_toffoli_right()
@@ -171,15 +162,15 @@ function decompose_toffoli_right()
         return CNot_1_3 * T_2 * T_3 * CNot_1_2 * H_3 * T_1 * Tdagger_2 * CNot_1_2
     end
 
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
+
     "num_qubits" => 3,
     "maximum_depth" => 8,
     "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => target_gate(), 
     "objective" => "minimize_depth"
     )
-    
-    return params
+
 end
 
 function decompose_miller()
@@ -196,13 +187,62 @@ function decompose_miller()
         return CNot_3_1 * CNot_3_2 * CV_2_3 * CNot_1_2 * CVdagger_2_3 * CV_1_3 * CNot_3_1 * CNot_1_2
     end
 
-    params = Dict{String, Any}(
+    return Dict{String, Any}(
+
     "num_qubits" => 3,
     "maximum_depth" => 8,
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
     "target_gate" => target_gate(),
     "objective" => "minimize_depth"
     )
-        
-    return params
+
+end
+
+function decompose_relative_toffoli()
+    #Reference: https://arxiv.org/pdf/1508.03273.pdf
+
+    return Dict{String, Any}(
+
+        "num_qubits" => 3,
+        "maximum_depth" => 9,
+        "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
+        "target_gate" => QCO.RCCXGate(),
+        "objective" => "minimize_depth",
+
+        "set_cnot_upper_bound" => 3
+        )
+
+end
+
+function decompose_margolus()
+    #Reference: https://arxiv.org/pdf/quant-ph/0312225.pdf
+
+    return Dict{String, Any}(
+
+        "num_qubits" => 3,
+        "maximum_depth" => 7,
+        "elementary_gates" => ["RY_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
+        "target_gate" => QCO.MargolusGate(),
+        "objective" => "minimize_depth",
+
+        "RY_discretization" => -π:π/4:π,
+        # "set_cnot_lower_bound" => 3,
+        # "set_cnot_upper_bound" => 3
+        )
+
+end
+
+function decompose_CiSwap()
+    #Reference: https://doi.org/10.1103/PhysRevResearch.2.033097
+
+    return Dict{String, Any}(
+
+        "num_qubits" => 3,
+        "maximum_depth" => 12,
+        # "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
+        "elementary_gates" => ["H_3", "S_3", "Sdagger_3", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
+        "target_gate" => QCO.CiSwapGate(),
+        "objective" => "minimize_depth",
+        )
+
 end

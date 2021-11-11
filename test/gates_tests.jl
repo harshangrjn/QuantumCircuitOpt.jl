@@ -72,21 +72,21 @@
     # Next 3 tests from: https://american-cse.org/csci2015/data/9795a059.pdf
 
     CV_31 = QCO.get_full_sized_gate("CV_3_1", 3);
-    cnot_23 = QCO.get_full_sized_gate("CNot_2_3", 3);
+    CNot_23 = QCO.get_full_sized_gate("CNot_2_3", 3);
     CVdagger_31 = QCO.get_full_sized_gate("CVdagger_3_1", 3);
     CV_21 = QCO.get_full_sized_gate("CV_2_1", 3);
 
     CVdagger_21 = QCO.get_full_sized_gate("CVdagger_2_1", 3);
 
-    @test isapprox(CV_31 * cnot_23 * CVdagger_31 * cnot_23 * CV_21, CVdagger_21 * cnot_23 * CV_31 * cnot_23 * CVdagger_31, atol = tol_0)
+    @test isapprox(CV_31 * CNot_23 * CVdagger_31 * CNot_23 * CV_21, CVdagger_21 * CNot_23 * CV_31 * CNot_23 * CVdagger_31, atol = tol_0)
 
     CV_12 = QCO.get_full_sized_gate("CV_1_2", 3);
     CV_32 = QCO.get_full_sized_gate("CV_3_2", 3);
     CVdagger_32 = QCO.get_full_sized_gate("CVdagger_3_2", 3);
     CVdagger_12 = QCO.get_full_sized_gate("CVdagger_1_2", 3);
-    cnot_13 = QCO.get_full_sized_gate("CNot_1_3", 3);
+    CNot_13 = QCO.get_full_sized_gate("CNot_1_3", 3);
 
-    @test isapprox(CV_32 * cnot_13 * CVdagger_32 * cnot_13 * CV_12, CVdagger_32 * cnot_13 * CV_32 * cnot_13 * CVdagger_12, atol = tol_0)
+    @test isapprox(CV_32 * CNot_13 * CVdagger_32 * CNot_13 * CV_12, CVdagger_32 * CNot_13 * CV_32 * CNot_13 * CVdagger_12, atol = tol_0)
 
     CVdagger_13 = QCO.get_full_sized_gate("CVdagger_1_3", 3);
     cnot_21 = QCO.get_full_sized_gate("CNot_2_1", 3);
@@ -157,13 +157,26 @@
     @test isapprox(QCO.PeresGate(), QCO.ToffoliGate() * CNot_12, atol = tol_0)
     @test isapprox(QCO.PeresGate(), CVdagger_13 * CVdagger_23 * CNot_12 * CV_23, atol = tol_0)
 
-    #iSwap test 
+    # iSwap test 
     @test isapprox(QCO.get_full_sized_gate("iSwap_2_1", 3), QCO.get_full_sized_gate("iSwap_1_2", 3), atol = tol_0)
     @test isapprox(QCO.get_full_sized_gate("iSwap_2_3", 4), QCO.get_full_sized_gate("iSwap_3_2", 4), atol = tol_0)
     @test isapprox(QCO.get_full_sized_gate("iSwap_3_5", 5), QCO.get_full_sized_gate("iSwap_5_3", 5), atol = tol_0)
 
     # Sycamore test
     @test isapprox(QCO.SycamoreGate()^12, QCO.IGate(2), atol = tol_0)
+
+    # RCCX test
+    T_3 = QCO.get_full_sized_gate("T_3", 3)
+    Tdagger_3 = QCO.get_full_sized_gate("Tdagger_3", 3)
+    @test isapprox(QCO.RCCXGate(),  H_3 * Tdagger_3 * CNot_23 * T_3 * CNot_13 * Tdagger_3 * CNot_23 * T_3 * H_3, atol = tol_0)
+
+    # Margolus test 
+    RY_a = QCO.get_full_sized_gate("RY_3", 3, angle = -π/4)
+    RY_b = QCO.get_full_sized_gate("RY_3", 3, angle = π/4)
+    @test isapprox(QCO.MargolusGate(),  RY_a * CNot_23 * RY_a * CNot_13 * RY_b * CNot_23 * RY_b, atol = tol_0)
+    
+    # CiSwap test 
+    @test isapprox(QCO.CiSwapGate(),  CNot_32 * H_3 * CNot_23 * T_3 * CNot_13 * Tdagger_3 * CNot_23 * T_3 * CNot_13 * Tdagger_3 * H_3 * CNot_32, atol = tol_0)
 
 end
 
