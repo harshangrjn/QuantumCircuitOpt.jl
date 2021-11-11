@@ -1295,7 +1295,8 @@ end
 @doc raw"""
     iSwapGate()
 
-Two-qubit, symmetric and clifford, iSWAP gate.
+Two-qubit, symmetric and clifford, iSWAP gate. This is an entangling swapping gate where the qubits 
+obtain a phase of ``i`` if the state of the qubits is swapped.
 
 **Circuit Representation**
 ```
@@ -1798,4 +1799,49 @@ function MargolusGate()
                                       0  0  0  0  0 -1  0  0
                                       0  0  0  0  0  0  0  1
                                       0  0  0  0  0  0  1  0])
+end
+
+@doc raw"""
+    CiSwapGate()
+
+Three-qubit controlled version of the [iSwapGate](@ref).
+Reference: [https://doi.org/10.1103/PhysRevResearch.2.033097](https://doi.org/10.1103/PhysRevResearch.2.033097)
+
+**Circuit Representation**
+```
+q_0: ─────■─────
+          │
+      ┌───────┐
+q_1: ─┤       ├─
+      │ iSwap │   
+q_2: ─┤       ├─ 
+      └───────┘ 
+```
+
+**Matrix Representation**
+
+```math
+CiSwapGate =
+            \begin{pmatrix}
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & i & 0 \\
+            0 & 0 & 0 & 0 & 0 & i & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+        \end{pmatrix}
+```
+"""
+function CiSwapGate()
+
+    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
+                                      0  1  0  0  0  0  0  0
+                                      0  0  1  0  0  0  0  0
+                                      0  0  0  1  0  0  0  0
+                                      0  0  0  0  1  0  0  0
+                                      0  0  0  0  0  0 im  0
+                                      0  0  0  0  0 im  0  0
+                                      0  0  0  0  0  0  0  1])
 end

@@ -28,3 +28,7 @@ RCCXGate
 ```@docs
 MargolusGate
 ```
+## CiSwapGate
+```@docs
+CiSwapGate
+```

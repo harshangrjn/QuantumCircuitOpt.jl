@@ -659,6 +659,12 @@ function _verify_λ_bounds(angle::Number)
     end
 end
 
+"""
+    _determinant_test_for_infeasibility(data::Dict{String,Any})
+
+Given the processed data dictionary, this function performs a few tests based on the determinant values of 
+elementary and target gates to throw an error if the problem is infeasible. 
+"""
 function _determinant_test_for_infeasibility(data::Dict{String,Any})
     det_target = LA.det(data["target_gate"])
 

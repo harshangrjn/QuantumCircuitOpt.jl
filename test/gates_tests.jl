@@ -174,5 +174,9 @@
     RY_a = QCO.get_full_sized_gate("RY_3", 3, angle = -π/4)
     RY_b = QCO.get_full_sized_gate("RY_3", 3, angle = π/4)
     @test isapprox(QCO.MargolusGate(),  RY_a * CNot_23 * RY_a * CNot_13 * RY_b * CNot_23 * RY_b, atol = tol_0)
+    
+    # CiSwap test 
+    @test isapprox(QCO.CiSwapGate(),  CNot_32 * H_3 * CNot_23 * T_3 * CNot_13 * Tdagger_3 * CNot_23 * T_3 * CNot_13 * Tdagger_3 * H_3 * CNot_32, atol = tol_0)
+
 end
 
