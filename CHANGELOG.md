@@ -4,7 +4,7 @@ QuantumCircuitOpt.jl Change Log
 ### v0.3.3 
 - Added determinant-based test to detect infeasibility in the pre-processing step
 - Added support for 3-qubit RCCXGate (relative Toffoli)
-- Added support for 3-qubit MargolusGate (simplified Toffoli)
+- Added support for 3-qubit MargolusGate (simplified Toffoli) - #46
 - Added support for 3-qubit CiSwapGate (controlled iSwap)
 - Updated docs and unit tests to reflect above changes
 
