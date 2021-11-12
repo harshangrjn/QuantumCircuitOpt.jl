@@ -240,7 +240,6 @@ function decompose_CiSwap()
         "num_qubits" => 3,
         "maximum_depth" => 12,
         "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
-        # "elementary_gates" => ["S_2", "Sdagger_2", "S_3", "Sdagger_3", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
         "target_gate" => QCOpt.CiSwapGate(),
         "objective" => "minimize_depth",
         )
