@@ -35,6 +35,8 @@ end
         "maximum_depth" => 4,        
         "elementary_gates" => ["CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCO.SwapGate(),  
+        "set_cnot_lower_bound" => 2,
+        "set_cnot_upper_bound" => 3,
         "objective" => "minimize_cnot", 
         "decomposition_type" => "exact"                      
         )

@@ -649,20 +649,10 @@ function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, n
     end
 
     if isempty(qubit_loc)
-        
-        if gate_type in QCO.ONE_QUBIT_GATES
-            Memento.error(_LOGGER, "Specify a valid qubit location for the input $input_gate gate")
-        elseif gate_type in QCO.TWO_QUBIT_GATES
-            Memento.error(_LOGGER, "Specify valid qubit locations for the input $input_gate gate")
-        end
+        Memento.error(_LOGGER, "Specify a valid qubit location(s) for the input $input_gate gate")
             
     elseif !issubset(qubit_loc, 1:num_qubits)
-        
-        if gate_type in QCO.ONE_QUBIT_GATES
-            Memento.error(_LOGGER, "Specified qubit for the $input_gate gate does not lie in [1,...,$num_qubits]")
-        elseif gate_type in QCO.TWO_QUBIT_GATES
-            Memento.error(_LOGGER, "Specified qubits for $input_gate gate do not lie in [1,...,$num_qubits]")
-        end
+        Memento.error(_LOGGER, "Specified qubit(s) for the $input_gate gate ∉ [1,...,$num_qubits]")
 
     elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
         Memento.error(_LOGGER, "Specified $input_gate gate cannot have identical control and target qubits") 
