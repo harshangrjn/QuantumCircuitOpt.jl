@@ -1,6 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.3.4
+- Updated error messages in `src/data.jl` to better represent one and two qubit gates
+- More determinant-based tests (to handle complex det values) to detect infeasibility
+
 ### v0.3.3 
 - Added determinant-based test to detect infeasibility in the pre-processing step
 - Added support for 3-qubit RCCXGate (relative Toffoli)

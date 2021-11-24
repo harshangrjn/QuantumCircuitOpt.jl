@@ -268,7 +268,7 @@ function real_to_complex_gate(M::Array{Float64,2})
     n = size(M)[1]
 
     if !iseven(n)
-        Memento.error(_LOGGER, "Input gate can admit only even numbered columns and rows")
+        Memento.error(_LOGGER, "Specified gate can admit only even numbered columns and rows")
     end
     
     M_complex = zeros(Complex{Float64}, (Int(n/2), Int(n/2)))
@@ -278,7 +278,7 @@ function real_to_complex_gate(M::Array{Float64,2})
         for j = collect(1:2:n)
 
             if !isapprox(M[i,j], M[i+1, j+1], atol = 1E-5) || !isapprox(M[i+1,j], -M[i,j+1], atol = 1E-5)
-                Memento.error(_LOGGER, "Input real form of the complex gate is invalid")
+                Memento.error(_LOGGER, "Specified real form of the complex gate is invalid")
             end
 
             M_re = M[i,j]
@@ -393,7 +393,7 @@ function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2},
     qubit = parse(Int, qubit_loc[2:end])
 
     if !(qubit in 1:num_qubits)
-        Memento.error(_LOGGER, "Input qubit location, $qubit, has to be ∈ [q1,...,q$num_qubits]")
+        Memento.error(_LOGGER, "Specified qubit location, $qubit, has to be ∈ [q1,...,q$num_qubits]")
     end
 
     I = QCO.IGate(1)
@@ -432,7 +432,7 @@ function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_
     t_qubit = parse(Int, t_qubit_loc[2:end])
 
     if !(c_qubit in 1:num_qubits) || !(t_qubit in 1:num_qubits)
-        Memento.error(_LOGGER, "Input control and target qubit locations have to be ∈ [q1,...,q$num_qubits]")
+        Memento.error(_LOGGER, "Specified control and target qubit locations have to be ∈ [q1,...,q$num_qubits]")
     elseif isapprox(c_qubit, t_qubit, atol = 1E-6)
         Memento.error(_LOGGER, "Control and target qubits cannot be identical for a multi-qubit elementary gate")
     end
@@ -662,20 +662,44 @@ end
 """
     _determinant_test_for_infeasibility(data::Dict{String,Any})
 
-Given the processed data dictionary, this function performs a few tests based on the determinant values of 
-elementary and target gates to throw an error if the problem is infeasible. 
+Given the processed data dictionary, this function performs a few simple tests based on the determinant values of 
+elementary and target gates to detect MIP infeasibility. 
 """
 function _determinant_test_for_infeasibility(data::Dict{String,Any})
-    det_target = LA.det(data["target_gate"])
 
-    if isapprox(det_target, -1, atol=1E-6)
-        sum_det = 0
-        for k = 1:size(data["gates_real"])[3]
-            sum_det += LA.det(data["gates_real"][:,:,k])
+    if data["are_gates_real"]
+        det_target = LA.det(data["target_gate"])
+    else
+        det_target = LA.det(QCO.real_to_complex_gate(data["target_gate"]))
+    end
+
+    if isapprox(imag(det_target), 0, atol = 1E-6) 
+        if isapprox(det_target, -1, atol=1E-6)
+            sum_det = 0
+            for k = 1:length(keys(data["gates_dict"]))
+                det_val = LA.det(data["gates_dict"]["$k"]["matrix"])
+                if isapprox(imag(det_val), 0, atol = 1E-6) 
+                    sum_det += det_val
+                end
+            end
+            
+            if (isapprox(sum_det, length(keys(data["gates_dict"])), atol = 1E-6)) && (data["decomposition_type"] == "exact")
+                Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
+            end
+        end
+    else
+        det_gates_real = true
+        for k = 1:length(keys(data["gates_dict"]))
+            if !(isapprox(imag(LA.det(data["gates_dict"]["$k"]["matrix"])), 0, atol=1E-6))
+                det_gates_real = false
+                continue
+            end
         end
         
-        if isapprox(sum_det, size(data["gates_real"])[3], atol = 1E-6) 
-            Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
+        if det_gates_real && (data["decomposition_type"] == "exact")
+            Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
         end
+
     end
+
 end
