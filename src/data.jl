@@ -30,7 +30,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
 
     # Elementary gates
     if !("elementary_gates" in keys(params)) || isempty(params["elementary_gates"])
-        Memento.error(_LOGGER, "Input elementary gates is empty. Enter at least two unique unitary gates")
+        Memento.error(_LOGGER, "Specify at least two unique unitary elementary gates")
     end
 
     # Input Circuit
@@ -642,20 +642,23 @@ this function catches and throws any errors, should the input gate type and qubi
 """
 function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
 
-    if isempty(qubit_loc)
-        Memento.error(_LOGGER, "A valid qubit location has to be specified for the input $input_gate gate")
-    elseif !issubset(qubit_loc, 1:num_qubits)
-        Memento.error(_LOGGER, "Specified qubits for $input_gate gate do not lie in [1,...,$num_qubits]")
-    elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
-        Memento.error(_LOGGER, "Input $input_gate gate cannot have identical control and target qubits") 
-    elseif length(qubit_loc) > 2 
-        Memento.error(_LOGGER, "Only 1- and 2-qubit elementary gates are currently supported")
+    if (gate_type in QCO.TWO_QUBIT_GATES) && (length(qubit_loc) != 2)
+        Memento.error(_LOGGER, "Specify two qubits for $input_gate, which is a 2-qubit gate")
+    elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) != 1)
+        Memento.error(_LOGGER, "Specify only one qubit for $input_gate, which is a 1-qubit gate")
     end
 
-    if (gate_type in QCO.TWO_QUBIT_GATES) && (length(qubit_loc) != 2)
-        Memento.error(_LOGGER, "Input two qubits for $input_gate, which is a 2-qubit gate")
-    elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) != 1)
-        Memento.error(_LOGGER, "Input only one qubit for $input_gate, which is a 1-qubit gate")
+    if isempty(qubit_loc)
+        Memento.error(_LOGGER, "Specify a valid qubit location(s) for the input $input_gate gate")
+            
+    elseif !issubset(qubit_loc, 1:num_qubits)
+        Memento.error(_LOGGER, "Specified qubit(s) for the $input_gate gate ∉ [1,...,$num_qubits]")
+
+    elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
+        Memento.error(_LOGGER, "Specified $input_gate gate cannot have identical control and target qubits") 
+
+    elseif length(qubit_loc) > 2 
+        Memento.error(_LOGGER, "Only 1- and 2-qubit elementary gates are currently supported")
     end
 
 end
