@@ -42,7 +42,8 @@ end
         )
     
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
-                                      :all_valid_constraints => 1)
+                                      :all_valid_constraints => 1,
+                                      :unit_magnitude_constraints => true)
 
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 

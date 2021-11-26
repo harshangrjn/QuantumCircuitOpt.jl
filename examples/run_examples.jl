@@ -29,20 +29,21 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-# decompose_gates = ["decompose_CiSwap"]
+decompose_gates = ["decompose_quantum_fulladder"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
 #----------------------------------------------#
-result_qc = Dict{String,Any}()
+result = Dict{String,Any}()
 
 for gates in decompose_gates 
     
     params = getfield(Main, Symbol(gates))()
 
-    model_options = Dict{Symbol, Any}(:model_type => "compact_formulation",
-                                      :convex_hull_gate_constraints => true)
+    model_options = Dict{Symbol, Any}(:convex_hull_gate_constraints => false,
+                                      :unit_magnitude_constraints => false,
+                                      :idempotent_gate_constraints => false)
     
     qcopt_optimizer = get_gurobi()
-    global result_qc = QCOpt.run_QCModel(params, qcopt_optimizer)
+    global result = QCOpt.run_QCModel(params, qcopt_optimizer; options = model_options)
 end

@@ -1,6 +1,11 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### Staged
+- Dropped support for redundant `constraint_complex_to_real_symmetry_compact` function
+- Added unit magnitude (outer-approximation) constraints for unitary variables
+- Updated docs and unit tests to reflect above changes
+
 ### v0.3.4
 - Updated error messages in `src/data.jl` to better represent one and two qubit gates
 - More determinant-based tests (to handle complex det values) to detect infeasibility

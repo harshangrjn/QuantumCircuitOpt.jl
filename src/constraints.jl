@@ -74,18 +74,8 @@ function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
     n_r    = size(qcm.data["gates_real"])[1]
     n_c    = size(qcm.data["gates_real"])[2]
 
-    for i=1:2:n_r
-        for j=1:2:n_c
-            for d=1:depth
-
-                if d <= (depth-1)
-                    JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j,d]   ==  qcm.variables[:U_var][i+1,j+1,d])
-                    JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d])
-                end
-
-            end
-        end
-    end
+    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], qcm.variables[:U_var][i,j,d]   ==  qcm.variables[:U_var][i+1,j+1,d])
+    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d])
     
     return
 end
@@ -158,18 +148,6 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
         JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"][:,:] + qcm.variables[:slack_var][:,:])    
     
     end
-    
-    return
-end
-
-function constraint_complex_to_real_symmetry_compact(qcm::QuantumCircuitModel)
-
-    depth  = qcm.data["maximum_depth"]
-    n_r    = size(qcm.data["gates_real"])[1]
-    n_c    = size(qcm.data["gates_real"])[2]
-
-    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], qcm.variables[:U_var][i,j,d]   ==  qcm.variables[:U_var][i+1,j+1,d])
-    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d])
     
     return
 end
@@ -463,5 +441,19 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
         
     end
     
+    return
+end
+
+function constraint_complex_unit_magnitude(qcm::QuantumCircuitModel)
+
+    depth  = qcm.data["maximum_depth"]
+    n_r    = size(qcm.data["gates_real"])[1]
+    n_c    = size(qcm.data["gates_real"])[2]
+
+    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)],  qcm.variables[:U_var][i,j,d] + qcm.variables[:U_var][i,j+1,d] <= sqrt(2))
+    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], -qcm.variables[:U_var][i,j,d] + qcm.variables[:U_var][i,j+1,d] <= sqrt(2))         
+    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)],  qcm.variables[:U_var][i,j,d] - qcm.variables[:U_var][i,j+1,d] <= sqrt(2))
+    JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], -qcm.variables[:U_var][i,j,d] - qcm.variables[:U_var][i,j+1,d] <= sqrt(2))
+
     return
 end

@@ -67,6 +67,7 @@ The second set of inputs for QCOpt contains all the optional specifications for 
 |`identity_gate_symmetry_constraints`| This option activates the valid constraints to eliminate symmetry in the Identity gate in the decomposition (default: `true`)| 
 |`idempotent_gate_constraints`| This option activates the valid constraints to eliminate idempotent gates in the elementary (native) gates set (default: `false`)| 
 |`convex_hull_gate_constraints`| This option activates the valid constraints to apply convex hull of complex entries in the elementary (native) gates set (default: `false`)| 
+|`unit_magnitude_constraints`| This option activates the valid outer-approximation constraints for unit-valued complex entries of the unitary gates (`U_var`) (default: `false`)|
 |`visualize_solution`| This option activates the visualization of the optimal circuit decomposition (default: `true`)| 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_log` | This option enables or disables console logging for the `optimizer` (default: `true`).|
