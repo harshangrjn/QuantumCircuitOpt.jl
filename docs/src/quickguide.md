@@ -12,6 +12,7 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 <img width="550px" class="display-dark-only" src="../assets/QCOpt_framework_dark.png" alt="../assets/QCOpt_framework.png"/>
 ```
 
+
 For more technical details about the QCOpt package, check out this [video](https://www.youtube.com/watch?v=sf1HJW5Vmio) from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing (SC21). 
 
 ## Getting started
