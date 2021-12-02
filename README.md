@@ -26,7 +26,7 @@ Pkg.add("QuantumCircuitOpt")
 - Hit `]` to open the project environment and run `test` to run unit tests. If
   you see an error because of missing packages, run `resolve`.
 
-On how to use this package, check the Documentation's [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/quickguide/#Sample-circuit-decomposition) and the [examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) folder for more such circuit decompositions.
+On how to use this package, check the Documentation's [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/quickguide/#Sample-circuit-decomposition) and the [examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) folder for several important circuit decompositions.
 
 For more technical details about the package, check out this [video](https://www.youtube.com/watch?v=sf1HJW5Vmio) from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing (SC21). 
 
