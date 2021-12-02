@@ -28,6 +28,8 @@ Pkg.add("QuantumCircuitOpt")
 
 On how to use this package, check the Documentation's [quick start guide](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/quickguide/#Sample-circuit-decomposition) and the [examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) folder for more such circuit decompositions.
 
+For more technical details about the package, check out this [video](https://www.youtube.com/watch?v=sf1HJW5Vmio) from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing (SC21). 
+
 ## Sample Circuit Synthesis
 Here is a sample usage of QuantumCircuitOpt to optimally decompose a 2-qubit controlled-Z gate ([CZGate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CZGate)) using the entangling [CNOT](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/2_qubit_gates/#CNotGate) gate and an one-qubit universal rotation gate ([U3Gate](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/1_qubit_gates/#U3Gate)) with three discretized Euler angles (θ,ϕ,λ):
 
@@ -66,7 +68,7 @@ Please report any issues via the Github **[issue tracker](https://github.com/har
 QuantumCircuitOpt is being actively developed and suggestions or other forms of contributions are encouraged. 
 
 ## Acknowledgement
-This work was supported by Los Alamos National Laboratory's LDRD Early Career Research Award, *"20190590ECR: Discrete Optimization Algorithms for Provable Optimal Quantum Circuit Design"*. The primary developer of this package is [Harsha Nagarajan](http://harshanagarajan.com) ([@harshangrjn](https://github.com/harshangrjn)). 
+This work was supported by Los Alamos National Laboratory's LDRD Early Career Research award. The primary developer of this package is [Harsha Nagarajan](http://harshanagarajan.com) ([@harshangrjn](https://github.com/harshangrjn)).
 
 ## Citing QuantumCircuitOpt
 If you find QuantumCircuitOpt useful in your work, we request you to cite the following paper ([arXiv link](https://arxiv.org/abs/2111.11674)): 
