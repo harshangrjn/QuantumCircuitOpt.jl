@@ -3,9 +3,7 @@ module QuantumCircuitOpt
 import JuMP
 import LinearAlgebra
 import Memento
-import MathOptInterface
 
-const MOI = MathOptInterface
 const LA = LinearAlgebra
 const QCO = QuantumCircuitOpt
 const kron_symbol = 'x'

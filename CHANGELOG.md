@@ -7,6 +7,7 @@ QuantumCircuitOpt.jl Change Log
 - Updated docs and unit tests to reflect above changes
 - Updated README.md and docs with the Youtube link for the SC21 presentation
 - Added support for JuMP v0.22+
+- Dropped explicit support for MathOptInterface
 
 ### v0.3.4
 - Updated error messages in `src/data.jl` to better represent one and two qubit gates

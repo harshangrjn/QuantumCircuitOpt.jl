@@ -16,7 +16,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         return
     else
-        gates_sol, gates_sol_compressed = QCO.get_postprocessed_decomposition(results, data)
+        gates_sol, gates_sol_compressed = QCO.get_postprocessed_circuit(results, data)
     end
 
     if !isempty(gates_sol_compressed)
@@ -108,7 +108,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("  ","Optimizer run time: ", ceil(results["solve_time"], digits=2)," sec.","\n"; color = :cyan)
             
         if results["termination_status"] == MOI.TIME_LIMIT
-            printstyled("  ","Termination status: TIME_LIMIT", "\n"; color = :cyan)
+            printstyled("  ","Termination status: MOI.TIME_LIMIT", "\n"; color = :cyan)
             printstyled("  ","Decomposition may not be optimal", "\n"; color = :cyan)
         end
 
@@ -124,7 +124,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
 end
 
-function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{String, Any})
+function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String, Any})
 
     gates_sol = Array{String,1}()
     id_sequence = Array{Int64,1}()
@@ -175,7 +175,7 @@ function get_postprocessed_decomposition(results::Dict{String, Any}, data::Dict{
     
     QCO.validate_circuit_decomposition(data, id_sequence)
 
-    gates_sol_compressed = QCO.get_compressed_decomposition(data["num_qubits"], gates_sol)
+    gates_sol_compressed = QCO.get_depth_compressed_circuit(data["num_qubits"], gates_sol)
 
     return gates_sol, gates_sol_compressed
 end
@@ -207,14 +207,14 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
 end
 
 """
-    get_compressed_decomposition(num_qubits::Int64, gates_sol::Array{String,1})
+    get_depth_compressed_circuit(num_qubits::Int64, gates_sol::Array{String,1})
 
 Given the number of qubits and the sequence of gates from the solution, this function returns a 
 decomposition of gates after compressing adjacent pair of gates represented on two separate qubits. 
 For example, gates H1 and H2 appearing in a sequence will be compressed to H1xH2 (kron(H1,H2)). 
 This functionality is currently supported only for two qubit circuits and gates without angle parameters. 
 """
-function get_compressed_decomposition(num_qubits::Int64, gates_sol::Array{String,1})
+function get_depth_compressed_circuit(num_qubits::Int64, gates_sol::Array{String,1})
     # This part of the code may be hacky. This needs to be updated once the input format gets cleaned up for elementary gates with U and R gates.     
 
     if (length(gates_sol) == 1) || (num_qubits > 2)

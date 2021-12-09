@@ -1,6 +1,7 @@
 #-----------------------------------------------------------#
 # Build optimization model for circuit decomsposition here  #
 #-----------------------------------------------------------#
+import JuMP: MOI
 
 function build_QCModel(data::Dict{String, Any}; options = nothing)
     

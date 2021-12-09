@@ -18,7 +18,7 @@ The following video presentation from the [2nd Quantum Computing Software Worksh
 ```@raw html 
 <align="center"/>
 <a href="https://www.youtube.com/watch?v=sf1HJW5Vmio">
-    <img alt="Youtube" src="./assets/video_img.png"
+    <img alt="Youtube-link" src="../assets/video_img.png"
     width=550" height="400">
 </a>
 ```
