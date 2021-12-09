@@ -7,7 +7,7 @@ function build_QCModel(data::Dict{String, Any}; options = nothing)
     m_qc = QCO.QuantumCircuitModel(data)
 
     # Update defaults to user-defined options
-    if options != nothing
+    if options !== nothing
         for i in keys(options)
             QCO.set_option(m_qc, i, options[i])
         end
@@ -139,21 +139,21 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
         JuMP.relax_integrality(qcm.model)
     end
 
-    JuMP.set_time_limit_sec(qcm.model, qcm.options.time_limit)
-
-    if !qcm.options.optimizer_log
-        JuMP.set_silent(qcm.model)
-    end
-
     if JuMP.mode(qcm.model) != JuMP.DIRECT && optimizer !== nothing
-        if qcm.model.moi_backend.state == MOI.Utilities.NO_OPTIMIZER
+        if JuMP.backend(qcm.model).optimizer === nothing
             JuMP.set_optimizer(qcm.model, optimizer)
         else
             Memento.warn(_LOGGER, "Model already contains optimizer, cannot use optimizer specified in `optimize_QCModel!`")
         end
     end
 
-    if JuMP.mode(qcm.model) != JuMP.DIRECT && qcm.model.moi_backend.state == MOI.Utilities.NO_OPTIMIZER
+    JuMP.set_time_limit_sec(qcm.model, qcm.options.time_limit)
+
+    if !qcm.options.optimizer_log
+        JuMP.set_silent(qcm.model)
+    end
+
+    if JuMP.mode(qcm.model) != JuMP.DIRECT && JuMP.backend(qcm.model).optimizer === nothing
         Memento.error(_LOGGER, "No optimizer specified in `optimize_QCModel!` or the given JuMP model.")
     end
     

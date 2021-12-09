@@ -12,8 +12,16 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 <img width="550px" class="display-dark-only" src="../assets/QCOpt_framework_dark.png" alt="../assets/QCOpt_framework.png"/>
 ```
 
-## Video link
-For more technical details about the QCOpt package, check out this [video](https://www.youtube.com/watch?v=sf1HJW5Vmio) presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)). 
+## Video tutorial
+The following video presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce you to the technicalities underlying the package. 
+
+```@raw html 
+<align="center"/>
+<a href="https://www.youtube.com/watch?v=sf1HJW5Vmio">
+    <img alt="Youtube" src="./assets/video_img.png"
+    width=550" height="400">
+</a>
+```
 
 ## Getting started
 To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QCOpt also needs a MIP solver such as [CPLEX](https://github.com/jump-dev/CPLEX.jl) or [Gurobi](https://github.com/jump-dev/Gurobi.jl). If you prefer an open-source MIP solver, install [CBC](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) from the Julia package manager, though be warned that the run times of QCOpt can be substantially slower using these open-source MIP solvers. 
