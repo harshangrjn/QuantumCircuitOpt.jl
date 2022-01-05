@@ -1,6 +1,9 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### Staged
+- DOI link for publication added
+
 ### v0.3.5
 - Dropped support for redundant `constraint_complex_to_real_symmetry_compact` function
 - Added unit magnitude (outer-approximation) constraints for unitary variables
