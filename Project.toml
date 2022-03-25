@@ -11,7 +11,7 @@ Memento = "f28f55f0-a522-5efc-85c2-fe41dfb9b2d9"
 
 [compat]
 DataStructures = "~0.17, ~0.18"
-JuMP = "~0.22"
+JuMP = "~0.22, 1"
 Memento = "~1.0, ~1.1, 1"
 julia = "^1"
 
