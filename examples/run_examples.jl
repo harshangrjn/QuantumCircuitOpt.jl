@@ -1,7 +1,7 @@
 import QuantumCircuitOpt as QCOpt
 using JuMP
 using Gurobi
-# using Cbc
+using Cbc
 # using CPLEX
 
 include("optimizers.jl")
@@ -29,7 +29,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-# decompose_gates = ["decompose_quantum_fulladder"]
+# decompose_gates = ["decompose_iSwap"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
