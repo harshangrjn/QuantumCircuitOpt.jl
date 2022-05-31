@@ -473,3 +473,31 @@ end
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 0.8275862068965518, atol = tol_0)
 end
+
+@testset "Tests: RGate decomposition" begin
+    
+    function target_gate()
+        num_qubits = 2
+        R1 = QCO.get_full_sized_gate("R_1", num_qubits; angle = [π/6, π/3])
+        R2 = QCO.get_full_sized_gate("R_2", num_qubits; angle = [π/3, π/6])
+        CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 2)
+
+        return QCO.round_complex_values(R2 * CNot_1_2 * R1)
+    end
+
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "maximum_depth" => 3,
+    "elementary_gates" => ["R_1", "R_2", "CNot_1_2", "Identity"],
+    "R_θ_discretization" => [π/3, π/6],
+    "R_ϕ_discretization" => [π/3, π/6],
+    "target_gate" => target_gate()
+    )
+    
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
+end

@@ -3,13 +3,15 @@ IMPORTANT: Update the lists below whenever a 1 or 2 qubit gate is added to this 
            Update QCO._get_angle_gates_idx in src/data.jl if gates with angle parameters are added to this file.
 =#
 
-const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "RX", "RY", "RZ", "Phase"]
+const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "R", "RX", "RY", "RZ", "Phase"]
 
 const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z", "S", 
                                               "Sdagger", "T", "Tdagger", "SX", "SXdagger"]
 
 const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", "CRZ", "CRZRev", 
                                               "CU3", "CU3Rev"]
+
+const MULTI_QUBIT_GATES_ANGLE_PARAMETERS   = ["GR"]
 
 # Gates invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "iSwap", "Sycamore", "DCX", "W", "M", 
@@ -28,6 +30,8 @@ const TWO_QUBIT_GATES_CONSTANTS = union(QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC,
 
 const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS, 
                                         QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
+
+const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
 
 #----------------------------------------#
 #            Single-qubit gates          #
@@ -130,6 +134,30 @@ function U1Gate(λ::Number)
 
     U1 = QCO.U3Gate(θ, ϕ, λ)
     return U1
+end
+
+@doc raw"""
+    RGate(θ::Number, ϕ::Number)
+
+A single-qubit rotation gate with two Euler angles, ``\theta`` and ``\phi``, 
+about the ``\cos(\phi)x + \sin(\phi)y`` axis. 
+
+**Matrix Representation**
+
+```math
+R(\theta, \phi) =  e^{-i \theta \left(\cos{\phi} x + \sin{\phi} y\right)} =
+\begin{pmatrix}
+    \cos{\theta} & -i e^{-i \phi} \sin{\theta} \\
+    -i e^{i \phi} \sin{\theta} & \cos{\theta}
+\end{pmatrix}
+```
+"""
+function RGate(θ::Number, ϕ::Number)
+
+    R = Array{Complex{Float64},2}([cos(θ/2)    -(sin(ϕ) + (cos(ϕ))im)*sin(θ/2) 
+                                  (sin(ϕ) - (cos(ϕ))im)*sin(θ/2)  cos(θ/2)])
+
+    return R
 end
 
 @doc raw"""
@@ -1009,10 +1037,10 @@ CRXRev(\theta)\ q_1, q_0 =
 """
 function CRXRevGate(θ::Number)
 
-    CRXRev = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 cos(θ/2) 0 -(sin(θ/2))im      
-                                      0 0 1 0
-                                      0 -(sin(θ/2))im 0 cos(θ/2)])
+    CRXRev = Array{Complex{Float64},2}([1 0 0 0            
+                                        0 cos(θ/2) 0 -(sin(θ/2))im      
+                                        0 0 1 0
+                                        0 -(sin(θ/2))im 0 cos(θ/2)])
 
     return QCO.round_complex_values(CRXRev)
 end
@@ -1049,10 +1077,10 @@ function CRYGate(θ::Number)
     
     QCO._verify_θ_bounds(θ)
 
-    CRY = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 1 0 0       
-                                      0 0  cos(θ/2)  -(sin(θ/2)) 
-                                      0 0  (sin(θ/2))  cos(θ/2)])
+    CRY = Array{Complex{Float64},2}([1 0 0 0            
+                                     0 1 0 0       
+                                     0 0  cos(θ/2)  -(sin(θ/2)) 
+                                     0 0  (sin(θ/2))  cos(θ/2)])
 
     return QCO.round_complex_values(CRY)
 end

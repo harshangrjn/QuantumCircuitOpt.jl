@@ -1,6 +1,11 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### Staged
+- Added support for two angle param gates througout data and log
+- Added support for Rotation gate (`RGate`) with two angle params
+- Updated docs and unit tests to reflect above changes
+
 ### v0.3.6
 - DOI link for publication added
 - Added support for JuMP v1.0
