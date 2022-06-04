@@ -301,10 +301,10 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
             for k in keys(M_elementary_dict) # Angle
                 for l in keys(M_elementary_dict[k]["$(num_qubits)qubit_rep"]) # qubits (which will now be 1)
 
-                    gates_dict["$counter"] = Dict{String, Any}("type" => [elementary_gates[i]],
-                                                                "angle" => Any,
-                                                                "qubit_loc" => l,
-                                                                "matrix" => M_elementary_dict[k]["$(num_qubits)qubit_rep"][l])
+                    gates_dict["$counter"] = Dict{String, Any}("type"      => [elementary_gates[i]],
+                                                               "angle"     => Any,
+                                                               "qubit_loc" => l,
+                                                               "matrix"    => M_elementary_dict[k]["$(num_qubits)qubit_rep"][l])
 
                     if i in one_angle_gates
                         gates_dict["$counter"]["angle"] = M_elementary_dict[k]["angle"]
@@ -326,13 +326,13 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
         # Elementary gates which contain Kronecker symbols
         elseif i in kron_gates_idx
             M = QCO.get_full_sized_kron_symbol_gate(elementary_gates[i], num_qubits)
-            gates_dict["$counter"] = Dict{String, Any}("type" => [elementary_gates[i]],
+            gates_dict["$counter"] = Dict{String, Any}("type"   => [elementary_gates[i]],
                                                        "matrix" => M)
             counter += 1
         else 
             
             M = QCO.get_full_sized_gate(elementary_gates[i], num_qubits)
-            gates_dict["$counter"] = Dict{String, Any}("type" => [elementary_gates[i]],
+            gates_dict["$counter"] = Dict{String, Any}("type"   => [elementary_gates[i]],
                                                        "matrix" => M)
             counter += 1
         end
@@ -438,14 +438,19 @@ function get_discretized_two_angle_gates(gate_type::String, M2::Dict{String, Any
                                                        "ϕ" => angles[2],
                                                        "$(num_qubits)qubit_rep" => Dict{String, Any}()
                                                       )
-            qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
-            if length(qubit_loc) == 1
-                qubit_loc_str = string(qubit_loc[1])
-            elseif length(qubit_loc) == 2 
-                qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
-            end             
+            if !(gate_type in QCO.MULTI_QUBIT_GATES)
+                qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
+                if length(qubit_loc) == 1
+                    qubit_loc_str = string(qubit_loc[1])
+                elseif length(qubit_loc) == 2
+                    qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
+                end             
 
-            M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+            else 
+                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["multi_qubits"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+            end
+
             counter += 1
         end
     end
@@ -533,7 +538,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
     gate_type, qubit_loc = QCO._parse_gate_string(input, type = true, qubits = true)
 
-    if !(gate_type in union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES))
+    if !(gate_type in union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES, QCO.MULTI_QUBIT_GATES))
         Memento.error(_LOGGER, "Specified $input gate does not exist in the predefined set of gates")
     end
 
@@ -602,6 +607,16 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
             end
 
         end
+
+    #-----------------------;
+    #   Multi qubit gates   ;
+    #-----------------------; 
+    elseif gate_type in QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS
+        if (angle !== nothing) && (length(angle) == 2)
+            return getfield(QCO, Symbol(gate_type, "Gate"))(num_qubits, angle[1], angle[2])
+        else
+            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $input gate")
+        end
     end
 
 end
@@ -648,11 +663,8 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
         end
     end
 
-    if size(M)[1] == 2^(num_qubits)
-        return M 
-    else 
-        Memento.error(_LOGGER, "Dimensions mismatch in evaluation of elementary gates with Kronecker symbol")
-    end
+    QCO._catch_kron_dimension_errors(num_qubits, size(M)[1])
+    return M
 
 end
 
@@ -711,8 +723,11 @@ function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, n
         Memento.error(_LOGGER, "Specify only one qubit for $input_gate, which is a 1-qubit gate")
     end
 
-    if isempty(qubit_loc)
+    if isempty(qubit_loc) && (gate_type !== "GR")
         Memento.error(_LOGGER, "Specify a valid qubit location(s) for the input $input_gate gate")
+
+    elseif (gate_type == "GR") && (!isempty(qubit_loc))
+        Memento.error(_LOGGER, "Qubit locations are not necessary for Global-R gate as it is applied on all qubits by default")
             
     elseif !issubset(qubit_loc, 1:num_qubits)
         Memento.error(_LOGGER, "Specified qubit(s) for the $input_gate gate ∉ [1,...,$num_qubits]")

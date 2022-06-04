@@ -474,24 +474,22 @@ end
     @test isapprox(result_qc["objective"], 0.8275862068965518, atol = tol_0)
 end
 
-@testset "Tests: RGate decomposition" begin
+@testset "Tests: RGate & GRGate decomposition" begin
     
-    function target_gate()
-        num_qubits = 2
-        R1 = QCO.get_full_sized_gate("R_1", num_qubits; angle = [π/6, π/3])
-        R2 = QCO.get_full_sized_gate("R_2", num_qubits; angle = [π/3, π/6])
-        CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 2)
-
-        return QCO.round_complex_values(R2 * CNot_1_2 * R1)
-    end
+    num_qubits = 2
+    GR1      = QCO.GRGate(num_qubits, π/6, π/3)
+    CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 2)
+    T        = QCO.round_complex_values(GR1 * CNot_1_2)
 
     params = Dict{String, Any}(
-    "num_qubits" => 2,
+    "num_qubits" => num_qubits,
     "maximum_depth" => 3,
     "elementary_gates" => ["R_1", "R_2", "CNot_1_2", "Identity"],
     "R_θ_discretization" => [π/3, π/6],
     "R_ϕ_discretization" => [π/3, π/6],
-    "target_gate" => target_gate()
+    "target_gate" => T,
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact",
     )
     
     model_options = Dict{Symbol, Any}(:optimizer_log => false)
@@ -500,4 +498,7 @@ end
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
+    z_sol = result_qc["solution"]["z_onoff_var"]
+    @test isapprox(sum(z_sol[1:8, :]), 2, atol = tol_0)
+    @test isapprox(sum(z_sol[9, :]),   1, atol = tol_0)
 end

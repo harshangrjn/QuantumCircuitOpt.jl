@@ -1,9 +1,12 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### Staged
+### v0.4.0
 - Added support for two angle param gates througout data and log
 - Added support for Rotation gate (`RGate`) with two angle params
+- Added support for multi-qubit gates with angle params
+- Added support for Global R gate (`GRGate`) with two angle params
+- General clean-up in `data.jl` and `utility.jl` to handle multi-qubit gates
 - Updated docs and unit tests to reflect above changes
 
 ### v0.3.6

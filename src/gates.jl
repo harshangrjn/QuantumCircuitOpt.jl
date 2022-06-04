@@ -11,6 +11,7 @@ const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z
 const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", "CRZ", "CRZRev", 
                                               "CU3", "CU3Rev"]
 
+# >= 3 qubit gates
 const MULTI_QUBIT_GATES_ANGLE_PARAMETERS   = ["GR"]
 
 # Gates invariant to qubit flip
@@ -31,6 +32,7 @@ const TWO_QUBIT_GATES_CONSTANTS = union(QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC,
 const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS, 
                                         QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
 
+# >= 3 qubit gates
 const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
 
 #----------------------------------------#
@@ -1872,4 +1874,41 @@ function CiSwapGate()
                                       0  0  0  0  0  0 im  0
                                       0  0  0  0  0 im  0  0
                                       0  0  0  0  0  0  0  1])
+end
+
+#---------------------------------------#
+#            Multi-qubit gates          #
+#---------------------------------------#
+@doc raw"""
+    GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
+
+A multi-qubit rotation gate with two Euler angles, ``\theta`` and ``\phi``, 
+applied about the ``\cos(\phi)x + \sin(\phi)y`` axis and parametrized by the number of qubits. 
+This gate can be applied to multiple qubits simultaneously, for a given depth. 
+The global R gate is native to atomic systems. In the one-qubit case, this gate is 
+equivalent to the [RGate](@ref).
+
+Reference: [Qiskit circuit library](https://qiskit.org/documentation/stubs/qiskit.circuit.library.GR.html)
+
+**Circuit Representation (in 3 qubits)**
+```
+     ┌──────────┐
+q_0: ┤0         ├ 
+     │          │
+q_1: ┤1 GR(ϴ,φ) ├    
+     │          │
+q_2: ┤2         ├
+     └──────────┘
+```
+
+**Matrix Representation (in 3 qubits)**
+
+```math
+GR(\theta, \phi) = \exp \left(-i \sum_{i=1}^{3} (\cos(\phi)X_i + \sin(\phi)Y_i) \theta/2 \right) \\ 
+                 = R(\theta, \phi) \otimes R(\theta, \phi) \otimes R(\theta, \phi)  
+```
+"""
+function GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
+
+    return QCO.kron_multi_qubit_gate(num_qubits, QCO.RGate(θ,ϕ))
 end

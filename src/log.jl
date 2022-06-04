@@ -142,17 +142,17 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
             if occursin(kron_symbol, s1)
                 push!(gates_sol, s1) 
 
-            elseif !(QCO._parse_gate_string(s1, type = true) in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS))
+            elseif !(QCO._parse_gate_string(s1, type = true) in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS, QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS))
                 push!(gates_sol, s1) 
 
             else
                 
-                s2 = String[]          
-                for i_qu = 1:data["num_qubits"]
-                    if gate_id["qubit_loc"] == "qubit_$i_qu"    
-                        s2 = "$i_qu"
-                    end
-                end
+                # s2 = String[]          
+                # for i_qu = 1:data["num_qubits"]
+                #     if gate_id["qubit_loc"] == "qubit_$i_qu"    
+                #         s2 = "$i_qu"
+                #     end
+                # end
 
                 if "angle" in keys(gate_id)
 
@@ -233,9 +233,13 @@ function get_depth_compressed_circuit(num_qubits::Int64, gates_sol::Array{String
     angle_param_gate = false
     for i=1:length(gates_sol)
         if !occursin(kron_symbol, gates_sol[i])
-            gates_sol_type = QCO._parse_gate_string(gates_sol[i], type = true)
+            if !occursin("GR", gates_sol[i])
+                gates_sol_type = QCO._parse_gate_string(gates_sol[i], type = true)
+            else 
+                gates_sol_type = "GR"
+            end
             
-            if gates_sol_type in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
+            if gates_sol_type in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS, QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
                 angle_param_gate = true
                 break
             end
