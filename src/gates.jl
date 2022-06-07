@@ -239,7 +239,7 @@ function RZGate(θ::Number)
 end
 
 @doc raw"""
-    HGate(num_qubits::Int64)
+    HGate()
 
 Single-qubit Hadamard gate, which is a ``\pi`` rotation about the X+Z axis, thus equivalent to [U3Gate](@ref)(``\frac{\pi}{2},0,\pi``)
 
@@ -445,7 +445,7 @@ function SXdaggerGate()
 end
 
 @doc raw"""
-    PhaseGate()
+    PhaseGate(λ::Number)
 
 Single-qubit rotation gate about the Z axis. This is also equivalent to [U3Gate](@ref)(``0,0,\lambda``). This 
 gate is also referred to as the [U1Gate](@ref). 

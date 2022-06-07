@@ -301,134 +301,139 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
         num_facets = 0
 
+        vertices_dict = Dict{Set{}, Tuple{<:Number, <:Number}}()
         for I=1:n_r
             for J=1:n_c
-                
-                vertices_coord = Set()
+                vertices_coord_IJ = Set()
 
                 for K in keys(gates_dict)
                     re = QCO.round_real_value(real(gates_dict[K]["matrix"][I,J]))
                     im = QCO.round_real_value(imag(gates_dict[K]["matrix"][I,J]))
 
-                    push!(vertices_coord, (re, im))
+                    push!(vertices_coord_IJ, (re, im))
                 end
                 
-                if (isapprox(minimum([x[1] for x in vertices_coord]), maximum([x[1] for x in vertices_coord]), atol = 1E-6)) || (isapprox(minimum([x[2] for x in vertices_coord]), maximum([x[2] for x in vertices_coord]), atol = 1E-6))
+                if (isapprox(minimum([x[1] for x in vertices_coord_IJ]), maximum([x[1] for x in vertices_coord_IJ]), atol = 1E-6)) || (isapprox(minimum([x[2] for x in vertices_coord_IJ]), maximum([x[2] for x in vertices_coord_IJ]), atol = 1E-6))
                     continue
+                else 
+                    # Eliminates repeated set of extreme points
+                    vertices_dict[vertices_coord_IJ] = (I,J)
+                end
+            end
+        end
+
+        for vertices_coord in keys(vertices_dict)
+            I = vertices_dict[vertices_coord][1]
+            J = vertices_dict[vertices_coord][2]
+
+            vertices = Vector{Tuple{<:Number, <:Number}}()
+            
+            if length(vertices_coord) == 2 
+                for l in vertices_coord
+                    push!(vertices, (l[1], l[2]))
                 end
 
-                vertices = Vector{Tuple{<:Number, <:Number}}()
+                slope, intercept = QCO._get_constraint_slope_intercept(vertices[1], vertices[2])
+
+                if !isinf(slope)
+                    if isapprox(abs(slope), 0, atol=1E-6)
+                        JuMP.@constraint(qcm.model, [d=1:depth], 
+                                        sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept == 0)
+                    else
+                        
+                        JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
+                                                                - slope*sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept == 0)
+                    end
+                elseif isinf(slope)
+                    JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) == vertices[1][1])
+                end
                 
-                if length(vertices_coord) == 2 
-                    
-                    for l in vertices_coord
-                        push!(vertices, (l[1], l[2]))
-                    end
+                num_facets += 1
 
-                    slope, intercept = QCO._get_constraint_slope_intercept(vertices[1], vertices[2])
+            elseif (length(vertices_coord) > 2)
+                
+                for l in vertices_coord
+                    push!(vertices, (l[1], l[2]))
+                end
+                
+                vertices_convex_hull = QCO.convex_hull(vertices)
+                
+                # if length(vertices_convex_hull) == 2
+                #     @show vertices_convex_hull
+                # end
 
-                    if !isinf(slope)
-                        if isapprox(abs(slope), 0, atol=1E-6)
-                            JuMP.@constraint(qcm.model, [d=1:depth], 
-                                            sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept == 0)
-                        else
-                            
-                            JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
-                                                                    - slope*sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept == 0)
+                num_ex_pt = size(vertices_convex_hull)[1]
+                
+                # Add a planar hull cut if num_ex_pt == 2
+
+                if (num_ex_pt >= 3) && (num_ex_pt <= max_ex_pt)
+
+                    for i=1:num_ex_pt
+                        v1 = vertices_convex_hull[i]
+
+                        if i == num_ex_pt
+                            v2 = vertices_convex_hull[1]
+                        else 
+                            v2 = vertices_convex_hull[i+1]
                         end
-                    elseif isinf(slope)
-                        JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) == vertices[1][1])
-                    end
-                    
-                    num_facets += 1
 
-                elseif (length(vertices_coord) > 2) && (length(vertices_coord) <= max_ex_pt)
+                        # Test-vertex for half-space directionality
+                        if i == (num_ex_pt - 1)
+                            v3 = vertices_convex_hull[1]
+                        elseif i == num_ex_pt
+                            v3 = vertices_convex_hull[2]
+                        else 
+                            v3 = vertices_convex_hull[i+2]
+                        end
 
-                    for l in vertices_coord
-                        push!(vertices, (l[1], l[2]))
-                    end
-                    
-                    # vertices_convex_hull = vertices[QHull.chull(vertices).vertices, :]
-                    vertices_convex_hull = QCO.convex_hull(vertices)
+                        slope, intercept = QCO._get_constraint_slope_intercept(v1, v2)
+                        
+                        # Facets of the hull
+                        if !isinf(slope)
 
-                    # if length(vertices_convex_hull) == 2
-                    #     @show vertices_convex_hull
-                    # end
+                            if v3[2] - slope*v3[1] - intercept <= -1E-6
 
-                    num_ex_pt = size(vertices_convex_hull)[1]
-                    
-                    # Add the convex hull facet if num_ex_pt == 2
-
-                    if num_ex_pt >= 3 
-
-                        for i=1:num_ex_pt
-                            v1 = vertices_convex_hull[i]
-
-                            if i == num_ex_pt
-                                v2 = vertices_convex_hull[1]
-                            else 
-                                v2 = vertices_convex_hull[i+1]
-                            end
-
-                            # Test-vertex for half-space directionality
-                            if i == (num_ex_pt - 1)
-                                v3 = vertices_convex_hull[1]
-                            elseif i == num_ex_pt
-                                v3 = vertices_convex_hull[2]
-                            else 
-                                v3 = vertices_convex_hull[i+2]
-                            end
-
-                            slope, intercept = QCO._get_constraint_slope_intercept(v1, v2)
-                            
-                            # Facets of the hull
-                            if !isinf(slope)
-
-                                if v3[2] - slope*v3[1] - intercept <= -1E-6
-
-                                    if isapprox(abs(slope), 0, atol=1E-6)
-                                        
-                                        JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept <= 0)
-                                    else
-                                        
-                                        JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
-                                                                            - slope*(sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates)) - intercept <= 0)
-                                    end
-                                    num_facets += 1
-
-                                elseif v3[2] - slope*v3[1] - intercept >= 1E-6
-
-                                    if isapprox(abs(slope), 0, atol=1E-6)
-                                        
-                                        JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept >= 0)
-                                    else
-                                        
-                                        JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
-                                                                            - slope*(sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates)) - intercept >= 0)
-                                    end
-                                    num_facets += 1
+                                if isapprox(abs(slope), 0, atol=1E-6)
                                     
-                                else 
-                                    Memento.warn(_LOGGER, "Indeterminate direction for the planar-hull cut")
-                                end
-
-                            else isinf(slope)
-
-                                if v3[1] >= v1[1] + 1E-6
-                                    
-                                    JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) >= v1[1])
-                                elseif v3[1] <= v1[1] - 1E-6
-                                    
-                                    JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) <= v1[1])
+                                    JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept <= 0)
                                 else
-                                    Memento.warn(_LOGGER, "Indeterminate direction for the convex-hull cut")
+                                    
+                                    JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
+                                                                        - slope*(sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates)) - intercept <= 0)
                                 end
                                 num_facets += 1
+
+                            elseif v3[2] - slope*v3[1] - intercept >= 1E-6
+
+                                if isapprox(abs(slope), 0, atol=1E-6)
                                     
+                                    JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept >= 0)
+                                else
+                                    
+                                    JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
+                                                                        - slope*(sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates)) - intercept >= 0)
+                                end
+                                num_facets += 1
+                                
+                            else 
+                                Memento.warn(_LOGGER, "Indeterminate direction for the planar-hull cut")
                             end
+
+                        else isinf(slope)
+
+                            if v3[1] >= v1[1] + 1E-6
+                                
+                                JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) >= v1[1])
+                            elseif v3[1] <= v1[1] - 1E-6
+                                
+                                JuMP.@constraint(qcm.model, [d=1:depth], sum(gates_real[(2*I-1),(2*J-1), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) <= v1[1])
+                            else
+                                Memento.warn(_LOGGER, "Indeterminate direction for the planar-hull cut")
+                            end
+                            num_facets += 1
+                                
                         end
                     end
-
                 end
             end
         end

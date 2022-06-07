@@ -6,7 +6,10 @@ QuantumCircuitOpt.jl Change Log
 - Added support for Rotation gate (`RGate`) with two angle params
 - Added support for multi-qubit gates with angle params
 - Added support for Global R gate (`GRGate`) with two angle params
-- General clean-up in `data.jl` and `utility.jl` to handle multi-qubit gates
+- Clean-up in `data.jl` and `utility.jl` to handle multi-qubit gates
+- Decomposition of Pauli-X using global rotation added in 2-qubit examples
+- Updated planar-hull cuts evaluation to account for repeated sets of extreme points (improved run times)
+- Clean-up of `constraint_convex_hull_complex_gates` 
 - Updated docs and unit tests to reflect above changes
 
 ### v0.3.6

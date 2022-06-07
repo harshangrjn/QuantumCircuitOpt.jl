@@ -41,8 +41,8 @@ for gates in decompose_gates
     params = getfield(Main, Symbol(gates))()
 
     model_options = Dict{Symbol, Any}(:convex_hull_gate_constraints => false,
-                                      :unit_magnitude_constraints => false,
-                                      :idempotent_gate_constraints => false)
+                                      :unit_magnitude_constraints   => false,
+                                      :idempotent_gate_constraints  => false)
     
     qcopt_optimizer = get_gurobi()
     global result = QCOpt.run_QCModel(params, qcopt_optimizer; options = model_options)

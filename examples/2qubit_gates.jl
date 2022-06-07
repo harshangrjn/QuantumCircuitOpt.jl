@@ -378,28 +378,6 @@ function decompose_qft2_using_HT()
     
 end
 
-function decompose_RGate()
-    println(">>>>> RGate testing <<<<<")
-    
-    R1 = QCOpt.get_full_sized_gate("R_1", 2; angle = [π/6, π/3])
-    R2 = QCOpt.get_full_sized_gate("R_2", 2; angle = [π/3, π/6])
-    CNot_1_2 = QCOpt.get_full_sized_gate("CNot_1_2", 2)
-    T = QCOpt.round_complex_values(R2 * CNot_1_2 * R1)
-
-    return Dict{String, Any}(
-    
-        "num_qubits" => 2, 
-        "maximum_depth" => 3,
-        "elementary_gates" => ["R_1", "R_2", "CNot_1_2", "Identity"],
-        "R_θ_discretization" => [π/3, π/6],
-        "R_ϕ_discretization" => [π/3, π/6],
-        "target_gate" => T,
-        "objective" => "minimize_depth",
-        "decomposition_type" => "exact", 
-        )
-    
-end
-
 function decompose_GRGate()
     println(">>>>> GRGate testing <<<<<")
 
