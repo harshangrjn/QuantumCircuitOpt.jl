@@ -421,3 +421,22 @@ function decompose_GRGate()
         )
     
 end
+
+function decompose_X_using_GR()
+
+    println(">>>>> Pauli-X Gate using global rotation <<<<<")
+ 
+    return Dict{String, Any}(
+    
+    "num_qubits" => 2,
+    "maximum_depth" => 5, 
+    "elementary_gates" => ["GR", "RZ_1", "RZ_2", "CZ_1_2", "Identity"], 
+    "target_gate" => QCOpt.get_full_sized_gate("X_1", 2),
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact",
+    "GR_θ_discretization" => [-π/2, 0, π/2],
+    "GR_ϕ_discretization" => [-π/2, 0, π/2],
+    "RZ_discretization"   => [-π, 0, π],
+    )
+ 
+end

@@ -558,7 +558,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
             if (angle !== nothing) && (length(angle) > 0)
                 
                 if length(angle) == 1 
-                    return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle), "q$(qubit_loc[1])")
+                    return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1]), "q$(qubit_loc[1])")
                 elseif length(angle) == 2
                     return QCO.kron_single_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1], angle[2]), "q$(qubit_loc[1])")
                 elseif length(angle) == 3
@@ -590,9 +590,9 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
                 
                 if length(angle) == 1 
                     if (qubit_loc[1] < qubit_loc[2])
-                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "Gate"))(angle[1]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
                     else
-                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(angle), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
+                        return QCO.kron_two_qubit_gate(num_qubits, getfield(QCO, Symbol(gate_type, "RevGate"))(angle[1]), "q$(qubit_loc[1])", "q$(qubit_loc[2])")
                     end
                 elseif length(angle) == 3
                     if (qubit_loc[1] < qubit_loc[2])
@@ -717,6 +717,10 @@ this function catches and throws any errors, should the input gate type and qubi
 """
 function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
 
+    if num_qubits <= 0
+        Memento.error(_LOGGER, "Specified number of qubits has to be >= 1")
+    end
+    
     if (gate_type in QCO.TWO_QUBIT_GATES) && (length(qubit_loc) != 2)
         Memento.error(_LOGGER, "Specify two qubits for $input_gate, which is a 2-qubit gate")
     elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) != 1)

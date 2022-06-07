@@ -159,7 +159,7 @@ function RGate(θ::Number, ϕ::Number)
     R = Array{Complex{Float64},2}([cos(θ/2)    -(sin(ϕ) + (cos(ϕ))im)*sin(θ/2) 
                                   (sin(ϕ) - (cos(ϕ))im)*sin(θ/2)  cos(θ/2)])
 
-    return R
+    return QCO.round_complex_values(R)
 end
 
 @doc raw"""
@@ -1888,7 +1888,7 @@ This gate can be applied to multiple qubits simultaneously, for a given depth.
 The global R gate is native to atomic systems. In the one-qubit case, this gate is 
 equivalent to the [RGate](@ref).
 
-Reference: [Qiskit circuit library](https://qiskit.org/documentation/stubs/qiskit.circuit.library.GR.html)
+Reference: [Qiskit's circuit library](https://qiskit.org/documentation/stubs/qiskit.circuit.library.GR.html)
 
 **Circuit Representation (in 3 qubits)**
 ```
@@ -1910,5 +1910,5 @@ GR(\theta, \phi) = \exp \left(-i \sum_{i=1}^{3} (\cos(\phi)X_i + \sin(\phi)Y_i) 
 """
 function GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
 
-    return QCO.kron_multi_qubit_gate(num_qubits, QCO.RGate(θ,ϕ))
+    return QCO.round_complex_values(QCO.kron_multi_qubit_gate(num_qubits, QCO.RGate(θ,ϕ)))
 end

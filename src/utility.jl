@@ -299,13 +299,10 @@ end
 """
     round_complex_values(M::Array{Complex{Float64},2})
 
-Given a complex-valued gate, this function returns a complex-valued gate which 
-rounds the values closest to 0 and 1. This is useful to avoid numerical issues. 
+Given a complex-valued matrix, this function returns a complex-valued matrix which 
+rounds the values closest to 0, 1 and -1. This is useful to avoid numerical issues. 
 """
-function round_complex_values(M::Array{Complex{Float64},2})   
-    if size(M)[1] == 0
-        Memento.error(_LOGGER, "Input cannot be a scalar")
-    end
+function round_complex_values(M::Array{Complex{Float64},2})
 
     if length(size(M)) == 2
         n_r = size(M)[1]
@@ -319,6 +316,8 @@ function round_complex_values(M::Array{Complex{Float64},2})
             end
         end
         return M_round
+    else 
+        return M
     end
     
 end
@@ -326,13 +325,15 @@ end
 """
     round_real_value(x::T) where T <: Number
 
-Given a real-valued number, this function returns a real-value which rounds the values closest to 0 and 1. 
+Given a real-valued number, this function returns a real-value which rounds the values closest to 0, 1 and -1. 
 """
 function round_real_value(x::T) where T <: Number
     if isapprox(abs(x), 0, atol=1E-6)
         x = 0
-    elseif isapprox(x, 1, atol=1E-6)
+    elseif isapprox(x,  1, atol=1E-6)
         x = 1
+    elseif isapprox(x, -1, atol=1E-6)
+        x = -1
     end  
 
     return x
@@ -459,7 +460,7 @@ function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_
         M_sub_swap_id = ct
         M_sub = Matrix{Complex{Float64}}(LA.I, 2^(ct+1),2^(ct+1))
         
-        # Idea is to represent gate_14 = swap_34 * swap_23 * gate_12 * swap_23 * swap_34
+        # Idea is to represent gate_1_4 = swap_3_4 * swap_2_3 * gate_1_2 * swap_2_3 * swap_3_4
         for d=1:M_sub_depth
             M_sub_kron = 1 
             swap_qubits = true
