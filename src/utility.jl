@@ -409,7 +409,7 @@ function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2},
     end
 
     QCO._catch_kron_dimension_errors(num_qubits, size(M_kron)[1])
-    return M_kron
+    return QCO.round_complex_values(M_kron)
 end
 
 
@@ -502,7 +502,7 @@ function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_
     end
 
     QCO._catch_kron_dimension_errors(num_qubits, size(M_kron)[1])
-    return M_kron
+    return QCO.round_complex_values(M_kron)
 end
 
 """
@@ -524,7 +524,7 @@ function kron_multi_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
     end
 
     QCO._catch_kron_dimension_errors(num_qubits, size(M_kron)[1])
-    return M_kron
+    return QCO.round_complex_values(M_kron)
 end
 
 """

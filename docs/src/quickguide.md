@@ -167,7 +167,7 @@ Optimal Circuit Decomposition
 
   U3_2(-90.0,0.0,0.0) * CNot_1_2 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 4.12 sec.
+  Optimizer run time: 2.64 sec.
 =============================================================================
 ```
 

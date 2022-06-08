@@ -734,7 +734,7 @@ function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, n
         Memento.error(_LOGGER, "Qubit locations are not necessary for Global-R gate as it is applied on all qubits by default")
             
     elseif !issubset(qubit_loc, 1:num_qubits)
-        Memento.error(_LOGGER, "Specified qubit(s) for the $input_gate gate ∉ [1,...,$num_qubits]")
+        Memento.error(_LOGGER, "Specified qubit(s) for the $input_gate gate ∉ {1,...,$num_qubits}")
 
     elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
         Memento.error(_LOGGER, "Specified $input_gate gate cannot have identical control and target qubits") 
