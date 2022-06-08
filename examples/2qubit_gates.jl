@@ -377,3 +377,44 @@ function decompose_qft2_using_HT()
         )
     
 end
+
+function decompose_GRGate()
+    println(">>>>> GRGate testing <<<<<")
+
+    GR1 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/6, π/3])
+    GR2 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/3, π/6])
+    CNot_1_2 = QCOpt.get_full_sized_gate("CNot_1_2", 2)
+    T = QCOpt.round_complex_values(GR1 * CNot_1_2)
+
+    return Dict{String, Any}(
+    
+        "num_qubits" => 2, 
+        "maximum_depth" => 3,
+        "elementary_gates" => ["R_1", "R_2", "CNot_1_2", "Identity"],
+        "R_θ_discretization" => [π/3, π/6],
+        "R_ϕ_discretization" => [π/3, π/6],
+        "target_gate" => T,
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact", 
+        )
+    
+end
+
+function decompose_X_using_GR()
+
+    println(">>>>> Pauli-X Gate using global rotation <<<<<")
+ 
+    return Dict{String, Any}(
+    
+    "num_qubits" => 2,
+    "maximum_depth" => 5, 
+    "elementary_gates" => ["GR", "RZ_1", "RZ_2", "CZ_1_2", "Identity"], 
+    "target_gate" => QCOpt.get_full_sized_gate("X_1", 2),
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact",
+    "GR_θ_discretization" => [-π/2, 0, π/2],
+    "GR_ϕ_discretization" => [-π/2, 0, π/2],
+    "RZ_discretization"   => [-π, 0, π],
+    )
+ 
+end

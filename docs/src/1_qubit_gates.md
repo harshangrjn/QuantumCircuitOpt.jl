@@ -20,6 +20,10 @@ U2Gate
 ```@docs
 U1Gate
 ```
+## RGate
+```@docs
+RGate
+```
 ## RXGate
 ```@docs
 RXGate

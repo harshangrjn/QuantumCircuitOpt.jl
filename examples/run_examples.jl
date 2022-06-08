@@ -29,7 +29,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-# decompose_gates = ["decompose_iSwap"]
+# decompose_gates = ["decompose_X_using_GR"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -41,8 +41,8 @@ for gates in decompose_gates
     params = getfield(Main, Symbol(gates))()
 
     model_options = Dict{Symbol, Any}(:convex_hull_gate_constraints => false,
-                                      :unit_magnitude_constraints => false,
-                                      :idempotent_gate_constraints => false)
+                                      :unit_magnitude_constraints   => false,
+                                      :idempotent_gate_constraints  => false)
     
     qcopt_optimizer = get_gurobi()
     global result = QCOpt.run_QCModel(params, qcopt_optimizer; options = model_options)

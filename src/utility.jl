@@ -299,13 +299,10 @@ end
 """
     round_complex_values(M::Array{Complex{Float64},2})
 
-Given a complex-valued gate, this function returns a complex-valued gate which 
-rounds the values closest to 0 and 1. This is useful to avoid numerical issues. 
+Given a complex-valued matrix, this function returns a complex-valued matrix which 
+rounds the values closest to 0, 1 and -1. This is useful to avoid numerical issues. 
 """
-function round_complex_values(M::Array{Complex{Float64},2})   
-    if size(M)[1] == 0
-        Memento.error(_LOGGER, "Input cannot be a scalar")
-    end
+function round_complex_values(M::Array{Complex{Float64},2})
 
     if length(size(M)) == 2
         n_r = size(M)[1]
@@ -319,6 +316,8 @@ function round_complex_values(M::Array{Complex{Float64},2})
             end
         end
         return M_round
+    else 
+        return M
     end
     
 end
@@ -326,13 +325,15 @@ end
 """
     round_real_value(x::T) where T <: Number
 
-Given a real-valued number, this function returns a real-value which rounds the values closest to 0 and 1. 
+Given a real-valued number, this function returns a real-value which rounds the values closest to 0, 1 and -1. 
 """
 function round_real_value(x::T) where T <: Number
     if isapprox(abs(x), 0, atol=1E-6)
         x = 0
-    elseif isapprox(x, 1, atol=1E-6)
+    elseif isapprox(x,  1, atol=1E-6)
         x = 1
+    elseif isapprox(x, -1, atol=1E-6)
+        x = -1
     end  
 
     return x
@@ -407,20 +408,17 @@ function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2},
         M_kron = kron(M_kron, M_iter)
     end
 
-    if size(M_kron)[1] == 2^(num_qubits)
-        return M_kron 
-    else 
-        Memento.error(_LOGGER, "Dimensions mismatch in evaluation of Kronecker of single-qubit gate")
-    end
-
+    QCO._catch_kron_dimension_errors(num_qubits, size(M_kron)[1])
+    return QCO.round_complex_values(M_kron)
 end
 
 
 """
     kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit_loc::String, t_qubit_loc::String)
 
-Given number of qubits of the circuit, the complex-valued two-qubit gate and the control and target qubit locations ("q1","q2',"q3",...),
-this function returns a full-sized gate after applying appropriate kronecker products. This function supports any number integer-valued qubits.  
+Given number of qubits of the circuit, the complex-valued two-qubit gate and the control and 
+target qubit locations ("q1","q2',"q3",...), this function returns a full-sized gate after applying 
+appropriate kronecker products. This function supports any number of integer-valued qubits.  
 """
 function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit_loc::String, t_qubit_loc::String)
     
@@ -462,7 +460,7 @@ function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_
         M_sub_swap_id = ct
         M_sub = Matrix{Complex{Float64}}(LA.I, 2^(ct+1),2^(ct+1))
         
-        # Idea is to represent gate_14 = swap_34 * swap_23 * gate_12 * swap_23 * swap_34
+        # Idea is to represent gate_1_4 = swap_3_4 * swap_2_3 * gate_1_2 * swap_2_3 * swap_3_4
         for d=1:M_sub_depth
             M_sub_kron = 1 
             swap_qubits = true
@@ -503,12 +501,30 @@ function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_
 
     end
 
-    if size(M_kron)[1] == 2^(num_qubits)
-        return M_kron 
-    else 
-        Memento.error(_LOGGER, "Dimensions mismatch in evaluation of Kronecker of two-qubit gate")
+    QCO._catch_kron_dimension_errors(num_qubits, size(M_kron)[1])
+    return QCO.round_complex_values(M_kron)
+end
+
+"""
+    kron_multi_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
+
+Given number of qubits of the circuit and any complex-valued one-qubit gate in it's matrix form,
+this function returns a multi-qubit global gate, after applying it simultaneously on all the qubits. 
+This function supports any number of integer-valued qubits. For example, given `G` and `num_qubits = 3`, 
+this function returns `G ⨷ G ⨷ G`.
+"""
+function kron_multi_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
+    if size(M)[1] != 2
+        Memento.error(_LOGGER, "Input should be an one-qubit R gate")
     end
 
+    M_kron = 1
+    for i = 1:num_qubits
+        M_kron = kron(M_kron, M)
+    end
+
+    QCO._catch_kron_dimension_errors(num_qubits, size(M_kron)[1])
+    return QCO.round_complex_values(M_kron)
 end
 
 """
@@ -625,7 +641,7 @@ For example, for a 2-qubit gate `CRZ_1_2`, output is `true`.
 """
  function is_multi_qubit_gate(gate::String)
     
-    if occursin(kron_symbol, gate)
+    if occursin(kron_symbol, gate) || (gate in QCO.MULTI_QUBIT_GATES)
         return true
     end
 
@@ -656,6 +672,12 @@ end
 function _verify_λ_bounds(angle::Number)
     if !(-2*π <= angle <= 2*π)
         Memento.error(_LOGGER, "λ angle is not within valid bounds")
+    end
+end
+
+function _catch_kron_dimension_errors(num_qubits::Int64, M_dim::Int64)
+    if M_dim !== 2^(num_qubits)
+        Memento.error(_LOGGER, "Dimensions mismatch in evaluation of Kronecker product")
     end
 end
 

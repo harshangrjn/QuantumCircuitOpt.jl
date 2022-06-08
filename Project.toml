@@ -1,7 +1,7 @@
 name = "QuantumCircuitOpt"
 uuid = "88128e30-b60a-4e54-ab02-1050a5f92a36"
 authors = ["Harsha Nagarajan"]
-version = "0.3.6"
+version = "0.4.0"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -11,7 +11,7 @@ Memento = "f28f55f0-a522-5efc-85c2-fe41dfb9b2d9"
 
 [compat]
 DataStructures = "~0.17, ~0.18"
-JuMP = "~0.22, ~0.23, ~1.0"
+JuMP = "~0.22, ~0.23, 1.0"
 Memento = "~1.0, ~1.1, 1"
 julia = "^1"
 

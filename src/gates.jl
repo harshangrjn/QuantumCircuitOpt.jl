@@ -3,13 +3,16 @@ IMPORTANT: Update the lists below whenever a 1 or 2 qubit gate is added to this 
            Update QCO._get_angle_gates_idx in src/data.jl if gates with angle parameters are added to this file.
 =#
 
-const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "RX", "RY", "RZ", "Phase"]
+const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "R", "RX", "RY", "RZ", "Phase"]
 
 const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z", "S", 
                                               "Sdagger", "T", "Tdagger", "SX", "SXdagger"]
 
 const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", "CRZ", "CRZRev", 
                                               "CU3", "CU3Rev"]
+
+# >= 3 qubit gates
+const MULTI_QUBIT_GATES_ANGLE_PARAMETERS   = ["GR"]
 
 # Gates invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "iSwap", "Sycamore", "DCX", "W", "M", 
@@ -28,6 +31,9 @@ const TWO_QUBIT_GATES_CONSTANTS = union(QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC,
 
 const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS, 
                                         QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
+
+# >= 3 qubit gates
+const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
 
 #----------------------------------------#
 #            Single-qubit gates          #
@@ -133,6 +139,30 @@ function U1Gate(λ::Number)
 end
 
 @doc raw"""
+    RGate(θ::Number, ϕ::Number)
+
+A single-qubit rotation gate with two Euler angles, ``\theta`` and ``\phi``, 
+about the ``\cos(\phi)x + \sin(\phi)y`` axis. 
+
+**Matrix Representation**
+
+```math
+R(\theta, \phi) =  e^{-i \theta \left(\cos{\phi} x + \sin{\phi} y\right)} =
+\begin{pmatrix}
+    \cos{\theta} & -i e^{-i \phi} \sin{\theta} \\
+    -i e^{i \phi} \sin{\theta} & \cos{\theta}
+\end{pmatrix}
+```
+"""
+function RGate(θ::Number, ϕ::Number)
+
+    R = Array{Complex{Float64},2}([cos(θ/2)    -(sin(ϕ) + (cos(ϕ))im)*sin(θ/2) 
+                                  (sin(ϕ) - (cos(ϕ))im)*sin(θ/2)  cos(θ/2)])
+
+    return QCO.round_complex_values(R)
+end
+
+@doc raw"""
     RXGate(θ::Number)
 
 A single-qubit Pauli gate which represents rotation about the X axis.
@@ -209,7 +239,7 @@ function RZGate(θ::Number)
 end
 
 @doc raw"""
-    HGate(num_qubits::Int64)
+    HGate()
 
 Single-qubit Hadamard gate, which is a ``\pi`` rotation about the X+Z axis, thus equivalent to [U3Gate](@ref)(``\frac{\pi}{2},0,\pi``)
 
@@ -415,7 +445,7 @@ function SXdaggerGate()
 end
 
 @doc raw"""
-    PhaseGate()
+    PhaseGate(λ::Number)
 
 Single-qubit rotation gate about the Z axis. This is also equivalent to [U3Gate](@ref)(``0,0,\lambda``). This 
 gate is also referred to as the [U1Gate](@ref). 
@@ -1009,10 +1039,10 @@ CRXRev(\theta)\ q_1, q_0 =
 """
 function CRXRevGate(θ::Number)
 
-    CRXRev = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 cos(θ/2) 0 -(sin(θ/2))im      
-                                      0 0 1 0
-                                      0 -(sin(θ/2))im 0 cos(θ/2)])
+    CRXRev = Array{Complex{Float64},2}([1 0 0 0            
+                                        0 cos(θ/2) 0 -(sin(θ/2))im      
+                                        0 0 1 0
+                                        0 -(sin(θ/2))im 0 cos(θ/2)])
 
     return QCO.round_complex_values(CRXRev)
 end
@@ -1049,10 +1079,10 @@ function CRYGate(θ::Number)
     
     QCO._verify_θ_bounds(θ)
 
-    CRY = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 1 0 0       
-                                      0 0  cos(θ/2)  -(sin(θ/2)) 
-                                      0 0  (sin(θ/2))  cos(θ/2)])
+    CRY = Array{Complex{Float64},2}([1 0 0 0            
+                                     0 1 0 0       
+                                     0 0  cos(θ/2)  -(sin(θ/2)) 
+                                     0 0  (sin(θ/2))  cos(θ/2)])
 
     return QCO.round_complex_values(CRY)
 end
@@ -1844,4 +1874,41 @@ function CiSwapGate()
                                       0  0  0  0  0  0 im  0
                                       0  0  0  0  0 im  0  0
                                       0  0  0  0  0  0  0  1])
+end
+
+#---------------------------------------#
+#            Multi-qubit gates          #
+#---------------------------------------#
+@doc raw"""
+    GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
+
+A multi-qubit rotation gate with two Euler angles, ``\theta`` and ``\phi``, 
+applied about the ``\cos(\phi)x + \sin(\phi)y`` axis and parametrized by the number of qubits. 
+This gate can be applied to multiple qubits simultaneously, for a given depth. 
+The global R gate is native to atomic systems. In the one-qubit case, this gate is 
+equivalent to the [RGate](@ref).
+
+Reference: [Qiskit's circuit library](https://qiskit.org/documentation/stubs/qiskit.circuit.library.GR.html)
+
+**Circuit Representation (in 3 qubits)**
+```
+     ┌──────────┐
+q_0: ┤0         ├ 
+     │          │
+q_1: ┤1 GR(ϴ,φ) ├    
+     │          │
+q_2: ┤2         ├
+     └──────────┘
+```
+
+**Matrix Representation (in 3 qubits)**
+
+```math
+GR(\theta, \phi) = \exp \left(-i \sum_{i=1}^{3} (\cos(\phi)X_i + \sin(\phi)Y_i) \theta/2 \right) \\ 
+                 = R(\theta, \phi) \otimes R(\theta, \phi) \otimes R(\theta, \phi)  
+```
+"""
+function GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
+
+    return QCO.round_complex_values(QCO.kron_multi_qubit_gate(num_qubits, QCO.RGate(θ,ϕ)))
 end

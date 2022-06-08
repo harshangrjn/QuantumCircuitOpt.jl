@@ -20,11 +20,11 @@
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 5, atol=tol_0)
-    @test isapprox(result_qc["solution"]["z_onoff_var"][1,1], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,1], 1, atol=tol_0)
-    @test isapprox(result_qc["solution"]["z_onoff_var"][1,2], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,2], 1, atol=tol_0)
-    @test isapprox(result_qc["solution"]["z_onoff_var"][3,3], 1, atol=tol_0)
-    @test isapprox(result_qc["solution"]["z_onoff_var"][1,4], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,4], 1, atol=tol_0)
-    @test isapprox(result_qc["solution"]["z_onoff_var"][1,5], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_onoff_var"][2,5], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_bin_var"][1,1], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_bin_var"][2,1], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_bin_var"][1,2], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_bin_var"][2,2], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_bin_var"][3,3], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_bin_var"][1,4], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_bin_var"][2,4], 1, atol=tol_0)
+    @test isapprox(result_qc["solution"]["z_bin_var"][1,5], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_bin_var"][2,5], 1, atol=tol_0)
     
 end
 
@@ -50,7 +50,7 @@ end
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3, atol = tol_0)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][1:2,:]), 3, atol=tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][1:2,:]), 3, atol=tol_0)
     
 end
 
@@ -76,8 +76,8 @@ end
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     @test "Identity" in data["gates_dict"]["3"]["type"]
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][4,:]), 1, atol = tol_0) 
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1"
 end
 
@@ -103,8 +103,8 @@ end
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     @test "Identity" in data["gates_dict"]["3"]["type"]
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][4,:]), 1, atol = tol_0) 
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1_2"
 end
 
@@ -130,8 +130,8 @@ end
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     @test "Identity" in data["gates_dict"]["3"]["type"]
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][3,:]), 1, atol = tol_0)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][4,:]), 1, atol = tol_0) 
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][4,:]), 1, atol = tol_0) 
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_3_1"
 end
 
@@ -234,7 +234,7 @@ end
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
-    if isapprox(sum(result_qc["solution"]["z_onoff_var"][14,:]), 1, atol=tol_0)
+    if isapprox(sum(result_qc["solution"]["z_bin_var"][14,:]), 1, atol=tol_0)
         @test data["gates_dict"]["14"]["qubit_loc"] == "qubit_3"
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["θ"]),  45, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["ϕ"]), -90, atol=tol_0)
@@ -266,7 +266,7 @@ end
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
-    if isapprox(sum(result_qc["solution"]["z_onoff_var"][18,:]), 1, atol=tol_0)
+    if isapprox(sum(result_qc["solution"]["z_bin_var"][18,:]), 1, atol=tol_0)
         @test data["gates_dict"]["18"]["qubit_loc"] == "qubit_1_3"
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["θ"]),  45, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["ϕ"]), -90, atol=tol_0)
@@ -295,13 +295,13 @@ end
 
     for i in keys(data["gates_dict"])
         if data["gates_dict"][i]["type"] == "H_1"
-            @test isapprox(sum(result_qc["solution"]["z_onoff_var"][parse(Int64, i),:]), 3 , atol = tol_0)
+            @test isapprox(sum(result_qc["solution"]["z_bin_var"][parse(Int64, i),:]), 3 , atol = tol_0)
         end
     end
   
 end
 
-@testset "Tests: JuMP set_start_value for z_onoff_var variables" begin
+@testset "Tests: JuMP set_start_value for z_bin_var variables" begin
     function input_circuit()
         # [(depth, gate)]
         return [(1, "CNot_2_1"), 
@@ -324,8 +324,8 @@ end
     result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][6,:]), 1, atol=tol_0)
-    @test isapprox(sum(result_qc["solution"]["z_onoff_var"][5,:]), 0, atol=tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][6,:]), 1, atol=tol_0)
+    @test isapprox(sum(result_qc["solution"]["z_bin_var"][5,:]), 0, atol=tol_0)
     
 end
 
@@ -436,7 +436,7 @@ end
 
     for i in keys(data["gates_dict"])
         if "Identity" in data["gates_dict"][i]["type"]
-            @test isapprox(sum(result_qc["solution"]["z_onoff_var"][parse(Int64, i),:]), 0, atol = tol_0)
+            @test isapprox(sum(result_qc["solution"]["z_bin_var"][parse(Int64, i),:]), 0, atol = tol_0)
         end
     end
 
@@ -472,4 +472,57 @@ end
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 0.8275862068965518, atol = tol_0)
+end
+
+@testset "Tests: RGate decomposition" begin
+    
+    num_qubits = 2
+    GR1      = QCO.GRGate(num_qubits, π/6, π/3)
+    CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 2)
+    T        = QCO.round_complex_values(GR1 * CNot_1_2)
+
+    params = Dict{String, Any}(
+    "num_qubits" => num_qubits,
+    "maximum_depth" => 3,
+    "elementary_gates" => ["R_1", "R_2", "CNot_1_2", "Identity"],
+    "R_θ_discretization" => [π/3, π/6],
+    "R_ϕ_discretization" => [π/3, π/6],
+    "target_gate" => T,
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact",
+    )
+    
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
+    z_sol = result_qc["solution"]["z_bin_var"]
+    @test isapprox(sum(z_sol[1:8, :]), 2, atol = tol_0)
+    @test isapprox(sum(z_sol[9, :]),   1, atol = tol_0)
+end
+
+@testset "Tests: GRGate decomposition for Pauli-X gate" begin
+
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "maximum_depth" => 5, 
+    "elementary_gates" => ["GR", "RZ_2", "CZ_1_2", "Identity"], 
+    "target_gate" => QCO.get_full_sized_gate("X_1", 2),
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact",
+    "GR_θ_discretization" => [-π/2, π/2],
+    "GR_ϕ_discretization" => [0],
+    "RZ_discretization"   => [π],
+    )
+    
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
+    z_sol = result_qc["solution"]["z_bin_var"]
+    @test isapprox(sum(z_sol[4, :]), 2, atol = tol_0) # test for number of CZ gates 
 end
