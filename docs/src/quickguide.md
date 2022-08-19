@@ -13,7 +13,7 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 ```
 
 ## Video tutorials
-1. July 2022: Presentation at the [JuliaCon 2022](https://pretalx.com/juliacon-2022/talk/KJTGC3/) introduces the package in greater depth and how to use it's various features. 
+- July 2022: Presentation at the [JuliaCon 2022](https://pretalx.com/juliacon-2022/talk/KJTGC3/) introduces the package in greater depth and how to use it's various features. 
 
 ```@raw html 
 <align="center"/>
@@ -23,7 +23,7 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 </a>
 ```
 
-2. November 2021: Presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce the technicalities underlying the package. 
+- November 2021: Presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce the technicalities underlying the package. 
 
 ```@raw html 
 <align="center"/>
