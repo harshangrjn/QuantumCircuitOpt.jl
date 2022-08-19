@@ -15,12 +15,13 @@ const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", 
 const MULTI_QUBIT_GATES_ANGLE_PARAMETERS   = ["GR"]
 
 # Gates invariant to qubit flip
-const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "iSwap", "Sycamore", "DCX", "W", "M", 
-                                              "QFT2", "HCoin", "GroverDiffusion"]
+const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "SSwap", "iSwap", "Sycamore", "DCX", "W", "M", "CZ",
+                                              "QFT2", "HCoin", "GroverDiffusion", "CS", "CSdagger", 
+                                              "CT", "CTdagger"]
 
 # Gates non-invariant to qubit flip
-const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = ["CNot", "CNotRev", "CX", "CXRev", "CY", "CYRev", "CZ", 
-                                              "CZRev", "CH", "CHRev", "CV", "CVRev", "CVdagger", 
+const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = ["CNot", "CNotRev", "CX", "CXRev", "CY", "CYRev", 
+                                              "CH", "CHRev", "CV", "CVRev", "CVdagger", 
                                               "CVdaggerRev", "CSX", "CSXRev"]
 
 const ONE_QUBIT_GATES           = union(QCO.ONE_QUBIT_GATES_CONSTANTS, 
@@ -35,9 +36,9 @@ const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS,
 # >= 3 qubit gates
 const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
 
-#----------------------------------------#
-#            Single-qubit gates          #
-#----------------------------------------#
+#-------------------------------------#
+#            ONE QUBIT gates          #
+#-------------------------------------#
 
 @doc raw"""
     IGate(num_qubits::Int64)
@@ -378,9 +379,7 @@ T = \begin{pmatrix}
 ```
 """
 function TGate()
-
     return Array{Complex{Float64},2}([1 0; 0 (1/sqrt(2)) + (1/sqrt(2))im])
-
 end
 
 @doc raw"""
@@ -399,9 +398,7 @@ T^{\dagger} = \begin{pmatrix}
 ```
 """
 function TdaggerGate()
-
     return Array{Complex{Float64},2}([1 0; 0 (1/sqrt(2)) - (1/sqrt(2))im])
-
 end
 
 @doc raw"""
@@ -464,7 +461,7 @@ function PhaseGate(λ::Number)
 end
 
 #-------------------------------------#
-#            Two-qubit gates          #
+#            TWO-QUBIT GATES          #
 #-------------------------------------#
 @doc raw"""
     CNotGate()
@@ -650,9 +647,9 @@ CY = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Y = \begin{pm
 function CYGate()
 
     # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
     # |1⟩⟨1| ⊗ Y 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.YGate())
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.YGate())
     
     return control_0 + control_1
 end
@@ -716,47 +713,12 @@ CZ = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Z = \begin{pm
 ```
 """
 function CZGate()
-    
     # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
     # |1⟩⟨1| ⊗ Z 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.ZGate())
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.ZGate())
     
     return control_0 + control_1 
-end
-
-@doc raw"""
-    CZRevGate()
-
-Two-qubit reverse controlled-Z gate, with target and control on first and second qubits, respectively. 
-
-**Circuit Representation**
-```
-     ┌───┐
-q_0: ┤ Z ├
-     └─┬─┘
-q_1: ──■──
-```
-
-**Matrix Representation**
-
-```math
-CZRev = I \otimes |0\rangle\langle0| + Z \otimes |1\rangle\langle1| = \begin{pmatrix}
-    1 & 0 & 0 & 0 \\
-    0 & 1 & 0 & 0 \\
-    0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & -1
-    \end{pmatrix}
-```
-"""
-function CZRevGate()
-    
-    # I ⊗ |0⟩⟨0|
-    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
-    # Z ⊗ |1⟩⟨1| 
-    control_1 = kron(QCO.ZGate(), Array{Complex{Float64},2}([0 0; 0 1]))
-    
-    return control_0 + control_1
 end
 
 @doc raw"""
@@ -786,9 +748,9 @@ CH = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes H = \begin{pmat
 function CHGate()
 
     # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
     # |1⟩⟨1| ⊗ H 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.HGate())
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.HGate())
     
     return control_0 + control_1 
 end
@@ -947,6 +909,141 @@ function CVdaggerRevGate()
 
     return Array{Complex{Float64},2}([1 0 0 0; 0 0.5-0.5im 0 0.5+0.5im; 0 0 1 0; 0 0.5+0.5im 0 0.5-0.5im])
 
+end
+
+@doc raw"""
+    CSGate()
+
+Two-qubit, controlled-S gate, which induces π/2 phase in the target qubit. 
+This gate is invariant to the swap of control and target qubits.
+
+**Circuit Representation**
+```
+q_0: ──■──     
+     ┌─┴─┐    
+q_1: ┤ S ├     
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+CS = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes S = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & i
+    \end{pmatrix}
+```
+"""
+function CSGate()
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
+    # |1⟩⟨1| ⊗ S 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.SGate())
+
+    return control_0 + control_1 
+end
+
+
+@doc raw"""
+    CSdaggerGate()
+
+Two-qubit hermitian conjugate of controlled-S gate. This gate is invariant to the swap of control and target qubits.
+
+**Circuit Representation**
+```
+q_0: ──■──     
+     ┌─┴─┐    
+q_1: ┤ S'├     
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+CSdagger = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes S^{\dagger} = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & -i
+    \end{pmatrix}
+```
+"""
+function CSdaggerGate()
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
+    # |1⟩⟨1| ⊗ S' 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.SdaggerGate())
+    
+    return control_0 + control_1 
+end
+
+@doc raw"""
+    CTGate()
+
+Two-qubit, controlled-T gate, which induces a π/4 phase in the target qubit. 
+This gate is invariant to the swap of control and target qubits.
+
+**Circuit Representation**
+```
+q_0: ──■──     
+     ┌─┴─┐    
+q_1: ┤ T ├     
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+CT = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes T = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & e^{i\pi/4}
+    \end{pmatrix}
+```
+"""
+function CTGate()
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
+    # |1⟩⟨1| ⊗ T 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.TGate())
+    
+    return control_0 + control_1 
+end
+
+@doc raw"""
+    CTdaggerGate()
+
+Two-qubit hermitian conjugate of controlled-T gate. This gate is invariant to the swap of control and target qubits.
+
+**Circuit Representation**
+```
+q_0: ──■──     
+     ┌─┴─┐    
+q_1: ┤ T'├     
+     └───┘
+```
+
+**Matrix Representation**
+
+```math
+CTdagger = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes T^{\dagger} = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & e^{-i\pi/4}
+    \end{pmatrix}
+```
+"""
+function CTdaggerGate()
+    # |0⟩⟨0| ⊗ I
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
+    # |1⟩⟨1| ⊗ Tdagger 
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.TdaggerGate())
+    
+    return control_0 + control_1 
 end
 
 @doc raw"""
@@ -1317,9 +1414,36 @@ SWAP = \begin{pmatrix}
 ```
 """
 function SwapGate()
-
     return Array{Complex{Float64},2}([1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1])
+end
 
+@doc raw"""
+    SSwapGate()
+
+Two-qubit, square root version of the [SwapGate](@ref). 
+
+**Circuit Representation**
+```
+     ┌────────────┐
+q_0: ┤            ├
+     │ sqrt(Swap) │   
+q_1: ┤            ├ 
+     └────────────┘ 
+```
+
+**Matrix Representation**
+
+```math
+SWAP = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0.5+0.5i & 0.5-0.5i & 0 \\
+0 & 0.5-0.5i & 0.5+0.5i & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+```
+"""
+function SSwapGate()
+    return sqrt(QCO.SwapGate())
 end
 
 @doc raw"""
@@ -1387,9 +1511,9 @@ CSXGate = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes SX = \be
 function CSXGate()
 
     # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]) , QCO.IGate(1))
+    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
     # |1⟩⟨1| ⊗ SX 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]) , QCO.SXGate())
+    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.SXGate())
         
     return control_0 + control_1 
 end
@@ -1674,7 +1798,7 @@ function CSwapGate()
 end
 
 @doc raw"""
-    CCZGate()
+    CCZRevGate()
 
 Three-qubit controlled-controlled Z gate. 
 

@@ -9,7 +9,7 @@
     "set_cnot_lower_bound" => 1,
     "set_cnot_upper_bound" => 1,
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"
+    "decomposition_type" => "exact_optimal"
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "compact_formulation_1", # Testing incorrect model_type
@@ -18,7 +18,7 @@
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 5, atol=tol_0)
     @test isapprox(result_qc["solution"]["z_bin_var"][1,1], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_bin_var"][2,1], 1, atol=tol_0)
     @test isapprox(result_qc["solution"]["z_bin_var"][1,2], 1, atol=tol_0) || isapprox(result_qc["solution"]["z_bin_var"][2,2], 1, atol=tol_0)
@@ -38,7 +38,7 @@ end
         "set_cnot_lower_bound" => 2,
         "set_cnot_upper_bound" => 3,
         "objective" => "minimize_cnot", 
-        "decomposition_type" => "exact"                      
+        "decomposition_type" => "exact_optimal"                      
         )
     
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
@@ -48,7 +48,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3, atol = tol_0)
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][1:2,:]), 3, atol=tol_0)
     
@@ -65,7 +65,7 @@ end
     "U3_ϕ_discretization" => [0],
     "U3_λ_discretization" => [0, π/4],
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                  
+    "decomposition_type" => "exact_optimal"                  
     )
 
     result_qc = QCO.run_QCModel(params, CBC)
@@ -73,7 +73,7 @@ end
     data = QCO.get_data(params)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
@@ -92,7 +92,7 @@ end
     "CU3_ϕ_discretization" => [0],
     "CU3_λ_discretization" => [0, π/4],
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                  
+    "decomposition_type" => "exact_optimal"                  
     )
 
     result_qc = QCO.run_QCModel(params, CBC)
@@ -100,7 +100,7 @@ end
     data = QCO.get_data(params)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
@@ -119,7 +119,7 @@ end
     "CU3_ϕ_discretization" => [0],
     "CU3_λ_discretization" => [0, π/4],
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                  
+    "decomposition_type" => "exact_optimal"                  
     )
 
     result_qc = QCO.run_QCModel(params, CBC)
@@ -127,7 +127,7 @@ end
     data = QCO.get_data(params)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
@@ -146,7 +146,7 @@ end
     "RY_discretization" => [π/4],
     "RZ_discretization" => [π/2, π/4],
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                            
+    "decomposition_type" => "exact_optimal"                            
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
@@ -155,7 +155,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3, atol = tol_0)
 
 end
@@ -171,7 +171,7 @@ end
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                            
+    "decomposition_type" => "exact_optimal"                            
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
@@ -180,7 +180,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3, atol = tol_0)
 
 end
@@ -196,7 +196,7 @@ end
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"                            
+    "decomposition_type" => "exact_optimal"                            
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
@@ -205,7 +205,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3, atol = tol_0)
 
 end
@@ -221,8 +221,8 @@ end
     "U3_θ_discretization" => [0, π/4],
     "U3_ϕ_discretization" => [0, -π/2],
     "U3_λ_discretization" => [0, π/2],    
-    "objective" => "minimize_cnot", 
-    "decomposition_type" => "exact"                   
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact_optimal"                   
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation")
@@ -232,7 +232,7 @@ end
     data = QCO.get_data(params)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     if isapprox(sum(result_qc["solution"]["z_bin_var"][14,:]), 1, atol=tol_0)
         @test data["gates_dict"]["14"]["qubit_loc"] == "qubit_3"
@@ -253,8 +253,8 @@ end
         "CU3_θ_discretization" => [0, π/4],
         "CU3_ϕ_discretization" => [0, -π/2],
         "CU3_λ_discretization" => [0, π/2],    
-        "objective" => "minimize_cnot", 
-        "decomposition_type" => "exact"                  
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal"                  
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation")
@@ -264,7 +264,7 @@ end
     data = QCO.get_data(params)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     if isapprox(sum(result_qc["solution"]["z_bin_var"][18,:]), 1, atol=tol_0)
         @test data["gates_dict"]["18"]["qubit_loc"] == "qubit_1_3"
@@ -282,7 +282,7 @@ end
         "elementary_gates" => ["H_1", "H_2"],  
         "target_gate" => QCO.kron_single_qubit_gate(2, QCO.HGate(), "q1"),
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact"
+        "decomposition_type" => "exact_optimal"
         )
     
     model_options = Dict{Symbol, Any}(:all_valid_constraints => -1)
@@ -290,7 +290,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     data = QCO.get_data(params)
 
     for i in keys(data["gates_dict"])
@@ -318,12 +318,12 @@ end
     "target_gate" => QCO.MGate(),
     "input_circuit" => input_circuit(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"
+    "decomposition_type" => "exact_optimal"
     )
 
     result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][6,:]), 1, atol=tol_0)
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][5,:]), 0, atol=tol_0)
     
@@ -337,7 +337,7 @@ end
     "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"
+    "decomposition_type" => "exact_optimal"
     )
 
     gates_dict = QCO.get_data(params)["gates_dict"]
@@ -355,7 +355,7 @@ end
 
     result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 4, atol = tol_0)
     
 end
@@ -368,14 +368,14 @@ end
     "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCO.MGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact"
+    "decomposition_type" => "exact_optimal"
     )
 
     model_options = Dict{Symbol, Any}(:time_limit => 1)
 
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
     @test result_qc["termination_status"] == MOI.TIME_LIMIT
-    @test result_qc["primal_status"] == MOI.NO_SOLUTION
+    @test result_qc["primal_status"]      == MOI.NO_SOLUTION
     
 end
 
@@ -407,7 +407,7 @@ end
 
     result_qc = QCO.run_QCModel(params, CBC)
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 2.0, atol = tol_0)
 
 end
@@ -431,7 +431,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
 
     for i in keys(data["gates_dict"])
@@ -470,7 +470,7 @@ end
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 0.8275862068965518, atol = tol_0)
 end
 
@@ -489,21 +489,21 @@ end
     "R_ϕ_discretization" => [π/3, π/6],
     "target_gate" => T,
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
     )
     
     model_options = Dict{Symbol, Any}(:optimizer_log => false)
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 3.0, atol = tol_0)
     z_sol = result_qc["solution"]["z_bin_var"]
     @test isapprox(sum(z_sol[1:8, :]), 2, atol = tol_0)
     @test isapprox(sum(z_sol[9, :]),   1, atol = tol_0)
 end
 
-@testset "Tests: GRGate decomposition for Pauli-X gate" begin
+@testset "Tests: GRGate decomposition for Pauli-X gate, and unitary constraints" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2,
@@ -511,18 +511,37 @@ end
     "elementary_gates" => ["GR", "RZ_2", "CZ_1_2", "Identity"], 
     "target_gate" => QCO.get_full_sized_gate("X_1", 2),
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
     "GR_θ_discretization" => [-π/2, π/2],
     "GR_ϕ_discretization" => [0],
     "RZ_discretization"   => [π],
     )
     
-    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_constraints => true)
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
-    @test result_qc["primal_status"] == MOI.FEASIBLE_POINT
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
     z_sol = result_qc["solution"]["z_bin_var"]
     @test isapprox(sum(z_sol[4, :]), 2, atol = tol_0) # test for number of CZ gates 
+end
+
+@testset "Tests: Decomposition using exact_feasible option" begin
+    params = Dict{String, Any}(
+        "num_qubits" => 2,
+        "maximum_depth" => 5,
+        "elementary_gates" => ["CH_1_2", "CNot_2_1", "CNot_1_2", "Identity"],
+        "target_gate" => QCO.WGate(),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact_feasible",
+        )
+
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 0.0, atol = tol_0)
+    z_sol = result_qc["solution"]["z_bin_var"]
+    @test isapprox(sum(z_sol[2:4, :]), 4, atol = tol_0)
 end

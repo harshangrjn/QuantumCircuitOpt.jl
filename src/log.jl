@@ -54,7 +54,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             if i != length(gates_sol_compressed)
                 printstyled(gates_sol_compressed[i], " * "; color = :cyan)
             else    
-                if data["decomposition_type"] == "exact"
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
                     printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = :cyan)
                 elseif data["decomposition_type"] == "approximate"
                     printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = :cyan)
@@ -69,7 +69,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         if data["objective"] == "minimize_depth"
 
-            if length(data["identity_idx"]) >= 1 && !(results["termination_status"] == MOI.TIME_LIMIT)
+            if length(data["identity_idx"]) >= 1 && (data["decomposition_type"] !== "exact_feasible") && !(results["termination_status"] == MOI.TIME_LIMIT)
                 printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
             else 
                 printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
@@ -79,28 +79,13 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
             if !isempty(data["cnot_idx"])
                 
-                if data["decomposition_type"] == "exact" 
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
                     printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
                 
                 elseif data["decomposition_type"] == "approximate"
                     printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = :cyan)
                 end
             
-            elseif !isempty(data["identity_idx"])
-               
-                printstyled("  ","Objective function changed to minimize_depth (CNOT gate not found in input)", "\n"; color = :cyan) 
-                
-                if !(results["termination_status"] == MOI.TIME_LIMIT)
-                    printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
-                else
-                    printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
-                end
-            
-            else
-
-                printstyled("  ","Objective function changed to feasiblity (CNOT and Identity gates not found in input)", "\n"; color = :cyan) 
-                printstyled("  ","Compressed depth for a feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
-
             end
 
         end
@@ -207,7 +192,7 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    if (data["decomposition_type"] == "exact") && (!isapprox(M_sol, target_gate, atol = 1E-4))
+    if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && (!isapprox(M_sol, target_gate, atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     

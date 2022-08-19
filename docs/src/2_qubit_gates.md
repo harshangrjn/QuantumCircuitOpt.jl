@@ -36,10 +36,6 @@ CYRevGate
 ```@docs
 CZGate
 ```
-## CZRevGate
-```@docs
-CZRevGate
-```
 ## CHGate
 ```@docs
 CHGate
@@ -92,6 +88,22 @@ CRZGate
 ```@docs
 CRZRevGate
 ```
+## CSGate
+```@docs
+CSGate
+```
+## CSdaggerGate
+```@docs
+CSdaggerGate
+```
+## CTGate
+```@docs
+CTGate
+```
+## CTdaggerGate
+```@docs
+CTdaggerGate
+```
 ## CU3Gate
 ```@docs
 CU3Gate
@@ -103,6 +115,10 @@ CU3RevGate
 ## SwapGate
 ```@docs
 SwapGate
+```
+## SSwapGate
+```@docs
+SSwapGate
 ```
 ## iSwapGate
 ```@docs

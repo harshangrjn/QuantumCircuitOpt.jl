@@ -46,6 +46,8 @@ function variable_QCModel_balas(qcm::QuantumCircuitModel)
         QCO.variable_slack_for_feasibility(qcm)
     end
 
+    QCO.variable_QCModel_valid(qcm)
+
     return
 end
 
@@ -73,6 +75,24 @@ function variable_QCModel_compact(qcm::QuantumCircuitModel)
 
     if qcm.data["decomposition_type"] == "approximate"
         QCO.variable_slack_for_feasibility(qcm)
+    end
+
+    QCO.variable_QCModel_valid(qcm)
+
+    return
+end
+
+function variable_QCModel_valid(qcm::QuantumCircuitModel)
+
+    if qcm.options.all_valid_constraints != -1
+
+        if qcm.options.all_valid_constraints == 1 
+            QCO.variable_binary_products(qcm)
+            
+        elseif qcm.options.all_valid_constraints == 0 
+            qcm.options.unitary_constraints && QCO.variable_binary_products(qcm)
+        end
+
     end
 
     return
@@ -105,6 +125,7 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
             QCO.constraint_identity_gate_symmetry(qcm)
             QCO.constraint_convex_hull_complex_gates(qcm)
             QCO.constraint_complex_unit_magnitude(qcm)
+            QCO.constraint_unitary_property(qcm)
             
         elseif qcm.options.all_valid_constraints == 0 
             qcm.options.commute_gate_constraints            && QCO.constraint_commutative_gate_pairs(qcm)
@@ -114,6 +135,7 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
             qcm.options.identity_gate_symmetry_constraints  && QCO.constraint_identity_gate_symmetry(qcm)
             qcm.options.convex_hull_gate_constraints        && QCO.constraint_convex_hull_complex_gates(qcm)
             qcm.options.unit_magnitude_constraints          && QCO.constraint_complex_unit_magnitude(qcm)
+            qcm.options.unitary_constraints                 && QCO.constraint_unitary_property(qcm)
         end
 
     end
