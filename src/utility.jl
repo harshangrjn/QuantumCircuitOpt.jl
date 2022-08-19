@@ -705,7 +705,7 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
                 end
             end
             
-            if (isapprox(sum_det, length(keys(data["gates_dict"])), atol = 1E-6)) && (data["decomposition_type"] == "exact")
+            if (isapprox(sum_det, length(keys(data["gates_dict"])), atol = 1E-6)) && (data["decomposition_type"] == "exact_optimal")
                 Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
             end
         end
@@ -718,7 +718,7 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
             end
         end
         
-        if det_gates_real && (data["decomposition_type"] == "exact")
+        if det_gates_real && (data["decomposition_type"] == "exact_optimal")
             Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
         end
 

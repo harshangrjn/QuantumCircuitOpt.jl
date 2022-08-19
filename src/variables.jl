@@ -101,3 +101,11 @@ function variable_slack_for_feasibility(qcm::QuantumCircuitModel)
     
     return
 end
+
+function variable_binary_products(qcm::QuantumCircuitModel)
+    num_gates = size(qcm.data["gates_real"])[3]
+    depth     = qcm.data["maximum_depth"]
+    
+    qcm.variables[:Z_var] = JuMP.@variable(qcm.model, 0 <= Z[1:num_gates, 1:num_gates, 1:depth] <= 1)
+    return
+end

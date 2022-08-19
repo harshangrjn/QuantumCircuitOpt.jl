@@ -17,7 +17,7 @@ function decompose_controlled_Z()
     "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
     "target_gate" => QCOpt.CZGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
 
     "U3_θ_discretization" => -π:π/2:π,
     "U3_ϕ_discretization" => -π:π/2:π,
@@ -34,7 +34,7 @@ function decompose_controlled_V()
     "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
     "target_gate" => QCOpt.CVGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact")
+    "decomposition_type" => "exact_optimal")
 end
 
 function decompose_controlled_H()
@@ -47,7 +47,7 @@ function decompose_controlled_H()
     "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCOpt.CHGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
 
     "U3_θ_discretization" => -2*π:π/4:2*π,
     "U3_ϕ_discretization" => [0],
@@ -65,7 +65,7 @@ function decompose_magic_using_U3_CNot_2_1()
         "elementary_gates" => ["U3_1", "U3_2", "CNot_2_1", "Identity"], 
         "target_gate" => QCOpt.MGate(),
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",
+        "decomposition_type" => "exact_optimal",
         
         "U3_θ_discretization" => -π:π/2:π,
         "U3_ϕ_discretization" => -π:π/2:π,
@@ -83,7 +83,7 @@ function decompose_iSwapGate()
         "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.iSwapGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact")
+        "decomposition_type" => "exact_optimal")
     
         
     
@@ -99,7 +99,7 @@ function decompose_GroverDiffusion_using_Clifford()
         "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "S_1", "S_2", "T_1", "T_2", "Y_1", "Y_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.GroverDiffusionGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact")
+        "decomposition_type" => "exact_optimal")
 end
 
 
@@ -113,7 +113,7 @@ function decompose_GroverDiffusion_using_U3()
         "elementary_gates" => ["U3_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.GroverDiffusionGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact",
+        "decomposition_type" => "exact_optimal",
 
         "U3_θ_discretization" => -π:π/2:π,
         "U3_ϕ_discretization" => -π:π/2:π,
@@ -130,7 +130,7 @@ function decompose_magic_using_SH_CNot_1_2()
         "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.MGate(),
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact") 
+        "decomposition_type" => "exact_optimal") 
 end
 
 
@@ -144,7 +144,7 @@ function decompose_magic_using_SH_CNot_2_1()
         "elementary_gates" => ["S_1", "S_2", "H_1", "H_2", "CNot_2_1", "Identity"], 
         "target_gate" => QCOpt.MGate(),
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact")
+        "decomposition_type" => "exact_optimal")
 end
 
 function decompose_magic_using_U3_CNot_1_2()
@@ -157,7 +157,7 @@ function decompose_magic_using_U3_CNot_1_2()
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.MGate(),
         "objective" => "minimize_depth", 
-        "decomposition_type" => "exact",
+        "decomposition_type" => "exact_optimal",
         
         "U3_θ_discretization" => -π:π/2:π,
         "U3_ϕ_discretization" => -π:π:π,
@@ -175,7 +175,7 @@ function decompose_toffoli_with_controlled_gates()
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CV_1_2", "CVdagger_1_3", "CVdagger_2_3", "CVdagger_1_2", "CNot_2_1", "CNot_1_2", "Identity"],
     "target_gate" => QCOpt.ToffoliGate(),
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact")
+    "decomposition_type" => "exact_optimal")
 end
 
 function decompose_Fredkin()
@@ -189,7 +189,7 @@ function decompose_Fredkin()
     "elementary_gates" => ["CV_1_2", "CV_2_3", "CV_1_3", "CVdagger_1_2", "CVdagger_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => QCOpt.CSwapGate(), #also Fredkin
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact")
+    "decomposition_type" => "exact_optimal")
 end
 
 function decompose_double_toffoli()
@@ -216,7 +216,7 @@ function decompose_double_toffoli()
     "elementary_gates" => ["CV_1_2", "CV_2_4", "CV_3_4", "CVdagger_1_2", "CVdagger_2_4", "CVdagger_3_4", "CNot_1_3", "CNot_3_2", "CNot_2_3", "Identity"],
     "target_gate" => target_gate(),
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact")
+    "decomposition_type" => "exact_optimal")
 end
 
 function decompose_quantum_fulladder()
@@ -246,5 +246,5 @@ function decompose_quantum_fulladder()
         "elementary_gates" => ["CV_1_2", "CV_4_2", "CV_3_2", "CVdagger_1_2", "CVdagger_4_2", "CVdagger_3_2", "CNot_3_1", "CNot_4_3", "CNot_2_4", "CNot_4_1", "Identity"],
         "target_gate" => target_gate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact")
+        "decomposition_type" => "exact_optimal")
 end

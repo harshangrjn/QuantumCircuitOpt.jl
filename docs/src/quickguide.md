@@ -12,13 +12,22 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 <img width="550px" class="display-dark-only" src="../assets/QCOpt_framework_dark.png" alt="../assets/QCOpt_framework.png"/>
 ```
 
-## Video tutorial
-The following video presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce you to the technicalities underlying the package. 
+## Video tutorials
+a. July 2022: The following presentation at [JuliaCon 2022](https://pretalx.com/juliacon-2022/talk/KJTGC3/) introduces the package in greater depth and how to use it's various features. 
+```@raw html 
+<align="center"/>
+<a href="https://www.youtube.com/watch?v=OeONXwD4JJY">
+    <img alt="Youtube-link" src="../assets/video_img_2.png"
+    width=500" height="350">
+</a>
+```
+ecent package features and how to use the package can be found here
+b. November 2021: The following presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce the technicalities underlying the package. 
 
 ```@raw html 
 <align="center"/>
 <a href="https://www.youtube.com/watch?v=sf1HJW5Vmio">
-    <img alt="Youtube-link" src="../assets/video_img.png"
+    <img alt="Youtube-link" src="../assets/video_img_1.png"
     width=550" height="400">
 </a>
 ```
@@ -36,7 +45,7 @@ QCOpt takes two types of user-defined input specifications. The first type of in
 | `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QCOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
 | `target_gate` | Target unitary gate which you wish to decompose using the above-mentioned `elementary_gates`.|
 | `objective` | Choose one of the following: (a) `minimize_depth`, which minimizes the total number of one- and two-qubit gates. For this option, include `Identity` matrix in the above-mentioned `elementary_gates`, (b) `minimize_cnot`, which minimizes the number of CNOT gates in the decomposition. (default: `minimize_depth`) |
-| `decomposition_type` | Choose one of the following: (a) `exact`, which finds an exact decomposition if it exists, (b) `approximate`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact solution. (default: `exact`)|
+| `decomposition_type` | Choose one of the following: (a) `exact_optimal`, which finds an exact, provably optimal, decomposition if it exists, (c) `exact_feasible`, which finds any feasible exact decomposition, but not necessarily an optimal one if it exsists (c) `approximate`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact decomposition (default: `exact_optimal`)|
 
 If the above-specified `elementary_gates` contain gates with continuous angle parameters, then the following mandarotry input angle discretizations have to be specified in addition to the above inputs: 
 
@@ -105,7 +114,7 @@ params = Dict{String, Any}(
 "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"],
 "target_gate" => target_gate(),
 "objective" => "minimize_depth",
-"decomposition_type" => "exact",
+"decomposition_type" => "exact_optimal",
        
 "U3_θ_discretization" => -π:π/2:π,
 "U3_ϕ_discretization" => -π:π/2:π,

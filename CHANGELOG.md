@@ -1,6 +1,17 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.4.1
+- Added support for returning exact feasible decomposition (without optimality certificate) using `exact_feasible`
+- Added support for unitary constraints using binary linearizations (speeds up feasiblity problems)
+- Added `decompose_W_using_HSTCnot` in examples
+- Added `decompose_CNOT_using_GR` in examples (for Rydberg atom array-based simulators)
+- Added support for `CSGate`, `CSdaggerGate`, `CTGate`, `CTdaggerGate` and `SSwapGate` (sqrt(`SwapGate`))
+- Dropped support for `CZRevGate` as it is invariant to qubit flip
+- Updated README and docs with the Youtube link for the JuliaCon's presentation
+- Updated `decomposition_type` to `exact_optimal` from `exact`
+- Updated docs and unit tests to reflect above changes
+
 ### v0.4.0
 - Added support for two angle param gates througout data and log
 - Added support for Rotation gate (`RGate`) with two angle params
