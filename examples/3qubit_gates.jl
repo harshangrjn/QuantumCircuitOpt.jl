@@ -15,7 +15,6 @@ function decompose_RX_on_q3()
     "U3_ϕ_discretization" => [0, -π/2],
     "U3_λ_discretization" => [0, π/2],
     )
-
 end
 
 function decompose_toffoli()
@@ -55,7 +54,6 @@ function decompose_toffoli()
     "set_cnot_lower_bound" => 6,
     "set_cnot_upper_bound" => 6,
     )
-
 end
 
 function decompose_toffoli_using_kronecker()
@@ -73,7 +71,6 @@ function decompose_toffoli_using_kronecker()
 
     "set_cnot_lower_bound" => 6,
     )
-
 end
 
 function decompose_toffoli_with_controlled_gates()
@@ -91,7 +88,6 @@ function decompose_toffoli_with_controlled_gates()
     "objective" => "minimize_depth",
     "decomposition_type" => "exact",
     )
-
 end
 
 function decompose_CNot_1_3()
@@ -105,7 +101,6 @@ function decompose_CNot_1_3()
     "target_gate" => QCOpt.get_full_sized_gate("CNot_1_3", 3),
     "objective" => "minimize_depth",
     )
-
 end
 
 function decompose_FredkinGate()
@@ -118,7 +113,18 @@ function decompose_FredkinGate()
     "target_gate" => QCOpt.CSwapGate(), #also Fredkin
     "objective" => "minimize_depth"
     )
+end
 
+function decompose_FredkinGate_using_SSwap()
+
+    return Dict{String, Any}(
+    "num_qubits" => 3,
+    "maximum_depth" => 8,
+    "elementary_gates" => ["SSwap_2_3", "SX_1", "SX_2", "SX_3", "H_1", "H_2", "H_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
+    "target_gate" => QCOpt.CSwapGate(), #also Fredkin
+    "decomposition_type" => "exact",
+    "objective" => "minimize_depth"
+    )
 end
 
 function decompose_toffoli_left()
@@ -143,7 +149,6 @@ function decompose_toffoli_left()
     "target_gate" => target_gate(),
     "objective" => "minimize_depth"
     )
-
 end
 
 function decompose_toffoli_right()
@@ -170,7 +175,6 @@ function decompose_toffoli_right()
     "target_gate" => target_gate(), 
     "objective" => "minimize_depth"
     )
-
 end
 
 function decompose_miller()
@@ -195,7 +199,6 @@ function decompose_miller()
     "target_gate" => target_gate(),
     "objective" => "minimize_depth"
     )
-
 end
 
 function decompose_relative_toffoli()
@@ -210,8 +213,7 @@ function decompose_relative_toffoli()
         "objective" => "minimize_depth",
 
         "set_cnot_upper_bound" => 3
-        )
-
+    )
 end
 
 function decompose_margolus()
@@ -229,7 +231,6 @@ function decompose_margolus()
         # "set_cnot_lower_bound" => 3,
         # "set_cnot_upper_bound" => 3
         )
-
 end
 
 function decompose_CiSwap()
@@ -243,5 +244,4 @@ function decompose_CiSwap()
         "target_gate" => QCOpt.CiSwapGate(),
         "objective" => "minimize_depth",
         )
-
 end

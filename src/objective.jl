@@ -13,37 +13,34 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
     decomposition_type = qcm.data["decomposition_type"]
 
     if !isempty(identity_idx)
-
         if decomposition_type == "exact"
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n = 1:num_gates, d=1:depth if !(n in identity_idx)))
 
+        elseif decomposition_type == "exact_feasible"
+            QCO.objective_feasibility(qcm)
+
         elseif decomposition_type == "approximate"
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n = 1:num_gates, d=1:depth if !(n in identity_idx)) + qcm.options.objective_slack_penalty * sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c))
-            
         end
-
     else
-
-        Memento.warn(_LOGGER, "Switching to a feasibility problem since Identity gate is not part of input elementary gates")
         QCO.objective_feasibility(qcm)
-        
     end                              
     
     return
 end
 
 function objective_feasibility(qcm::QuantumCircuitModel)
-    n_r     = size(qcm.data["gates_real"])[1]
-    n_c     = size(qcm.data["gates_real"])[2]
 
     decomposition_type = qcm.data["decomposition_type"]
+    
+    Memento.warn(_LOGGER, "Switching to a feasibility problem")
 
-    if decomposition_type == "exact"
+    if decomposition_type in ["exact", "exact_feasible"]
         # Feasibility objective
-
     elseif decomposition_type == "approximate"
+        n_r     = size(qcm.data["gates_real"])[1]
+        n_c     = size(qcm.data["gates_real"])[2]
         JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var][i,j]^2 for i=1:n_r, j=1:n_c))
-
     end 
 
     return
@@ -60,7 +57,7 @@ function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
     
     if !isempty(qcm.data["cnot_idx"])
 
-        if decomposition_type == "exact"
+        if decomposition_type in ["exact", "exact_feasible"]
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n in cnot_idx, d=1:depth))
             
         elseif decomposition_type == "approximate"            

@@ -10,7 +10,7 @@ include("3qubit_gates.jl")
 include("4qubit_gates.jl")
 include("5qubit_gates.jl")
 
-decompose_gates = ["decompose_hadamard", 
+decompose_gates = ["decompose_hadamard",
                    "decompose_controlled_Z",
                    "decompose_controlled_V",
                    "decompose_controlled_H",
@@ -29,7 +29,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-# decompose_gates = ["decompose_X_using_GR"]
+# decompose_gates = ["decompose_magic"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -42,7 +42,8 @@ for gates in decompose_gates
 
     model_options = Dict{Symbol, Any}(:convex_hull_gate_constraints => false,
                                       :unit_magnitude_constraints   => false,
-                                      :idempotent_gate_constraints  => false)
+                                      :idempotent_gate_constraints  => false,
+                                      :unitary_constraints          => false)
     
     qcopt_optimizer = get_gurobi()
     global result = QCOpt.run_QCModel(params, qcopt_optimizer; options = model_options)

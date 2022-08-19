@@ -503,7 +503,7 @@ end
     @test isapprox(sum(z_sol[9, :]),   1, atol = tol_0)
 end
 
-@testset "Tests: GRGate decomposition for Pauli-X gate" begin
+@testset "Tests: GRGate decomposition for Pauli-X gate, and unitary constraints" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2,
@@ -517,7 +517,7 @@ end
     "RZ_discretization"   => [π],
     )
     
-    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_constraints => true)
     result_qc = QCO.run_QCModel(params, CBC; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL

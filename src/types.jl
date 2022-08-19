@@ -17,6 +17,7 @@ mutable struct QCModelOptions
     idempotent_gate_constraints        :: Bool
     convex_hull_gate_constraints       :: Bool
     unit_magnitude_constraints         :: Bool
+    unitary_constraints                :: Bool
 
     time_limit                         :: Float64
     relax_integrality                  :: Bool
@@ -41,6 +42,7 @@ function get_default_options()
     idempotent_gate_constraints        = false # true, false
     convex_hull_gate_constraints       = false # true, false
     unit_magnitude_constraints         = false # true, false
+    unitary_constraints                = false # true, false
 
     time_limit                         = 10800 # float value
     relax_integrality                  = false # true, false
@@ -57,6 +59,7 @@ function get_default_options()
                           idempotent_gate_constraints,
                           convex_hull_gate_constraints,
                           unit_magnitude_constraints,
+                          unitary_constraints,
                           time_limit,
                           relax_integrality,
                           optimizer_log,

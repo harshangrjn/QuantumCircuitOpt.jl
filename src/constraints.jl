@@ -57,7 +57,7 @@ function constraint_gate_target_condition(qcm::QuantumCircuitModel)
     decomposition_type = qcm.data["decomposition_type"]
     
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
-    if decomposition_type == "exact"
+    if decomposition_type in ["exact", "exact_feasible"]
         JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"])
     
     elseif decomposition_type == "approximate"
@@ -141,7 +141,7 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     zU_var = qcm.variables[:zU_var]
     
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
-    if decomposition_type == "exact"
+    if decomposition_type in ["exact", "exact_feasible"]
         JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"][:,:])  
     
     elseif decomposition_type == "approximate"
@@ -457,6 +457,52 @@ function constraint_complex_unit_magnitude(qcm::QuantumCircuitModel)
     JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], -qcm.variables[:U_var][i,j,d] + qcm.variables[:U_var][i,j+1,d] <= sqrt(2))         
     JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)],  qcm.variables[:U_var][i,j,d] - qcm.variables[:U_var][i,j+1,d] <= sqrt(2))
     JuMP.@constraint(qcm.model, [i=1:2:n_r, j=1:2:n_c, d=1:(depth-1)], -qcm.variables[:U_var][i,j,d] - qcm.variables[:U_var][i,j+1,d] <= sqrt(2))
+
+    return
+end
+
+function constraint_unitary_property(qcm::QuantumCircuitModel)
+    depth      = qcm.data["maximum_depth"]
+    Z_var      = qcm.variables[:Z_var]
+    z_bin_var  = qcm.variables[:z_bin_var]
+    gates_real = qcm.data["gates_real"]
+    num_gates  = size(gates_real)[3]
+
+    n_r = size(gates_real)[1]
+    n_c = size(gates_real)[2]
+    gates_adjoint = zeros(n_r, n_c, num_gates)
+    
+    for k=1:num_gates
+        if qcm.data["are_gates_real"]
+            gates_adjoint[:,:,k] = gates_real[:,:,k]'
+        else
+            gate_complex = QCO.real_to_complex_gate(gates_real[:,:,k])
+            gate_complex_adj = Matrix{ComplexF64}(adjoint(gate_complex))
+            gates_adjoint[:,:,k] = QCO.complex_to_real_gate(gate_complex_adj)
+        end
+    end
+
+    for d = 1:depth
+        for i=1:num_gates
+            for j=i:num_gates
+                if i == j 
+                    JuMP.@constraint(qcm.model, Z_var[i,j,d] == z_bin_var[i,d])
+                else 
+                    QCO.relaxation_bilinear(qcm.model, Z_var[i,j,d], z_bin_var[i,d], z_bin_var[j,d])
+                    # JuMP.@constraint(qcm.model, Z_var[i,j,d] == 0)
+                    JuMP.@constraint(qcm.model, Z_var[j,i,d] == Z_var[i,j,d])
+                end
+            end
+            # RLT-type constraint
+            JuMP.@constraint(qcm.model, sum(Z_var[i,:,d]) == z_bin_var[i,d])
+        end
+        # JuMP.@constraint(qcm.model, sum(Z_var[i,i,d] for i=1:num_gates) == 1)
+    end
+
+    # Unitary constraint
+    JuMP.@constraint(qcm.model, [d=1:depth], sum(Z_var[i,j,d]* QCO.round_real_value.(gates_real[:,:,i] * gates_adjoint[:,:,j] + 
+                                                 gates_real[:,:,j] * gates_adjoint[:,:,i]) for i=1:(num_gates-1), 
+                                                 j=(i+1):num_gates) .== zeros(n_r, n_c))
 
     return
 end

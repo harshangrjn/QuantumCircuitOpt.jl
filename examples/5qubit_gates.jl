@@ -16,5 +16,4 @@ function decompose_RX_on_5qubits()
     "CU3_λ_discretization" => [0, π/2],
     "RX_discretization" => [π/2],
     )
-    
 end

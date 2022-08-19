@@ -542,7 +542,7 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
         Memento.error(_LOGGER, "Specified $input gate does not exist in the predefined set of gates")
     end
 
-    QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input)
+    QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input; angle = angle)
     
     #----------------------;
     #   One qubit gates    ;
@@ -715,7 +715,7 @@ end
 Given an input gate string, number of qubits of the circuit and the qubit locations for the input gate, 
 this function catches and throws any errors, should the input gate type and qubits are invalid. 
 """
-function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
+function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String; angle = nothing)
 
     if num_qubits <= 0
         Memento.error(_LOGGER, "Specified number of qubits has to be >= 1")
@@ -731,7 +731,7 @@ function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, n
         Memento.error(_LOGGER, "Specify a valid qubit location(s) for the input $input_gate gate")
 
     elseif (gate_type == "GR") && (!isempty(qubit_loc))
-        Memento.error(_LOGGER, "Qubit locations are not necessary for Global-R gate as it is applied on all qubits by default")
+        Memento.error(_LOGGER, "Qubit locations are not necessary for Global-R gate as it is simultaneously applied on all qubits at a depth")
             
     elseif !issubset(qubit_loc, 1:num_qubits)
         Memento.error(_LOGGER, "Specified qubit(s) for the $input_gate gate ∉ {1,...,$num_qubits}")
@@ -741,6 +741,11 @@ function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, n
 
     elseif length(qubit_loc) > 2 
         Memento.error(_LOGGER, "Only 1- and 2-qubit elementary gates are currently supported")
+    end
+
+    if !(gate_type in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS, 
+         QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)) && (angle !== nothing)
+        Memento.warn(_LOGGER, "Neglecting the angle input for gate $(gate_type) with constant parameters")
     end
 
 end
