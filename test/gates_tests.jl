@@ -185,11 +185,18 @@
     U3[1,2] = U3[1,2] * im; U3[2,1] = U3[2,1] * -im;
     @test isapprox(R1, U3; atol = tol_0)
 
-    # CS gate test
+    # CS, CSdagger gate test
     H1    = QCO.get_full_sized_gate("H_1", 2)
     H2    = QCO.get_full_sized_gate("H_2", 2)
     CS_12 = QCO.get_full_sized_gate("CS_1_2", 2)
     Swap  = QCO.SwapGate()
-    @test isapprox(H1 * CS_12 * H2 * Swap, QCO.QFT2Gate(), atol = 1E-6)
-end
+    @test isapprox(H1 * CS_12 * H2 * Swap, QCO.QFT2Gate(), atol = tol_0)
+    @test isapprox(QCO.CSGate() *  QCO.CSdaggerGate(), QCO.IGate(2), atol = tol_0)
 
+    #SSwapGate test
+    @test isapprox(QCO.SSwapGate()^2, QCO.SwapGate(), atol = 1E-6)
+
+    # CT, CTdagger gate test
+    @test isapprox(QCO.CTGate() *  QCO.CTdaggerGate(), QCO.IGate(2), atol = tol_0)
+
+end

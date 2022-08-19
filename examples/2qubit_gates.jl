@@ -98,14 +98,14 @@ function decompose_magic()
     
         "num_qubits" => 2, 
         "maximum_depth" => 4,
-        "elementary_gates" => ["U3_1", "U3_2", "CNot_2_1", "CNot_1_2", "Identity"], 
-        "target_gate" => QCOpt.MGate(),   
-        "objective" => "minimize_depth", 
+        "elementary_gates" => ["U3_1", "U3_2", "CNot_2_1", "CNot_1_2", "Identity"],
+        "target_gate" => QCOpt.MGate(),
+        "objective" => "minimize_depth",
         "decomposition_type" => "exact_optimal",
 
         "U3_θ_discretization" => -π:π/2:π,
         "U3_ϕ_discretization" => -π:π/2:π,
-        "U3_λ_discretization" => -π:π/2:π,                         
+        "U3_λ_discretization" => -π:π/2:π,            
         )
 end
 

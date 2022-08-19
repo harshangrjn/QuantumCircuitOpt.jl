@@ -221,7 +221,7 @@ end
     "U3_θ_discretization" => [0, π/4],
     "U3_ϕ_discretization" => [0, -π/2],
     "U3_λ_discretization" => [0, π/2],    
-    "objective" => "minimize_cnot", 
+    "objective" => "minimize_depth", 
     "decomposition_type" => "exact_optimal"                   
     )
 
@@ -253,7 +253,7 @@ end
         "CU3_θ_discretization" => [0, π/4],
         "CU3_ϕ_discretization" => [0, -π/2],
         "CU3_λ_discretization" => [0, π/2],    
-        "objective" => "minimize_cnot", 
+        "objective" => "minimize_depth",
         "decomposition_type" => "exact_optimal"                  
     )
 

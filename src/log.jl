@@ -86,21 +86,6 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                     printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = :cyan)
                 end
             
-            elseif !isempty(data["identity_idx"])
-               
-                printstyled("  ","Objective function changed to minimize_depth (CNOT gate not found in input)", "\n"; color = :cyan) 
-                
-                if !(results["termination_status"] == MOI.TIME_LIMIT)
-                    printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
-                else
-                    printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
-                end
-            
-            else
-
-                printstyled("  ","Objective function changed to feasiblity (CNOT and Identity gates not found in input)", "\n"; color = :cyan) 
-                printstyled("  ","Compressed depth for a feasbile decomposition: ", length(gates_sol_compressed),"\n"; color = :cyan)
-
             end
 
         end
