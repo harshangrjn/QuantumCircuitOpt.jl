@@ -13,7 +13,8 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 ```
 
 ## Video tutorials
-a. July 2022: The following presentation at [JuliaCon 2022](https://pretalx.com/juliacon-2022/talk/KJTGC3/) introduces the package in greater depth and how to use it's various features. 
+1. July 2022: Presentation at the [JuliaCon 2022](https://pretalx.com/juliacon-2022/talk/KJTGC3/) introduces the package in greater depth and how to use it's various features. 
+
 ```@raw html 
 <align="center"/>
 <a href="https://www.youtube.com/watch?v=OeONXwD4JJY">
@@ -21,14 +22,14 @@ a. July 2022: The following presentation at [JuliaCon 2022](https://pretalx.com/
     width=500" height="350">
 </a>
 ```
-ecent package features and how to use the package can be found here
-b. November 2021: The following presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce the technicalities underlying the package. 
+
+2. November 2021: Presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce the technicalities underlying the package. 
 
 ```@raw html 
 <align="center"/>
 <a href="https://www.youtube.com/watch?v=sf1HJW5Vmio">
     <img alt="Youtube-link" src="../assets/video_img_1.png"
-    width=550" height="400">
+    width=500" height="350">
 </a>
 ```
 
