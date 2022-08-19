@@ -9,6 +9,7 @@ QuantumCircuitOpt.jl Change Log
 - Added support for `CSGate`, `CSdaggerGate`, `CTGate`, `CTdaggerGate` and `SSwapGate` (sqrt(`SwapGate`))
 - Dropped support for `CZRevGate` as it is invariant to qubit flip
 - Updated README and docs with the Youtube link for the JuliaCon's presentation
+- Updated `decomposition_type` to `exact_optimal` from `exact`
 - Updated docs and unit tests to reflect above changes
 
 ### v0.4.0

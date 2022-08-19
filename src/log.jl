@@ -54,7 +54,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             if i != length(gates_sol_compressed)
                 printstyled(gates_sol_compressed[i], " * "; color = :cyan)
             else    
-                if data["decomposition_type"] in ["exact", "exact_feasible"]
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
                     printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = :cyan)
                 elseif data["decomposition_type"] == "approximate"
                     printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = :cyan)
@@ -79,7 +79,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
             if !isempty(data["cnot_idx"])
                 
-                if data["decomposition_type"] in ["exact", "exact_feasible"]
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
                     printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
                 
                 elseif data["decomposition_type"] == "approximate"
@@ -207,7 +207,7 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    if (data["decomposition_type"] in ["exact", "exact_feasible"]) && (!isapprox(M_sol, target_gate, atol = 1E-4))
+    if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && (!isapprox(M_sol, target_gate, atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
     

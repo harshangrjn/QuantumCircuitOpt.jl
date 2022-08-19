@@ -57,7 +57,7 @@ function constraint_gate_target_condition(qcm::QuantumCircuitModel)
     decomposition_type = qcm.data["decomposition_type"]
     
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
-    if decomposition_type in ["exact", "exact_feasible"]
+    if decomposition_type in ["exact_optimal", "exact_feasible"]
         JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"])
     
     elseif decomposition_type == "approximate"
@@ -82,10 +82,10 @@ end
 
 function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
 
-    depth   = qcm.data["maximum_depth"]
-    n_r     = size(qcm.data["gates_real"])[1]
-    n_c     = size(qcm.data["gates_real"])[2]
-    num_gates = size(qcm.data["gates_real"])[3]
+    depth          = qcm.data["maximum_depth"]
+    n_r            = size(qcm.data["gates_real"])[1]
+    n_c            = size(qcm.data["gates_real"])[2]
+    num_gates      = size(qcm.data["gates_real"])[3]
     are_gates_real = qcm.data["are_gates_real"]
 
     i_val = 2 - are_gates_real
@@ -124,7 +124,7 @@ end
 function constraint_gate_intermediate_products_compact(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
-    depth   = qcm.data["maximum_depth"]
+    depth     = qcm.data["maximum_depth"]
     
     JuMP.@constraint(qcm.model, [d=2:(depth-1)], qcm.variables[:U_var][:,:,d] .== 
                                         sum((qcm.variables[:zU_var][:,:,n,(d-1)]) * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
@@ -141,7 +141,7 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     zU_var = qcm.variables[:zU_var]
     
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
-    if decomposition_type in ["exact", "exact_feasible"]
+    if decomposition_type in ["exact_optimal", "exact_feasible"]
         JuMP.@constraint(qcm.model, sum(zU_var[:,:,n,(depth-1)] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"][:,:])  
     
     elseif decomposition_type == "approximate"

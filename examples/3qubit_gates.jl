@@ -9,7 +9,7 @@ function decompose_RX_on_q3()
     "elementary_gates" => ["U3_3", "Identity"], 
     "target_gate" => QCOpt.kron_single_qubit_gate(3, QCOpt.RXGate(π/4), "q3"),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
        
     "U3_θ_discretization" => [0, π/4],
     "U3_ϕ_discretization" => [0, -π/2],
@@ -48,7 +48,7 @@ function decompose_toffoli()
     "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCOpt.ToffoliGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
 
     "input_circuit" => toffoli_circuit(),
     "set_cnot_lower_bound" => 6,
@@ -67,7 +67,7 @@ function decompose_toffoli_using_kronecker()
     "elementary_gates" => ["T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_3", "I_1xT_2xT_3", "CNot_1_2xH_3", "T_1xTdagger_2xI_3", "Identity"], 
     "target_gate" => QCOpt.ToffoliGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
 
     "set_cnot_lower_bound" => 6,
     )
@@ -83,10 +83,9 @@ function decompose_toffoli_with_controlled_gates()
     "num_qubits" => 3,
     "maximum_depth" => 5,
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CV_1_2", "CVdagger_1_3", "CVdagger_2_3", "CVdagger_1_2", "CNot_2_1", "CNot_1_2", "Identity"],
-    # "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_2_1", "Identity"], 
     "target_gate" => QCOpt.ToffoliGate(),
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
     )
 end
 
@@ -111,7 +110,8 @@ function decompose_FredkinGate()
     # Reference: https://doi.org/10.1103/PhysRevA.53.2855
     "elementary_gates" => ["CV_1_2", "CV_2_3", "CV_1_3", "CVdagger_1_2", "CVdagger_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => QCOpt.CSwapGate(), #also Fredkin
-    "objective" => "minimize_depth"
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal"
     )
 end
 
@@ -122,7 +122,7 @@ function decompose_FredkinGate_using_SSwap()
     "maximum_depth" => 8,
     "elementary_gates" => ["SSwap_2_3", "SX_1", "SX_2", "SX_3", "H_1", "H_2", "H_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => QCOpt.CSwapGate(), #also Fredkin
-    "decomposition_type" => "exact",
+    "decomposition_type" => "exact_optimal",
     "objective" => "minimize_depth"
     )
 end
@@ -243,5 +243,6 @@ function decompose_CiSwap()
         "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
         "target_gate" => QCOpt.CiSwapGate(),
         "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal",
         )
 end

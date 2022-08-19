@@ -55,7 +55,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     if "decomposition_type" in keys(params)
         decomposition_type = params["decomposition_type"]
     else
-        decomposition_type = "exact"
+        decomposition_type = "exact_optimal"
     end
 
     # Objective function

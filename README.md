@@ -52,7 +52,7 @@ params = Dict{String, Any}(
 "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"],
 "target_gate" => target_gate(),
 "objective" => "minimize_depth",
-"decomposition_type" => "exact",
+"decomposition_type" => "exact_optimal",
        
 "U3_θ_discretization" => -π:π/2:π,
 "U3_ϕ_discretization" => -π:π/2:π,
