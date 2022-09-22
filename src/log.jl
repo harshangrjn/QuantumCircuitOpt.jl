@@ -192,10 +192,25 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && (!isapprox(M_sol, target_gate, atol = 1E-4))
+    n_r            = size(target_gate)[1]
+    n_c            = size(target_gate)[2]
+
+    nonzero_r = 0
+    nonzero_c = 0
+    for i=1:n_r, j=1:n_c
+        if !isapprox(data["target_gate"][i,j], 0, atol=1E-7) 
+            nonzero_r = i
+            nonzero_c = j
+            break
+        end
+    end
+
+    global_phase = M_sol[nonzero_r, nonzero_c] / target_gate[nonzero_r, nonzero_c]
+
+    if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && (!isapprox(M_sol, target_gate.*global_phase, atol = 1E-4))
         Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     end
-    
+
 end
 
 """

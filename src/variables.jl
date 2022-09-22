@@ -66,7 +66,7 @@ function variable_sequential_gate_products(qcm::QuantumCircuitModel)
     n_r    = size(qcm.data["gates_real"])[1]
     n_c    = size(qcm.data["gates_real"])[2]
 
-    qcm.variables[:U_var] = JuMP.@variable(qcm.model, -1 <= U_var[1:n_r, 1:n_c, 1:(depth-1)] <= 1)
+    qcm.variables[:U_var] = JuMP.@variable(qcm.model, -1 <= U_var[1:n_r, 1:n_c, 1:depth] <= 1)
     
     return
 end

@@ -725,3 +725,32 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
     end
 
 end
+
+function _get_nonzero_index_of_real_target(data::Dict{String,Any})
+
+    n_r            = size(data["gates_real"])[1]
+    n_c            = size(data["gates_real"])[2]
+
+    nonzero_r = 0
+    nonzero_c = 0
+    if data["are_gates_real"]
+        for i=1:n_r, j=1:n_c
+            if !isapprox(data["target_gate"][i,j], 0, atol=1E-7) 
+                nonzero_r = i
+                nonzero_c = j
+                break
+            end
+        end
+    else
+        for i=1:2:n_r, j=1:2:n_c
+            if !isapprox(data["target_gate"][i,j], 0, atol=1E-7) || !isapprox(data["target_gate"][i,j+1], 0, atol=1E-7)
+                nonzero_r = i
+                nonzero_c = j
+                break
+            end
+        end
+    end
+
+    return nonzero_r, nonzero_c 
+end
+

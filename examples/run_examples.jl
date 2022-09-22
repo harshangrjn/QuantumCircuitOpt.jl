@@ -1,4 +1,6 @@
 import QuantumCircuitOpt as QCOpt
+using LinearAlgebra
+
 using JuMP
 using Gurobi
 # using Cbc
@@ -29,7 +31,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_controlled_V"]
+decompose_gates = ["decompose_miller"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
