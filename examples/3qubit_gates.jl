@@ -77,21 +77,13 @@ function decompose_toffoli_with_controlled_gates()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
     println(">>>>> Toffoli gate with controlled gates <<<<<")
- 
-    target_gate = Array{Complex{Float64},2}(exp(im*pi*0.0) *[1  0  0  0  0  0  0  0
-                                            0  1  0  0  0  0  0  0
-                                            0  0  1  0  0  0  0  0
-                                            0  0  0  1  0  0  0  0
-                                            0  0  0  0  1  0  0  0
-                                            0  0  0  0  0  1  0  0
-                                            0  0  0  0  0  0  0  1
-                                            0  0  0  0  0  0  1  0])
+
     return Dict{String, Any}(
     
     "num_qubits" => 3,
     "maximum_depth" => 5,
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CV_1_2", "CVdagger_1_3", "CVdagger_2_3", "CVdagger_1_2", "CNot_2_1", "CNot_1_2", "Identity"],
-    "target_gate" => target_gate,
+    "target_gate" => QCOpt.ToffoliGate(),
     "objective" => "minimize_depth",
     "decomposition_type" => "exact_optimal",
     )
