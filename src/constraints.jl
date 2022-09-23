@@ -158,6 +158,7 @@ function constraint_gate_target_condition_compact_real(qcm::QuantumCircuitModel)
             JuMP.@constraint(qcm.model, U_var[i,j,depth] .== 0)
         else
             JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][nonzero_r,nonzero_c] .== qcm.data["target_gate"][i,j]*U_var[nonzero_r,nonzero_c,depth])
+            nonzero_r, nonzero_c = i, j
         end
     end
     return    
@@ -184,6 +185,7 @@ function constraint_gate_target_condition_compact_complex(qcm::QuantumCircuitMod
             #complex part equal
             JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][nonzero_r,(nonzero_c+1)] + U_var[i,(j+1),depth]*qcm.data["target_gate"][nonzero_r,nonzero_c] ==
                 U_var[nonzero_r,nonzero_c,depth]*qcm.data["target_gate"][i,(j+1)] + U_var[nonzero_r,(nonzero_c+1),depth]*qcm.data["target_gate"][i,j]) 
+            nonzero_r, nonzero_c = i, j
         end
     end
     return    
