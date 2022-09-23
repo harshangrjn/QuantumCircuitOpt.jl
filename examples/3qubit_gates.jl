@@ -78,7 +78,7 @@ function decompose_toffoli_with_controlled_gates()
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
     println(">>>>> Toffoli gate with controlled gates <<<<<")
  
-    target_gate = Array{Complex{Float64},2}(exp(im*0.3) *[1  0  0  0  0  0  0  0
+    target_gate = Array{Complex{Float64},2}(exp(im*pi*0.0) *[1  0  0  0  0  0  0  0
                                             0  1  0  0  0  0  0  0
                                             0  0  1  0  0  0  0  0
                                             0  0  0  1  0  0  0  0
