@@ -255,10 +255,17 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
     is_target_real = QCO.is_gate_real(params["target_gate"])
 
     if are_elementary_gates_real
-        if !is_target_real
-            Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts")
-        else 
+        if is_target_real
             return real(params["target_gate"]), is_target_real
+        else
+            nonzero_r, nonzero_c = QCO._get_nonzero_index_of_original_target(params["target_gate"])
+            global_phase = angle(params["target_gate"][nonzero_r, nonzero_c])
+            is_target_real_up_to_phase = QCO.is_gate_real(exp(-im*global_phase)*params["target_gate"])
+            if is_target_real_up_to_phase
+                return real(exp(-im*global_phase)*params["target_gate"]), !is_target_real
+            else    
+                Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real")
+            end
         end
     else
         return QCO.complex_to_real_gate(params["target_gate"]), is_target_real

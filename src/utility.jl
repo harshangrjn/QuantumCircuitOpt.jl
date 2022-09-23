@@ -754,3 +754,21 @@ function _get_nonzero_index_of_real_target(data::Dict{String,Any})
     return nonzero_r, nonzero_c 
 end
 
+function _get_nonzero_index_of_original_target(T::Array{Complex{Float64},2})
+
+    n_r            = size(T)[1]
+    n_c            = size(T)[2]
+
+    nonzero_r = 0
+    nonzero_c = 0
+    
+    for i=1:n_r, j=1:n_c
+        if !isapprox(T[i,j], 0, atol=1E-6) 
+            nonzero_r = i
+            nonzero_c = j
+            break
+        end
+    end
+   
+    return nonzero_r, nonzero_c 
+end
