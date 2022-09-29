@@ -51,7 +51,7 @@ end
 function decompose_exact_random_target1()
 
     num_qubits = 5
-    elementary_gates = ["H_2", "H_3", "T_1", "T_3", "T_5", "CNot_2_3", "CNot_3_4", "CNot_1_5", "CVdagger_1_2", "CVdagger_4_2", "Identity"]
+    elementary_gates = ["H_2", "H_3", "T_1", "T_3", "T_5", "CNot_2_3", "CNot_3_4", "CVdagger_1_2", "CVdagger_4_2", "Identity"]
     depth = 5
 
     function target_gate()
