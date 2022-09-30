@@ -258,7 +258,7 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
         if is_target_real
             return real(params["target_gate"]), is_target_real
         else
-            nonzero_r, nonzero_c = QCO._get_nonzero_index_of_original_target(params["target_gate"])
+            nonzero_r, nonzero_c = QCO._get_ref_nonzero_index_of_original_target(params["target_gate"])
             global_phase = angle(params["target_gate"][nonzero_r, nonzero_c])
             is_target_real_up_to_phase = QCO.is_gate_real(exp(-im*global_phase)*params["target_gate"])
             if is_target_real_up_to_phase

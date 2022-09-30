@@ -51,22 +51,30 @@ end
 function decompose_exact_random_target1()
 
     num_qubits = 5
-    elementary_gates = ["H_2", "H_3", "T_1", "T_3", "T_5", "CNot_2_3", "CNot_3_4", "CVdagger_1_2", "CVdagger_4_2", "Identity"]
+    elementary_gates = ["H_1", "H_2", "Y_3", "T_4", "T_5", "CH_1_2", "CNot_2_3", "CNot_3_4", "CH_4_5", "CZ_1_5", "Identity"]
     depth = 5
 
     function target_gate()
+
+        H_1 = QCOpt.get_full_sized_gate("H_1", num_qubits);
         H_2 = QCOpt.get_full_sized_gate("H_2", num_qubits);
         H_3 = QCOpt.get_full_sized_gate("H_3", num_qubits);
-        T_5 = QCOpt.get_full_sized_gate("T_5", num_qubits);
-        T_3 = QCOpt.get_full_sized_gate("T_3", num_qubits);
+        Y_3 = QCOpt.get_full_sized_gate("Y_3", num_qubits);
         T_1 = QCOpt.get_full_sized_gate("T_1", num_qubits);
+        T_3 = QCOpt.get_full_sized_gate("T_3", num_qubits);
+        T_4 = QCOpt.get_full_sized_gate("T_4", num_qubits);
+        T_5 = QCOpt.get_full_sized_gate("T_5", num_qubits);
+    
+        CH_1_2 = QCOpt.get_full_sized_gate("CH_1_2", num_qubits);
+        CH_4_5 = QCOpt.get_full_sized_gate("CH_4_5", num_qubits);
         CNot_2_3 = QCOpt.get_full_sized_gate("CNot_2_3", num_qubits);
         CNot_3_4 = QCOpt.get_full_sized_gate("CNot_3_4", num_qubits);
         CNot_1_5 = QCOpt.get_full_sized_gate("CNot_1_5", num_qubits);
+        CZ_1_5 = QCOpt.get_full_sized_gate("CZ_1_5", num_qubits);
         CVdagger_1_2 = QCOpt.get_full_sized_gate("CVdagger_1_2", num_qubits);
         CVdagger_4_2 = QCOpt.get_full_sized_gate("CVdagger_4_2", num_qubits);
 
-        return T_3 * H_3 * T_1 * CVdagger_1_2 * H_2
+        return Y_3 * CNot_2_3 * Y_3 * CH_4_5 * H_1
 
     end
 

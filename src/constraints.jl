@@ -151,13 +151,13 @@ function constraint_gate_target_condition_compact_real(qcm::QuantumCircuitModel)
 
     U_var = qcm.variables[:U_var]
     
-    nonzero_r, nonzero_c = QCO._get_nonzero_index_of_real_target(qcm.data::Dict{String,Any})
+    ref_nonzero_r, ref_nonzero_c = QCO._get_ref_nonzero_index_of_real_target(qcm.data::Dict{String,Any})
 
     for i=1:n_r, j=1:n_c
-        if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-7)
-            JuMP.@constraint(qcm.model, U_var[i,j,depth] .== 0)
+        if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6)
+            JuMP.@constraint(qcm.model, U_var[i,j,depth] == 0)
         else
-            JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][nonzero_r,nonzero_c] .== qcm.data["target_gate"][i,j]*U_var[nonzero_r,nonzero_c,depth])
+            JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] == qcm.data["target_gate"][i,j]*U_var[ref_nonzero_r,ref_nonzero_c,depth])
         end
     end
     return    
@@ -171,19 +171,19 @@ function constraint_gate_target_condition_compact_complex(qcm::QuantumCircuitMod
 
     U_var = qcm.variables[:U_var]
     
-    nonzero_r, nonzero_c = QCO._get_nonzero_index_of_real_target(qcm.data::Dict{String,Any})
+    ref_nonzero_r, ref_nonzero_c = QCO._get_ref_nonzero_index_of_real_target(qcm.data::Dict{String,Any})
 
     for i=1:2:n_r, j=1:2:n_c
-        if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-7) && isapprox(qcm.data["target_gate"][i,j+1], 0, atol=1E-7)
+        if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6) && isapprox(qcm.data["target_gate"][i,j+1], 0, atol=1E-7)
             JuMP.@constraint(qcm.model, U_var[i,j,depth] == 0.0)
             JuMP.@constraint(qcm.model, U_var[i,(j+1),depth] == 0.0)
         else
             #real parts equal
-            JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][nonzero_r,nonzero_c] - U_var[i,(j+1),depth]*qcm.data["target_gate"][nonzero_r,(nonzero_c+1)] ==
-                U_var[nonzero_r,nonzero_c,depth]*qcm.data["target_gate"][i,j] - U_var[nonzero_r,(nonzero_c+1),depth]*qcm.data["target_gate"][i,(j+1)])       
+            JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] - U_var[i,(j+1),depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] ==
+                U_var[ref_nonzero_r,ref_nonzero_c,depth]*qcm.data["target_gate"][i,j] - U_var[ref_nonzero_r,(ref_nonzero_c+1),depth]*qcm.data["target_gate"][i,(j+1)])       
             #complex part equal
-            JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][nonzero_r,(nonzero_c+1)] + U_var[i,(j+1),depth]*qcm.data["target_gate"][nonzero_r,nonzero_c] ==
-                U_var[nonzero_r,nonzero_c,depth]*qcm.data["target_gate"][i,(j+1)] + U_var[nonzero_r,(nonzero_c+1),depth]*qcm.data["target_gate"][i,j]) 
+            JuMP.@constraint(qcm.model, U_var[i,j,depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] + U_var[i,(j+1),depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] ==
+                U_var[ref_nonzero_r,ref_nonzero_c,depth]*qcm.data["target_gate"][i,(j+1)] + U_var[ref_nonzero_r,(ref_nonzero_c+1),depth]*qcm.data["target_gate"][i,j]) 
         end
     end
     return    
