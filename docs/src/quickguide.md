@@ -161,23 +161,25 @@ QCOpt.visualize_solution(results, data)
 For example, for the above controlled-Z gate decomposition, the processed output of QCOpt is as follows: 
 ```
 =============================================================================
+QuantumCircuitOpt version: v0.5.0
+
 Quantum Circuit Model Data
 
   Number of qubits: 2
   Total number of elementary gates (after presolve): 72
   Maximum depth of decomposition: 4
-  Input elementary gates: ["U3_1", "U3_2", "CNot_1_2", "Identity"]
+  Elementary gates: ["U3_1", "U3_2", "CNot_1_2", "Identity"]
     U3_θ discretization: [-180.0, -90.0, 0.0, 90.0, 180.0]
     U3_ϕ discretization: [-180.0, -90.0, 0.0, 90.0, 180.0]
     U3_λ discretization: [-180.0, -90.0, 0.0, 90.0, 180.0]
-  Type of decomposition: exact
+  Type of decomposition: exact_optimal
   MIP optimizer: Gurobi
 
 Optimal Circuit Decomposition
 
   U3_2(-90.0,0.0,0.0) * CNot_1_2 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 2.64 sec.
+  Optimizer run time: 3.01 sec.
 =============================================================================
 ```
 

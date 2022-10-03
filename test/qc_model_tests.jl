@@ -493,7 +493,7 @@ end
     "decomposition_type" => "exact_optimal",
     )
     
-    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :fix_unitary_variables => false)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
