@@ -1,11 +1,19 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.4.2 
+- Minor: Fixed result `primal_status` issue in `log.jl`
+- Added helper functions for obtaining fixed indices of `U_var` unitary variables to zeros or constant values. Dropped linearization constraints for fixed `U_var` variables
+- Dropped support for `unit_magnitude_constraints`
+- Minor updates in error messages for kron symboled gates
+- Changed Cbc test dependency to HiGHS (MIP) solver 
+- Updated docs and unit tests to reflect above changes
+
 ### v0.4.1
 - Added support for returning exact feasible decomposition (without optimality certificate) using `exact_feasible`
 - Added support for unitary constraints using binary linearizations (speeds up feasiblity problems)
-- Added `decompose_W_using_HSTCnot` in examples
-- Added `decompose_CNOT_using_GR` in examples (for Rydberg atom array-based simulators)
+- Added `W_using_HSTCnot` in examples
+- Added `CNOT_using_GR` in examples (for Rydberg atom array-based simulators)
 - Added support for `CSGate`, `CSdaggerGate`, `CTGate`, `CTdaggerGate` and `SSwapGate` (sqrt(`SwapGate`))
 - Dropped support for `CZRevGate` as it is invariant to qubit flip
 - Updated README and docs with the Youtube link for the JuliaCon's presentation

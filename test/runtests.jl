@@ -1,17 +1,23 @@
-using QuantumCircuitOpt
-using Memento
 using JuMP
-using LinearAlgebra
-using Test
-using Cbc
+using Test 
 
-const QCO = QuantumCircuitOpt
-const LA = LinearAlgebra
+import QuantumCircuitOpt as QCO
+import Memento
+import LinearAlgebra as LA
+import Cbc
+import HiGHS
 
 # Suppress warnings during testing
 QCO.logger_config!("error")
 
-const CBC = JuMP.optimizer_with_attributes(Cbc.Optimizer,  MOI.Silent() => true)
+const HIGHS = MOI.OptimizerWithAttributes(
+    HiGHS.Optimizer,
+    "presolve" => "on",
+    "log_to_console" => false,
+)
+
+const MIP_SOLVER = HIGHS
+
 tol_0 = 1E-6
 
 @testset "QuantumCircuitOpt" begin

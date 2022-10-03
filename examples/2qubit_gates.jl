@@ -1,4 +1,4 @@
-function decompose_hadamard()
+function hadamard()
 
     println(">>>>> Hadamard Gate <<<<<")
  
@@ -17,7 +17,7 @@ function decompose_hadamard()
     )
 end
 
-function decompose_controlled_Z()
+function controlled_Z()
 
     println(">>>>> Controlled-Z Gate <<<<<")
 
@@ -37,7 +37,7 @@ function decompose_controlled_Z()
 
 end
 
-function decompose_controlled_V()
+function controlled_V()
 
     println(">>>>> Controlled-V Gate <<<<<")
 
@@ -52,7 +52,7 @@ function decompose_controlled_V()
     )
 end
 
-function decompose_controlled_H()
+function controlled_H()
 
     println(">>>>> Controlled-H Gate <<<<<")
 
@@ -71,7 +71,7 @@ function decompose_controlled_H()
     )
 end
 
-function decompose_controlled_H_with_R()
+function controlled_H_with_R()
 
     println(">>>>> Controlled-H with R Gate <<<<<")
 
@@ -90,7 +90,7 @@ function decompose_controlled_H_with_R()
     )
 end
 
-function decompose_magic()
+function magic()
     
     println(">>>>> M Gate <<<<<")
 
@@ -109,7 +109,7 @@ function decompose_magic()
         )
 end
 
-function decompose_magic_using_CNOT_1_2()
+function magic_using_CNOT_1_2()
     
     println(">>>>> M Gate <<<<<")
 
@@ -128,7 +128,7 @@ function decompose_magic_using_CNOT_1_2()
         )
 end
 
-function decompose_magic_using_SHCnot()
+function magic_using_SHCnot()
     
     println(">>>>> M gate using S, H and CNOT Gate <<<<<")
 
@@ -143,7 +143,7 @@ function decompose_magic_using_SHCnot()
         )
 end
 
-function decompose_S()
+function S_gate()
 
     println(">>>>> S Gate <<<<<")
 
@@ -162,7 +162,7 @@ function decompose_S()
         )
 end
 
-function decompose_revcnot()
+function revcnot()
 
     println(">>>>> Reverse CNOT Gate <<<<<")
 
@@ -177,7 +177,7 @@ function decompose_revcnot()
     )
 end
 
-function decompose_revcnot_with_U()
+function revcnot_with_U()
     
     println(">>>>> Reverse CNOT using U3 and CNOT Gates <<<<<")
 
@@ -196,7 +196,7 @@ function decompose_revcnot_with_U()
         )
 end
 
-function decompose_swap()
+function swap()
 
     println(">>>>> SWAP Gate <<<<<")
 
@@ -211,7 +211,7 @@ function decompose_swap()
         )
 end
 
-function decompose_W()
+function W_gate()
 
     println(">>>>> W Gate <<<<<")
 
@@ -230,7 +230,7 @@ function decompose_W()
         )
 end
 
-function decompose_W_using_HSTCnot()
+function W_using_HSTCnot()
 
     println(">>>>> W Gate using H, S, T and CNOT gates <<<<<")
 
@@ -245,7 +245,7 @@ function decompose_W_using_HSTCnot()
     )
 end
 
-function decompose_W_using_HCnot()
+function W_using_HCnot()
 
     println(">>>>> W Gate using H and CNOT gates <<<<<")
 
@@ -260,7 +260,7 @@ function decompose_W_using_HCnot()
         )
 end
 
-function decompose_HCoinGate()
+function HCoinGate()
 
     println(">>>>> Hadamard Coin gate <<<<<")
 
@@ -275,7 +275,7 @@ function decompose_HCoinGate()
         )
 end
 
-function decompose_GroverDiffusion_using_HX()
+function GroverDiffusion_using_HX()
 
     println(">>>>> Grover's Diffusion Operator <<<<<")
 
@@ -292,7 +292,7 @@ function decompose_GroverDiffusion_using_HX()
         )
 end
 
-function decompose_GroverDiffusion_using_Clifford()
+function GroverDiffusion_using_Clifford()
 
     println(">>>>> Grover's Diffusion Operator <<<<<")
 
@@ -308,7 +308,7 @@ function decompose_GroverDiffusion_using_Clifford()
 end
 
 
-function decompose_GroverDiffusion_using_U3()
+function GroverDiffusion_using_U3()
 
     println(">>>>> Grover's Diffusion Operator using U3 gate <<<<<")
 
@@ -327,7 +327,7 @@ function decompose_GroverDiffusion_using_U3()
     )
 end
 
-function decompose_iSwap()
+function iSwap()
 
     println(">>>>> iSwap Gate <<<<<")
 
@@ -343,7 +343,7 @@ function decompose_iSwap()
         )
 end
 
-function decompose_qft2_using_R()
+function qft2_using_R()
     println(">>>>> QFT2 Gate using R and CNOT gates <<<<<")
 
     return Dict{String, Any}(
@@ -360,7 +360,7 @@ function decompose_qft2_using_R()
         )
 end
 
-function decompose_qft2_using_HT()
+function qft2_using_HT()
     println(">>>>> QFT2 Gate using H, T, CNOT gates <<<<<")
 
     return Dict{String, Any}(
@@ -374,7 +374,7 @@ function decompose_qft2_using_HT()
         )
 end
 
-function decompose_GRGate()
+function GRGate()
     println(">>>>> GRGate testing <<<<<")
 
     GR1 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/6, π/3])
@@ -395,7 +395,7 @@ function decompose_GRGate()
         )
 end
 
-function decompose_X_using_GR()
+function X_using_GR()
 
     println(">>>>> Pauli-X Gate using global rotation <<<<<")
  
@@ -415,7 +415,7 @@ function decompose_X_using_GR()
     )
 end
 
-function decompose_CNOT_using_GR()
+function CNOT_using_GR()
     println(">>>>> CNOT Gate using global rotation <<<<<")
     
     return Dict{String, Any}(

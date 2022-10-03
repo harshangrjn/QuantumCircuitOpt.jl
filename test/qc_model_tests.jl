@@ -15,7 +15,7 @@
     model_options = Dict{Symbol, Any}(:model_type => "compact_formulation_1", # Testing incorrect model_type
                                       :all_valid_constraints => 2)            # Testing incorrect all_valid_constraints
 
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -42,10 +42,9 @@ end
         )
     
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
-                                      :all_valid_constraints => 1,
-                                      :unit_magnitude_constraints => true)
+                                      :all_valid_constraints => 1)
 
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -68,7 +67,7 @@ end
     "decomposition_type" => "exact_optimal"                  
     )
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
 
     data = QCO.get_data(params)
 
@@ -95,7 +94,7 @@ end
     "decomposition_type" => "exact_optimal"                  
     )
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
 
     data = QCO.get_data(params)
 
@@ -122,7 +121,7 @@ end
     "decomposition_type" => "exact_optimal"                  
     )
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
 
     data = QCO.get_data(params)
 
@@ -152,7 +151,7 @@ end
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
                                       :commute_gate_constraints => true)
 
-    result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -177,7 +176,7 @@ end
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
                                       :commute_gate_constraints => true)
 
-    result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -202,7 +201,7 @@ end
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
                                       :commute_gate_constraints => true)
 
-    result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -227,7 +226,7 @@ end
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation")
 
-    result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
     
     data = QCO.get_data(params)
 
@@ -259,7 +258,7 @@ end
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation")
 
-    result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
     
     data = QCO.get_data(params)
 
@@ -287,7 +286,7 @@ end
     
     model_options = Dict{Symbol, Any}(:all_valid_constraints => -1)
 
-    result_qc = QCO.run_QCModel(params, CBC; options =  model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -321,7 +320,7 @@ end
     "decomposition_type" => "exact_optimal"
     )
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][6,:]), 1, atol=tol_0)
@@ -353,7 +352,7 @@ end
         end
     end
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 4, atol = tol_0)
@@ -373,7 +372,7 @@ end
 
     model_options = Dict{Symbol, Any}(:time_limit => 1)
 
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.TIME_LIMIT
     @test result_qc["primal_status"]      == MOI.NO_SOLUTION
     
@@ -405,7 +404,7 @@ end
     @test isapprox(data["gates_dict"]["1"]["matrix"] * data["gates_dict"]["4"]["matrix"], data["gates_dict"]["2"]["matrix"], atol = tol_0)
     @test isapprox(data["gates_dict"]["5"]["matrix"] * data["gates_dict"]["7"]["matrix"], data["gates_dict"]["6"]["matrix"], atol = tol_0)
 
-    result_qc = QCO.run_QCModel(params, CBC)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 2.0, atol = tol_0)
@@ -428,7 +427,7 @@ end
 
     model_options = Dict{Symbol, Any}(:idempotent_gate_constraints => true)
     
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -458,20 +457,22 @@ end
 
     params = Dict{String, Any}(
     "num_qubits" => 4,
-    "maximum_depth" => 2,
+    "maximum_depth" => 6,
     "elementary_gates" => ["CV_1_4", "CV_2_4", "CV_3_4", "CVdagger_3_4", "CNot_1_2", "CNot_2_3", "Identity"],
     "target_gate" => target_gate()
     )
     
     model_options = Dict{Symbol, Any}(:relax_integrality => true,
                                       :convex_hull_gate_constraints => true,
-                                      :optimizer_log => false)
+                                      :fix_unitary_variables => true,
+                                      :optimizer_log => false,
+                                      )
 
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
-    @test isapprox(result_qc["objective"], 0.8275862068965518, atol = tol_0)
+    @test isapprox(result_qc["objective"], 0.6, atol = tol_0)
 end
 
 @testset "Tests: RGate decomposition" begin
@@ -493,7 +494,7 @@ end
     )
     
     model_options = Dict{Symbol, Any}(:optimizer_log => false)
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -518,7 +519,7 @@ end
     )
     
     model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_constraints => true)
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -538,7 +539,7 @@ end
         )
 
     model_options = Dict{Symbol, Any}(:optimizer_log => false)
-    result_qc = QCO.run_QCModel(params, CBC; options = model_options)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 0.0, atol = tol_0)

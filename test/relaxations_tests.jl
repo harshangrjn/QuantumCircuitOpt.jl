@@ -1,7 +1,7 @@
 @testset "Tests: relaxation_bilinear" begin
     QCO.silence()
     
-    m = JuMP.Model(CBC)
+    m = JuMP.Model(MIP_SOLVER)
 
     LB = [-1, -2.5, 0, -3, 0]
     UB = [2.5, 0, 1, 3.2, 1]

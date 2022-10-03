@@ -22,11 +22,11 @@ import Pkg
 Pkg.add("QuantumCircuitOpt")
 ```
 
-At least one mixed-integer programming solver is required for running QuantumCircuitOpt. The well-known [CPLEX](https://github.com/jump-dev/CPLEX.jl) or the [Gurobi](https://github.com/jump-dev/Gurobi.jl) solver is highly recommended, as it is fast, scaleable and can be used to solve on fairly large-scale graphs. However, open-source solvers such as [Cbc](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) is also compatible with QuantumCircuitOpt which can be installed via the package manager with
+At least one mixed-integer programming (MIP) solver is required for running QuantumCircuitOpt. The well-known [Gurobi](https://github.com/jump-dev/Gurobi.jl) or IBM's [CPLEX](https://github.com/jump-dev/CPLEX.jl) solver is highly recommended, as it is fast, scaleable and can be used to solve on fairly large-scale circuits. However, the open-source MIP solver [HiGHS](https://github.com/jump-dev/HiGHS.jl) is also compatible with QuantumCircuitOpt. Gurobi (or any other MIP solver) can be installed via the package manager with
 
 ```julia
 import Pkg
-Pkg.add("Cbc")
+Pkg.add("Gurobi")
 ```
 
 ## Unit Tests

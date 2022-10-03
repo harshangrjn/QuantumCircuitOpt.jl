@@ -42,17 +42,14 @@ function gate_element_bounds(M::Array{Float64,3})
     M_l = zeros(size(M)[1], size(M)[2])
     M_u = zeros(size(M)[1], size(M)[2])
 
-    for i = 1:size(M)[1]
-        for j = 1:size(M)[2]
+    for i = 1:size(M)[1], j = 1:size(M)[2]
+        M_l[i,j] = minimum(M[i,j,:])
+        M_u[i,j] = maximum(M[i,j,:])
 
-            M_l[i,j] = minimum(M[i,j,:])
-            M_u[i,j] = maximum(M[i,j,:])
-
-            if M_l[i,j] > M_u[i,j]
-                Memento.error(_LOGGER, "Lower and upper bound conflict in the elements of input elementary gates")
-            elseif (M_l[i,j] in [-Inf, Inf]) || (M_u[i,j] in [-Inf, Inf])
-                Memento.error(_LOGGER, "Unbounded entry detected in the input elementary gates")
-            end
+        if M_l[i,j] > M_u[i,j]
+            Memento.error(_LOGGER, "Lower and upper bound conflict in the elements of input elementary gates")
+        elseif (M_l[i,j] in [-Inf, Inf]) || (M_u[i,j] in [-Inf, Inf])
+            Memento.error(_LOGGER, "Unbounded entry detected in the input elementary gates")
         end
     end
 
@@ -71,28 +68,25 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
     commute_pairs = Array{Tuple{Int64,Int64},1}()
     commute_pairs_prodIdentity = Array{Tuple{Int64,Int64},1}()
 
-    for i = 1:(num_gates-1)
-        for j = (i+1):num_gates
-            M_i = M["$i"]["matrix"]
-            M_j = M["$j"]["matrix"]
+    for i = 1:(num_gates-1), j = (i+1):num_gates
+        M_i = M["$i"]["matrix"]
+        M_j = M["$j"]["matrix"]
 
-            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
-                continue
-            end
-            
-            M_ij = M_i*M_j
-            M_ji = M_j*M_i
-            Id = Matrix(LA.I, size(M_ij)[1], size(M_ij)[2])
+        if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
+            continue
+        end
+        
+        M_ij = M_i*M_j
+        M_ji = M_j*M_i
+        Id = Matrix(LA.I, size(M_ij)[1], size(M_ij)[2])
 
-            # Commuting pairs == Identity 
-            if isapprox(M_ij, Id, atol=1E-6)
-                push!(commute_pairs_prodIdentity, (i,j))
-            
-            # Commuting pairs != Identity 
-            elseif isapprox(M_ij, M_ji, atol = 1E-4)
-                push!(commute_pairs, (i, j))
-
-            end
+        # Commuting pairs == Identity 
+        if isapprox(M_ij, Id, atol=1E-6)
+            push!(commute_pairs_prodIdentity, (i,j))
+        
+        # Commuting pairs != Identity 
+        elseif isapprox(M_ij, M_ji, atol = 1E-4)
+            push!(commute_pairs, (i, j))
 
         end
     end
@@ -133,29 +127,26 @@ function get_redundant_gate_product_pairs(M::Dict{String,Any})
     redundant_pairs_idx = Array{Tuple{Int64,Int64},1}()
 
     # Non-Identity redundant pairs
-    for i = 1:(num_gates-1)
-        for j = (i+1):num_gates
-            M_i = M["$i"]["matrix"]
-            M_j = M["$j"]["matrix"]
+    for i = 1:(num_gates-1), j = (i+1):num_gates
+        M_i = M["$i"]["matrix"]
+        M_j = M["$j"]["matrix"]
 
-            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
-                continue
-            end
+        if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
+            continue
+        end
+        
+        for k = 1:num_gates 
+            if (k != i) && (k != j) && !("Identity" in M["$k"]["type"])                
+                M_k = M["$k"]["matrix"]
             
-            for k = 1:num_gates 
-                if (k != i) && (k != j) && !("Identity" in M["$k"]["type"])                
-                    M_k = M["$k"]["matrix"]
-                
-                    if isapprox(M_i*M_j, M_k, atol = 1E-4)
-                        push!(redundant_pairs_idx, (i, j))
-                    end
+                if isapprox(M_i*M_j, M_k, atol = 1E-4)
+                    push!(redundant_pairs_idx, (i, j))
+                end
 
-                    if isapprox(M_j*M_i, M_k, atol = 1E-4)
-                        push!(redundant_pairs_idx, (j, i))
-                    end
+                if isapprox(M_j*M_i, M_k, atol = 1E-4)
+                    push!(redundant_pairs_idx, (j, i))
                 end
             end
-
         end
     end
 
@@ -563,7 +554,7 @@ which the input gate is located. For example, if the input string is `CRX_2_3`, 
 function _parse_gate_string(s::String; type=false, qubits=false)
 
     if occursin(kron_symbol, s)
-        Memento.error(_LOGGER, "Kron symbol is not supported for parsing qubit numbers in $s")
+        Memento.error(_LOGGER, "Kron symbol is not supported for parsing qubit locations in $s. Instead try `get_full_sized_kron_symbol_gate` function.")
     end
     
     gates = Vector{String}()
@@ -724,4 +715,95 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
 
     end
 
+end
+
+"""
+    _get_elementary_gates_fixed_indices(M::Array{T,3} where T <: Number)
+
+Given the set of input elementary gates in real form, 
+this function returns a dictionary of tuples of indices wholse values are fixed in `sum_k (z_k*M[:,:,k])`. 
+"""
+function _get_elementary_gates_fixed_indices(M::Array{T,3} where T <: Number)
+    N = size(M[:,:,1])[1]
+    M_l, M_u = QCO.gate_element_bounds(M)
+
+    G_fixed_idx = Dict{Tuple{Int64, Int64}, Any}()
+    for i=1:N, j=1:N
+        if isapprox(M_l[i,j], M_u[i,j], atol = 1E-6)
+            G_fixed_idx[(i,j)] = Dict{String, Any}("value" => M_l[i,j])
+        end
+    end
+
+    return G_fixed_idx
+end
+
+function _get_unitary_variables_fixed_indices(data::Dict{String,Any})
+    
+    N = size(data["gates_real"])[1]
+    maximum_depth = data["maximum_depth"]
+    G_fixed_idx = QCO._get_elementary_gates_fixed_indices(data["gates_real"])
+    
+    U_fixed_idx = Dict{Int64, Any}()
+    for depth = 1:(maximum_depth-1)
+        U_fixed_idx[depth] = Dict{Tuple{Int64, Int64}, Any}()
+        if depth == 1 
+            # Assuming data["initial_gate"] == "Identity"
+            U_fixed_idx[depth] = G_fixed_idx
+        else 
+            U_fixed_idx[depth] = QCO._get_matrix_product_fixed_indices(U_fixed_idx[depth-1], G_fixed_idx, N)
+        end
+    end
+    
+
+    return U_fixed_idx
+end
+
+"""
+    _get_matrix_product_fixed_indices(left_matrix_fixed_idx::Dict{Tuple{Int64, Int64}, Any}, 
+                                  right_matrix_fixed_idx::Dict{Tuple{Int64, Int64}, Any}, 
+                                  N::Int64)
+
+Given left and right square matrices of size `NxN`, in a dictionary format with tuples of indices whose values are fixed, 
+this function returns a dictionary of tuples of indices wholse values are fixed in `left_matrix * right_matrix`. 
+"""
+function _get_matrix_product_fixed_indices(left_matrix_fixed_idx::Dict{Tuple{Int64, Int64}, Any}, 
+                                           right_matrix_fixed_idx::Dict{Tuple{Int64, Int64}, Any}, 
+                                           N::Int64)
+    
+    product_fixed_idx = Dict{Tuple{Int64, Int64}, Any}()
+
+    for row = 1:N
+        left_matrix_constants_row = filter(p -> (p.first[1] == row), left_matrix_fixed_idx)
+        left_matrix_zeros_row = filter(p -> (isapprox(p.second["value"], 0, atol = 1E-6)), left_matrix_constants_row)
+
+        v_constants_row = keys(left_matrix_constants_row) |> collect .|> last
+        v_zeros_row = keys(left_matrix_zeros_row) |> collect .|> last
+    
+        for col = 1:N
+            right_matrix_constants_col = filter(p -> (p.first[2] == col), right_matrix_fixed_idx)
+            right_matrix_zeros_col = filter(p -> (isapprox(p.second["value"], 0, atol=1E-6)), right_matrix_constants_col)
+
+            v_constants_col = keys(right_matrix_constants_col) |> collect .|> first
+            v_zeros_col = keys(right_matrix_zeros_col) |> collect .|> first
+
+            all_zero_idx = union(v_zeros_row, v_zeros_col)
+            
+            # Keep track of zero value indices in matrix product
+            if sort(all_zero_idx) == 1:N
+                product_fixed_idx[(row,col)] = Dict{String, Any}("value" => 0)
+            end
+
+            # Keep track of non-zero constant value indices in matrix product
+            if (sort(v_constants_row) == 1:N) && (sort(v_constants_col) == 1:N)
+                value = 0
+                for i = 1:N
+                    value += left_matrix_constants_row[(row, i)]["value"] * right_matrix_constants_col[(i, col)]["value"]
+                end
+                product_fixed_idx[(row,col)] = Dict{String, Any}("value" => value)
+            end
+
+        end 
+    end
+
+    return product_fixed_idx
 end

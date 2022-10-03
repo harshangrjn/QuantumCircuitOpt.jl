@@ -6,12 +6,12 @@ this function aids in visualizing the optimal circuit decomposition.
 """
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
-    if results["primal_status"] != MOI.FEASIBLE_POINT 
+    if !(results["primal_status"] in [MOI.FEASIBLE_POINT, MOI.NEARLY_FEASIBLE_POINT])  
         
-        if results["termination_status"] != MOI.TIME_LIMIT
-            Memento.warn(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
-        else 
+        if results["termination_status"]  == MOI.TIME_LIMIT 
             Memento.warn(_LOGGER, "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate")
+        else
+            Memento.warn(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
         end
 
         return
