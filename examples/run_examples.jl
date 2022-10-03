@@ -1,7 +1,7 @@
 import QuantumCircuitOpt as QCOpt
 using JuMP
 using Gurobi
-using HiGHS
+# using HiGHS
 
 include("optimizers.jl")
 include("2qubit_gates.jl")
@@ -10,12 +10,12 @@ include("4qubit_gates.jl")
 include("5qubit_gates.jl")
 include("decompose_all_gates.jl")
 
-# decompose_gates = ["iSwap"]
+decompose_gates = ["iSwap"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
 #----------------------------------------------#
-qcopt_optimizer = get_highs()
+qcopt_optimizer = get_gurobi()
 
 result = Dict{String,Any}()
 times = zeros(length(decompose_gates), 1)

@@ -1,7 +1,7 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### v0.4.2 
+### v0.5.0
 - Minor: Fixed result `primal_status` issue in `log.jl`
 - Added helper functions for obtaining fixed indices of `U_var` unitary variables to zeros or constant values. Dropped linearization constraints for fixed `U_var` variables
 - Dropped support for `unit_magnitude_constraints`

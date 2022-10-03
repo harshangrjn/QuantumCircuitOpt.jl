@@ -737,11 +737,18 @@ function _get_elementary_gates_fixed_indices(M::Array{T,3} where T <: Number)
     return G_fixed_idx
 end
 
-function _get_unitary_variables_fixed_indices(data::Dict{String,Any})
+"""
+    _get_unitary_variables_fixed_indices(M::Array{T,3} where T <: Number, 
+                                         maximum_depth::Int64)
+
+Given a 3D array of real square matrices (representing gates), and a maximum alowable depth, 
+this function returns a dictionary of tuples of indices wholse values are fixed in the unitary matrices for every depth 
+of the circuit. 
+"""
+function _get_unitary_variables_fixed_indices(M::Array{T,3} where T <: Number, maximum_depth::Int64)
     
-    N = size(data["gates_real"])[1]
-    maximum_depth = data["maximum_depth"]
-    G_fixed_idx = QCO._get_elementary_gates_fixed_indices(data["gates_real"])
+    N = size(M)[1]
+    G_fixed_idx = QCO._get_elementary_gates_fixed_indices(M)
     
     U_fixed_idx = Dict{Int64, Any}()
     for depth = 1:(maximum_depth-1)
@@ -754,7 +761,6 @@ function _get_unitary_variables_fixed_indices(data::Dict{String,Any})
         end
     end
     
-
     return U_fixed_idx
 end
 

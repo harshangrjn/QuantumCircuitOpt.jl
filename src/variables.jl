@@ -68,7 +68,7 @@ function variable_sequential_gate_products(qcm::QuantumCircuitModel)
     end
 
     qcm.variables[:U_var] = JuMP.@variable(qcm.model, U_var[1:n_r, 1:n_c, 1:max_depth])
-    U_fixed_idx = QCO._get_unitary_variables_fixed_indices(qcm.data)
+    U_fixed_idx = QCO._get_unitary_variables_fixed_indices(qcm.data["gates_real"], qcm.data["maximum_depth"])
     # U_var_bound_tol = 1E-8
 
     for depth = 1:(max_depth-1)

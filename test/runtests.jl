@@ -4,7 +4,6 @@ using Test
 import QuantumCircuitOpt as QCO
 import Memento
 import LinearAlgebra as LA
-import Cbc
 import HiGHS
 
 # Suppress warnings during testing
