@@ -10,9 +10,9 @@ include("2qubit_gates.jl")
 include("3qubit_gates.jl")
 include("4qubit_gates.jl")
 include("5qubit_gates.jl")
-include("decompose_all_gates.jl")
+#include("decompose_all_gates.jl")
 
-# decompose_gates = ["iSwap"]
+decompose_gates = ["toffoli_with_controlled_gates"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

@@ -57,7 +57,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                 printstyled(gates_sol_compressed[i], " * "; color = _main_color)
             else    
                 if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
-                    printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = :cyan)
+                    printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = _main_color)
                 elseif data["decomposition_type"] == "approximate"
                     printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = _main_color)
                 end

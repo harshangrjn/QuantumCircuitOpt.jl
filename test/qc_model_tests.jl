@@ -618,3 +618,7 @@ end
     @test isapprox(result_qc["objective"], 0.38281250, atol = tol_0)
 
 end
+
+@testset "QC_model Tests: Global phase constraints" begin
+
+end

@@ -770,6 +770,7 @@ Given the set of input elementary gates in real form,
 this function returns a dictionary of tuples of indices wholse values are fixed in `sum_k (z_k*M[:,:,k])`. 
 """
 function _get_elementary_gates_fixed_indices(M::Array{T,3} where T <: Number)
+    
     N = size(M[:,:,1])[1]
     M_l, M_u = QCO.gate_element_bounds(M)
 
