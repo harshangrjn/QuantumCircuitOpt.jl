@@ -13,10 +13,10 @@ mutable struct QCModelOptions
     involutory_gate_constraints        :: Bool
     redundant_gate_pair_constraints    :: Bool 
     identity_gate_symmetry_constraints :: Bool
+    fix_unitary_variables              :: Bool
     visualize_solution                 :: Bool
     idempotent_gate_constraints        :: Bool
     convex_hull_gate_constraints       :: Bool
-    unit_magnitude_constraints         :: Bool
     unitary_constraints                :: Bool
 
     time_limit                         :: Float64
@@ -30,18 +30,18 @@ end
 This function returns the default options for building the struct `QCModelOptions`.
 """
 function get_default_options()
-    model_type                         = "compact_formulation" # compact_formulation, balas_formulation
+    model_type                         = "compact_formulation" # check MODEL_TYPES in src/qc_model.jl for options
     
     all_valid_constraints              = 0    # -1, 0, 1
     commute_gate_constraints           = true # true, false
     involutory_gate_constraints        = true # true, false
     redundant_gate_pair_constraints    = true # true, false
     identity_gate_symmetry_constraints = true # true, false
+    fix_unitary_variables              = true # true, false
     visualize_solution                 = true # true, false
 
     idempotent_gate_constraints        = false # true, false
     convex_hull_gate_constraints       = false # true, false
-    unit_magnitude_constraints         = false # true, false
     unitary_constraints                = false # true, false
 
     time_limit                         = 10800 # float value
@@ -55,10 +55,10 @@ function get_default_options()
                           involutory_gate_constraints,
                           redundant_gate_pair_constraints,
                           identity_gate_symmetry_constraints,
+                          fix_unitary_variables,
                           visualize_solution,
                           idempotent_gate_constraints,
                           convex_hull_gate_constraints,
-                          unit_magnitude_constraints,
                           unitary_constraints,
                           time_limit,
                           relax_integrality,

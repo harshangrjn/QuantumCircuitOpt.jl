@@ -34,7 +34,7 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 ```
 
 ## Getting started
-To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QCOpt also needs a MIP solver such as [CPLEX](https://github.com/jump-dev/CPLEX.jl) or [Gurobi](https://github.com/jump-dev/Gurobi.jl). If you prefer an open-source MIP solver, install [CBC](https://github.com/jump-dev/Cbc.jl) or [GLPK](https://github.com/jump-dev/GLPK.jl) from the Julia package manager, though be warned that the run times of QCOpt can be substantially slower using these open-source MIP solvers. 
+To get started, install [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) and [JuMP](https://github.com/jump-dev/JuMP.jl), a modeling language layer for optimization. QCOpt also needs a MIP solver such as [Gurobi](https://github.com/jump-dev/Gurobi.jl) or IBM's [CPLEX](https://github.com/jump-dev/CPLEX.jl). If you prefer an open-source MIP solver, install [HiGHS](https://github.com/jump-dev/HiGHS.jl) from the Julia package manager, though be warned that the run times of QCOpt can be substantially slower using any of the open-source MIP solvers. 
 
 # User inputs
 QCOpt takes two types of user-defined input specifications. The first type of input contains all the necessary circuit specifications. This is given by a dictionary in Julia, which is a collection of key-value pairs, where every key is of the type `String`, which admits values of various types. Below is the list of allowable keys for the dictionary, given in column 1, and it's respective values with descriptions, given in column 2. This input dictionary is represented as `params` in all the [example](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) circuit decompositions. 
@@ -88,7 +88,7 @@ The second set of inputs for QCOpt contains all the optional specifications for 
 |`identity_gate_symmetry_constraints`| This option activates the valid constraints to eliminate symmetry in the Identity gate in the decomposition (default: `true`)| 
 |`idempotent_gate_constraints`| This option activates the valid constraints to eliminate idempotent gates in the elementary (native) gates set (default: `false`)| 
 |`convex_hull_gate_constraints`| This option activates the valid constraints to apply convex hull of complex entries in the elementary (native) gates set (default: `false`)| 
-|`unit_magnitude_constraints`| This option activates the valid outer-approximation constraints for unit-valued complex entries of the unitary gates (`U_var`) (default: `false`)|
+|`fix_unitary_variables`| This option evaluates all the fixed-valued indices of unitary matrix varaibles (`U_var`) at every depth, and appropriately builds the optimization model (default: `true`)|
 |`visualize_solution`| This option activates the visualization of the optimal circuit decomposition (default: `true`)| 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_log` | This option enables or disables console logging for the `optimizer` (default: `true`).|
@@ -161,23 +161,25 @@ QCOpt.visualize_solution(results, data)
 For example, for the above controlled-Z gate decomposition, the processed output of QCOpt is as follows: 
 ```
 =============================================================================
+QuantumCircuitOpt version: v0.5.0
+
 Quantum Circuit Model Data
 
   Number of qubits: 2
   Total number of elementary gates (after presolve): 72
   Maximum depth of decomposition: 4
-  Input elementary gates: ["U3_1", "U3_2", "CNot_1_2", "Identity"]
+  Elementary gates: ["U3_1", "U3_2", "CNot_1_2", "Identity"]
     U3_θ discretization: [-180.0, -90.0, 0.0, 90.0, 180.0]
     U3_ϕ discretization: [-180.0, -90.0, 0.0, 90.0, 180.0]
     U3_λ discretization: [-180.0, -90.0, 0.0, 90.0, 180.0]
-  Type of decomposition: exact
+  Type of decomposition: exact_optimal
   MIP optimizer: Gurobi
 
 Optimal Circuit Decomposition
 
   U3_2(-90.0,0.0,0.0) * CNot_1_2 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 2.64 sec.
+  Optimizer run time: 3.01 sec.
 =============================================================================
 ```
 

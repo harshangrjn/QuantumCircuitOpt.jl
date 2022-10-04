@@ -6,12 +6,15 @@ this function aids in visualizing the optimal circuit decomposition.
 """
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
-    if results["primal_status"] != MOI.FEASIBLE_POINT 
+    _header_color = :cyan 
+    _main_color   = :White
+
+    if !(results["primal_status"] in [MOI.FEASIBLE_POINT, MOI.NEARLY_FEASIBLE_POINT])  
         
-        if results["termination_status"] != MOI.TIME_LIMIT
-            Memento.warn(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
-        else 
+        if results["termination_status"]  == MOI.TIME_LIMIT 
             Memento.warn(_LOGGER, "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate")
+        else
+            Memento.warn(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
         end
 
         return
@@ -21,58 +24,57 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
     if !isempty(gates_sol_compressed)
 
-        printstyled("\n","=============================================================================","\n"; color = :cyan)
+        printstyled("\n","=============================================================================","\n"; color = _main_color)
+        printstyled("QuantumCircuitOpt version: ", _QCOPT_VERSION, "\n"; color = _header_color)
+
+        printstyled("\n","Quantum Circuit Model Data","\n"; color = _header_color)
         
-        printstyled("Quantum Circuit Model Data","\n"; color = :red)
+        printstyled("\n","  ","Number of qubits: ", data["num_qubits"], "\n"; color = _main_color)
         
-        printstyled("\n","  ","Number of qubits: ", data["num_qubits"], "\n"; color = :cyan)
+        printstyled("  ","Total number of elementary gates (after presolve): ",size(data["gates_real"])[3],"\n"; color = _main_color)
         
-        printstyled("  ","Total number of elementary gates (after presolve): ",size(data["gates_real"])[3],"\n"; color = :cyan)
+        printstyled("  ","Maximum depth of decomposition: ", data["maximum_depth"],"\n"; color = _main_color)
         
-        printstyled("  ","Maximum depth of decomposition: ", data["maximum_depth"],"\n"; color = :cyan)
-        
-        printstyled("  ","Input elementary gates: ", data["elementary_gates"],"\n"; color = :cyan)
+        printstyled("  ","Elementary gates: ", data["elementary_gates"],"\n"; color = _main_color)
 
         if "discretization" in keys(data)
             for i in keys(data["discretization"])
-                printstyled("    ","$i discretization: ", ceil.(rad2deg.(data["discretization"][i]), digits = 1),"\n"; color = :cyan)
+                printstyled("    ","$i discretization: ", ceil.(rad2deg.(data["discretization"][i]), digits = 1),"\n"; color = _main_color)
             end
         end
-        
-        # printstyled("  ","Input target gate: ", data["target_gate"]["type"],"\n"; color = :cyan)
-        
-        printstyled("  ","Type of decomposition: ", data["decomposition_type"],"\n"; color = :cyan)
+                
+        printstyled("  ","Type of decomposition: ", data["decomposition_type"],"\n"; color = _main_color)
 
-        printstyled("  ","MIP optimizer: ", results["optimizer"],"\n"; color = :cyan)
+        printstyled("  ","MIP optimizer: ", results["optimizer"],"\n"; color = _main_color)
 
-        printstyled("\n","Optimal Circuit Decomposition","\n","\n"; color = :red)
+        printstyled("\n","Optimal Circuit Decomposition","\n","\n"; color = _header_color)
         
         print("  ")
         
         for i=1:length(gates_sol_compressed)
             
             if i != length(gates_sol_compressed)
-                printstyled(gates_sol_compressed[i], " * "; color = :cyan)
+                printstyled(gates_sol_compressed[i], " * "; color = _main_color)
             else    
                 if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
                     printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = :cyan)
                 elseif data["decomposition_type"] == "approximate"
-                    printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = :cyan)
+                    printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = _main_color)
                 end
             end
 
         end
 
         if data["decomposition_type"] == "approximate"
-            printstyled("  ","||Decomposition error||₂: ", round(LA.norm(results["solution"]["slack_var"]), digits = 10),"\n"; color = :cyan)
+            printstyled("  ","||Decomposition error||₂: ", round(LA.norm(results["solution"]["slack_var"]), digits = 10),"\n"; color = _main_color)
         end
 
         if data["objective"] == "minimize_depth"
 
             if length(data["identity_idx"]) >= 1 && (data["decomposition_type"] !== "exact_feasible") && !(results["termination_status"] == MOI.TIME_LIMIT)
-                printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+                printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = _main_color)
             else 
-                printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = :cyan)
+                printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = _main_color)
             end
 
         elseif data["objective"] == "minimize_cnot"
@@ -83,21 +85,20 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                     printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
                 
                 elseif data["decomposition_type"] == "approximate"
-                    printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = :cyan)
+                    printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = _main_color)
                 end
             
             end
 
         end
 
-        printstyled("  ","Optimizer run time: ", ceil(results["solve_time"], digits=2)," sec.","\n"; color = :cyan)
+        printstyled("  ","Optimizer run time: ", ceil(results["solve_time"], digits=2)," sec.","\n"; color = _main_color)
             
         if results["termination_status"] == MOI.TIME_LIMIT
-            printstyled("  ","Termination status: MOI.TIME_LIMIT", "\n"; color = :cyan)
-            printstyled("  ","Decomposition may not be optimal", "\n"; color = :cyan)
+            printstyled("  ","Termination status: TIME_LIMIT", "\n"; color = _main_color)
         end
 
-        printstyled("=============================================================================","\n"; color = :cyan)      
+        printstyled("=============================================================================","\n"; color = _main_color)      
 
     else
         Memento.warn(_LOGGER, "Valid integral feasible solutions could not be found to visualize the solution")

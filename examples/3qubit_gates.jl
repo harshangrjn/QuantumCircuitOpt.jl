@@ -1,4 +1,4 @@
-function decompose_RX_on_q3()
+function RX_on_q3()
 
     println(">>>>> RX Gate on third qubit using U3Gate <<<<<")
  
@@ -17,7 +17,7 @@ function decompose_RX_on_q3()
     )
 end
 
-function decompose_toffoli()
+function toffoli()
 
     function toffoli_circuit()
         # [(depth, gate)]
@@ -56,7 +56,7 @@ function decompose_toffoli()
     )
 end
 
-function decompose_toffoli_using_kronecker()
+function toffoli_using_kronecker()
 
     println(">>>>> Toffoli gate using Kronecker <<<<<")
  
@@ -73,7 +73,7 @@ function decompose_toffoli_using_kronecker()
     )
 end
 
-function decompose_toffoli_with_controlled_gates()
+function toffoli_with_controlled_gates()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
     println(">>>>> Toffoli gate with controlled gates <<<<<")
@@ -89,7 +89,7 @@ function decompose_toffoli_with_controlled_gates()
     )
 end
 
-function decompose_CNot_1_3()
+function CNot_1_3()
 
     return Dict{String, Any}(
 
@@ -102,7 +102,7 @@ function decompose_CNot_1_3()
     )
 end
 
-function decompose_FredkinGate()
+function FredkinGate()
 
     return Dict{String, Any}(
     "num_qubits" => 3,
@@ -115,7 +115,7 @@ function decompose_FredkinGate()
     )
 end
 
-function decompose_FredkinGate_using_SSwap()
+function FredkinGate_using_SSwap()
 
     return Dict{String, Any}(
     "num_qubits" => 3,
@@ -127,7 +127,7 @@ function decompose_FredkinGate_using_SSwap()
     )
 end
 
-function decompose_toffoli_left()
+function toffoli_left()
 
     # Reference: https://arxiv.org/pdf/0803.2316.pdf 
 
@@ -151,7 +151,7 @@ function decompose_toffoli_left()
     )
 end
 
-function decompose_toffoli_right()
+function toffoli_right()
 
     # Reference: https://arxiv.org/pdf/0803.2316.pdf 
     
@@ -177,7 +177,7 @@ function decompose_toffoli_right()
     )
 end
 
-function decompose_miller()
+function miller()
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
 
     function target_gate()
@@ -201,7 +201,7 @@ function decompose_miller()
     )
 end
 
-function decompose_relative_toffoli()
+function relative_toffoli()
     #Reference: https://arxiv.org/pdf/1508.03273.pdf
 
     return Dict{String, Any}(
@@ -216,7 +216,7 @@ function decompose_relative_toffoli()
     )
 end
 
-function decompose_margolus()
+function margolus()
     #Reference: https://arxiv.org/pdf/quant-ph/0312225.pdf
 
     return Dict{String, Any}(
@@ -233,7 +233,7 @@ function decompose_margolus()
         )
 end
 
-function decompose_CiSwap()
+function CiSwap()
     #Reference: https://doi.org/10.1103/PhysRevResearch.2.033097
 
     return Dict{String, Any}(

@@ -173,3 +173,56 @@ end
 
     QCO._get_constraint_slope_intercept(v1, v1)
 end
+
+@testset "Tests: U_var fixed indices" begin
+    num_qubits = 2
+    maximum_depth = 3
+
+    # Input gates
+    H1 = QCO.complex_to_real_gate(QCO.get_full_sized_gate("H_1", num_qubits))
+    CNot_1_2 = QCO.complex_to_real_gate(QCO.get_full_sized_gate("CNot_1_2", num_qubits))
+    Id = QCO.complex_to_real_gate(QCO.IGate(num_qubits))
+
+    # Assuming only H1 in elementary gates
+    n_r = size(H1)[1]
+    gates = zeros(n_r,n_r,1)
+    gates[:,:,1] = H1
+
+    U_fixed_idx = QCO._get_unitary_variables_fixed_indices(gates, maximum_depth)
+    
+    # Depth = 1
+    for idx in keys(U_fixed_idx[1])
+        @test isapprox(U_fixed_idx[1][idx]["value"], gates[idx[1],idx[2],1], atol = tol_0)
+    end
+
+    # Depth = 2 (product of H1 is an identity matrix)
+    @test length(keys(U_fixed_idx[2])) == n_r * n_r
+    for idx in keys(U_fixed_idx[2])
+        @test isapprox(U_fixed_idx[2][idx]["value"], Id[idx[1], idx[2]], atol = tol_0)
+    end
+
+    # Assuming H1 and CNot_1_2 in elementary gates
+    gates = zeros(n_r,n_r,2)
+    gates[:,:,1] = H1
+    gates[:,:,2] = CNot_1_2
+    U_fixed_idx = QCO._get_unitary_variables_fixed_indices(gates, maximum_depth)
+    
+    # Depth = 1        
+    sum_mat = abs.(gates[:,:,1]) + abs.(gates[:,:,2])
+    for idx in keys(U_fixed_idx[1])
+        if isapprox(U_fixed_idx[1][idx]["value"], 0, atol = tol_0)
+            @test isapprox(U_fixed_idx[1][idx]["value"], sum_mat[idx[1], idx[2]], atol = tol_0)
+        end
+    end
+    
+    # Depth = 2
+    prod_mat_1 = gates[:,:,1] * gates[:,:,2]
+    prod_mat_2 = gates[:,:,2] * gates[:,:,1]
+    for idx in keys(U_fixed_idx[2])
+        if isapprox(U_fixed_idx[2][idx]["value"], 0, atol = tol_0)
+            @test isapprox(U_fixed_idx[2][idx]["value"], prod_mat_1[idx[1], idx[2]], atol = tol_0)
+            @test isapprox(U_fixed_idx[2][idx]["value"], prod_mat_2[idx[1], idx[2]], atol = tol_0)
+        end
+    end
+
+end
