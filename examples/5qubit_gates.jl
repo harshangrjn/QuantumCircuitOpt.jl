@@ -1,4 +1,4 @@
-function decompose_RX_on_5qubits()
+function RX_on_5qubits()
 
     println(">>>>> RX Gate on fourth qubit using U3Gate <<<<<")
  

@@ -1,4 +1,4 @@
-function decompose_CNot_41()
+function CNot_41()
     # Reference: https://doi.org/10.1109/DSD.2018.00005
 
     return Dict{String, Any}(
@@ -12,7 +12,7 @@ function decompose_CNot_41()
     )
 end
 
-function decompose_quantum_fulladder()
+function quantum_fulladder()
     #Reference-1: https://doi.org/10.1109/DATE.2005.249
     #Reference-2: https://doi.org/10.1109/TCAD.2005.858352 
     
@@ -42,7 +42,7 @@ function decompose_quantum_fulladder()
     )
 end
 
-function decompose_double_toffoli()
+function double_toffoli()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352 
     
@@ -69,7 +69,7 @@ function decompose_double_toffoli()
     )
 end
 
-function decompose_double_peres()
+function double_peres()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352 
     

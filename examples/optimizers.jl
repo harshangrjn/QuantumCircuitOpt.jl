@@ -1,7 +1,8 @@
-#=====================================#
-# MIP solvers (commercial, but fast)  #
-#=====================================#
+#===================================#
+# MIP solvers (commercial, faster)  #
+#===================================#
 
+# https://github.com/jump-dev/Gurobi.jl
 function get_gurobi()
     return JuMP.optimizer_with_attributes(Gurobi.Optimizer, 
                                           MOI.Silent() => false, 
@@ -9,6 +10,7 @@ function get_gurobi()
                                           "Presolve" => 1) 
 end
 
+# https://github.com/jump-dev/CPLEX.jl
 function get_cplex()
      return JuMP.optimizer_with_attributes(CPLEX.Optimizer, 
                                            MOI.Silent() => false, 
@@ -17,15 +19,25 @@ function get_cplex()
                                            "CPX_PARAM_PREIND" => 1)
 end
 
-#======================================#
-# MIP solvers (open-source, but slow)  #
-#======================================#
+#====================================#
+# MIP solvers (open-source, slower)  #
+#====================================#
+# https://github.com/jump-dev/HiGHS.jl
+function get_highs()
+    return JuMP.optimizer_with_attributes(
+        HiGHS.Optimizer,
+        "presolve" => "on",
+        "log_to_console" => true,
+    )
+end
 
+# https://github.com/jump-dev/Cbc.jl
 function get_cbc()
     return JuMP.optimizer_with_attributes(Cbc.Optimizer, 
                                           MOI.Silent() => false) 
 end
 
+# https://github.com/jump-dev/Glpk.jl
 function get_glpk()
     return JuMP.optimizer_with_attributes(GLPK.Optimizer, 
                                           MOI.Silent() => false)
@@ -34,7 +46,7 @@ end
 #========================================================#
 # Continuous nonlinear programming solver (open-source)  #
 #========================================================#
-
+# https://github.com/jump-dev/Ipopt.jl
 function get_ipopt()
      return JuMP.optimizer_with_attributes(Ipopt.Optimizer, 
                                        MOI.Silent() => true, 
@@ -46,6 +58,7 @@ end
 #=================================================================#
 # Local mixed-integer nonlinear programming solver (open-source)  #
 #=================================================================#
+# https://github.com/lanl-ansi/Juniper.jl
 function get_juniper()
      return JuMP.optimizer_with_attributes(Juniper.Optimizer, 
                                          MOI.Silent() => false, 
@@ -56,13 +69,11 @@ end
 #=================================================================#
 # Global mixed-integer nonlinear programming solver (open-source) #
 #=================================================================#
+# https://github.com/lanl-ansi/Alpine.jl
 function get_alpine()
         return JuMP.optimizer_with_attributes(Alpine.Optimizer, 
                                             "nlp_solver" => get_ipopt(),
                                             "minlp_solver" => get_juniper(),  
-                                            "mip_solver" => get_gurobi(),
-                                            "optimizer_presolve_bt" => false,
-                                            "optimizer_presolve_max_iter" => 10,
-                                            "optimizer_presolve_bp" => false,
-                                            "disc_ratio" => 10)
+                                            "mip_solver" => get_gurobi()
+        )
 end

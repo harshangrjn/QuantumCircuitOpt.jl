@@ -1,7 +1,7 @@
 name = "QuantumCircuitOpt"
 uuid = "88128e30-b60a-4e54-ab02-1050a5f92a36"
 authors = ["Harsha Nagarajan"]
-version = "0.4.1"
+version = "0.5.0"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -16,8 +16,8 @@ Memento = "~1.0, ~1.1, 1"
 julia = "^1"
 
 [extras]
-Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
 
 [targets]
-test = ["Cbc", "Test"]
+test = ["HiGHS", "Test"]

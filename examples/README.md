@@ -1,0 +1,2 @@
+# Examples for QuantumCircuitOpt
+`run_examples.jl` file contains the main driver file which can be executed to decompose a target gate into sequence of elementary gates of your choice. Multiple such gate implementations can be found inside files such as `2qubit_gates.jl`, `3qubit_gates.jl`, etc.
