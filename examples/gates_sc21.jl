@@ -7,7 +7,7 @@ Version of QCOpt: v0.3.0
 Last updated: Oct 12, 2021
 =#
 
-function decompose_controlled_Z()
+function controlled_Z()
 
     println(">>>>> Controlled-Z Gate <<<<<")
 
@@ -24,7 +24,7 @@ function decompose_controlled_Z()
     "U3_λ_discretization" => -π:π/2:π,)    
 end
 
-function decompose_controlled_V()
+function controlled_V()
 
     println(">>>>> Controlled-V Gate <<<<<")
 
@@ -37,7 +37,7 @@ function decompose_controlled_V()
     "decomposition_type" => "exact_optimal")
 end
 
-function decompose_controlled_H()
+function controlled_H()
 
     println(">>>>> Controlled-H Gate <<<<<")
 
@@ -55,7 +55,7 @@ function decompose_controlled_H()
     )
 end
 
-function decompose_magic_using_U3_CNot_2_1()
+function magic_using_U3_CNot_2_1()
     
     println(">>>>> Magic basis using U3 and CNot_2_1 <<<<<")
 
@@ -73,7 +73,7 @@ function decompose_magic_using_U3_CNot_2_1()
     )     
 end
 
-function decompose_iSwapGate()
+function iSwapGate()
 
     println(">>>>> iSwap Gate <<<<<")
 
@@ -89,7 +89,7 @@ function decompose_iSwapGate()
     
 end
 
-function decompose_GroverDiffusion_using_Clifford()
+function GroverDiffusion_using_Clifford()
 
     println(">>>>> Grover's Diffusion Operator <<<<<")
 
@@ -103,7 +103,7 @@ function decompose_GroverDiffusion_using_Clifford()
 end
 
 
-function decompose_GroverDiffusion_using_U3()
+function GroverDiffusion_using_U3()
 
     println(">>>>> Grover's Diffusion Operator using U3 gate <<<<<")
 
@@ -120,7 +120,7 @@ function decompose_GroverDiffusion_using_U3()
         "U3_λ_discretization" => [0])
 end
 
-function decompose_magic_using_SH_CNot_1_2()
+function magic_using_SH_CNot_1_2()
     
     println(">>>>> M gate using S, H and CNOT_1_2 Gate <<<<<")
 
@@ -134,7 +134,7 @@ function decompose_magic_using_SH_CNot_1_2()
 end
 
 
-function decompose_magic_using_SH_CNot_2_1()
+function magic_using_SH_CNot_2_1()
     
     println(">>>>> M gate using S, H and CNOT_2_1 Gate <<<<<")
 
@@ -147,7 +147,7 @@ function decompose_magic_using_SH_CNot_2_1()
         "decomposition_type" => "exact_optimal")
 end
 
-function decompose_magic_using_U3_CNot_1_2()
+function magic_using_U3_CNot_1_2()
     
     println(">>>>> Magic basis using U3 and CNot_1_2 <<<<<")
 
@@ -164,7 +164,7 @@ function decompose_magic_using_U3_CNot_1_2()
         "U3_λ_discretization" => -π:π/2:π,)
 end
 
-function decompose_toffoli_with_controlled_gates()
+function toffoli_with_controlled_gates()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
     println(">>>>> Toffoli gate using controlled gates <<<<<")
@@ -178,7 +178,7 @@ function decompose_toffoli_with_controlled_gates()
     "decomposition_type" => "exact_optimal")
 end
 
-function decompose_Fredkin()
+function Fredkin()
 
     println(">>>>> Fredkin gate using controlled gates <<<<<")
 
@@ -192,7 +192,7 @@ function decompose_Fredkin()
     "decomposition_type" => "exact_optimal")
 end
 
-function decompose_double_toffoli()
+function double_toffoli()
 
     println(">>>>> Double Toffoli using controlled gates <<<<<")
 
@@ -219,7 +219,7 @@ function decompose_double_toffoli()
     "decomposition_type" => "exact_optimal")
 end
 
-function decompose_quantum_fulladder()
+function quantum_fulladder()
     #Reference-1: https://doi.org/10.1109/DATE.2005.249
     #Reference-2: https://doi.org/10.1109/TCAD.2005.858352 
     

@@ -19,12 +19,12 @@ qcm_optimizer = JuMP.optimizer_with_attributes(Gurobi.Optimizer, "Presolve" => 1
 #-----------------------------#
 #      Results of Table-I     #
 #-----------------------------#
-table_I_gates = ["decompose_controlled_Z",
-                 "decompose_controlled_V",
-                 "decompose_controlled_H",
-                 "decompose_magic_using_U3_CNot_2_1",
-                 "decompose_iSwapGate",
-                 "decompose_GroverDiffusion_using_U3"]
+table_I_gates = ["controlled_Z",
+                 "controlled_V",
+                 "controlled_H",
+                 "magic_using_U3_CNot_2_1",
+                 "iSwapGate",
+                 "GroverDiffusion_using_U3"]
 
 result_with_VC = Dict{String,Any}()
 result_without_VC = Dict{String,Any}()
@@ -54,10 +54,10 @@ end
 #      Results of Figure 3 (Magic basis)     #
 #--------------------------------------------#
 result = Dict{String,Any}()
-figure_3_gates = ["decompose_magic_using_SH_CNot_2_1",
-                  "decompose_magic_using_U3_CNot_2_1",
-                  "decompose_magic_using_SH_CNot_1_2",
-                  "decompose_magic_using_U3_CNot_1_2",
+figure_3_gates = ["magic_using_SH_CNot_2_1",
+                  "magic_using_U3_CNot_2_1",
+                  "magic_using_SH_CNot_1_2",
+                  "magic_using_U3_CNot_1_2",
                   ]
 
 run_times_fig3 = zeros(length(figure_3_gates),1)
@@ -76,8 +76,8 @@ end
 #      Results of Figure 4 (Grover operator)     #
 #------------------------------------------------#
 result = Dict{String,Any}()
-figure_4_gates = ["decompose_GroverDiffusion_using_Clifford",
-                  "decompose_GroverDiffusion_using_U3"]
+figure_4_gates = ["GroverDiffusion_using_Clifford",
+                  "GroverDiffusion_using_U3"]
 
 run_times_fig4 = zeros(length(figure_4_gates),1)
 
@@ -95,10 +95,10 @@ end
 #      Results of Figure 5 (larger circuits)     #
 #------------------------------------------------#
 result = Dict{String,Any}()
-figure_5_gates = ["decompose_toffoli_with_controlled_gates",
-                  "decompose_Fredkin",
-                  "decompose_double_toffoli",
-                  "decompose_quantum_fulladder",
+figure_5_gates = ["toffoli_with_controlled_gates",
+                  "Fredkin",
+                  "double_toffoli",
+                  "quantum_fulladder",
                   ]
 
 run_times_fig5 = zeros(length(figure_5_gates),1)

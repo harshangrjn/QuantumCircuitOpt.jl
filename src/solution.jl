@@ -11,7 +11,7 @@ function build_QCModel_result(qcm::QuantumCircuitModel, solve_time::Number)
     solution = Dict{String,Any}()
 
     if result_count > 0
-        solution = build_QCModel_solution(qcm)
+        solution = QCO.build_QCModel_solution(qcm)
     else
         Memento.warn(_LOGGER, "Quantum circuit model has no results, solution cannot be built")
     end
@@ -20,8 +20,8 @@ function build_QCModel_result(qcm::QuantumCircuitModel, solve_time::Number)
         "optimizer" => JuMP.solver_name(qcm.model),
         "termination_status" => JuMP.termination_status(qcm.model),
         "primal_status" => JuMP.primal_status(qcm.model),
-        "objective" => get_objective_value(qcm.model),
-        "objective_lb" => get_objective_bound(qcm.model),
+        "objective" => QCO.get_objective_value(qcm.model),
+        "objective_lb" => QCO.get_objective_bound(qcm.model),
         "solve_time" => solve_time,
         "solution" => solution,
     )
@@ -33,7 +33,6 @@ function build_QCModel_result(qcm::QuantumCircuitModel, solve_time::Number)
 
     return result
 end
-
 
 ""
 function get_objective_value(model::JuMP.Model)

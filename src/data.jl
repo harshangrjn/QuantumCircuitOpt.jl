@@ -633,8 +633,11 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
 
     kron_gates = QCO._parse_gates_with_kron_symbol(input)
     
-    M = 1
+    if length(unique(kron_gates)) !== length(kron_gates)
+        Memento.error(_LOGGER, "Specify only a single gate per qubit within kron symbol gate $input")
+    end
 
+    M = 1
     for i = 1:length(kron_gates)
         
         gate_type, qubit_loc = QCO._parse_gate_string(kron_gates[i], type = true, qubits = true)
@@ -722,9 +725,11 @@ function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, n
     end
     
     if (gate_type in QCO.TWO_QUBIT_GATES) && (length(qubit_loc) != 2)
-        Memento.error(_LOGGER, "Specify two qubits for $input_gate, which is a 2-qubit gate")
-    elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) != 1)
-        Memento.error(_LOGGER, "Specify only one qubit for $input_gate, which is a 1-qubit gate")
+        Memento.error(_LOGGER, "Specify two qubits for 2-qubit gate $gate_type in elementary gates")
+    elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) == 0)
+        Memento.error(_LOGGER, "Specify a qubit for the 1-qubit gate $gate_type in elementary gates")
+    elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) >= 2)
+        Memento.error(_LOGGER, "Specify only one qubit for the 1-qubit gate $gate_type in elementary gates")
     end
 
     if isempty(qubit_loc) && (gate_type !== "GR")
