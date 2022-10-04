@@ -10,6 +10,13 @@ function get_gurobi()
                                           "Presolve" => 1) 
 end
 
+function get_gurobi_nonconvex()
+    return JuMP.optimizer_with_attributes(Gurobi.Optimizer, 
+                                          MOI.Silent() => false, 
+                                          "NonConvex" => 2,
+                                          "Presolve" => 1) 
+end
+
 # https://github.com/jump-dev/CPLEX.jl
 function get_cplex()
      return JuMP.optimizer_with_attributes(CPLEX.Optimizer, 
@@ -51,7 +58,9 @@ function get_ipopt()
      return JuMP.optimizer_with_attributes(Ipopt.Optimizer, 
                                        MOI.Silent() => true, 
                                        "sb" => "yes", 
-                                       "max_iter" => Int(1E4))
+                                       "max_iter" => Int(2E3),
+                                       "constr_viol_tol" => 1E-6,
+                                       "acceptable_tol" => 1E-5)
 end
 
 

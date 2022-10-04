@@ -3,6 +3,8 @@
 #-----------------------------------------------------------#
 import JuMP: MOI
 
+const MODEL_TYPES = ["compact_formulation", "balas_formulation", "nlp_relaxation_1", "nlp_relaxation_2"]
+
 function build_QCModel(data::Dict{String, Any}; options = nothing)
     
     m_qc = QCO.QuantumCircuitModel(data)
@@ -18,21 +20,39 @@ function build_QCModel(data::Dict{String, Any}; options = nothing)
 
     # convex-hull formulation per depth, but larger number of variables and constraints
     if m_qc.options.model_type == "balas_formulation" 
-
         QCO.variable_QCModel_balas(m_qc)
         QCO.constraint_QCModel_balas(m_qc)
 
     # minimal variables and constraints, but not a convex-hull formulation per depth
     elseif m_qc.options.model_type == "compact_formulation" 
-        
         QCO.variable_QCModel_compact(m_qc)                                    
         QCO.constraint_QCModel_compact(m_qc)
+
+    elseif m_qc.options.model_type == "nlp_relaxation_1"
+        QCO.variable_QCModel_nlp1(m_qc)                                    
+        QCO.constraint_QCModel_nlp1(m_qc)
 
     end
 
     QCO.objective_QCModel(m_qc)
 
     return m_qc
+end
+
+function variable_QCModel_nlp1(qcm::QuantumCircuitModel)
+
+    QCO.variable_gates_onoff(qcm)
+    QCO.variable_sequential_gate_products(qcm)
+    QCO.variable_gate_products_linearization(qcm)
+    QCO.variable_dummy_for_ipopt(qcm)
+
+    if qcm.data["decomposition_type"] == "approximate"
+        QCO.variable_slack_for_feasibility(qcm)
+    end
+
+    QCO.variable_QCModel_valid(qcm)
+
+    return
 end
 
 function variable_QCModel_balas(qcm::QuantumCircuitModel)
@@ -97,6 +117,22 @@ function variable_QCModel_valid(qcm::QuantumCircuitModel)
         end
 
     end
+
+    return
+end
+
+function constraint_QCModel_nlp1(qcm::QuantumCircuitModel)
+
+    QCO.constraint_single_gate_per_depth(qcm)
+    QCO.constraint_gate_initial_condition_compact(qcm)
+    QCO.constraint_gate_intermediate_products_compact(qcm)
+    QCO.constraint_gate_product_nlp1(qcm)
+    QCO.constraint_gate_target_condition_compact(qcm)
+    QCO.constraint_cnot_gate_bounds(qcm)
+    (qcm.data["decomposition_type"] == "approximate") && (QCO.constraint_slack_var_outer_approximation(qcm))
+    # (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm))
+
+    QCO.constraint_QCModel_valid(qcm)
 
     return
 end
@@ -230,7 +266,7 @@ end
 
 function _catch_options_errors(qcm::QuantumCircuitModel)
     
-    if !(qcm.options.model_type in ["compact_formulation", "balas_formulation"])
+    if !(qcm.options.model_type in MODEL_TYPES)
         Memento.warn(_LOGGER, "Invalid model_type. Setting it to default value (compact_formulation).")
         QCO.set_option(qcm, :model_type, "compact_formulation")
     end

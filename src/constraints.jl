@@ -74,8 +74,8 @@ function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
     n_c    = size(qcm.data["gates_real"])[2]
     
     for i=1:2:n_r, j=1:2:n_c, d=1:(max_depth-1)
-        JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j,d] == qcm.variables[:U_var][i+1,j+1,d])
-      JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d]) # This seems to slow down the solution search
+        JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j,d]   == qcm.variables[:U_var][i+1,j+1,d])
+        JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d]) # This seems to slow down the solution search
     end
     
 
@@ -103,6 +103,40 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
         
         if !(isapprox(abs(U_var_u - U_var_l), 0, atol = 2*U_var_bound_tol))
             QCO.relaxation_bilinear(qcm.model, zU_var[i,j,n,d], U_var[i,j,d], z_bin_var[n,(d+1)])
+        else
+            JuMP.@constraint(qcm.model, zU_var[i,j,n,d] == (U_var_l + U_var_u)/2 * z_bin_var[n,(d+1)])
+        end
+
+        if !are_gates_real && isodd(j)
+            JuMP.@constraint(qcm.model, zU_var[i,j,n,d]   ==  zU_var[i+1,j+1,n,d])
+            JuMP.@constraint(qcm.model, zU_var[i,j+1,n,d] == -zU_var[i+1,j,n,d])
+        end
+    end
+    
+    return
+end
+
+function constraint_gate_product_nlp1(qcm::QuantumCircuitModel)
+
+    max_depth      = qcm.data["maximum_depth"]
+    n_r            = size(qcm.data["gates_real"])[1]
+    n_c            = size(qcm.data["gates_real"])[2]
+    num_gates      = size(qcm.data["gates_real"])[3]
+    are_gates_real = qcm.data["are_gates_real"]
+
+    U_var  = qcm.variables[:U_var]
+    zU_var = qcm.variables[:zU_var]
+    z_bin_var = qcm.variables[:z_bin_var]
+
+    i_val = 2 - are_gates_real
+    U_var_bound_tol = 1E-8
+
+    for i=1:i_val:n_r, j=1:n_c, n=1:num_gates, d=1:(max_depth-1)
+        U_var_l = JuMP.lower_bound(U_var[i,j,d])
+        U_var_u = JuMP.upper_bound(U_var[i,j,d])
+        
+        if !(isapprox(abs(U_var_u - U_var_l), 0, atol = 2*U_var_bound_tol))
+            JuMP.@constraint(qcm.model, zU_var[i,j,n,d] == U_var[i,j,d] * z_bin_var[n,(d+1)])
         else
             JuMP.@constraint(qcm.model, zU_var[i,j,n,d] == (U_var_l + U_var_u)/2 * z_bin_var[n,(d+1)])
         end

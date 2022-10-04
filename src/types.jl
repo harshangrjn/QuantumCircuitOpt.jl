@@ -23,6 +23,7 @@ mutable struct QCModelOptions
     relax_integrality                  :: Bool
     optimizer_log                      :: Bool
     objective_slack_penalty            :: Float64
+    num_dummy_vars                     :: Int64
 end
 
 """
@@ -48,6 +49,7 @@ function get_default_options()
     relax_integrality                  = false # true, false
     optimizer_log                      = true  # true, false
     objective_slack_penalty            = 1E3   # > 0 value
+    num_dummy_vars                     = 0     # Any integer value > 0
 
     return QCModelOptions(model_type,
                           all_valid_constraints,
@@ -63,7 +65,8 @@ function get_default_options()
                           time_limit,
                           relax_integrality,
                           optimizer_log,
-                          objective_slack_penalty)
+                          objective_slack_penalty,
+                          num_dummy_vars)
 end
 
 """

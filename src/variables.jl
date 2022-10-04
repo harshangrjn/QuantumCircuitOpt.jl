@@ -35,7 +35,20 @@ function variable_gates_onoff(qcm::QuantumCircuitModel)
     num_gates = size(qcm.data["gates_real"])[3]
     max_depth   = qcm.data["maximum_depth"]
 
-    qcm.variables[:z_bin_var] = JuMP.@variable(qcm.model, z_bin_var[1:num_gates,1:max_depth], Bin)
+    if qcm.options.model_type in ["nlp_relaxation_1", "nlp_relaxation_2"]
+        qcm.variables[:z_bin_var] = JuMP.@variable(qcm.model, 0 <= z_bin_var[1:num_gates,1:max_depth] <= 1)
+        for d=1:max_depth 
+            z_start = zeros(num_gates,1)
+            idx = rand(1:num_gates)
+            z_start[idx] = 1
+            for i = 1:num_gates
+                JuMP.set_start_value(z_bin_var[i,d], z_start[i])
+            end
+        end
+    else 
+        qcm.variables[:z_bin_var] = JuMP.@variable(qcm.model, z_bin_var[1:num_gates,1:max_depth], Bin)
+    end
+
 
     if "input_circuit" in keys(qcm.data)
         
@@ -91,10 +104,14 @@ function variable_sequential_gate_products(qcm::QuantumCircuitModel)
             else
                 JuMP.set_lower_bound(U_var[ii, jj, depth], -1)
                 JuMP.set_upper_bound(U_var[ii, jj, depth],  1)
+                
+                # warm-start
+                JuMP.set_start_value(U_var[ii, jj, depth], rand(-1:1E-3:1))
             end
         end
     end
 
+    # U_var at max_depth
     for ii = 1:n_r, jj = 1:n_c
         JuMP.set_lower_bound(U_var[ii, jj, max_depth], -1)
         JuMP.set_upper_bound(U_var[ii, jj, max_depth],  1)
@@ -138,6 +155,9 @@ function variable_gate_products_linearization(qcm::QuantumCircuitModel)
         else
             JuMP.set_lower_bound(zU_var[i,j,k,d], -1)
             JuMP.set_upper_bound(zU_var[i,j,k,d],  1)
+
+            # warm-start
+            JuMP.set_start_value(zU_var[i,j,k,d], rand(-1:1E-3:1))
         end
     end 
     
@@ -179,5 +199,14 @@ function variable_binary_products(qcm::QuantumCircuitModel)
     max_depth = qcm.data["maximum_depth"]
     
     qcm.variables[:Z_var] = JuMP.@variable(qcm.model, 0 <= Z[1:num_gates, 1:num_gates, 1:max_depth] <= 1)
+    return
+end
+
+# For Ipopt's degree-of-freedom issue
+function variable_dummy_for_ipopt(qcm::QuantumCircuitModel)
+    num_dummy_vars = qcm.options.num_dummy_vars
+    if num_dummy_vars > 0
+        qcm.variables[:dummy_var] = JuMP.@variable(qcm.model, 0 <= dummy_var[1:num_dummy_vars] <= 1)    
+    end
     return
 end
