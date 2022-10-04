@@ -546,3 +546,68 @@ end
     z_sol = result_qc["solution"]["z_bin_var"]
     @test isapprox(sum(z_sol[2:4, :]), 4, atol = tol_0)
 end
+
+@testset "Tests: Approximate decomposition using outer approximation" begin
+    params = Dict{String, Any}(
+        "num_qubits" => 2,
+        "maximum_depth" => 5,
+        "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],
+        "target_gate" => QCO.CNotRevGate(),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "approximate",
+        )
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
+end
+
+@testset "Tests: Approximate decomposition using outer approximation" begin
+    params = Dict{String, Any}(
+        "num_qubits" => 2,
+        "maximum_depth" => 5,
+        "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],
+        "target_gate" => QCO.CNotRevGate(),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "approximate",
+        )
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
+
+    # Testing approximate decomposition for feasibility case
+    params["elementary_gates"] = ["H_1", "H_2", "CNot_1_2"]
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 0.0, atol = tol_0)
+
+    # Testing approximate decomposition for minimizing CNOT gates
+    params["elementary_gates"] = ["H_1", "H_2", "CNot_1_2", "Identity"]
+    params["objective"] = "minimize_cnot"
+    model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 1.0, atol = tol_0)
+
+    # Testing approximate decomposition for case when slack_var-s are fixed based on U_var-s
+    params = Dict{String, Any}(
+    "num_qubits" => 3,
+    "maximum_depth" => 7,
+    "elementary_gates" => ["CV_1_2", "CV_2_3", "CV_1_3", "CVdagger_1_2", "CVdagger_2_3", "CVdagger_1_3", "CNot_1_2", "CNot_3_2", "CNot_2_3", "CNot_1_3", "Identity"],
+    "target_gate" => QCO.CSwapGate(), #also Fredkin
+    "objective" => "minimize_depth",
+    "decomposition_type" => "approximate"
+    )
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :relax_integrality => true, :fix_unitary_variables => true)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 0.38281250, atol = tol_0)
+
+end

@@ -5,6 +5,8 @@ QuantumCircuitOpt.jl Change Log
 - Minor: Fixed result `primal_status` issue in `log.jl`
 - Added helper functions for obtaining fixed indices of `U_var` unitary variables to zeros or constant values. Dropped linearization constraints for fixed `U_var` variables
 - Dropped support for `unit_magnitude_constraints`
+- Reformulated quadratic objective function of `slack_var` variables into a linear outer-approximation - increases code coverage due to MILP reformulation 
+- Fixed `slack_var` based on fixed `U_var` variables  
 - Minor updates in error messages for kron symboled gates
 - Changed Cbc test dependency to HiGHS (MIP) solver 
 - Updated docs and unit tests to reflect above changes

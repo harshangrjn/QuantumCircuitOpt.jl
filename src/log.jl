@@ -7,7 +7,7 @@ this function aids in visualizing the optimal circuit decomposition.
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
     _header_color = :cyan 
-    _main_color   = :white
+    _main_color   = :White
 
     if !(results["primal_status"] in [MOI.FEASIBLE_POINT, MOI.NEARLY_FEASIBLE_POINT])  
         

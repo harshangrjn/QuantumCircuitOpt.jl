@@ -27,7 +27,7 @@ for gates = 1:length(decompose_gates)
         :convex_hull_gate_constraints => false,
         :idempotent_gate_constraints  => false,
         :unitary_constraints          => false,
-        :fix_unitary_variables        => true
+        :fix_unitary_variables        => true,
     )
 
     global result = QCOpt.run_QCModel(params, qcopt_optimizer; options = model_options)

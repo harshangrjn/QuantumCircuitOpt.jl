@@ -173,7 +173,7 @@ function revcnot()
     "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
     "target_gate" => QCOpt.CNotRevGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact_optimal"     
+    "decomposition_type" => "exact_optimal"
     )
 end
 
@@ -339,7 +339,7 @@ function iSwap()
         # "elementary_gates" => ["S_1", "S_2", "Sdagger_1", "Sdagger_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.iSwapGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact_optimal",                           
+        "decomposition_type" => "exact_optimal",  
         )
 end
 
@@ -353,7 +353,7 @@ function qft2_using_R()
         "elementary_gates" => ["RX_1", "RZ_1", "RZ_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.QFT2Gate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "approximate",
+        "decomposition_type" => "exact_feasible",
         
         "RX_discretization" => [π/2],
         "RZ_discretization" => [-π/4, π/2, 3*π/4, 7*π/4],                      
@@ -378,7 +378,7 @@ function GRGate()
     println(">>>>> GRGate testing <<<<<")
 
     GR1 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/6, π/3])
-    GR2 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/3, π/6])
+    # GR2 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/3, π/6])
     CNot_1_2 = QCOpt.get_full_sized_gate("CNot_1_2", 2)
     T = QCOpt.round_complex_values(GR1 * CNot_1_2)
 

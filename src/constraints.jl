@@ -56,7 +56,6 @@ function constraint_gate_target_condition(qcm::QuantumCircuitModel)
     num_gates          = size(qcm.data["gates_real"])[3]
     decomposition_type = qcm.data["decomposition_type"]
     
-    # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
     if decomposition_type in ["exact_optimal", "exact_feasible"]
         JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,max_depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"])
     
@@ -154,6 +153,32 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     
     end
     
+    return
+end
+
+function constraint_slack_var_outer_approximation(qcm::QuantumCircuitModel)
+    slack_var    = qcm.variables[:slack_var]
+    slack_var_oa = qcm.variables[:slack_var_oa]
+    
+    # Number of under-estimators for the quadratic function
+    num_points = 9 
+
+    for i=1:size(slack_var)[1], j=1:size(slack_var)[2]
+        lb = JuMP.lower_bound(slack_var[i,j])
+        ub = JuMP.upper_bound(slack_var[i,j])
+        if !(isapprox(lb, ub, atol = 1E-6))
+            oa_points = range(lb, ub, num_points)
+            JuMP.@constraint(qcm.model, [k=1:length(oa_points)], 
+                            slack_var_oa[i,j] >= 2*slack_var[i,j]*oa_points[k] - (oa_points[k])^2)
+            if !(0 in oa_points)
+                JuMP.@constraint(qcm.model, slack_var_oa[i,j] >= 0)
+            end
+        else
+            mid_point = (lb+ub)/2
+            JuMP.@constraint(qcm.model, slack_var_oa[i,j] >= 2*slack_var[i,j]*mid_point - (mid_point)^2)
+        end
+    end
+
     return
 end
 
@@ -360,11 +385,6 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
                 end
                 
                 vertices_convex_hull = QCO.convex_hull(vertices)
-                
-                # if length(vertices_convex_hull) == 2
-                #     @show vertices_convex_hull
-                # end
-
                 num_ex_pt = size(vertices_convex_hull)[1]
                 
                 # Add a planar hull cut if num_ex_pt == 2

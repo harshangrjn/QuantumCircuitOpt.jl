@@ -19,10 +19,9 @@ function get_cplex()
                                            "CPX_PARAM_PREIND" => 1)
 end
 
-#==================================#
-# MIP solvers (open-source, slow)  #
-#==================================#
-
+#====================================#
+# MIP solvers (open-source, slower)  #
+#====================================#
 # https://github.com/jump-dev/HiGHS.jl
 function get_highs()
     return JuMP.optimizer_with_attributes(
@@ -59,6 +58,7 @@ end
 #=================================================================#
 # Local mixed-integer nonlinear programming solver (open-source)  #
 #=================================================================#
+# https://github.com/lanl-ansi/Juniper.jl
 function get_juniper()
      return JuMP.optimizer_with_attributes(Juniper.Optimizer, 
                                          MOI.Silent() => false, 
@@ -69,6 +69,7 @@ end
 #=================================================================#
 # Global mixed-integer nonlinear programming solver (open-source) #
 #=================================================================#
+# https://github.com/lanl-ansi/Alpine.jl
 function get_alpine()
         return JuMP.optimizer_with_attributes(Alpine.Optimizer, 
                                             "nlp_solver" => get_ipopt(),

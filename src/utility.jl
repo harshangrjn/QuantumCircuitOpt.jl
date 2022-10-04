@@ -749,7 +749,7 @@ function _get_unitary_variables_fixed_indices(M::Array{T,3} where T <: Number, m
     
     N = size(M)[1]
     G_fixed_idx = QCO._get_elementary_gates_fixed_indices(M)
-    
+
     U_fixed_idx = Dict{Int64, Any}()
     for depth = 1:(maximum_depth-1)
         U_fixed_idx[depth] = Dict{Tuple{Int64, Int64}, Any}()
