@@ -73,7 +73,7 @@ function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
     n_r    = size(qcm.data["gates_real"])[1]
     n_c    = size(qcm.data["gates_real"])[2]
     
-    for i=1:2:n_r, j=1:2:n_c, d=1:max_depth
+    for i=1:2:n_r, j=1:2:n_c, d=1:(max_depth-1)
         JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j,d] == qcm.variables[:U_var][i+1,j+1,d])
         JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d]) # This seems to slow down the solution search
     end
@@ -146,7 +146,7 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     
     # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
     if decomposition_type in ["exact_optimal", "exact_feasible"]
-        JuMP.@constraint(qcm.model, U_var[:,:,max_depth] .== qcm.data["target_gate"][:,:])  
+        JuMP.@constraint(qcm.model, U_var[:,:,max_depth] .== qcm.data["target_gate"][:,:])
     
     elseif decomposition_type == "approximate"
         JuMP.@constraint(qcm.model, U_var[:,:,max_depth] .== qcm.data["target_gate"][:,:] + qcm.variables[:slack_var][:,:])

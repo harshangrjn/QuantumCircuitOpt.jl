@@ -82,7 +82,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             if !isempty(data["cnot_idx"])
                 
                 if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
-                    printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
+                    printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = _main_color)
                 
                 elseif data["decomposition_type"] == "approximate"
                     printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = _main_color)

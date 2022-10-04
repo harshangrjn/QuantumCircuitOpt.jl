@@ -96,22 +96,3 @@ function double_peres()
     "decomposition_type" => "exact_optimal"
     )
 end
-
-function decompose_0_reflection_on_4qubits()
-
-    println(">>>>> Reflection of the |0><0| state <<<<<")
-
-    num_qubits = 4
-
-    function target_gate()
-        return Array{Complex{Float64},2}(Diagonal([-1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1]))
-    end
-
-    return Dict{String, Any}(
-        "num_qubits" => num_qubits,
-        "maximum_depth" => 10,
-        "elementary_gates" => ["H_1", "H_2", "H_3", "H_4", "Z_1", "Z_2", "Z_3", "Z_4",  "T_1", "T_2", "T_3", "T_4",  "Tdagger_1", "Tdagger_2", "Tdagger_3", "Tdagger_4",  "CZ_1_2", "CZ_1_3", "CZ_1_4", "CZ_2_3", "CZ_2_4", "CZ_3_4",  "Identity"],
-        "target_gate" => target_gate(),
-        "objective" => "minimize_depth",
-        "decomposition_type" => "exact_feasible")
-end
