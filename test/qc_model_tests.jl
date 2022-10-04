@@ -1,4 +1,4 @@
-@testset "Tests: Minimize depth for controlled-NOT gate" begin
+@testset "QC_model Tests: Minimize depth for controlled-NOT gate" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
@@ -28,7 +28,7 @@
     
 end
 
-@testset "Tests: Minimum CNOT swap gate decomposition" begin
+@testset "QC_model Tests: Minimum CNOT swap gate decomposition" begin
 
     params = Dict{String, Any}(
         "num_qubits" => 2,
@@ -53,7 +53,7 @@ end
     
 end
 
-@testset "Tests: Minimum depth U3(0,0,π/4) gate" begin
+@testset "QC_model Tests: Minimum depth U3(0,0,π/4) gate" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
@@ -80,7 +80,7 @@ end
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1"
 end
 
-@testset "Tests: Minimum depth CU3(0,0,π/4) gate" begin
+@testset "QC_model Tests: Minimum depth CU3(0,0,π/4) gate" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
@@ -107,7 +107,7 @@ end
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1_2"
 end
 
-@testset "Tests: Minimum depth Rev CU3(0,0,π/4) gate" begin
+@testset "QC_model Tests: Minimum depth Rev CU3(0,0,π/4) gate" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 3, 
@@ -134,7 +134,7 @@ end
     @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_3_1"
 end
 
-@testset "Tests: Minimum depth RX, RY, RZ gate decomposition" begin
+@testset "QC_model Tests: Minimum depth RX, RY, RZ gate decomposition" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2, 
@@ -159,7 +159,7 @@ end
 
 end
 
-@testset "Tests: Minimum depth CRX, CRY, CRZ gate decomposition" begin
+@testset "QC_model Tests: Minimum depth CRX, CRY, CRZ gate decomposition" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 3, 
@@ -184,7 +184,7 @@ end
 
 end
 
-@testset "Tests: Minimum depth Rev CRX, CRY, CRZ gate decomposition" begin
+@testset "QC_model Tests: Minimum depth Rev CRX, CRY, CRZ gate decomposition" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 3, 
@@ -210,7 +210,7 @@ end
 end
 
 
-@testset "Tests: 3-qubit RX gate decomposition" begin
+@testset "QC_model Tests: 3-qubit RX gate decomposition" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 3, 
@@ -242,7 +242,7 @@ end
 
 end
 
-@testset "Tests: 3-qubit CRX gate decomposition" begin
+@testset "QC_model Tests: 3-qubit CRX gate decomposition" begin
 
     params = Dict{String, Any}(
         "num_qubits" => 3, 
@@ -274,7 +274,7 @@ end
 
 end
 
-@testset "Tests: feasibility problem" begin
+@testset "QC_model Tests: feasibility problem" begin
     params = Dict{String, Any}(
         "num_qubits" => 2, 
         "maximum_depth" => 3,    
@@ -300,7 +300,7 @@ end
   
 end
 
-@testset "Tests: JuMP set_start_value for z_bin_var variables" begin
+@testset "QC_model Tests: JuMP set_start_value for z_bin_var variables" begin
     function input_circuit()
         # [(depth, gate)]
         return [(1, "CNot_2_1"), 
@@ -328,7 +328,7 @@ end
     
 end
 
-@testset "Tests: Involutory gate constraints" begin
+@testset "QC_model Tests: Involutory gate constraints" begin
     
     params = Dict{String, Any}(
     "num_qubits" => 2,
@@ -359,7 +359,7 @@ end
     
 end
 
-@testset "Tests: TIME_LIMIT for building results dict and log" begin
+@testset "QC_model Tests: TIME_LIMIT for building results dict and log" begin
     
     params = Dict{String, Any}(
     "num_qubits" => 2,
@@ -378,7 +378,7 @@ end
     
 end
 
-@testset "Tests: constraint_redundant_gate_product_pairs" begin
+@testset "QC_model Tests: constraint_redundant_gate_product_pairs" begin
     
     function target_gate()
         T1 = QCO.get_full_sized_gate("U3_2", 2, angle = [0,π/2,π])
@@ -411,7 +411,7 @@ end
 
 end
 
-@testset "Tests: constraint_idempotent_gates" begin
+@testset "QC_model Tests: constraint_idempotent_gates" begin
     params = Dict{String, Any}(
     "num_qubits" => 2, 
     "maximum_depth" => 3,    
@@ -441,7 +441,7 @@ end
 
 end
 
-@testset "Tests: constraint_convex_hull_complex_gates" begin
+@testset "QC_model Tests: constraint_convex_hull_complex_gates" begin
     
     function target_gate()
         num_qubits = 4
@@ -475,7 +475,7 @@ end
     @test isapprox(result_qc["objective"], 0.6, atol = tol_0)
 end
 
-@testset "Tests: RGate decomposition" begin
+@testset "QC_model Tests: RGate decomposition" begin
     
     num_qubits = 2
     GR1      = QCO.GRGate(num_qubits, π/6, π/3)
@@ -504,7 +504,7 @@ end
     @test isapprox(sum(z_sol[9, :]),   1, atol = tol_0)
 end
 
-@testset "Tests: GRGate decomposition for Pauli-X gate, and unitary constraints" begin
+@testset "QC_model Tests: GRGate decomposition for Pauli-X gate, and unitary constraints" begin
 
     params = Dict{String, Any}(
     "num_qubits" => 2,
@@ -528,7 +528,7 @@ end
     @test isapprox(sum(z_sol[4, :]), 2, atol = tol_0) # test for number of CZ gates 
 end
 
-@testset "Tests: Decomposition using exact_feasible option" begin
+@testset "QC_model Tests: Decomposition using exact_feasible option" begin
     params = Dict{String, Any}(
         "num_qubits" => 2,
         "maximum_depth" => 5,
@@ -547,7 +547,7 @@ end
     @test isapprox(sum(z_sol[2:4, :]), 4, atol = tol_0)
 end
 
-@testset "Tests: Approximate decomposition using outer approximation" begin
+@testset "QC_model Tests: Approximate decomposition using outer approximation" begin
     params = Dict{String, Any}(
         "num_qubits" => 2,
         "maximum_depth" => 5,
@@ -563,7 +563,7 @@ end
     @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
 end
 
-@testset "Tests: Approximate decomposition using outer approximation" begin
+@testset "QC_model Tests: Approximate decomposition using outer approximation" begin
     params = Dict{String, Any}(
         "num_qubits" => 2,
         "maximum_depth" => 5,
@@ -573,6 +573,13 @@ end
         "decomposition_type" => "approximate",
         )
     model_options = Dict{Symbol, Any}(:optimizer_log => false)
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
+
+    # Testing approximate decomposition for balas_formulation
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :model_type => "balas_formulation")
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT

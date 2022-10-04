@@ -1,6 +1,6 @@
 # Unit tests for functions in gates.jl
 
-@testset "Tests: elementary universal gates in gates.jl" begin
+@testset "Gates tests: elementary universal gates in gates.jl" begin
     @test isapprox(QCO.U2Gate(0,-π/4), QCO.U3Gate(π/2,0,-π/4), atol=tol_0)
     @test isapprox(QCO.U1Gate(-π/4), QCO.U3Gate(0,0,-π/4), atol=tol_0)
 

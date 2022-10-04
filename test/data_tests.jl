@@ -1,6 +1,6 @@
 # Unit tests for functions in data.jl
 
-@testset "Tests: building elementary universal gate" begin
+@testset "Data tests: building elementary universal gate" begin
     test_angle = π/3
     pauli_Y = QCO.YGate()
     H = QCO.HGate()
@@ -28,7 +28,7 @@
     @test isapprox(QCO.RZGate(test_angle), test_U1_1)
 end 
 
-@testset "Tests: get_full_sized_gate" begin
+@testset "Data tests: get_full_sized_gate" begin
 
     # 2-qubit gates
     params = Dict{String, Any}(
@@ -90,7 +90,7 @@ end
     @test length(keys(data["gates_dict"])) == 17
 end
 
-@testset "Tests: get_input_circuit_dict" begin
+@testset "Data tests: get_input_circuit_dict" begin
     
     function input_circuit_1()
         # [(depth, gate)]

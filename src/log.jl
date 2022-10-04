@@ -95,8 +95,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("  ","Optimizer run time: ", ceil(results["solve_time"], digits=2)," sec.","\n"; color = _main_color)
             
         if results["termination_status"] == MOI.TIME_LIMIT
-            printstyled("  ","Termination status: MOI.TIME_LIMIT", "\n"; color = _main_color)
-            printstyled("  ","Decomposition may not be optimal", "\n"; color = _main_color)
+            printstyled("  ","Termination status: TIME_LIMIT", "\n"; color = _main_color)
         end
 
         printstyled("=============================================================================","\n"; color = _main_color)      
