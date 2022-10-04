@@ -54,7 +54,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             if i != length(gates_sol_compressed)
                 printstyled(gates_sol_compressed[i], " * "; color = :cyan)
             else    
-                if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
                     printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = :cyan)
                 elseif data["decomposition_type"] == "approximate"
                     printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = :cyan)
@@ -79,7 +79,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
             if !isempty(data["cnot_idx"])
                 
-                if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
                     printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = :cyan)
                 
                 elseif data["decomposition_type"] == "approximate"
@@ -192,25 +192,29 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    n_r            = size(target_gate)[1]
-    n_c            = size(target_gate)[2]
+    if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && (!isapprox(M_sol, target_gate, atol = 1E-4))
+        Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
+    
+    elseif data["decomposition_type"] in ["exact_optimal_global_phase"]
+        n_r            = size(target_gate)[1]
+        n_c            = size(target_gate)[2]
 
-    ref_nonzero_r = 0
-    ref_nonzero_c = 0
-    for i=1:n_r, j=1:n_c
-        if !isapprox(target_gate[i,j], 0, atol=1E-6) 
-            ref_nonzero_r = i
-            ref_nonzero_c = j
-            break
+        ref_nonzero_r = 0
+        ref_nonzero_c = 0
+        for i=1:n_r, j=1:n_c
+            if !isapprox(target_gate[i,j], 0, atol=1E-6) 
+                ref_nonzero_r = i
+                ref_nonzero_c = j
+                break
+            end
+        end
+
+        global_phase = M_sol[ref_nonzero_r, ref_nonzero_c] / target_gate[ref_nonzero_r, ref_nonzero_c]
+
+        if (!isapprox(M_sol, global_phase*target_gate, atol = 1E-6))
+            Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
         end
     end
-
-    global_phase = M_sol[ref_nonzero_r, ref_nonzero_c] / target_gate[ref_nonzero_r, ref_nonzero_c]
-
-    if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && (!isapprox(M_sol, global_phase*target_gate, atol = 1E-6))
-        Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
-    end
-
 end
 
 """

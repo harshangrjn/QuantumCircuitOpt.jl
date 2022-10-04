@@ -31,7 +31,7 @@ decompose_gates = ["decompose_hadamard",
                    "decompose_qft2_using_HT",
                    "decompose_RX_on_q3"]
 
-decompose_gates = ["decompose_exact_random_target1"]
+decompose_gates = ["decompose_CNot_41"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

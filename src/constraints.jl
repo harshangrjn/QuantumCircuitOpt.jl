@@ -134,16 +134,30 @@ end
 
 function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
 
-    if qcm.data["are_gates_real"] 
-        QCO.constraint_gate_target_condition_compact_real(qcm)        
-    else
-        QCO.constraint_gate_target_condition_compact_complex(qcm)
-    end    
+    depth   = qcm.data["maximum_depth"]
+    decomposition_type = qcm.data["decomposition_type"]
+
+    U_var = qcm.variables[:U_var]
+    
+    # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
+    if decomposition_type in ["exact_optimal", "exact_feasible"]
+        JuMP.@constraint(qcm.model, U_var[:,:,depth] .== qcm.data["target_gate"][:,:])  
+    
+    elseif decomposition_type == "approximate"
+        JuMP.@constraint(qcm.model, U_var[:,:,depth] .== qcm.data["target_gate"][:,:] + qcm.variables[:slack_var][:,:])
+
+    elseif decomposition_type == "exact_optimal_global_phase"
+        if qcm.data["are_gates_real"] 
+            QCO.constraint_gate_target_condition_compact_global_phase_real(qcm)        
+        else
+            QCO.constraint_gate_target_condition_compact_global_phase_complex(qcm)
+        end     
+    end
     
     return
 end
 
-function constraint_gate_target_condition_compact_real(qcm::QuantumCircuitModel)
+function constraint_gate_target_condition_compact_global_phase_real(qcm::QuantumCircuitModel)
     
     depth   = qcm.data["maximum_depth"]
     n_r            = size(qcm.data["gates_real"])[1]
@@ -163,7 +177,7 @@ function constraint_gate_target_condition_compact_real(qcm::QuantumCircuitModel)
     return    
 end
 
-function constraint_gate_target_condition_compact_complex(qcm::QuantumCircuitModel)
+function constraint_gate_target_condition_compact_global_phase_complex(qcm::QuantumCircuitModel)
     
     depth   = qcm.data["maximum_depth"]
     n_r            = size(qcm.data["gates_real"])[1]

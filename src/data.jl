@@ -58,6 +58,10 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         decomposition_type = "exact_optimal"
     end
 
+    if !(decomposition_type in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase", "approximate"]) 
+        Memento.error(_LOGGER, "Decomposition type not supported")
+    end
+
     # Objective function
     if "objective" in keys(params)
         objective = params["objective"]
@@ -119,7 +123,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     data = QCO._populate_data_angle_discretization!(data, params)
 
     # Determinant test for input gates
-    # QCO._determinant_test_for_infeasibility(data)
+    (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && QCO._determinant_test_for_infeasibility(data)
 
     # Input circuit
     if length(keys(input_circuit_dict)) > 0
@@ -258,13 +262,13 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
         if is_target_real
             return real(params["target_gate"]), is_target_real
         else
-            nonzero_r, nonzero_c = QCO._get_ref_nonzero_index_of_original_target(params["target_gate"])
-            global_phase = angle(params["target_gate"][nonzero_r, nonzero_c])
+            ref_nonzero_r, ref_nonzero_c = QCO._get_ref_nonzero_index_of_original_target(params["target_gate"])
+            global_phase = angle(params["target_gate"][ref_nonzero_r, ref_nonzero_c])
             is_target_real_up_to_phase = QCO.is_gate_real(exp(-im*global_phase)*params["target_gate"])
             if is_target_real_up_to_phase
                 return real(exp(-im*global_phase)*params["target_gate"]), !is_target_real
             else    
-                Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real")
+                Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real up to a global phase")
             end
         end
     else
