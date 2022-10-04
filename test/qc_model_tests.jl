@@ -626,11 +626,20 @@ end
         "elementary_gates" => ["T_1", "H_1", "H_2", "CNot_1_2", "Identity"],
         "target_gate" => exp(im*pi*0.3) * QCO.CNotRevGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact_optimal_global_phase",
+        "decomposition_type" => "exact_optimal",
         )
     model_options = Dict{Symbol, Any}(:optimizer_log => false)
+
+    # Without global phase constraints
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
+    @test result_qc["termination_status"] == MOI.INFEASIBLE
+    @test result_qc["primal_status"]      == MOI.NO_SOLUTION
+
+    # Using global phase constraints
+    params["decomposition_type"] = "exact_optimal_global_phase"
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
+
 end

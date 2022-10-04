@@ -166,7 +166,7 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
         end
     end
     
-    QCO.validate_circuit_decomposition(data, id_sequence)
+    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]) && QCO.validate_circuit_decomposition(data, id_sequence)
 
     gates_sol_compressed = QCO.get_depth_compressed_circuit(data["num_qubits"], gates_sol)
 
@@ -193,12 +193,11 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && (!isapprox(M_sol, target_gate, atol = 1E-4))
-        Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
-    
-    elseif data["decomposition_type"] in ["exact_optimal_global_phase"]
-        n_r            = size(target_gate)[1]
-        n_c            = size(target_gate)[2]
+    global_phase = 1
+
+    if data["decomposition_type"] in ["exact_optimal_global_phase"]
+        n_r = size(target_gate)[1]
+        n_c = size(target_gate)[2]
 
         ref_nonzero_r = 0
         ref_nonzero_c = 0
@@ -211,11 +210,9 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         end
 
         global_phase = M_sol[ref_nonzero_r, ref_nonzero_c] / target_gate[ref_nonzero_r, ref_nonzero_c]
-
-        if (!isapprox(M_sol, global_phase*target_gate, atol = 1E-6))
-            Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
-        end
     end
+
+    (!isapprox(M_sol, global_phase*target_gate, atol = 1E-4)) && Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
 end
 
 """
