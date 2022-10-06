@@ -196,19 +196,7 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
     global_phase = 1
 
     if data["decomposition_type"] in ["exact_optimal_global_phase"]
-        n_r = size(target_gate)[1]
-        n_c = size(target_gate)[2]
-
-        ref_nonzero_r = 0
-        ref_nonzero_c = 0
-        for i=1:n_r, j=1:n_c
-            if !isapprox(target_gate[i,j], 0, atol=1E-6) 
-                ref_nonzero_r = i
-                ref_nonzero_c = j
-                break
-            end
-        end
-
+        ref_nonzero_r, ref_nonzero_c =  QCO._get_ref_nonzero_index_of_original_target(convert(Array{Complex{Float64},2},target_gate))
         global_phase = M_sol[ref_nonzero_r, ref_nonzero_c] / target_gate[ref_nonzero_r, ref_nonzero_c]
     end
 
