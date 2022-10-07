@@ -58,6 +58,10 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         decomposition_type = "exact_optimal"
     end
 
+    if !(decomposition_type in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase", "approximate"]) 
+        Memento.error(_LOGGER, "Decomposition type not supported")
+    end
+
     # Objective function
     if "objective" in keys(params)
         objective = params["objective"]
@@ -73,7 +77,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
 
     gates_dict, are_elementary_gates_real = QCO.get_elementary_gates_dictionary(params, elementary_gates)
 
-    target_real, is_target_real = QCO.get_target_gate(params, are_elementary_gates_real)
+    target_real, is_target_real = QCO.get_target_gate(params, are_elementary_gates_real, decomposition_type)
 
     gates_dict_unique, M_real_unique, identity_idx, cnot_idx = QCO.eliminate_nonunique_gates(gates_dict, are_elementary_gates_real, eliminate_identical_gates = eliminate_identical_gates)
 
@@ -119,7 +123,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     data = QCO._populate_data_angle_discretization!(data, params)
 
     # Determinant test for input gates
-    QCO._determinant_test_for_infeasibility(data)
+    (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) && QCO._determinant_test_for_infeasibility(data)
 
     # Input circuit
     if length(keys(input_circuit_dict)) > 0
@@ -241,7 +245,7 @@ end
 Given the user input `params` dictionary and a boolean if all the input elementary gates are real, 
 this function returns the corresponding real version of the target gate. 
 """ 
-function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool)
+function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool, decomposition_type::String)
 
     if !("target_gate" in keys(params)) || isempty(params["target_gate"])
         Memento.error(_LOGGER, "Target gate not found in the input data")
@@ -251,15 +255,26 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
         Memento.error(_LOGGER, "Dimensions of target gate do not match the input num_qubits")
     end
     
-    # This identifies if all the target gate has only real entries and returns a compact matrix
+    # This identifies if all the target gate has only real entries of if it is real up to a global phase and returns a compact matrix
     is_target_real = QCO.is_gate_real(params["target_gate"])
 
     if are_elementary_gates_real
-        if !is_target_real
-            Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts")
-        else 
-            return real(params["target_gate"]), is_target_real
+
+        global_phase = 0
+
+        if (decomposition_type in ["exact_optimal_global_phase"]) && !is_target_real
+            ref_nonzero_r, ref_nonzero_c = QCO._get_ref_nonzero_index_of_original_target(params["target_gate"])
+            global_phase = angle(params["target_gate"][ref_nonzero_r, ref_nonzero_c])
         end
+        
+        is_target_real_up_to_phase = QCO.is_gate_real(exp(-im*global_phase)*params["target_gate"])
+            
+        if is_target_real_up_to_phase
+            return real(exp(-im*global_phase)*params["target_gate"]), is_target_real_up_to_phase
+        else    
+            Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real for exact decomposition or not real up to a global phase for exact_optimal_global_phase decomposition.")
+        end
+        
     else
         return QCO.complex_to_real_gate(params["target_gate"]), is_target_real
     end

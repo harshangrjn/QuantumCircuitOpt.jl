@@ -1,4 +1,6 @@
 import QuantumCircuitOpt as QCOpt
+using LinearAlgebra
+
 using JuMP
 using Gurobi
 # using HiGHS

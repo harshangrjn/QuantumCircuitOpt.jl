@@ -77,7 +77,7 @@ function toffoli_with_controlled_gates()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
     println(">>>>> Toffoli gate with controlled gates <<<<<")
- 
+
     return Dict{String, Any}(
     
     "num_qubits" => 3,

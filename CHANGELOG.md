@@ -1,6 +1,11 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### Staged
+- New feature: Added support for compiling circuits upto global phase using linear constraints (`exact_optimal_global_phase`)
+- Deactivated determinant feasiblity check for global phase model
+- Updated docs and unit tests to reflect above changes
+
 ### v0.5.0
 - Minor: Fixed result `primal_status` issue in `log.jl`
 - Added helper functions for obtaining fixed indices of `U_var` unitary variables to zeros or constant values. Dropped linearization constraints for fixed `U_var` variables
