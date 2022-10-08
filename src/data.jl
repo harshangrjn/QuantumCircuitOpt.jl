@@ -340,7 +340,7 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
         
         # Elementary gates which contain Kronecker symbols
         elseif i in kron_gates_idx
-            M = QCO.get_full_sized_kron_symbol_gate(elementary_gates[i], num_qubits)
+            M = QCO.get_full_sized_kron_gate(elementary_gates[i], num_qubits)
             gates_dict["$counter"] = Dict{String, Any}("type"   => [elementary_gates[i]],
                                                        "matrix" => M)
             counter += 1
@@ -637,14 +637,16 @@ function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 end
 
 """
-    get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
+    get_full_sized_kron_gate(input::String, num_qubits::Int64)
 
-Given an input string with kronecker symbols representing the gate and number of qubits of the circuit, this function returns a full-sized 
-gate with respect to the input number of qubits. For example, if `num_qubits = 3` and the input gate in `I_1xT_1xH_3`, 
-then this function returns `IGate ⨷ TGate ⨷ HGate`, where IGate, TGate and HGate are single-qubit Identity, T and Hadamard gates, respectively.  
-Note that this function currently does not support an input gate parametrized with Euler angles. 
+Given an input string with kronecker symbols representing the gate and number of qubits of 
+the circuit, this function returns a full-sized gate with respect to the input number of qubits. 
+For example, if `num_qubits = 3` and the input gate in `I_1xT_2xH_3`, then this function returns 
+`IGate ⨷ TGate ⨷ HGate`, where IGate, TGate and HGate are single-qubit Identity, T and 
+Hadamard gates, respectively. Two qubit gates can also be used as one of the input gates, for ex. `I_1xCV_2_3xH_4`. 
+Note that this function currently does not support an input gate parametrized with Euler angles.
 """
-function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
+function get_full_sized_kron_gate(input::String, num_qubits::Int64)
 
     kron_gates = QCO._parse_gates_with_kron_symbol(input)
     
@@ -653,6 +655,7 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
     end
 
     M = 1
+    gate_qubit_locs = []
     for i = 1:length(kron_gates)
         
         gate_type, qubit_loc = QCO._parse_gate_string(kron_gates[i], type = true, qubits = true)
@@ -660,10 +663,16 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
         if !(gate_type in union(QCO.ONE_QUBIT_GATES_CONSTANTS, QCO.TWO_QUBIT_GATES_CONSTANTS))
             Memento.error(_LOGGER, "Specified $input gate is not supported in conjunction with the Kronecker product operation")
         end
-    
-        QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input)
 
-        # One qubit gates
+        QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input)
+        
+        if issubset(qubit_loc, gate_qubit_locs)
+            Memento.error(_LOGGER, "Specified qubit(s) for $input gate is incorrect")
+        else
+            append!(gate_qubit_locs, range(qubit_loc[1], qubit_loc[end]))
+        end
+
+        # One-qubit gates
         if (length(qubit_loc) == 1) && (gate_type in QCO.ONE_QUBIT_GATES_CONSTANTS)
             if (gate_type == "I") || (gate_type == "Identity")
                 M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))(1))
@@ -671,19 +680,30 @@ function get_full_sized_kron_symbol_gate(input::String, num_qubits::Int64)
                 M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))())
             end
         
-        # Two qubit gates
+        # Two-qubit gates
         elseif (length(qubit_loc) == 2) && (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS)
-            if (qubit_loc[1] < qubit_loc[2]) || (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
-                M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))())
+            gate_width = abs(qubit_loc[1] - qubit_loc[2]) 
+            
+            if gate_width == 1
+                if (qubit_loc[1] < qubit_loc[2]) || (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
+                    M = kron(M, getfield(QCO, Symbol(gate_type, "Gate"))())
+                else
+                    M = kron(M, getfield(QCO, Symbol(gate_type, "RevGate"))())
+                end
             else
-                M = kron(M, getfield(QCO, Symbol(gate_type, "RevGate"))())
+                if (qubit_loc[1] < qubit_loc[2]) || (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
+                    kron_gate = QCO.get_full_sized_gate(string(gate_type, qubit_separator, 1, qubit_separator, Int(gate_width + 1)), (gate_width + 1))
+                else 
+                    kron_gate = QCO.get_full_sized_gate(string(gate_type, qubit_separator, Int(gate_width + 1), qubit_separator, 1), (gate_width + 1))
+                end
+                M = kron(M, kron_gate)
             end
         end
     end
 
     QCO._catch_kron_dimension_errors(num_qubits, size(M)[1])
+    
     return M
-
 end
 
 """
@@ -754,7 +774,7 @@ function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, n
         Memento.error(_LOGGER, "Qubit locations are not necessary for Global-R gate as it is simultaneously applied on all qubits at a depth")
             
     elseif !issubset(qubit_loc, 1:num_qubits)
-        Memento.error(_LOGGER, "Specified qubit(s) for the $input_gate gate ∉ {1,...,$num_qubits}")
+        Memento.error(_LOGGER, "Specified qubit(s) for $input_gate gate ∉ {1,...,$num_qubits}")
 
     elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
         Memento.error(_LOGGER, "Specified $input_gate gate cannot have identical control and target qubits") 

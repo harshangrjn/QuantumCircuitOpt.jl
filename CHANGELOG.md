@@ -1,9 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### Staged
+### v0.5.1
 - New feature: Added support for compiling circuits upto global phase using linear constraints (`exact_optimal_global_phase`)
 - Deactivated determinant feasiblity check for global phase model
+- Bug fix in evaluation of kron-symboled elementary gates (#63)
 - Updated docs and unit tests to reflect above changes
 
 ### v0.5.0
@@ -93,7 +94,7 @@ QuantumCircuitOpt.jl Change Log
 
 ### v0.2.5
 - Major updates in input gate convention for two qubit gates. For example, `CNot_12` becomes `CNot_1_2`. This update now makes the package flexible to be able to compute on any number of qubit circuits. `CNot_2_10` is a valid input for a 10 qubit circuit
-- Major clean up in `data.jl` including generalized parsing in `get_full_sized_gate` and `get_full_sized_kron_symbol_gate` functions
+- Major clean up in `data.jl` including generalized parsing in `get_full_sized_gate` and `get_full_sized_kron_gate` functions
 - Clean up of `log.jl` to make it generic and consistent with above changes 
 - Enabling support for convex hull-based cuts on complex variables at every depth (improved run times in CPLEX, default = turned off)
 - Added `constraint_convex_hull_complex_gates` function in support with depndency of QHull.jl 
@@ -139,7 +140,7 @@ QuantumCircuitOpt.jl Change Log
 - Kron symbol updated from `⊗` to `x`
 - Enabling functionality to take elementary gates with kronecker symbols over all qubits. For example, `"H_1xCNot_23xI_4xI_5"`, `H_1xH_2xT_3`, `I_1xSX_2xTdagger_3`. This functionality only supports one and 2 qubit gates without angle parameters (excluded controlled R and U3 gates)
 - Adding various new 2 qubit gates (including controlled R and U3) in `src/gates.jl`
-- Expanding the elementary gates set with cleaner and flexible framework for any `num_qubits` in functions, `get_full_sized_gate` and `get_full_sized_kron_symbol_gate`
+- Expanding the elementary gates set with cleaner and flexible framework for any `num_qubits` in functions, `get_full_sized_gate` and `get_full_sized_kron_gate`
 - Adding new functions: `_parse_gates_with_kron_symbol`, `kron_two_qubit_gate`
 - Updating Docs and adding new unit tests to reflect above changes
 

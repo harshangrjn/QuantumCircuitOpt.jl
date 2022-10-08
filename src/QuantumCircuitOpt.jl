@@ -8,7 +8,7 @@ const LA = LinearAlgebra
 const QCO = QuantumCircuitOpt
 const kron_symbol = 'x'
 const qubit_separator = '_'
-const _QCOPT_VERSION = "v0.5.0"
+const _QCOPT_VERSION = "v0.5.1"
 
 # Create our module level logger (this will get precompiled)
 const _LOGGER = Memento.getlogger(@__MODULE__)

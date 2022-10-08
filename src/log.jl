@@ -25,9 +25,9 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
     if !isempty(gates_sol_compressed)
 
         printstyled("\n","=============================================================================","\n"; color = _main_color)
-        printstyled("QuantumCircuitOpt version: ", _QCOPT_VERSION, "\n"; color = _header_color)
+        printstyled("QuantumCircuitOpt version: ", _QCOPT_VERSION, "\n"; color = _header_color, bold = true)
 
-        printstyled("\n","Quantum Circuit Model Data","\n"; color = _header_color)
+        printstyled("\n","Quantum Circuit Model Data"; color = _header_color, bold = true)
         
         printstyled("\n","  ","Number of qubits: ", data["num_qubits"], "\n"; color = _main_color)
         
@@ -47,7 +47,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
         printstyled("  ","MIP optimizer: ", results["optimizer"],"\n"; color = _main_color)
 
-        printstyled("\n","Optimal Circuit Decomposition","\n","\n"; color = _header_color)
+        printstyled("\n","Optimal Circuit Decomposition","\n"; color = _header_color, bold = true)
         
         print("  ")
         

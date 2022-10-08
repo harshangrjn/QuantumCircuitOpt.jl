@@ -554,7 +554,7 @@ which the input gate is located. For example, if the input string is `CRX_2_3`, 
 function _parse_gate_string(s::String; type=false, qubits=false)
 
     if occursin(kron_symbol, s)
-        Memento.error(_LOGGER, "Kron symbol is not supported for parsing qubit locations in $s. Instead try `get_full_sized_kron_symbol_gate` function.")
+        Memento.error(_LOGGER, "Kron symbol is not supported for parsing qubit locations in $s. Instead try `get_full_sized_kron_gate` function.")
     end
     
     gates = Vector{String}()

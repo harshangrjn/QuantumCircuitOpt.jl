@@ -199,4 +199,13 @@
     # CT, CTdagger gate test
     @test isapprox(QCO.CTGate() *  QCO.CTdaggerGate(), QCO.IGate(2), atol = tol_0)
 
+    # Test for elementary gates with kron symbols
+    M1 = QCO.get_full_sized_kron_gate("I_1xCZ_2_4xH_5", 5)
+    M2 = kron(kron(QCO.IGate(1), QCO.get_full_sized_gate("CZ_1_3", 3)), QCO.HGate())
+    @test isapprox(M1, M2, atol = tol_0)
+
+    M1 = QCO.get_full_sized_kron_gate("CV_1_4xH_5xZ_6", 6)
+    M2 = kron(kron(QCO.get_full_sized_gate("CV_1_4", 4), QCO.HGate()), QCO.ZGate())
+    @test isapprox(M1, M2, atol = tol_0)
+
 end
