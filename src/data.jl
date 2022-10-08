@@ -285,8 +285,6 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
 
     num_qubits = params["num_qubits"]
 
-    kron_gates_idx  = QCO._get_kron_gates_idx(elementary_gates)
-
     one_angle_gates, two_angle_gates, three_angle_gates = QCO._get_angle_gates_idx(elementary_gates)
 
     one_angle_gates_dict   = Dict{String,Any}()
@@ -338,14 +336,7 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
                 end
             end
         
-        # Elementary gates which contain Kronecker symbols
-        elseif i in kron_gates_idx
-            M = QCO.get_full_sized_kron_gate(elementary_gates[i], num_qubits)
-            gates_dict["$counter"] = Dict{String, Any}("type"   => [elementary_gates[i]],
-                                                       "matrix" => M)
-            counter += 1
         else 
-            
             M = QCO.get_full_sized_gate(elementary_gates[i], num_qubits)
             gates_dict["$counter"] = Dict{String, Any}("type"   => [elementary_gates[i]],
                                                        "matrix" => M)
@@ -538,13 +529,18 @@ end
 
 Given an input string representing the gate and number of qubits of the circuit, this function returns a full-sized 
 gate with respect to the input number of qubits. For example, if `num_qubits = 3` and the input gate in `H_3` 
-(Hadamard on third qubit), then this function returns `IGate ⨷ IGate ⨷ HGate`, where IGate and HGate are single qubit Identity and Hadamard gates, respectively.  
-Note that `angle` vector is an optional input which is necessary when the input gate is parametrized by Euler angles. 
+(Hadamard on third qubit), then this function returns `IGate ⨷ IGate ⨷ HGate`, where IGate and HGate are single 
+qubit Identity and Hadamard gates, respectively. Note that `angle` vector is an optional input which is 
+necessary when the input gate is parametrized by Euler angles.
 """
 function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
 
     if num_qubits > 10
         Memento.error(_LOGGER, "Greater than 10 qubits is currently not supported")
+    end
+
+    if occursin(QCO.kron_symbol, input)
+        return QCO.get_full_sized_kron_gate(input, num_qubits)
     end
 
     if input == "Identity"
@@ -812,10 +808,6 @@ end
 
 function _get_CU3_gates_idx(elementary_gates::Array{String, 1})
     return findall(x -> (startswith(x, "CU3")) && !(occursin(kron_symbol, x)), elementary_gates)
-end
-
-function _get_kron_gates_idx(elementary_gates::Array{String, 1})
-    return findall(x -> occursin(kron_symbol, x), elementary_gates)
 end
 
 function _get_Phase_gates_idx(elementary_gates::Array{String, 1})

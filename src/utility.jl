@@ -521,7 +521,7 @@ end
 """
     _parse_gates_with_kron_symbol(s::String)
 
-Given a string with gates separated by kronecker symbols (x), this function parses and returns the vector of gates. For 
+Given a string with gates separated by kronecker symbols `x`, this function parses and returns the vector of gates. For 
 example, if the input string is `H_1xCNot_2_3xT_4`, the output will be `Vector{String}(["H_1", "CNot_2_3", "T_4"])`.
 """
 function _parse_gates_with_kron_symbol(s::String)
@@ -530,7 +530,7 @@ function _parse_gates_with_kron_symbol(s::String)
     gate_id = string()
  
     for i = 1:length(s)
-       if s[i] != kron_symbol
+       if s[i] != QCO.kron_symbol
           gate_id = gate_id * s[i]
        else
           push!(gates, gate_id)
@@ -548,20 +548,17 @@ function _parse_gates_with_kron_symbol(s::String)
 """
     _parse_gate_string(s::String)
 
-Given a string representing a single gate with qubit numbers separated by symbol `_`, this function parses and returns the vector of qubits on
-which the input gate is located. For example, if the input string is `CRX_2_3`, the output will be `Vector{Int64}([2,3])`.
+Given a string representing a single gate with qubit numbers separated by symbol `_`, this 
+function parses and returns the vector of qubits on which the input gate is located. For example, 
+if the input string is `CRX_2_3`, the output will be `Vector{Int64}([2,3])`.
 """
 function _parse_gate_string(s::String; type=false, qubits=false)
-
-    if occursin(kron_symbol, s)
-        Memento.error(_LOGGER, "Kron symbol is not supported for parsing qubit locations in $s. Instead try `get_full_sized_kron_gate` function.")
-    end
     
     gates = Vector{String}()
     gate_id = string()
  
     for i = 1:length(s)
-       if s[i] != qubit_separator
+       if s[i] != QCO.qubit_separator
           gate_id = gate_id * s[i]
        else
           push!(gates, gate_id)

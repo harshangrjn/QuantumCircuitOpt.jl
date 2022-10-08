@@ -1,6 +1,7 @@
 #=
-IMPORTANT: Update the lists below whenever a 1 or 2 qubit gate is added to this file. 
-           Update QCO._get_angle_gates_idx in src/data.jl if gates with angle parameters are added to this file.
+IMPORTANT: a) Update the lists below whenever a 1 or 2 qubit gate is added to this file. 
+           b) Update QCO._get_angle_gates_idx in src/data.jl if gates with angle parameters are
+           added to this file.
 =#
 
 const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "R", "RX", "RY", "RZ", "Phase"]
@@ -35,6 +36,20 @@ const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS,
 
 # >= 3 qubit gates
 const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
+
+"""
+    _catch_gate_name_error()
+
+Helper function to ensure that the kron_symbol `x` does not appear in any of the gate names. 
+"""
+function _catch_gate_name_error()
+    all_gates = union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES, QCO.MULTI_QUBIT_GATES)
+    
+    if length(findall(x -> occursin(QCO.kron_symbol, x), all_gates)) > 0
+        Memento.error(_LOGGER, "Avoid the character `$(QCO.kron_symbol)` in the elemetary gate name")
+    end
+end
+QCO._catch_gate_name_error()
 
 #-------------------------------------#
 #            ONE QUBIT gates          #
