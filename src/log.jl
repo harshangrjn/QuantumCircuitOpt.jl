@@ -56,7 +56,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             if i != length(gates_sol_compressed)
                 printstyled(gates_sol_compressed[i], " * "; color = _main_color)
             else    
-                if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
                     printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = _main_color)
                 elseif data["decomposition_type"] == "approximate"
                     printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = _main_color)
@@ -81,7 +81,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
             if !isempty(data["cnot_idx"])
                 
-                if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
+                if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
                     printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = _main_color)
                 
                 elseif data["decomposition_type"] == "approximate"
@@ -166,7 +166,7 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
         end
     end
     
-    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]) && QCO.validate_circuit_decomposition(data, id_sequence)
+    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]) && QCO.validate_circuit_decomposition(data, id_sequence)
 
     gates_sol_compressed = QCO.get_depth_compressed_circuit(data["num_qubits"], gates_sol)
 
@@ -193,14 +193,14 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    global_phase = 1
+    exp_global_phase = 1 # exp(-im*ϕ) evaluated at ϕ = 0
 
-    if data["decomposition_type"] in ["exact_optimal_global_phase"]
-        ref_nonzero_r, ref_nonzero_c =  QCO._get_ref_nonzero_index_of_original_target(convert(Array{Complex{Float64},2},target_gate))
-        global_phase = M_sol[ref_nonzero_r, ref_nonzero_c] / target_gate[ref_nonzero_r, ref_nonzero_c]
+    if data["decomposition_type"] in ["optimal_global_phase"]
+        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(convert(Array{Complex{Float64},2}, target_gate))
+        exp_global_phase = M_sol[ref_nonzero_r, ref_nonzero_c] / target_gate[ref_nonzero_r, ref_nonzero_c]
     end
 
-    (!isapprox(M_sol, global_phase*target_gate, atol = 1E-4)) && Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
+    (!isapprox(M_sol, exp_global_phase * target_gate, atol = 1E-4)) && Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
 end
 
 """

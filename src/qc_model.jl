@@ -107,10 +107,17 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel)
     QCO.constraint_gate_initial_condition_compact(qcm)
     QCO.constraint_gate_intermediate_products_compact(qcm)
     QCO.constraint_gate_product_linearization(qcm)
-    QCO.constraint_gate_target_condition_compact(qcm)
+
+    if qcm.data["decomposition_type"] == "optimal_global_phase"
+        QCO.constraint_gate_target_condition_glphase(qcm)  
+    else 
+        QCO.constraint_gate_target_condition_compact(qcm)
+    end
+    
     QCO.constraint_cnot_gate_bounds(qcm)
     (qcm.data["decomposition_type"] == "approximate") && (QCO.constraint_slack_var_outer_approximation(qcm))
-    # (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm))
+
+    # (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm)) # seems to slow down MIP run times
 
     QCO.constraint_QCModel_valid(qcm)
 

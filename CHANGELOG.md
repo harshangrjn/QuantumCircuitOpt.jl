@@ -2,7 +2,7 @@ QuantumCircuitOpt.jl Change Log
 ===============================
 
 ### v0.5.1
-- New feature: Added support for compiling circuits upto global phase using linear constraints (`exact_optimal_global_phase`)
+- New feature: Added support for compiling optimal circuits upto a global phase using linear constraints (`optimal_global_phase`)
 - Deactivated determinant feasiblity check for global phase model
 - Bug fix in evaluation of kron-symboled elementary gates (#63)
 - `get_full_sized_gate` function now supports gates with kronecker operations

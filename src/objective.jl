@@ -11,7 +11,7 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
     decomposition_type = qcm.data["decomposition_type"]
 
     if !isempty(identity_idx)
-        if decomposition_type in ["exact_optimal", "exact_optimal_global_phase"]
+        if decomposition_type in ["exact_optimal", "optimal_global_phase"]
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n = 1:num_gates, d=1:max_depth if !(n in identity_idx)))
 
         elseif decomposition_type == "exact_feasible"
@@ -33,7 +33,7 @@ function objective_feasibility(qcm::QuantumCircuitModel)
     decomposition_type = qcm.data["decomposition_type"]
     Memento.warn(_LOGGER, "Switching to a feasibility problem")
 
-    if decomposition_type in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
+    if decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
         # Feasibility objective
     elseif decomposition_type == "approximate"
         JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var_oa]))
@@ -51,7 +51,7 @@ function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
     
     if !isempty(qcm.data["cnot_idx"])
 
-        if decomposition_type in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase"]
+        if decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n in cnot_idx, d=1:max_depth))
             
         elseif decomposition_type == "approximate"            

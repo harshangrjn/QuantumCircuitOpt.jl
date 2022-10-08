@@ -58,7 +58,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         decomposition_type = "exact_optimal"
     end
 
-    if !(decomposition_type in ["exact_optimal", "exact_feasible", "exact_optimal_global_phase", "approximate"]) 
+    if !(decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase", "approximate"]) 
         Memento.error(_LOGGER, "Decomposition type not supported")
     end
 
@@ -255,15 +255,15 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
         Memento.error(_LOGGER, "Dimensions of target gate do not match the input num_qubits")
     end
     
-    # This identifies if all the target gate has only real entries of if it is real up to a global phase and returns a compact matrix
+    # Identify if the target gate has only real entries or if it is real up to a global phase and returns a compact matrix
     is_target_real = QCO.is_gate_real(params["target_gate"])
 
     if are_elementary_gates_real
 
         global_phase = 0
 
-        if (decomposition_type in ["exact_optimal_global_phase"]) && !is_target_real
-            ref_nonzero_r, ref_nonzero_c = QCO._get_ref_nonzero_index_of_original_target(params["target_gate"])
+        if (decomposition_type in ["optimal_global_phase"]) && !is_target_real
+            ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(params["target_gate"])
             global_phase = angle(params["target_gate"][ref_nonzero_r, ref_nonzero_c])
         end
         
@@ -272,7 +272,7 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
         if is_target_real_up_to_phase
             return real(exp(-im*global_phase)*params["target_gate"]), is_target_real_up_to_phase
         else    
-            Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real for exact decomposition or not real up to a global phase for exact_optimal_global_phase decomposition.")
+            Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real for exact decomposition or not real up to a global phase for optimal_global_phase decomposition.")
         end
         
     else

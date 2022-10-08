@@ -150,25 +150,23 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     
     elseif decomposition_type == "approximate"
         JuMP.@constraint(qcm.model, U_var[:,:,max_depth] .== qcm.data["target_gate"][:,:] + qcm.variables[:slack_var][:,:])
-
-    elseif decomposition_type == "exact_optimal_global_phase"
-        QCO.constraint_gate_target_condition_compact_global_phase(qcm)  
-        
     end
     
     return
 end
 
-function constraint_gate_target_condition_compact_global_phase(qcm::QuantumCircuitModel)
+function constraint_gate_target_condition_glphase(qcm::QuantumCircuitModel)
     
     max_depth      = qcm.data["maximum_depth"]
     n_r            = size(qcm.data["gates_real"])[1]
     n_c            = size(qcm.data["gates_real"])[2]
 
     U_var = qcm.variables[:U_var]    
-    ref_nonzero_r, ref_nonzero_c = QCO._get_ref_nonzero_index_of_real_target(qcm.data::Dict{String,Any})
+    # ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_real_target(qcm.data::Dict{String,Any})
 
     if qcm.data["are_gates_real"] 
+        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(Array{Complex{Float64},2}(qcm.data["target_gate"]))
+
         for i=1:n_r, j=1:n_c
             if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6)
                 JuMP.@constraint(qcm.model, U_var[i,j,max_depth] == 0)
@@ -178,15 +176,17 @@ function constraint_gate_target_condition_compact_global_phase(qcm::QuantumCircu
         end
 
     else
+        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_to_real_matrix(qcm.data["target_gate"])
+
         for i=1:2:n_r, j=1:2:n_c
-            if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6) && isapprox(qcm.data["target_gate"][i,j+1], 0, atol=1E-7)
+            if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6) && isapprox(qcm.data["target_gate"][i,j+1], 0, atol=1E-6)
                 JuMP.@constraint(qcm.model, U_var[i,j,max_depth] == 0.0)
                 JuMP.@constraint(qcm.model, U_var[i,(j+1),max_depth] == 0.0)
             else
                 #real parts equal
                 JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] - U_var[i,(j+1),max_depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] ==
                     U_var[ref_nonzero_r,ref_nonzero_c,max_depth]*qcm.data["target_gate"][i,j] - U_var[ref_nonzero_r,(ref_nonzero_c+1),max_depth]*qcm.data["target_gate"][i,(j+1)])       
-                #complex part equal
+                #complex parts equal
                 JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] + U_var[i,(j+1),max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] ==
                     U_var[ref_nonzero_r,ref_nonzero_c,max_depth]*qcm.data["target_gate"][i,(j+1)] + U_var[ref_nonzero_r,(ref_nonzero_c+1),max_depth]*qcm.data["target_gate"][i,j]) 
             end

@@ -204,8 +204,8 @@
     M2 = kron(kron(QCO.IGate(1), QCO.get_full_sized_gate("CZ_1_3", 3)), QCO.HGate())
     @test isapprox(M1, M2, atol = tol_0)
 
-    M1 = QCO.get_full_sized_gate("CV_1_4xH_5xZ_6", 6)
-    M2 = kron(kron(QCO.get_full_sized_gate("CV_1_4", 4), QCO.HGate()), QCO.ZGate())
+    M1 = QCO.get_full_sized_gate("CV_4_1xH_5xZ_6", 6)
+    M2 = kron(kron(QCO.get_full_sized_gate("CV_4_1", 4), QCO.HGate()), QCO.ZGate())
     @test isapprox(M1, M2, atol = tol_0)
 
 end

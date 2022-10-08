@@ -714,52 +714,22 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
 
 end
 
-function _get_ref_nonzero_index_of_real_target(data::Dict{String,Any})
-
-    n_r            = size(data["gates_real"])[1]
-    n_c            = size(data["gates_real"])[2]
-
-    ref_nonzero_r = 0
-    ref_nonzero_c = 0
-    if data["are_gates_real"]
-        for i=1:n_r, j=1:n_c
-            if !isapprox(data["target_gate"][i,j], 0, atol=1E-6) 
-                ref_nonzero_r = i
-                ref_nonzero_c = j
-                break
-            end
-        end
-    else
-        for i=1:2:n_r, j=1:2:n_c
-            if !isapprox(data["target_gate"][i,j], 0, atol=1E-6) || !isapprox(data["target_gate"][i,j+1], 0, atol=1E-6)
-                ref_nonzero_r = i
-                ref_nonzero_c = j
-                break
-            end
+function _get_nonzero_idx_of_complex_to_real_matrix(M::Array{Float64,2})
+    for i=1:2:size(M)[1], j=1:2:size(M)[2]
+        if !isapprox(M[i,j], 0, atol=1E-6) || !isapprox(M[i,j+1], 0, atol=1E-6)
+            return i,j
         end
     end
-
-    return ref_nonzero_r, ref_nonzero_c 
 end
 
-function _get_ref_nonzero_index_of_original_target(T::Array{Complex{Float64},2})
-
-    n_r            = size(T)[1]
-    n_c            = size(T)[2]
-
-    ref_nonzero_r = 0
-    ref_nonzero_c = 0
-    
-    for i=1:n_r, j=1:n_c
-        if !isapprox(T[i,j], 0, atol=1E-6) 
-            ref_nonzero_r = i
-            ref_nonzero_c = j
-            break
+function _get_nonzero_idx_of_complex_matrix(M::Array{Complex{Float64},2})
+    for i=1:size(M)[1], j=1:size(M)[2]
+        if !isapprox(M[i,j], 0, atol=1E-6) 
+            return i,j
         end
     end
-   
-    return ref_nonzero_r, ref_nonzero_c 
 end
+
 """
     _get_elementary_gates_fixed_indices(M::Array{T,3} where T <: Number)
 

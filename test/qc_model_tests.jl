@@ -637,29 +637,31 @@ end
     @test result_qc["termination_status"] == MOI.INFEASIBLE
     @test result_qc["primal_status"]      == MOI.NO_SOLUTION
     
-    # Using global phase constraints
-    params["decomposition_type"] = "exact_optimal_global_phase"
+    # With global phase constraints
+    params["decomposition_type"] = "optimal_global_phase"
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
 
 
-    #Real elementary gates - Target is complex, but real in a global phase sence
+    # Real elementary gates - Target is complex, but real in a global phase sence
     params["target_gate"] = exp(im*pi*0.3) * QCO.CNotRevGate()
 
     # Without global phase constraints 
-    # ERROR - Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real for exact decomposition or not real up to a global phase for exact_optimal_global_phase decomposition.
+    # This is an infeasible decomposition: all elementary gates have zero imaginary parts and 
+    # target is not real for exact decomposition or not real up to a global phase for 
+    # `optimal_global_phase` decomposition.
     
-    # Using global phase constraints
-    params["decomposition_type"] = "exact_optimal_global_phase"
+    # With global phase constraints
+    params["decomposition_type"] = "optimal_global_phase"
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
 
 
-    #  Complex elementry gates - Does not make sence to evaluate if target is real
+    # Using complex-valued elementary gates
     params["elementary_gates"] = ["T_1", "H_1", "H_2", "CNot_1_2", "Identity"]
 
     # Without global phase constraints
@@ -669,7 +671,7 @@ end
     @test result_qc["primal_status"]      == MOI.NO_SOLUTION
 
     # Using global phase constraints
-    params["decomposition_type"] = "exact_optimal_global_phase"
+    params["decomposition_type"] = "optimal_global_phase"
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
