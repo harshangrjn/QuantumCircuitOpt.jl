@@ -4,8 +4,9 @@
 Utility function for `convex_hull`. Given an ordered triplet, this function returns if three
 points are collinear, oriented in clock-wise or anticlock-wise direction. 
 """
-function _orientation(x::Tuple{<:Number, <:Number}, y::Tuple{<:Number, <:Number}, z::Tuple{<:Number, <:Number})
-    
+function _orientation(x::Tuple{<:Number, <:Number}, 
+                      y::Tuple{<:Number, <:Number}, 
+                      z::Tuple{<:Number, <:Number})
     a = ((y[2] - x[2]) * (z[1] - y[1]) - (y[1] - x[1]) * (z[2] - y[2]))
 
     if isapprox(a, 0, atol=1e-6)
@@ -15,7 +16,6 @@ function _orientation(x::Tuple{<:Number, <:Number}, y::Tuple{<:Number, <:Number}
     else 
         return 2 # counterclock-wise
     end
-
 end
 
 """
@@ -38,7 +38,6 @@ function _lt_filter(a::Tuple{<:Number, <:Number}, b::Tuple{<:Number, <:Number})
     else
         return false
     end
-    
 end
 
 """

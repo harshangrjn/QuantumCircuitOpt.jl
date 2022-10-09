@@ -233,7 +233,6 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
                 
             end
         end
-
     end
 
     return data
@@ -529,7 +528,7 @@ end
 
 Given an input string representing the gate and number of qubits of the circuit, this function returns a full-sized 
 gate with respect to the input number of qubits. For example, if `num_qubits = 3` and the input gate in `H_3` 
-(Hadamard on third qubit), then this function returns `IGate ⨷ IGate ⨷ HGate`, where IGate and HGate are single 
+(Hadamard on third qubit), then this function returns `IGate ⨂ IGate ⨂ HGate`, where IGate and HGate are single 
 qubit Identity and Hadamard gates, respectively. Note that `angle` vector is an optional input which is 
 necessary when the input gate is parametrized by Euler angles.
 """
@@ -638,7 +637,7 @@ end
 Given an input string with kronecker symbols representing the gate and number of qubits of 
 the circuit, this function returns a full-sized gate with respect to the input number of qubits. 
 For example, if `num_qubits = 3` and the input gate in `I_1xT_2xH_3`, then this function returns 
-`IGate ⨷ TGate ⨷ HGate`, where IGate, TGate and HGate are single-qubit Identity, T and 
+`IGate⨂TGate⨂HGate`, where IGate, TGate and HGate are single-qubit Identity, T and 
 Hadamard gates, respectively. Two qubit gates can also be used as one of the input gates, for ex. `I_1xCV_2_3xH_4`. 
 Note that this function currently does not support an input gate parametrized with Euler angles.
 """

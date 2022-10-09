@@ -497,16 +497,15 @@ function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_
 end
 
 """
-    kron_multi_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
+    multi_qubit_global_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
 
-Given number of qubits of the circuit and any complex-valued one-qubit gate in it's matrix form,
-this function returns a multi-qubit global gate, after applying it simultaneously on all the qubits. 
-This function supports any number of integer-valued qubits. For example, given `G` and `num_qubits = 3`, 
-this function returns `G ⨷ G ⨷ G`.
+Given number of qubits of the circuit and any complex-valued one-qubit gate (`G``) in it's matrix form,
+this function returns a multi-qubit global gate, by applying `G` simultaneously on all the qubits. 
+For example, given `G` and `num_qubits = 3`, this function returns `G⨂G⨂G`. 
 """
-function kron_multi_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
+function multi_qubit_global_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
     if size(M)[1] != 2
-        Memento.error(_LOGGER, "Input should be an one-qubit R gate")
+        Memento.error(_LOGGER, "Input should be an one-qubit gate")
     end
 
     M_kron = 1
@@ -714,6 +713,12 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
 
 end
 
+"""
+    _get_nonzero_idx_of_complex_to_real_matrix(M::Array{Float64,2})
+
+A helper function for global phase constraints: Given a complex to real reformulated matrix, `M`, using `QCO.complex_to_real_gate`, this function 
+returns the first non-zero index it locates within `M`. 
+"""
 function _get_nonzero_idx_of_complex_to_real_matrix(M::Array{Float64,2})
     for i=1:2:size(M)[1], j=1:2:size(M)[2]
         if !isapprox(M[i,j], 0, atol=1E-6) || !isapprox(M[i,j+1], 0, atol=1E-6)
@@ -722,6 +727,12 @@ function _get_nonzero_idx_of_complex_to_real_matrix(M::Array{Float64,2})
     end
 end
 
+"""
+    _get_nonzero_idx_of_complex_matrix(M::Array{Complex{Float64},2})
+
+A helper function for global phase constraints: Given a complex matrix, `M`, this 
+function returns the first non-zero index it locates within `M`, either in real or the complex part. 
+"""
 function _get_nonzero_idx_of_complex_matrix(M::Array{Complex{Float64},2})
     for i=1:size(M)[1], j=1:size(M)[2]
         if !isapprox(M[i,j], 0, atol=1E-6) 

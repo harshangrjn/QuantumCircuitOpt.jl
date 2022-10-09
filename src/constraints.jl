@@ -23,7 +23,7 @@ function constraint_gates_onoff_per_depth(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_gate_initial_condition(qcm::QuantumCircuitModel)
+function constraint_initial_gate_condition(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
 
@@ -33,7 +33,7 @@ function constraint_gate_initial_condition(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_gate_intermediate_products(qcm::QuantumCircuitModel)
+function constraint_intermediate_products(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
     max_depth = qcm.data["maximum_depth"]
@@ -50,7 +50,7 @@ function constraint_gate_intermediate_products(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_gate_target_condition(qcm::QuantumCircuitModel)
+function constraint_target_gate_condition(qcm::QuantumCircuitModel)
 
     max_depth          = qcm.data["maximum_depth"]
     num_gates          = size(qcm.data["gates_real"])[3]
@@ -77,7 +77,6 @@ function constraint_complex_to_real_symmetry(qcm::QuantumCircuitModel)
         JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j,d] == qcm.variables[:U_var][i+1,j+1,d])
         JuMP.@constraint(qcm.model, qcm.variables[:U_var][i,j+1,d] == -qcm.variables[:U_var][i+1,j,d]) # This seems to slow down the solution search
     end
-    
 
     return
 end
@@ -116,7 +115,7 @@ function constraint_gate_product_linearization(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_gate_initial_condition_compact(qcm::QuantumCircuitModel)
+function constraint_initial_gate_condition_compact(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
     
@@ -126,7 +125,7 @@ function constraint_gate_initial_condition_compact(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_gate_intermediate_products_compact(qcm::QuantumCircuitModel)
+function constraint_intermediate_products_compact(qcm::QuantumCircuitModel)
 
     num_gates = size(qcm.data["gates_real"])[3]
     max_depth = qcm.data["maximum_depth"]
@@ -137,14 +136,13 @@ function constraint_gate_intermediate_products_compact(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
+function constraint_target_gate_condition_compact(qcm::QuantumCircuitModel)
 
     max_depth = qcm.data["maximum_depth"]
     decomposition_type = qcm.data["decomposition_type"]
 
     U_var = qcm.variables[:U_var]
     
-    # For correct implementation of this, use MutableArithmetics.jl >= v0.2.11
     if decomposition_type in ["exact_optimal", "exact_feasible"]
         JuMP.@constraint(qcm.model, U_var[:,:,max_depth] .== qcm.data["target_gate"][:,:])
     
@@ -155,14 +153,13 @@ function constraint_gate_target_condition_compact(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_gate_target_condition_glphase(qcm::QuantumCircuitModel)
+function constraint_target_gate_condition_glphase(qcm::QuantumCircuitModel)
     
     max_depth      = qcm.data["maximum_depth"]
     n_r            = size(qcm.data["gates_real"])[1]
     n_c            = size(qcm.data["gates_real"])[2]
 
     U_var = qcm.variables[:U_var]    
-    # ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_real_target(qcm.data::Dict{String,Any})
 
     if qcm.data["are_gates_real"] 
         ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(Array{Complex{Float64},2}(qcm.data["target_gate"]))

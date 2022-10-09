@@ -2049,5 +2049,5 @@ GR(\theta, \phi) = \exp \left(-i \sum_{i=1}^{3} (\cos(\phi)X_i + \sin(\phi)Y_i) 
 """
 function GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
 
-    return QCO.round_complex_values(QCO.kron_multi_qubit_gate(num_qubits, QCO.RGate(θ,ϕ)))
+    return QCO.round_complex_values(QCO.multi_qubit_global_gate(num_qubits, QCO.RGate(θ,ϕ)))
 end

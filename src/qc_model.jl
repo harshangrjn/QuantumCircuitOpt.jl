@@ -56,10 +56,10 @@ function constraint_QCModel_balas(qcm::QuantumCircuitModel)
     
     QCO.constraint_single_gate_per_depth(qcm)
     QCO.constraint_gates_onoff_per_depth(qcm)
-    QCO.constraint_gate_initial_condition(qcm)
-    QCO.constraint_gate_intermediate_products(qcm)
+    QCO.constraint_initial_gate_condition(qcm)
+    QCO.constraint_intermediate_products(qcm)
     QCO.constraint_gate_product_linearization(qcm)
-    QCO.constraint_gate_target_condition(qcm)
+    QCO.constraint_target_gate_condition(qcm)
     QCO.constraint_cnot_gate_bounds(qcm)
     (qcm.data["decomposition_type"] == "approximate") && (QCO.constraint_slack_var_outer_approximation(qcm))
     (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm))
@@ -104,14 +104,14 @@ end
 function constraint_QCModel_compact(qcm::QuantumCircuitModel)
 
     QCO.constraint_single_gate_per_depth(qcm)
-    QCO.constraint_gate_initial_condition_compact(qcm)
-    QCO.constraint_gate_intermediate_products_compact(qcm)
+    QCO.constraint_initial_gate_condition_compact(qcm)
+    QCO.constraint_intermediate_products_compact(qcm)
     QCO.constraint_gate_product_linearization(qcm)
 
     if qcm.data["decomposition_type"] == "optimal_global_phase"
-        QCO.constraint_gate_target_condition_glphase(qcm)  
+        QCO.constraint_target_gate_condition_glphase(qcm)  
     else 
-        QCO.constraint_gate_target_condition_compact(qcm)
+        QCO.constraint_target_gate_condition_compact(qcm)
     end
     
     QCO.constraint_cnot_gate_bounds(qcm)
