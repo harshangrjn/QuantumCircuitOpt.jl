@@ -25,7 +25,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
     if !isempty(gates_sol_compressed)
 
         printstyled("\n","=============================================================================","\n"; color = _main_color)
-        printstyled("QuantumCircuitOpt version: ", _QCOPT_VERSION, "\n"; color = _header_color, bold = true)
+        printstyled("QuantumCircuitOpt version: ", Pkg.TOML.parse(read(string(pkgdir(QCO), "/Project.toml"), String))["version"], "\n"; color = _header_color, bold = true)
 
         printstyled("\n","Quantum Circuit Model Data"; color = _header_color, bold = true)
         

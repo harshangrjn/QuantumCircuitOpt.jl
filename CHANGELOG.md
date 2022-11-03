@@ -1,6 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.2
+- Added dependency on `Pkg` package for logging purposes
+- Renamed gates in `src/examples` folder
+
 ### v0.5.1
 - New feature: Added support for compiling optimal circuits upto a global phase using linear constraints (`optimal_global_phase`)
 - Deactivated determinant feasiblity check for global phase model

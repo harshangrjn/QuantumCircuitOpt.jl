@@ -143,7 +143,7 @@ function magic_using_SHCnot()
         )
 end
 
-function S_gate()
+function S_using_U3()
 
     println(">>>>> S Gate <<<<<")
 
@@ -211,7 +211,7 @@ function swap()
         )
 end
 
-function W_gate()
+function W_using_U3()
 
     println(">>>>> W Gate <<<<<")
 
@@ -260,7 +260,7 @@ function W_using_HCnot()
         )
 end
 
-function HCoinGate()
+function hadamard_coin()
 
     println(">>>>> Hadamard Coin gate <<<<<")
 
@@ -374,7 +374,7 @@ function qft2_using_HT()
         )
 end
 
-function GRGate()
+function GR_using_R()
     println(">>>>> GRGate testing <<<<<")
 
     GR1 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/6, π/3])

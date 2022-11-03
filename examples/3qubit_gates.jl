@@ -73,7 +73,7 @@ function toffoli_using_kronecker()
     )
 end
 
-function toffoli_with_controlled_gates()
+function toffoli_using_2qubit_gates()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
     println(">>>>> Toffoli gate with controlled gates <<<<<")
@@ -102,7 +102,7 @@ function CNot_1_3()
     )
 end
 
-function FredkinGate()
+function fredkin()
 
     return Dict{String, Any}(
     "num_qubits" => 3,
@@ -115,7 +115,7 @@ function FredkinGate()
     )
 end
 
-function FredkinGate_using_SSwap()
+function fredkin_using_SSwap()
 
     return Dict{String, Any}(
     "num_qubits" => 3,

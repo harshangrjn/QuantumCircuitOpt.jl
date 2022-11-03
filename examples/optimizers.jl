@@ -54,7 +54,6 @@ function get_ipopt()
                                        "max_iter" => Int(1E4))
 end
 
-
 #=================================================================#
 # Local mixed-integer nonlinear programming solver (open-source)  #
 #=================================================================#

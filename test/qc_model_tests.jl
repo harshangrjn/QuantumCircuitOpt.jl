@@ -370,7 +370,7 @@ end
     "decomposition_type" => "exact_optimal"
     )
 
-    model_options = Dict{Symbol, Any}(:time_limit => 1)
+    model_options = Dict{Symbol, Any}(:time_limit => 0.2)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.TIME_LIMIT
