@@ -1,6 +1,10 @@
-<p align="center">
+<!-- <p align="center">
 <img width="790px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/logo.png" alt="https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/docs/src/assets/docs_header_dark.png"/>
-</p>
+</p> -->
+<h1 align="center" margin=0px>
+  <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_light.png#gh-light-mode-only" width=60%>
+  <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_dark.png#gh-dark-mode-only"   width=60%>
+  <br>
 
 Status: 
 [![CI](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml)
