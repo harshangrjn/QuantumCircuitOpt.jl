@@ -47,10 +47,21 @@ If you find QuantumCircuitOpt useful in your work, we request you to cite the fo
   title={{QuantumCircuitOpt}: An Open-source Framework for Provably Optimal Quantum Circuit Design},
   author={Nagarajan, Harsha and Lockwood, Owen and Coffrin, Carleton},
   booktitle={SC21: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
-  series={Workshop on Quantum Computing Software},
+  series={Second Workshop on Quantum Computing Software},
   pages={55--63},
   year={2021},
   doi={10.1109/QCS54837.2021.00010},
+  organization={IEEE Computer Society}
+}
+```
+Another publication which explores the potential of non-linear programming formulations in the QuantumCircuitOpt package is the following: 
+```bibtex
+@inproceedings{HendersonNagarajanCoffrin2022,
+  title={Exploring Non-linear Programming Formulations in {QuantumCircuitOpt} for Optimal Circuit Design},
+  author={Henderson. R, Elena and Nagarajan, Harsha and Coffrin, Carleton},
+  booktitle={SC22: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
+  series={Third Workshop on Quantum Computing Software},
+  year={2022},
   organization={IEEE Computer Society}
 }
 ```

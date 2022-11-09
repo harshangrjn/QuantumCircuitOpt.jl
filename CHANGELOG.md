@@ -1,6 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.3
+- Minor update: SC22 publication added in docs
+- README banner update
+
 ### v0.5.2
 - Added dependency on `Pkg` package for logging purposes
 - Renamed gates in `src/examples` folder

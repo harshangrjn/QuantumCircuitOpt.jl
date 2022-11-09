@@ -1,6 +1,3 @@
-<!-- <p align="center">
-<img width="790px" src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/logo.png" alt="https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/docs/src/assets/docs_header_dark.png"/>
-</p> -->
 <h1 align="center" margin=0px>
   <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_light.png#gh-light-mode-only" width=80%>
   <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_dark.png#gh-dark-mode-only"   width=80%>
@@ -8,7 +5,7 @@
   A Julia Package for Optimal Quantum Circuit Design
 </h1>
 
-Status: 
+Status:
 [![CI](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/master/graph/badge.svg?token=KGJWIV6QF4)](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl)
 [![version](https://juliahub.com/docs/QuantumCircuitOpt/version.svg)](https://juliahub.com/ui/Packages/QuantumCircuitOpt/dwSy1)
@@ -87,7 +84,7 @@ If you find QuantumCircuitOpt useful in your work, we request you to cite the fo
   title={{QuantumCircuitOpt}: An Open-source Framework for Provably Optimal Quantum Circuit Design},
   author={Nagarajan, Harsha and Lockwood, Owen and Coffrin, Carleton},
   booktitle={SC21: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
-  series={Workshop on Quantum Computing Software},
+  series={Second Workshop on Quantum Computing Software},
   pages={55--63},
   year={2021},
   doi={10.1109/QCS54837.2021.00010},
