@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>3-qubit gates · QuantumCircuitOpt.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&amp;display=swap" rel="stylesheet" type="text/css"/><link href="../assets/extra_styles.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img class="docs-light-only" src="../assets/logo.png" alt="QuantumCircuitOpt.jl logo"/><img class="docs-dark-only" src="../assets/logo-dark.png" alt="QuantumCircuitOpt.jl logo"/></a><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><a class="tocitem" href="../quickguide/">Quick Start guide</a></li><li><span class="tocitem">Quantum Gates Library</span><ul><li><a class="tocitem" href="../1_qubit_gates/">1-qubit gates</a></li><li><a class="tocitem" href="../2_qubit_gates/">2-qubit gates</a></li><li class="is-active"><a class="tocitem" href>3-qubit gates</a><ul class="internal"><li><a class="tocitem" href="#ToffoliGate"><span>ToffoliGate</span></a></li><li><a class="tocitem" href="#CSwapGate"><span>CSwapGate</span></a></li><li><a class="tocitem" href="#CCZGate"><span>CCZGate</span></a></li><li><a class="tocitem" href="#PeresGate"><span>PeresGate</span></a></li><li><a class="tocitem" href="#RCCXGate"><span>RCCXGate</span></a></li><li><a class="tocitem" href="#MargolusGate"><span>MargolusGate</span></a></li><li><a class="tocitem" href="#CiSwapGate"><span>CiSwapGate</span></a></li></ul></li><li><a class="tocitem" href="../multi_qubit_gates/">Multi-qubit gates</a></li></ul></li><li><a class="tocitem" href="../function_references/">Function References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Quantum Gates Library</a></li><li class="is-active"><a href>3-qubit gates</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>3-qubit gates</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/3_qubit_gates.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Quantum-Circuits-Library:-Three-qubit-gates"><a class="docs-heading-anchor" href="#Quantum-Circuits-Library:-Three-qubit-gates">Quantum Circuits Library: Three-qubit gates</a><a id="Quantum-Circuits-Library:-Three-qubit-gates-1"></a><a class="docs-heading-anchor-permalink" href="#Quantum-Circuits-Library:-Three-qubit-gates" title="Permalink"></a></h1><h2 id="ToffoliGate"><a class="docs-heading-anchor" href="#ToffoliGate">ToffoliGate</a><a id="ToffoliGate-1"></a><a class="docs-heading-anchor-permalink" href="#ToffoliGate" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="QuantumCircuitOpt.ToffoliGate" href="#QuantumCircuitOpt.ToffoliGate"><code>QuantumCircuitOpt.ToffoliGate</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">ToffoliGate()</code></pre><p>Three-qubit Toffoli gate, also known as the CCX (controlled-controlled-NOT) gate. </p><p><strong>Circuit Representation</strong></p><pre><code class="nohighlight hljs">q_0: ──■──
+       │
+q_1: ──■──
+     ┌─┴─┐
+q_2: ┤ X ├
+     └───┘</code></pre><p><strong>Matrix Representation</strong></p><p class="math-container">\[Toffoli     =
+            |0 \rangle \langle 0| \otimes I \otimes I + |1 \rangle \langle 1| \otimes CXGate =
+            \begin{pmatrix}
+                1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+                0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+                0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+                0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+                0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0\\
+                0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0\\
+                0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1\\
+                0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0
+            \end{pmatrix}\]</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/6fcf673cdc3861dc9602e865c0e70ce6e42a9069/src/gates.jl#L1662-L1693">source</a></section></article><h2 id="CSwapGate"><a class="docs-heading-anchor" href="#CSwapGate">CSwapGate</a><a id="CSwapGate-1"></a><a class="docs-heading-anchor-permalink" href="#CSwapGate" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="QuantumCircuitOpt.CSwapGate" href="#QuantumCircuitOpt.CSwapGate"><code>QuantumCircuitOpt.CSwapGate</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">CSwapGate()</code></pre><p>Three-qubit, controlled <a href="../2_qubit_gates/#SwapGate">SwapGate</a>, also known as the <a href="https://en.wikipedia.org/wiki/Fredkin_gate">Fredkin gate</a>.</p><p><strong>Circuit Representation</strong></p><pre><code class="nohighlight hljs">q_0: ─■─
+      │
+q_1: ─X─
+      │
+q_2: ─X─</code></pre><p><strong>Matrix Representation</strong></p><p class="math-container">\[CSwapGate =
+            \begin{pmatrix}
+            1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 \\
+        \end{pmatrix}\]</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/6fcf673cdc3861dc9602e865c0e70ce6e42a9069/src/gates.jl#L1698-L1727">source</a></section></article><h2 id="CCZGate"><a class="docs-heading-anchor" href="#CCZGate">CCZGate</a><a id="CCZGate-1"></a><a class="docs-heading-anchor-permalink" href="#CCZGate" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="QuantumCircuitOpt.CCZGate" href="#QuantumCircuitOpt.CCZGate"><code>QuantumCircuitOpt.CCZGate</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">CCZGate()</code></pre><p>Three-qubit controlled-controlled Z gate. </p><p><strong>Circuit Representation</strong></p><pre><code class="nohighlight hljs">q_0: ─■─
+      │
+q_1: ─■─
+      │
+q_2: ─■─</code></pre><p><strong>Matrix Representation</strong></p><p class="math-container">\[CCZGate =
+            \begin{pmatrix}
+            1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -1 \\
+        \end{pmatrix}\]</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/6fcf673cdc3861dc9602e865c0e70ce6e42a9069/src/gates.jl#L1732-L1761">source</a></section></article><h2 id="PeresGate"><a class="docs-heading-anchor" href="#PeresGate">PeresGate</a><a id="PeresGate-1"></a><a class="docs-heading-anchor-permalink" href="#PeresGate" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="QuantumCircuitOpt.PeresGate" href="#QuantumCircuitOpt.PeresGate"><code>QuantumCircuitOpt.PeresGate</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">PeresGate()</code></pre><p>Three-qubit Peres gate. This gate is equivalent to <a href="../3_qubit_gates/#ToffoliGate">ToffoliGate</a> followed by the <a href="../2_qubit_gates/#CNotGate">CNotGate</a> in 3 qubits.  Reference: <a href="https://doi.org/10.1103/PhysRevA.32.3266">https://doi.org/10.1103/PhysRevA.32.3266</a></p><p><strong>Circuit Representation</strong></p><pre><code class="nohighlight hljs">q_0: ──■─────■──          
+       │   ┌─┴─┐
+q_1: ──■───┤ X ├
+     ┌─┴─┐ └───┘
+q_2: ┤ X ├──────
+     └───┘</code></pre><p><strong>Matrix Representation</strong></p><p class="math-container">\[PeresGate =
+            \begin{pmatrix}
+            1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+        \end{pmatrix}\]</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/6fcf673cdc3861dc9602e865c0e70ce6e42a9069/src/gates.jl#L1766-L1797">source</a></section></article><h2 id="RCCXGate"><a class="docs-heading-anchor" href="#RCCXGate">RCCXGate</a><a id="RCCXGate-1"></a><a class="docs-heading-anchor-permalink" href="#RCCXGate" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="QuantumCircuitOpt.RCCXGate" href="#QuantumCircuitOpt.RCCXGate"><code>QuantumCircuitOpt.RCCXGate</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">RCCXGate()</code></pre><p>Three-qubit relative (or simplified) Toffoli gate, or the CCX gate. This gate is equivalent to <a href="../3_qubit_gates/#ToffoliGate">ToffoliGate</a> upto relative phases.  The advantage of this gate is that it&#39;s implementation requires only three CNot (or CX) gates.  Reference: <a href="https://arxiv.org/pdf/1508.03273.pdf">https://arxiv.org/pdf/1508.03273.pdf</a></p><p><strong>Matrix Representation</strong></p><p class="math-container">\[RCCXGate =
+            \begin{pmatrix}
+            1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -1 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -i \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; i &amp; 0 \\
+        \end{pmatrix}\]</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/6fcf673cdc3861dc9602e865c0e70ce6e42a9069/src/gates.jl#L1811-L1833">source</a></section></article><h2 id="MargolusGate"><a class="docs-heading-anchor" href="#MargolusGate">MargolusGate</a><a id="MargolusGate-1"></a><a class="docs-heading-anchor-permalink" href="#MargolusGate" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="QuantumCircuitOpt.MargolusGate" href="#QuantumCircuitOpt.MargolusGate"><code>QuantumCircuitOpt.MargolusGate</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">MargolusGate()</code></pre><p>Three-qubit Margolus gate, which is a simplified <a href="../3_qubit_gates/#ToffoliGate">ToffoliGate</a> and coincides with the Toffoli gate up  to a single change of sign. The advantage of this gate is that its implementation requires only three CNot (or CX) gates.  Reference: <a href="https://arxiv.org/pdf/quant-ph/0312225.pdf">https://arxiv.org/pdf/quant-ph/0312225.pdf</a></p><p><strong>Matrix Representation</strong></p><p class="math-container">\[MargolusGate =
+            \begin{pmatrix}
+            1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -1 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \\
+        \end{pmatrix}\]</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/6fcf673cdc3861dc9602e865c0e70ce6e42a9069/src/gates.jl#L1846-L1868">source</a></section></article><h2 id="CiSwapGate"><a class="docs-heading-anchor" href="#CiSwapGate">CiSwapGate</a><a id="CiSwapGate-1"></a><a class="docs-heading-anchor-permalink" href="#CiSwapGate" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="QuantumCircuitOpt.CiSwapGate" href="#QuantumCircuitOpt.CiSwapGate"><code>QuantumCircuitOpt.CiSwapGate</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">CiSwapGate()</code></pre><p>Three-qubit controlled version of the <a href="../2_qubit_gates/#iSwapGate">iSwapGate</a>. Reference: <a href="https://doi.org/10.1103/PhysRevResearch.2.033097">https://doi.org/10.1103/PhysRevResearch.2.033097</a></p><p><strong>Circuit Representation</strong></p><pre><code class="nohighlight hljs">q_0: ─────■─────
+          │
+      ┌───────┐
+q_1: ─┤       ├─
+      │ iSwap │   
+q_2: ─┤       ├─ 
+      └───────┘ </code></pre><p><strong>Matrix Representation</strong></p><p class="math-container">\[CiSwapGate =
+            \begin{pmatrix}
+            1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; i &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; i &amp; 0 &amp; 0 \\
+            0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 \\
+        \end{pmatrix}\]</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/6fcf673cdc3861dc9602e865c0e70ce6e42a9069/src/gates.jl#L1881-L1913">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../2_qubit_gates/">« 2-qubit gates</a><a class="docs-footer-nextpage" href="../multi_qubit_gates/">Multi-qubit gates »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Monday 14 November 2022 23:23">Monday 14 November 2022</span>. Using Julia version 1.8.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
