@@ -1,6 +1,11 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.4
+- Added a generalized function to obtain controlled gates (`controlled_gate(G)`)
+- Clean-up in controlled gates within `src/gates.jl`
+- 
+
 ### v0.5.3
 - Minor update: SC22 publication added in docs
 - README banner update

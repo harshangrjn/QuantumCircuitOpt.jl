@@ -838,3 +838,31 @@ function _get_matrix_product_fixed_indices(left_matrix_fixed_idx::Dict{Tuple{Int
 
     return product_fixed_idx
 end
+
+"""
+    controlled_gate(G::Array{Complex{Float64},2}; reverse = false)
+
+Given a complex-valued gate (`G`) in `N` qubits, this function returns a controlled gate (`CG`) representable in 
+`N+1` qubits. The state of control qubit is applied to one wire prior to the location of the `G` gate. For example, 
+given a [CNotGate](@ref) as the input, this function returns a controlled-CNot or the [ToffoliGate](@ref).
+"""
+function controlled_gate(G::Array{Complex{Float64},2}; reverse = false)
+
+    num_qubits = Int(log2(size(G)[1]))
+    M_0 = Array{Complex{Float64},2}([1 0; 0 0])
+    M_1 = Array{Complex{Float64},2}([0 0; 0 1])
+
+    if !reverse 
+        # |0⟩⟨0| ⊗ I
+        control_0 = kron(M_0, QCO.IGate(num_qubits))
+        # |1⟩⟨1| ⊗ G
+        control_1 = kron(M_1, G)
+    else
+        # I ⊗ |0⟩⟨0|
+        control_0 = kron(QCO.IGate(num_qubits), M_0)
+        # X ⊗ |1⟩⟨1|
+        control_1 = kron(G, M_1)
+    end
+
+    return control_0 + control_1
+end

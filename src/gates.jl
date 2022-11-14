@@ -504,9 +504,7 @@ CNot = \begin{pmatrix}
 ```
 """
 function CNotGate()
-
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]) 
-
+    return QCO.controlled_gate(QCO.XGate())
 end
 
 @doc raw"""
@@ -534,9 +532,7 @@ CNotRev = \begin{pmatrix}
 ```
 """
 function CNotRevGate()
-
-    return Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]) 
-
+    return QCO.controlled_gate(QCO.XGate(), reverse = true) 
 end
 
 @doc raw"""
@@ -565,9 +561,7 @@ DCX = \begin{pmatrix}
 ```
 """
 function DCXGate()
-
     return Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 1 0 0; 0 0 1 0]) 
-
 end
 
 @doc raw"""
@@ -595,9 +589,7 @@ CX = \begin{pmatrix}
 ```
 """
 function CXGate()
-
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]) 
-
+    return QCO.controlled_gate(QCO.XGate())  
 end
 
 @doc raw"""
@@ -626,13 +618,7 @@ CXRev = I \otimes |0 \rangle\langle 0| + X \otimes |1 \rangle\langle 1| = \begin
 ```
 """
 function CXRevGate()
-    
-    # I ⊗ |0⟩⟨0|
-    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
-    # X ⊗ |1⟩⟨1| 
-    control_1 = kron(QCO.XGate(), Array{Complex{Float64},2}([0 0; 0 1]))
-    
-    return control_0 + control_1
+    return QCO.controlled_gate(QCO.XGate(), reverse = true) 
 end
 
 @doc raw"""
@@ -660,13 +646,7 @@ CY = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Y = \begin{pm
 ```
 """
 function CYGate()
-
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ Y 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.YGate())
-    
-    return control_0 + control_1
+    return QCO.controlled_gate(QCO.YGate()) 
 end
 
 @doc raw"""
@@ -694,13 +674,7 @@ CYRev = I \otimes |0 \rangle\langle 0| + Y \otimes |1 \rangle\langle 1| = \begin
 ```
 """
 function CYRevGate()
-    
-    # I ⊗ |0⟩⟨0|
-    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
-    # Y ⊗ |1⟩⟨1| 
-    control_1 = kron(QCO.YGate(), Array{Complex{Float64},2}([0 0; 0 1]))
-    
-    return control_0 + control_1
+    return QCO.controlled_gate(QCO.YGate(), reverse = true)
 end
 
 @doc raw"""
@@ -728,12 +702,7 @@ CZ = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Z = \begin{pm
 ```
 """
 function CZGate()
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ Z 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.ZGate())
-    
-    return control_0 + control_1 
+    return QCO.controlled_gate(QCO.ZGate())
 end
 
 @doc raw"""
@@ -761,13 +730,7 @@ CH = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes H = \begin{pmat
 ```
 """
 function CHGate()
-
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ H 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.HGate())
-    
-    return control_0 + control_1 
+    return QCO.controlled_gate(QCO.HGate())
 end
 
 @doc raw"""
@@ -795,13 +758,7 @@ CHRev = I \otimes |0\rangle\langle 0| + H \otimes |1\rangle\langle 1| = \begin{p
 ```
 """
 function CHRevGate()
-    
-    # I ⊗ |0⟩⟨0|
-    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
-    # H ⊗ |1⟩⟨1| 
-    control_1 = kron(QCO.HGate(), Array{Complex{Float64},2}([0 0; 0 1]))
-    
-    return control_0 + control_1
+    return QCO.controlled_gate(QCO.HGate(), reverse = true)
 end
 
 @doc raw"""
@@ -829,9 +786,7 @@ CV = \begin{pmatrix}
 ```
 """
 function CVGate()
-
-    return QCO.CSXGate() 
-
+    return QCO.CSXGate()
 end
 
 
@@ -860,9 +815,7 @@ CVRev = \begin{pmatrix}
 ```
 """
 function CVRevGate()
-
     return Array{Complex{Float64},2}([1 0 0 0; 0 0.5+0.5im 0 0.5-0.5im; 0 0 1 0; 0 0.5-0.5im 0 0.5+0.5im])
-
 end
 
 @doc raw"""
@@ -1524,13 +1477,7 @@ CSXGate = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes SX = \be
 ```
 """
 function CSXGate()
-
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ SX 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.SXGate())
-        
-    return control_0 + control_1 
+    return QCO.controlled_gate(QCO.SXGate()) 
 end
 
 @doc raw"""
@@ -1558,13 +1505,7 @@ CSXRevGate = I \otimes |0\rangle\langle 0| + SX \otimes |1\rangle\langle 1| = \b
 ```
 """
 function CSXRevGate()
-
-    # I ⊗ |0⟩⟨0|
-    control_0 = kron(QCO.IGate(1), Array{Complex{Float64},2}([1 0; 0 0]))
-    # SX ⊗ |1⟩⟨1| 
-    control_1 = kron(QCO.SXGate(), Array{Complex{Float64},2}([0 0; 0 1]))
-    
-    return control_0 + control_1
+    return QCO.controlled_gate(QCO.SXGate(), reverse = true)
 end
 
 
@@ -1597,9 +1538,7 @@ M = \frac{1}{\sqrt{2}} \begin{pmatrix}
 ```
 """
 function MGate()
-
     return Array{Complex{Float64},2}(1/sqrt(2)*[1 im 0 0; 0 0 im 1; 0 0 im -1; 1 -im 0 0])
-
 end
 
 @doc raw"""
@@ -1631,9 +1570,7 @@ M = \frac{1}{2} \begin{pmatrix}
 ```
 """
 function QFT2Gate()
-
     return Array{Complex{Float64},2}(0.5*[1 1 1 1; 1 im -1 -im; 1 -1 1 -1; 1 -im -1 im])
-
 end
 
 @doc raw"""
@@ -1654,9 +1591,7 @@ HCoinGate = \begin{pmatrix}
 ```
 """
 function HCoinGate()
-
     return Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1])
-
 end
 
 @doc raw"""
@@ -1713,7 +1648,7 @@ SycamoreGate() = \begin{pmatrix}
 """
 function SycamoreGate()
 
-    return  Array{Complex{Float64},2}([ 1 0 0 0            
+    return  Array{Complex{Float64},2}([1 0 0 0            
                                       0 0 -im 0    
                                       0 -im 0 0
                                       0 0 0 cos(pi/6)-(sin(pi/6))im])
@@ -1757,16 +1692,7 @@ Toffoli     =
 ```
 """
 function ToffoliGate()
-
-    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                      0  1  0  0  0  0  0  0
-                                      0  0  1  0  0  0  0  0
-                                      0  0  0  1  0  0  0  0
-                                      0  0  0  0  1  0  0  0
-                                      0  0  0  0  0  1  0  0
-                                      0  0  0  0  0  0  0  1
-                                      0  0  0  0  0  0  1  0])
-
+    return QCO.controlled_gate(QCO.CNotGate())
 end
 
 @doc raw"""
@@ -1800,20 +1726,11 @@ CSwapGate =
 ```
 """
 function CSwapGate()
-
-    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                      0  1  0  0  0  0  0  0
-                                      0  0  1  0  0  0  0  0
-                                      0  0  0  1  0  0  0  0
-                                      0  0  0  0  1  0  0  0
-                                      0  0  0  0  0  0  1  0
-                                      0  0  0  0  0  1  0  0
-                                      0  0  0  0  0  0  0  1])
-
+    return QCO.controlled_gate(QCO.SwapGate())
 end
 
 @doc raw"""
-    CCZRevGate()
+    CCZGate()
 
 Three-qubit controlled-controlled Z gate. 
 
@@ -1843,16 +1760,7 @@ CCZGate =
 ```
 """
 function CCZGate()
-
-    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                      0  1  0  0  0  0  0  0
-                                      0  0  1  0  0  0  0  0
-                                      0  0  0  1  0  0  0  0
-                                      0  0  0  0  1  0  0  0
-                                      0  0  0  0  0  1  0  0
-                                      0  0  0  0  0  0  1  0
-                                      0  0  0  0  0  0  0  -1])
-
+    return QCO.controlled_gate(QCO.CZGate())
 end
 
 @doc raw"""
@@ -2004,15 +1912,7 @@ CiSwapGate =
 ```
 """
 function CiSwapGate()
-
-    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                      0  1  0  0  0  0  0  0
-                                      0  0  1  0  0  0  0  0
-                                      0  0  0  1  0  0  0  0
-                                      0  0  0  0  1  0  0  0
-                                      0  0  0  0  0  0 im  0
-                                      0  0  0  0  0 im  0  0
-                                      0  0  0  0  0  0  0  1])
+    return QCO.controlled_gate(QCO.iSwapGate())
 end
 
 #---------------------------------------#
@@ -2048,6 +1948,5 @@ GR(\theta, \phi) = \exp \left(-i \sum_{i=1}^{3} (\cos(\phi)X_i + \sin(\phi)Y_i) 
 ```
 """
 function GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
-
     return QCO.round_complex_values(QCO.multi_qubit_global_gate(num_qubits, QCO.RGate(θ,ϕ)))
 end
