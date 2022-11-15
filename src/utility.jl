@@ -835,7 +835,7 @@ this function returns a complex-valued controlled gate representable in `N+NCQ` 
 The state of control qubit is applied `NCQ` times to every wire preceeding the location 
 of the input gate. Note that this function does not account for the actual location
 of the controlled gate in the circuit. Here are a few examples:
-(a) [ToffoliGate](@ref) = controlled_gate(XGate(), 2) = controlled_gate(CnotGate(), 1)
+(a) [ToffoliGate](@ref) = controlled_gate(XGate(), 2) = controlled_gate(CNotGate(), 1)
 (b) CCCCCZGate = controlled_gate(ZGate(), 5)
 (c) TCCGate = controlled(TGate(), 2, reverse = true)
 """
