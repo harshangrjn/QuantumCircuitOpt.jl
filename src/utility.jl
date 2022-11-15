@@ -840,29 +840,43 @@ function _get_matrix_product_fixed_indices(left_matrix_fixed_idx::Dict{Tuple{Int
 end
 
 """
-    controlled_gate(G::Array{Complex{Float64},2}; reverse = false)
+    controlled_gate(gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
 
-Given a complex-valued gate (`G`) in `N` qubits, this function returns a controlled gate (`CG`) representable in 
-`N+1` qubits. The state of control qubit is applied to one wire prior to the location of the `G` gate. For example, 
-given a [CNotGate](@ref) as the input, this function returns a controlled-CNot or the [ToffoliGate](@ref).
+Given a complex-valued matrix (`gate`) of `N` qubits, and number of control qubits (`NCQ`), 
+this function returns a complex-valued controlled gate representable in `N+NCQ` qubits. 
+The state of control qubit is applied `NCQ` times to every wire preceeding the location 
+of the input gate. Note that this function does not account for the actual location
+of the controlled gate in the circuit. Here are a few examples:
+(a) [ToffoliGate](@ref) = controlled_gate(XGate(), 2) = controlled_gate(CnotGate(), 1)
+(b) CCCCCZGate = controlled_gate(ZGate(), 5)
+(c) TCCGate = controlled(TGate(), 2, reverse = true)
 """
-function controlled_gate(G::Array{Complex{Float64},2}; reverse = false)
+function controlled_gate(gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
 
-    num_qubits = Int(log2(size(G)[1]))
+    if num_control_qubits < 0 
+        Memento.error(_LOGGER, "Number of control qubits has to be a non-negative integer")
+    end
+    
     M_0 = Array{Complex{Float64},2}([1 0; 0 0])
     M_1 = Array{Complex{Float64},2}([0 0; 0 1])
 
-    if !reverse 
-        # |0⟩⟨0| ⊗ I
-        control_0 = kron(M_0, QCO.IGate(num_qubits))
-        # |1⟩⟨1| ⊗ G
-        control_1 = kron(M_1, G)
-    else
-        # I ⊗ |0⟩⟨0|
-        control_0 = kron(QCO.IGate(num_qubits), M_0)
-        # X ⊗ |1⟩⟨1|
-        control_1 = kron(G, M_1)
+    ctrl_gate = gate
+    for _ = 1:num_control_qubits
+        num_qubits = Int(log2(size(ctrl_gate)[1]))
+
+        if !reverse 
+            # |0⟩⟨0| ⊗ I
+            control_0 = kron(M_0, QCO.IGate(num_qubits))
+            # |1⟩⟨1| ⊗ G
+            control_1 = kron(M_1, ctrl_gate)
+        else
+            # I ⊗ |0⟩⟨0|
+            control_0 = kron(QCO.IGate(num_qubits), M_0)
+            # G ⊗ |1⟩⟨1|
+            control_1 = kron(ctrl_gate, M_1)
+        end
+        ctrl_gate = control_0 + control_1
     end
 
-    return control_0 + control_1
+    return ctrl_gate
 end

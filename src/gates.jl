@@ -504,7 +504,7 @@ CNot = \begin{pmatrix}
 ```
 """
 function CNotGate()
-    return QCO.controlled_gate(QCO.XGate())
+    return QCO.controlled_gate(QCO.XGate(), 1)
 end
 
 @doc raw"""
@@ -532,7 +532,7 @@ CNotRev = \begin{pmatrix}
 ```
 """
 function CNotRevGate()
-    return QCO.controlled_gate(QCO.XGate(), reverse = true) 
+    return QCO.controlled_gate(QCO.XGate(), 1, reverse = true) 
 end
 
 @doc raw"""
@@ -589,7 +589,7 @@ CX = \begin{pmatrix}
 ```
 """
 function CXGate()
-    return QCO.controlled_gate(QCO.XGate())  
+    return QCO.controlled_gate(QCO.XGate(), 1)  
 end
 
 @doc raw"""
@@ -618,7 +618,7 @@ CXRev = I \otimes |0 \rangle\langle 0| + X \otimes |1 \rangle\langle 1| = \begin
 ```
 """
 function CXRevGate()
-    return QCO.controlled_gate(QCO.XGate(), reverse = true) 
+    return QCO.controlled_gate(QCO.XGate(), 1, reverse = true) 
 end
 
 @doc raw"""
@@ -646,7 +646,7 @@ CY = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Y = \begin{pm
 ```
 """
 function CYGate()
-    return QCO.controlled_gate(QCO.YGate()) 
+    return QCO.controlled_gate(QCO.YGate(), 1) 
 end
 
 @doc raw"""
@@ -674,7 +674,7 @@ CYRev = I \otimes |0 \rangle\langle 0| + Y \otimes |1 \rangle\langle 1| = \begin
 ```
 """
 function CYRevGate()
-    return QCO.controlled_gate(QCO.YGate(), reverse = true)
+    return QCO.controlled_gate(QCO.YGate(), 1, reverse = true)
 end
 
 @doc raw"""
@@ -702,7 +702,7 @@ CZ = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Z = \begin{pm
 ```
 """
 function CZGate()
-    return QCO.controlled_gate(QCO.ZGate())
+    return QCO.controlled_gate(QCO.ZGate(), 1)
 end
 
 @doc raw"""
@@ -730,7 +730,7 @@ CH = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes H = \begin{pmat
 ```
 """
 function CHGate()
-    return QCO.controlled_gate(QCO.HGate())
+    return QCO.controlled_gate(QCO.HGate(), 1)
 end
 
 @doc raw"""
@@ -758,7 +758,7 @@ CHRev = I \otimes |0\rangle\langle 0| + H \otimes |1\rangle\langle 1| = \begin{p
 ```
 """
 function CHRevGate()
-    return QCO.controlled_gate(QCO.HGate(), reverse = true)
+    return QCO.controlled_gate(QCO.HGate(), 1, reverse = true)
 end
 
 @doc raw"""
@@ -905,12 +905,7 @@ CS = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes S = \begin{pm
 ```
 """
 function CSGate()
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ S 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.SGate())
-
-    return control_0 + control_1 
+    return QCO.controlled_gate(QCO.SGate(), 1)
 end
 
 
@@ -939,12 +934,7 @@ CSdagger = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes S^{\dag
 ```
 """
 function CSdaggerGate()
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ S' 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.SdaggerGate())
-    
-    return control_0 + control_1 
+    return QCO.controlled_gate(QCO.SdaggerGate(), 1)
 end
 
 @doc raw"""
@@ -973,12 +963,7 @@ CT = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes T = \begin{pm
 ```
 """
 function CTGate()
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ T 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.TGate())
-    
-    return control_0 + control_1 
+    return QCO.controlled_gate(QCO.TGate(), 1) 
 end
 
 @doc raw"""
@@ -1006,12 +991,7 @@ CTdagger = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes T^{\dag
 ```
 """
 function CTdaggerGate()
-    # |0⟩⟨0| ⊗ I
-    control_0 = kron(Array{Complex{Float64},2}([1 0; 0 0]), QCO.IGate(1))
-    # |1⟩⟨1| ⊗ Tdagger 
-    control_1 = kron(Array{Complex{Float64},2}([0 0; 0 1]), QCO.TdaggerGate())
-    
-    return control_0 + control_1 
+    return QCO.controlled_gate(QCO.TdaggerGate(), 1) 
 end
 
 @doc raw"""
@@ -1477,7 +1457,7 @@ CSXGate = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes SX = \be
 ```
 """
 function CSXGate()
-    return QCO.controlled_gate(QCO.SXGate()) 
+    return QCO.controlled_gate(QCO.SXGate(), 1) 
 end
 
 @doc raw"""
@@ -1505,7 +1485,7 @@ CSXRevGate = I \otimes |0\rangle\langle 0| + SX \otimes |1\rangle\langle 1| = \b
 ```
 """
 function CSXRevGate()
-    return QCO.controlled_gate(QCO.SXGate(), reverse = true)
+    return QCO.controlled_gate(QCO.SXGate(), 1, reverse = true)
 end
 
 
@@ -1692,7 +1672,7 @@ Toffoli     =
 ```
 """
 function ToffoliGate()
-    return QCO.controlled_gate(QCO.CNotGate())
+    return QCO.controlled_gate(QCO.XGate(), 2)
 end
 
 @doc raw"""
@@ -1726,7 +1706,7 @@ CSwapGate =
 ```
 """
 function CSwapGate()
-    return QCO.controlled_gate(QCO.SwapGate())
+    return QCO.controlled_gate(QCO.SwapGate(), 1)
 end
 
 @doc raw"""
@@ -1760,7 +1740,7 @@ CCZGate =
 ```
 """
 function CCZGate()
-    return QCO.controlled_gate(QCO.CZGate())
+    return QCO.controlled_gate(QCO.ZGate(), 2)
 end
 
 @doc raw"""
@@ -1912,7 +1892,7 @@ CiSwapGate =
 ```
 """
 function CiSwapGate()
-    return QCO.controlled_gate(QCO.iSwapGate())
+    return QCO.controlled_gate(QCO.iSwapGate(), 1)
 end
 
 #---------------------------------------#
