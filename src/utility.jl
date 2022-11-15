@@ -644,21 +644,9 @@ For example, for a 2-qubit gate `CRZ_1_2`, output is `true`.
 
 end
 
-function _verify_θ_bounds(angle::Number)
+function _verify_angle_bounds(angle::Number)
     if !(-2*π <= angle <= 2*π)
-        Memento.error(_LOGGER, "θ angle is not within valid bounds")
-    end
-end
-
-function _verify_ϕ_bounds(angle::Number)
-    if !(-2*π <= angle <= 2*π)
-        Memento.error(_LOGGER, "ϕ angle is not within valid bounds")
-    end
-end
-
-function _verify_λ_bounds(angle::Number)
-    if !(-2*π <= angle <= 2*π)
-        Memento.error(_LOGGER, "λ angle is not within valid bounds")
+        Memento.error(_LOGGER, "Input angle is not within valid bounds in [-2π, 2π]")
     end
 end
 
@@ -837,4 +825,46 @@ function _get_matrix_product_fixed_indices(left_matrix_fixed_idx::Dict{Tuple{Int
     end
 
     return product_fixed_idx
+end
+
+"""
+    controlled_gate(gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
+
+Given a complex-valued matrix (`gate`) of `N` qubits, and number of control qubits (`NCQ`), 
+this function returns a complex-valued controlled gate representable in `N+NCQ` qubits. 
+The state of control qubit is applied `NCQ` times to every wire preceeding the location 
+of the input gate. Note that this function does not account for the actual location
+of the controlled gate in the circuit. Here are a few examples:
+(a) [ToffoliGate](@ref) = controlled_gate(XGate(), 2) = controlled_gate(CnotGate(), 1)
+(b) CCCCCZGate = controlled_gate(ZGate(), 5)
+(c) TCCGate = controlled(TGate(), 2, reverse = true)
+"""
+function controlled_gate(gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
+
+    if num_control_qubits < 0 
+        Memento.error(_LOGGER, "Number of control qubits has to be a non-negative integer")
+    end
+    
+    M_0 = Array{Complex{Float64},2}([1 0; 0 0])
+    M_1 = Array{Complex{Float64},2}([0 0; 0 1])
+
+    ctrl_gate = gate
+    for _ = 1:num_control_qubits
+        num_qubits = Int(log2(size(ctrl_gate)[1]))
+
+        if !reverse 
+            # |0⟩⟨0| ⊗ I
+            control_0 = kron(M_0, QCO.IGate(num_qubits))
+            # |1⟩⟨1| ⊗ G
+            control_1 = kron(M_1, ctrl_gate)
+        else
+            # I ⊗ |0⟩⟨0|
+            control_0 = kron(QCO.IGate(num_qubits), M_0)
+            # G ⊗ |1⟩⟨1|
+            control_1 = kron(ctrl_gate, M_1)
+        end
+        ctrl_gate = control_0 + control_1
+    end
+
+    return ctrl_gate
 end
