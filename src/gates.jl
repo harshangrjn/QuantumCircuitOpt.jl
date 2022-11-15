@@ -94,9 +94,9 @@ U3(\theta, \phi, \lambda) =
 """
 function U3Gate(θ::Number, ϕ::Number, λ::Number)
 
-    QCO._verify_θ_bounds(θ)
-    QCO._verify_ϕ_bounds(ϕ)
-    QCO._verify_λ_bounds(λ)
+    QCO._verify_angle_bounds(θ)
+    QCO._verify_angle_bounds(ϕ)
+    QCO._verify_angle_bounds(λ)
 
     U3 = Array{Complex{Float64},2}([           cos(θ/2)               -(cos(λ) + (sin(λ))im)*sin(θ/2) 
                                     (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)])
@@ -196,7 +196,7 @@ RX(\theta) = exp(-i \th X) =
 """
 function RXGate(θ::Number)
 
-    QCO._verify_θ_bounds(θ)
+    QCO._verify_angle_bounds(θ)
 
     RX = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
     
@@ -221,7 +221,7 @@ RY(\theta) = exp(-i \th Y) =
 """
 function RYGate(θ::Number)
 
-    QCO._verify_θ_bounds(θ)
+    QCO._verify_angle_bounds(θ)
 
     RY = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
     
@@ -247,7 +247,7 @@ RZ(\theta) = exp(-i\th Z) =
 """
 function RZGate(θ::Number)
 
-    QCO._verify_θ_bounds(θ)
+    QCO._verify_angle_bounds(θ)
 
     RZ = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
     
@@ -1122,7 +1122,7 @@ CRY(\theta)\ q_1, q_0 =
 """
 function CRYGate(θ::Number)
     
-    QCO._verify_θ_bounds(θ)
+    QCO._verify_angle_bounds(θ)
 
     CRY = Array{Complex{Float64},2}([1 0 0 0            
                                      0 1 0 0       
@@ -1162,7 +1162,7 @@ CRYRev(\theta)\ q_1, q_0 =
 """
 function CRYRevGate(θ::Number)
     
-    QCO._verify_θ_bounds(θ)
+    QCO._verify_angle_bounds(θ)
 
     CRYRev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 cos(θ/2) 0 -(sin(θ/2))      
@@ -1202,7 +1202,7 @@ CRZ(\theta)\ q_1, q_0 =
 """
 function CRZGate(θ::Number)
     
-    QCO._verify_θ_bounds(θ)
+    QCO._verify_angle_bounds(θ)
 
     CRZ = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 1 0 0       
@@ -1242,7 +1242,7 @@ CRZRev(\theta)\ q_1, q_0 =
 """
 function CRZRevGate(θ::Number)
     
-    QCO._verify_θ_bounds(θ)
+    QCO._verify_angle_bounds(θ)
 
     CRZRev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 (cos(θ/2) - (sin(θ/2))im) 0 0       
@@ -1283,9 +1283,9 @@ CU3(\theta, \phi, \lambda)\ q_1, q_0 =
 """
 function CU3Gate(θ::Number, ϕ::Number, λ::Number)
 
-    QCO._verify_θ_bounds(θ)
-    QCO._verify_ϕ_bounds(ϕ)
-    QCO._verify_λ_bounds(λ)
+    QCO._verify_angle_bounds(θ)
+    QCO._verify_angle_bounds(ϕ)
+    QCO._verify_angle_bounds(λ)
 
     CU3 = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 1 0 0       
@@ -1326,9 +1326,9 @@ CU3(\theta, \phi, \lambda)\ q_1, q_0 =
 """
 function CU3RevGate(θ::Number, ϕ::Number, λ::Number)
 
-    QCO._verify_θ_bounds(θ)
-    QCO._verify_ϕ_bounds(ϕ)
-    QCO._verify_λ_bounds(λ)
+    QCO._verify_angle_bounds(θ)
+    QCO._verify_angle_bounds(ϕ)
+    QCO._verify_angle_bounds(λ)
 
     CU3Rev = Array{Complex{Float64},2}([ 1 0 0 0            
                                       0 cos(θ/2) 0 -(cos(λ)+(sin(λ))im)*sin(θ/2)    
