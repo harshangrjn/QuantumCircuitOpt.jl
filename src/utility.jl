@@ -62,7 +62,7 @@ end
 Given a dictionary of elementary quantum gates, this function returns all pairs of commuting 
 gates. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
 """
-function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
+function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::String; identity_in_pairs = true)
     
     num_gates = length(keys(M))
     commute_pairs = Array{Tuple{Int64,Int64},1}()
@@ -71,7 +71,7 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
     for i = 1:(num_gates-1), j = (i+1):num_gates
         M_i = M["$i"]["matrix"]
         M_j = M["$j"]["matrix"]
-
+        
         if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
             continue
         end
@@ -87,8 +87,15 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
         # Commuting pairs != Identity 
         elseif isapprox(M_ij, M_ji, atol = 1E-4)
             push!(commute_pairs, (i, j))
-
+        
+        # Commuting pairs up to a global phase 
+        
+        elseif decomposition_type in ["optimal_global_phase"]
+            ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(convert(Array{Complex{Float64},2}, M_ji))
+            exp_global_phase = M_ij[ref_nonzero_r, ref_nonzero_c] / M_ji[ref_nonzero_r, ref_nonzero_c]
+            (isapprox(M_ij, exp_global_phase * M_ji, atol = 1E-4)) && push!(commute_pairs, (i, j))   
         end
+        
     end
 
     if identity_in_pairs
@@ -111,8 +118,9 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
         end
 
     end 
-
+    println("commuting pairs",commute_pairs)
     return commute_pairs, commute_pairs_prodIdentity
+    
 end
 
 """

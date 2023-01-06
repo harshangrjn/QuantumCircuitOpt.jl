@@ -224,7 +224,7 @@ function constraint_commutative_gate_pairs(qcm::QuantumCircuitModel)
     max_depth = qcm.data["maximum_depth"]
     z_bin_var = qcm.variables[:z_bin_var]
 
-    commute_pairs, commute_pairs_prodIdentity = QCO.get_commutative_gate_pairs(qcm.data["gates_dict"])
+    commute_pairs, commute_pairs_prodIdentity = QCO.get_commutative_gate_pairs(qcm.data["gates_dict"], qcm.data["decomposition_type"])
 
     if !isempty(commute_pairs)
         (length(commute_pairs) == 1) && (Memento.info(_LOGGER, "Detected $(length(commute_pairs)) input elementary gate pair which commutes"))
