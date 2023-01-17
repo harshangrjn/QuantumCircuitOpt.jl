@@ -57,7 +57,7 @@ function gate_element_bounds(M::Array{Float64,3})
 end
 
 """
-    get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
+    get_commutative_gate_pairs(M::Dict{String,Any}; decomposition_type::String; identity_in_pairs = true)
 
 Given a dictionary of elementary quantum gates, this function returns all pairs of commuting 
 gates. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 

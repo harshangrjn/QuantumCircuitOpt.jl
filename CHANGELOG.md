@@ -1,6 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.5
+- `optimal_global_phase` now recognizes commuting elemetary gate pairs that commute up to a phase
+- Updated docs and unit tests to reflect above changes
+
 ### v0.5.4
 - Added a generalized function to obtain controlled gates (`controlled_gate()`) in any number of qubits
 - Cleaned-up controlled gates in `src/gates.jl`
