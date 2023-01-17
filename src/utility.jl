@@ -118,7 +118,7 @@ function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::Str
         end
 
     end 
-    println("commuting pairs",commute_pairs)
+
     return commute_pairs, commute_pairs_prodIdentity
     
 end
