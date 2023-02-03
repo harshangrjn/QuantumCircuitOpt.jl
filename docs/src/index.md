@@ -54,14 +54,16 @@ If you find QuantumCircuitOpt useful in your work, we request you to cite the fo
   organization={IEEE Computer Society}
 }
 ```
-Another publication which explores the potential of non-linear programming formulations in the QuantumCircuitOpt package is the following: 
+Another publication which explores the potential of non-linear programming formulations in the QuantumCircuitOpt package is the following ([IEEE link](https://doi.org/10.1109/QCS56647.2022.00009): 
 ```bibtex
 @inproceedings{HendersonNagarajanCoffrin2022,
   title={Exploring Non-linear Programming Formulations in {QuantumCircuitOpt} for Optimal Circuit Design},
   author={Henderson. R, Elena and Nagarajan, Harsha and Coffrin, Carleton},
   booktitle={SC22: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
   series={Third Workshop on Quantum Computing Software},
+  pages={36--42},
   year={2022},
+  doi={10.1109/QCS56647.2022.00009},
   organization={IEEE Computer Society}
 }
 ```
