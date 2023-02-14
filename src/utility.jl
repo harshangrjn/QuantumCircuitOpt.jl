@@ -738,6 +738,18 @@ function _get_nonzero_idx_of_complex_matrix(M::Array{Complex{Float64},2})
 end
 
 """
+    isapprox_global_phase(M1::Array{Complex{Float64},2}, M2::Array{Complex{Float64},2}; tol_0 = 1E-4)
+
+Given two complex matrices, `M1` and `M2`, this function returns a boolean if these matrices are 
+equivalent up to a global phase. 
+"""
+function isapprox_global_phase(M1::Array{Complex{Float64},2}, M2::Array{Complex{Float64},2}; tol_0 = 1E-4)
+    ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(M1)
+    global_phase = M2[ref_nonzero_r, ref_nonzero_c] / M1[ref_nonzero_r, ref_nonzero_c] # exp(-im*ϕ)
+    return isapprox(M2, global_phase * M1, atol = tol_0)
+end
+
+"""
     _get_elementary_gates_fixed_indices(M::Array{T,3} where T <: Number)
 
 Given the set of input elementary gates in real form, 

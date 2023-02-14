@@ -193,14 +193,8 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    exp_global_phase = 1 # exp(-im*ϕ) evaluated at ϕ = 0
-
-    if data["decomposition_type"] in ["optimal_global_phase"]
-        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(convert(Array{Complex{Float64},2}, target_gate))
-        exp_global_phase = M_sol[ref_nonzero_r, ref_nonzero_c] / target_gate[ref_nonzero_r, ref_nonzero_c]
-    end
-
-    (!isapprox(M_sol, exp_global_phase * target_gate, atol = 1E-4)) && Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
+    (!QCO.isapprox_global_phase(M_sol, convert(Array{Complex{Float64},2}, target_gate))) && 
+                Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
 end
 
 """

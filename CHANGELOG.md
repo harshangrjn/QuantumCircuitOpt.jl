@@ -4,6 +4,7 @@ QuantumCircuitOpt.jl Change Log
 ### v0.5.5
 - `optimal_global_phase` now recognizes commuting elementary gate pairs that commute up to a global phase
 - Docs updated with the SC22 (IEEE) paper link
+- Added `isapprox_global_phase` utility to evaluate equivalences of any two complex gates up to a global phase
 - Updated docs and unit tests to reflect above changes
 
 ### v0.5.4
