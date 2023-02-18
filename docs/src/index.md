@@ -12,6 +12,8 @@ CurrentModule = QuantumCircuitOpt
 ## Overview
 **[QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl)** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of an architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. Now, this package also supports multi-qubit gates in the elementary gates set, such as the [global rotation](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/multi_qubit_gates/#GRGate) gate which is native to trapped ion quantum computers. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to ten qubits_.
 
+Overall, QuantumCircuitOpt can be a useful tool for researchers and developers working on quantum algorithms or quantum computing applications, as it can help to reduce the resource requirements of quantum computations, making them more practical and efficient.
+
 ## Installation 
 To use QuantumCircuitOpt, first [download and install](https://julialang.org/downloads/) Julia. Note that the current version of QuantumCircuitOpt is compatible with Julia 1.0 and later. 
 
@@ -54,14 +56,16 @@ If you find QuantumCircuitOpt useful in your work, we request you to cite the fo
   organization={IEEE Computer Society}
 }
 ```
-Another publication which explores the potential of non-linear programming formulations in the QuantumCircuitOpt package is the following: 
+Another publication which explores the potential of non-linear programming formulations in the QuantumCircuitOpt package is the following ([IEEE link](https://doi.org/10.1109/QCS56647.2022.00009): 
 ```bibtex
 @inproceedings{HendersonNagarajanCoffrin2022,
   title={Exploring Non-linear Programming Formulations in {QuantumCircuitOpt} for Optimal Circuit Design},
   author={Henderson. R, Elena and Nagarajan, Harsha and Coffrin, Carleton},
   booktitle={SC22: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
   series={Third Workshop on Quantum Computing Software},
+  pages={36--42},
   year={2022},
+  doi={10.1109/QCS56647.2022.00009},
   organization={IEEE Computer Society}
 }
 ```

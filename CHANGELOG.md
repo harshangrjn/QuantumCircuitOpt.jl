@@ -1,6 +1,13 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.5
+- `optimal_global_phase` now recognizes commuting elementary gate pairs that commute, are redundant and idempotent up to a global phase
+- Docs updated with the SC22 (IEEE) paper link
+- Added `isapprox_global_phase` utility to evaluate equivalences of any two complex gates up to a global phase
+- Updated docs and unit tests to reflect above changes
+- Removed compatability on Pkg
+
 ### v0.5.4
 - Added a generalized function to obtain controlled gates (`controlled_gate()`) in any number of qubits
 - Cleaned-up controlled gates in `src/gates.jl`

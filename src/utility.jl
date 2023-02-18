@@ -57,55 +57,52 @@ function gate_element_bounds(M::Array{Float64,3})
 end
 
 """
-    get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
+    get_commutative_gate_pairs(M::Dict{String,Any}; decomposition_type::String; identity_in_pairs = true)
 
 Given a dictionary of elementary quantum gates, this function returns all pairs of commuting 
 gates. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
 """
-function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = true)
+function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::String; identity_in_pairs = true)
     
     num_gates = length(keys(M))
     commute_pairs = Array{Tuple{Int64,Int64},1}()
     commute_pairs_prodIdentity = Array{Tuple{Int64,Int64},1}()
 
+    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])[1], size(M["1"]["matrix"])[2]))
+
     for i = 1:(num_gates-1), j = (i+1):num_gates
         M_i = M["$i"]["matrix"]
         M_j = M["$j"]["matrix"]
-
+        
         if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
             continue
         end
         
         M_ij = M_i*M_j
         M_ji = M_j*M_i
-        Id = Matrix(LA.I, size(M_ij)[1], size(M_ij)[2])
 
-        # Commuting pairs == Identity 
-        if isapprox(M_ij, Id, atol=1E-6)
-            push!(commute_pairs_prodIdentity, (i,j))
-        
-        # Commuting pairs != Identity 
-        elseif isapprox(M_ij, M_ji, atol = 1E-4)
-            push!(commute_pairs, (i, j))
-
-        end
+        if decomposition_type in ["optimal_global_phase"]
+            # Commuting pairs up to a global phase
+            QCO.isapprox_global_phase(M_ij, Id)   && push!(commute_pairs_prodIdentity, (i,j))
+            QCO.isapprox_global_phase(M_ij, M_ji) && push!(commute_pairs, (i,j))
+        else
+            # Commuting pairs == Identity
+            isapprox(M_ij, Id, atol = 1E-4)   && push!(commute_pairs_prodIdentity, (i,j))
+            isapprox(M_ij, M_ji, atol = 1E-4) && push!(commute_pairs, (i,j))
+        end        
     end
 
     if identity_in_pairs
         # Commuting pairs involving Identity
         identity_idx = []
         for i in keys(M)
-            if "Identity" in M[i]["type"]
-                push!(identity_idx, parse(Int64, i))
-            end
+            ("Identity" in M[i]["type"]) && push!(identity_idx, parse(Int64, i))
         end
 
         if length(identity_idx) > 0
             for i = 1:length(identity_idx)
                 for j = 1:num_gates 
-                    if j != identity_idx[i]
-                        push!(commute_pairs, (j, identity_idx[i]))
-                    end
+                    (j != identity_idx[i]) && push!(commute_pairs, (j, identity_idx[i]))
                 end
             end
         end
@@ -113,16 +110,17 @@ function get_commutative_gate_pairs(M::Dict{String,Any}; identity_in_pairs = tru
     end 
 
     return commute_pairs, commute_pairs_prodIdentity
+    
 end
 
 """
-    get_redundant_gate_product_pairs(M::Dict{String,Any})
+    get_redundant_gate_product_pairs(M::Dict{String,Any}, decomposition_type::String)
 
 Given a dictionary of elementary quantum gates, this function returns all pairs of gates whose product is 
 one of the input elementary gates. For example, let `G_basis = {G1, G2, G3}` be the elementary gates. If `G1*G2 ∈ G_basis`, 
 then `(1,2)` is considered as a redundant pair. 
 """
-function get_redundant_gate_product_pairs(M::Dict{String,Any})
+function get_redundant_gate_product_pairs(M::Dict{String,Any}, decomposition_type::String)
     num_gates = length(keys(M))
     redundant_pairs_idx = Array{Tuple{Int64,Int64},1}()
 
@@ -138,28 +136,28 @@ function get_redundant_gate_product_pairs(M::Dict{String,Any})
         for k = 1:num_gates 
             if (k != i) && (k != j) && !("Identity" in M["$k"]["type"])                
                 M_k = M["$k"]["matrix"]
-            
-                if isapprox(M_i*M_j, M_k, atol = 1E-4)
-                    push!(redundant_pairs_idx, (i, j))
-                end
-
-                if isapprox(M_j*M_i, M_k, atol = 1E-4)
-                    push!(redundant_pairs_idx, (j, i))
+                if decomposition_type in ["optimal_global_phase"]
+                    QCO.isapprox_global_phase(M_i*M_j, M_k) && push!(redundant_pairs_idx, (i,j))
+                    QCO.isapprox_global_phase(M_j*M_i, M_k) && push!(redundant_pairs_idx, (j,i))
+                else
+                    isapprox(M_i*M_j, M_k, atol = 1E-4) && push!(redundant_pairs_idx, (i,j))
+                    isapprox(M_j*M_i, M_k, atol = 1E-4) && push!(redundant_pairs_idx, (j,i))
                 end
             end
         end
+
     end
 
     return redundant_pairs_idx
 end
 
 """
-    get_idempotent_gates(M::Dict{String,Any})
+    get_idempotent_gates(M::Dict{String,Any}, decomposition_type::String)
 
 Given the dictionary of complex quantum gates, this function returns the indices of matrices which are self-idempotent 
 or idempotent with other set of input gates, excluding the Identity gate.
 """
-function get_idempotent_gates(M::Dict{String,Any})
+function get_idempotent_gates(M::Dict{String,Any}, decomposition_type::String)
     num_gates = length(keys(M))
     idempotent_gates_idx = Vector{Int64}()
 
@@ -172,10 +170,11 @@ function get_idempotent_gates(M::Dict{String,Any})
                 continue
             end
 
-            if isapprox(M_i^2, M_j, atol=1E-4)
-                push!(idempotent_gates_idx, i)
+            if decomposition_type in ["optimal_global_phase"]
+                QCO.isapprox_global_phase(M_i^2, M_j) && push!(idempotent_gates_idx, i)
+            else
+                isapprox(M_i^2, M_j, atol=1E-4) && push!(idempotent_gates_idx, i)
             end
-
         end
     end
 
@@ -727,6 +726,18 @@ function _get_nonzero_idx_of_complex_matrix(M::Array{Complex{Float64},2})
             return i,j
         end
     end
+end
+
+"""
+    isapprox_global_phase(M1::Array{Complex{Float64},2}, M2::Array{Complex{Float64},2}; tol_0 = 1E-4)
+
+Given two complex matrices, `M1` and `M2`, this function returns a boolean if these matrices are 
+equivalent up to a global phase. 
+"""
+function isapprox_global_phase(M1::Array{Complex{Float64},2}, M2::Array{Complex{Float64},2}; tol_0 = 1E-4)
+    ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(M1)
+    global_phase = M2[ref_nonzero_r, ref_nonzero_c] / M1[ref_nonzero_r, ref_nonzero_c] # exp(-im*ϕ)
+    return isapprox(M2, global_phase * M1, atol = tol_0)
 end
 
 """
