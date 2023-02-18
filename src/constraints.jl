@@ -274,7 +274,7 @@ function constraint_redundant_gate_product_pairs(qcm::QuantumCircuitModel)
     max_depth  = qcm.data["maximum_depth"]
     z_bin_var  = qcm.variables[:z_bin_var]
 
-    redundant_pairs = QCO.get_redundant_gate_product_pairs(gates_dict)
+    redundant_pairs = QCO.get_redundant_gate_product_pairs(gates_dict, qcm.data["decomposition_type"])
     
     if !isempty(redundant_pairs)
         (length(redundant_pairs) == 1) && (Memento.info(_LOGGER, "Detected $(length(redundant_pairs)) redundant input elementary gate pair"))
@@ -294,7 +294,7 @@ function constraint_idempotent_gates(qcm::QuantumCircuitModel)
     max_depth  = qcm.data["maximum_depth"]
     z_bin_var  = qcm.variables[:z_bin_var]
 
-    idempotent_gates = QCO.get_idempotent_gates(gates_dict)
+    idempotent_gates = QCO.get_idempotent_gates(gates_dict, qcm.data["decomposition_type"])
     
     if !isempty(idempotent_gates)
         (length(idempotent_gates) == 1) && (Memento.info(_LOGGER, "Detected $(length(idempotent_gates)) idempotent elementary gate"))

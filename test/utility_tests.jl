@@ -82,7 +82,7 @@ end
     @test length(C2_Identity) == 0
     @test isapprox(data["gates_real"][:,:,C2[1][1]] * data["gates_real"][:,:,C2[1][2]], data["gates_real"][:,:,C2[1][2]] * data["gates_real"][:,:,C2[1][1]], atol=tol_0)
 
-    # With global phase constraints
+    # With global phase equivalence
     params["decomposition_type"] = "optimal_global_phase"
     params["elementary_gates"] = ["Y_1", "H_1", "H_2", "CNot_1_2", "Identity"]
     data = QCO.get_data(params)
@@ -107,7 +107,13 @@ end
         "target_gate" => QCO.ToffoliGate()
         )
     data = QCO.get_data(params)
-    redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"])
+    redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"], data["decomposition_type"])
+    @test length(redundant_pairs) == 0
+
+    # With global phase equivalence
+    params["decomposition_type"] = "optimal_global_phase"
+    data = QCO.get_data(params)
+    redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"], data["decomposition_type"])
     @test length(redundant_pairs) == 0
 
 end
@@ -121,7 +127,7 @@ end
         "target_gate" => -QCO.HCoinGate())
 
     data = QCO.get_data(params)
-    idempotent_gates = QCO.get_idempotent_gates(data["gates_dict"])
+    idempotent_gates = QCO.get_idempotent_gates(data["gates_dict"], data["decomposition_type"])
     @test idempotent_gates[1] == 6
     @test idempotent_gates[2] == 7
     @test "Tdagger_1" in data["gates_dict"]["$(idempotent_gates[1])"]["type"]
@@ -133,6 +139,12 @@ end
     
     @test isapprox(M1^2, data["gates_dict"]["7"]["matrix"], atol = tol_0)
     @test isapprox(M2^2, data["gates_dict"]["3"]["matrix"], atol = tol_0)
+
+    # With global phase equivalence
+    params["decomposition_type"] = "optimal_global_phase"
+    data = QCO.get_data(params)
+    idempotent_gates = QCO.get_idempotent_gates(data["gates_dict"], data["decomposition_type"])
+    @test length(idempotent_gates) == 2
 end
 
 @testset "Tests: _parse_gate_string" begin

@@ -397,7 +397,7 @@ end
                "objective" => "minimize_depth")
 
     data = QCO.get_data(params)
-    redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"])
+    redundant_pairs = QCO.get_redundant_gate_product_pairs(data["gates_dict"], data["decomposition_type"])
     @test length(redundant_pairs) == 2
     @test redundant_pairs[1] == (1,4)
     @test redundant_pairs[2] == (5,7)
@@ -422,7 +422,7 @@ end
     "U3_λ_discretization" => [0, π/2])
 
     data = QCO.get_data(params)
-    idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"])
+    idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"], data["decomposition_type"])
     @test length(idempotent_pairs) == 2
 
     model_options = Dict{Symbol, Any}(:idempotent_gate_constraints => true)
