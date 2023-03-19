@@ -1,6 +1,9 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.6
+- Video link to SC22 presentation added
+
 ### v0.5.5
 - `optimal_global_phase` now recognizes commuting elementary gate pairs that commute, are redundant and idempotent up to a global phase
 - Docs updated with the SC22 (IEEE) paper link

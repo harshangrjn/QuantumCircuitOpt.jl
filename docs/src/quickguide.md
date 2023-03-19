@@ -13,6 +13,8 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 ```
 
 ## Video tutorials
+- November 2022: Presentation [link](https://vimeo.com/771366943/01810daa4e) from the [Third Quantum Computing Software Workshop](https://sc22.supercomputing.org/session/?sess=sess423), held in conjunction with the International Conference on Super Computing ([SC22](https://sc22.supercomputing.org)). This video will introduce the importance of nonlinear programming formulations for optimal quantum circuit design. More technical details can be found in this [paper](https://doi.org/10.1109/QCS56647.2022.00009). 
+
 - July 2022: Presentation at the [JuliaCon 2022](https://pretalx.com/juliacon-2022/talk/KJTGC3/) introduces the package in greater depth and how to use it's various features. 
 
 ```@raw html 
@@ -23,7 +25,7 @@ Building on the recent success of [Julia](https://julialang.org), [JuMP](https:/
 </a>
 ```
 
-- November 2021: Presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce the technicalities underlying the package. 
+- November 2021: Presentation from the [2nd Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)), will introduce the technicalities underlying the package, which can also be found in this [paper](https://doi.org/10.1109/QCS54837.2021.00010).
 
 ```@raw html 
 <align="center"/>
