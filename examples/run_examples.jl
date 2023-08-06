@@ -13,7 +13,7 @@ include("5qubit_gates.jl")
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-decompose_gates = ["parametrized_hermitian_gates"]
+# decompose_gates = ["iSwap"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
