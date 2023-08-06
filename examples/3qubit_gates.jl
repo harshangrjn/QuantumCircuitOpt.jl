@@ -147,7 +147,8 @@ function toffoli_left()
     "maximum_depth" => 7,
     "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => target_gate(),
-    "objective" => "minimize_depth"
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal"
     )
 end
 

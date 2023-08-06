@@ -6,7 +6,7 @@
 function get_gurobi()
     return JuMP.optimizer_with_attributes(Gurobi.Optimizer, 
                                           MOI.Silent() => false, 
-                                          # "MIPFocus" => 3, # Focus on optimality over feasibility 
+                                        #   "MIPFocus" => 3, # Focus on optimality over feasibility 
                                           "Presolve" => 1) 
 end
 

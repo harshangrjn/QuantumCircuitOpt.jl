@@ -37,5 +37,7 @@ decompose_gates = [
         "quantum_fulladder",
         "double_toffoli",
         #-- 5-qubit gates --#
-        "RX_on_5qubits"
+        "RX_on_5qubits",
+        #-- paramterized gates --#
+        "parametrized_hermitian_gates"
         ]

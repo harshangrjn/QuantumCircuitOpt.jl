@@ -267,7 +267,7 @@ function hadamard_coin()
     return Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 14,
+        "maximum_depth" => 12,
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.HCoinGate(),
         "objective" => "minimize_depth",
@@ -286,9 +286,10 @@ function GroverDiffusion_using_HX()
         "num_qubits" => 2, 
         "maximum_depth" => 10,
         "elementary_gates" => ["X_1", "X_1xX_2", "H_1xH_2", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
+        # "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
         "target_gate" => QCOpt.GroverDiffusionGate(),          
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact_optimal",
+        "decomposition_type" => "optimal_global_phase",
         )
 end
 
@@ -303,7 +304,7 @@ function GroverDiffusion_using_Clifford()
         "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "S_1", "S_2", "T_1", "T_2", "Y_1", "Y_2", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.GroverDiffusionGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact_optimal",
+        "decomposition_type" => "optimal_global_phase",
         )
 end
 
@@ -424,7 +425,7 @@ function CNOT_using_GR()
     "elementary_gates" => ["GR", "R_1", "R_2", "CZ_1_2", "Identity"], 
     "target_gate" => QCOpt.CNotGate(),
     "objective" => "minimize_depth",
-    "decomposition_type" => "exact_optimal",
+    "decomposition_type" => "optimal_global_phase",
     "GR_θ_discretization" => -2π:π/2:2π,
     "GR_ϕ_discretization" => [0],
     "R_θ_discretization" => 0:π/4:π,

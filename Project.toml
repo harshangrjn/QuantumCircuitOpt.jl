@@ -1,7 +1,7 @@
 name = "QuantumCircuitOpt"
 uuid = "88128e30-b60a-4e54-ab02-1050a5f92a36"
 authors = ["Harsha Nagarajan"]
-version = "0.5.6"
+version = "0.5.7"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"

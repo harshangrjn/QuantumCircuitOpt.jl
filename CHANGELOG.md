@@ -1,6 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.7
+- Clean up in log.jl to validate circuit decomposition upto global phase
+- Added `parametrized_hermitian_gates` in examples
+
 ### v0.5.6
 - Video link to SC22 presentation added
 

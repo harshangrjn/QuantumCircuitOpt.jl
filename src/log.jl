@@ -113,13 +113,12 @@ end
 function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String, Any})
 
     gates_sol = Array{String,1}()
-    id_sequence = Array{Int64,1}()
+    id_sequence = QCO._gate_id_sequence(results["solution"]["z_bin_var"], data["maximum_depth"])
+    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]) && QCO.validate_circuit_decomposition(data, id_sequence)
 
     for d = 1:data["maximum_depth"]
-        id = findall(isone.(round.(abs.(results["solution"]["z_bin_var"][:,d]), digits=3)))[1]
-        push!(id_sequence, id)
-
-        gate_id = data["gates_dict"]["$id"]
+        
+        gate_id = data["gates_dict"]["$(id_sequence[d])"]
 
         if !("Identity" in gate_id["type"])
             
@@ -165,8 +164,6 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
             end
         end
     end
-    
-    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]) && QCO.validate_circuit_decomposition(data, id_sequence)
 
     gates_sol_compressed = QCO.get_depth_compressed_circuit(data["num_qubits"], gates_sol)
 
@@ -178,8 +175,9 @@ end
 
 This function validates the circuit decomposition if it is indeed exact with respect to the specified target gate. 
 """
-function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Array{Int64,1})
-    
+function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Array{Int64,1}; error_message = true)
+    valid_status = false
+
     M_sol = Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["num_qubits"]), 2^(data["num_qubits"])))
     
     for i in id_sequence
@@ -193,8 +191,15 @@ function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Ar
         target_gate = QCO.real_to_complex_gate(data["target_gate"])
     end
     
-    (!QCO.isapprox_global_phase(M_sol, convert(Array{Complex{Float64},2}, target_gate))) && 
-                Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
+    if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
+        (QCO.isapprox(M_sol, convert(Array{Complex{Float64},2}, target_gate), atol = 1E-4)) && (valid_status = true)
+    elseif data["decomposition_type"] in ["optimal_global_phase"]
+        (QCO.isapprox_global_phase(M_sol, convert(Array{Complex{Float64},2}, target_gate))) && (valid_status = true)
+    end
+    
+    (!(valid_status) && error_message) && Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
+    
+    return valid_status
 end
 
 """
@@ -278,4 +283,15 @@ function get_depth_compressed_circuit(num_qubits::Int64, gates_sol::Array{String
     end
 
     return gates_sol_compressed
+end
+
+function _gate_id_sequence(z_val::Matrix{<:Number}, maximum_depth::Int64)
+    id_sequence = Array{Int64,1}()
+
+    for d = 1:maximum_depth
+        id = findall(isone.(round.(abs.(z_val[:,d]), digits=3)))[1]
+        push!(id_sequence, id)
+    end
+
+    return id_sequence 
 end
