@@ -1,6 +1,13 @@
 <h1 align="center" margin=0px>
-  <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_light.png#gh-light-mode-only" width=90%>
+  <!-- <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_light.png#gh-light-mode-only" width=90%>
   <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_dark.png#gh-dark-mode-only"   width=90%>
+  <br> -->
+    <a href="https://github.com#gh-light-mode-only">
+  <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_light.png#gh-light-mode-only"> width=90%
+  </a>
+  <a href="https://github.com#gh-dark-mode-only">
+    <img src="https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/docs/src/assets/logo_header_dark.png#gh-dark-mode-only"> width=90%
+  </a>
   <br>
   A Julia Package for Optimal Quantum Circuit Design
 </h1>

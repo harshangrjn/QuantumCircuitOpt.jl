@@ -1,6 +1,9 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### Staged 
+- Readme update for dark/light theme logo display
+
 ### v0.5.7
 - Clean up in log.jl to validate circuit decomposition upto global phase
 - Added `parametrized_hermitian_gates` in examples
