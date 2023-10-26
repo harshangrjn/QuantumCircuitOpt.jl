@@ -8,8 +8,14 @@ for w in ("light", "dark")
     write(joinpath(@__DIR__, "src/assets/themes/$(w).scss"), header*"\n"*theme)
 end
 
-Themes.compile(joinpath(@__DIR__, "src/assets/themes/light.scss"), joinpath(@__DIR__, "src/assets/themes/documenter-light.css"))
-Themes.compile(joinpath(@__DIR__, "src/assets/themes/dark.scss"), joinpath(@__DIR__, "src/assets/themes/documenter-dark.css"))
+Themes.compile(
+    joinpath(@__DIR__, "src/assets/themes/documenter-light.css"),
+    joinpath(@__DIR__, "src/assets/themes/light.scss"),
+)
+Themes.compile(
+    joinpath(@__DIR__, "src/assets/themes/documenter-dark.css"),
+    joinpath(@__DIR__, "src/assets/themes/dark.scss"),
+)
 
 makedocs(
     modules = [QuantumCircuitOpt],
@@ -20,7 +26,7 @@ makedocs(
                              prettyurls = get(ENV, "CI", nothing) == "true",
                              sidebar_sitename=false
                              ),
-    strict = true,
+    # strict = true,
     authors = "Harsha Nagarajan",
     pages = [
         "Introduction" => "index.md",
