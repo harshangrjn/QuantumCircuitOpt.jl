@@ -101,3 +101,4 @@ If you find QuantumCircuitOpt useful in your work, we request you to cite the fo
   organization={IEEE Computer Society}
 }
 ```
+Another publication which explores the potential of non-linear programming formulations in QuantumCircuitOpt is the following: [IEEE link](https://doi.org/10.1109/QCS56647.2022.00009), [arXiv link](https://arxiv.org/abs/2310.18281). 

@@ -1,9 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
-### Staged 
+### v0.5.8 
 - Readme update for dark/light theme logo display
 - Fixed Docs compile issue
+- Updated arXiv link for SC22 paper
 
 ### v0.5.7
 - Clean up in log.jl to validate circuit decomposition upto global phase
