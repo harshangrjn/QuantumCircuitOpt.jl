@@ -13,6 +13,8 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 [compat]
 DataStructures = "~0.17, ~0.18"
 JuMP = "~0.22, ~0.23, 1.0"
+LinearAlgebra = "1"
+Pkg = "1"
 Memento = "~1.0, ~1.1, 1"
 julia = "^1"
 
