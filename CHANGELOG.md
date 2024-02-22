@@ -1,6 +1,10 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.5.9
+- Catch error in `data.jl` if `set_cnot_lower_bound` > `maximum_depth`
+- Feasibility switching warning moved to the correct condition in `objective.jl`
+
 ### v0.5.8 
 - Readme update for dark/light theme logo display
 - Fixed Docs compile issue

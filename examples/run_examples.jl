@@ -3,22 +3,20 @@ using LinearAlgebra
 
 using JuMP
 using Gurobi
+using CPLEX
 # using HiGHS
 
 include("optimizers.jl")
-include("2qubit_gates.jl")
-include("3qubit_gates.jl")
-include("4qubit_gates.jl")
-include("5qubit_gates.jl")
+[include("$(i)qubit_gates.jl") for i in 2:5]
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-# decompose_gates = ["iSwap"]
+decompose_gates = ["iSwap"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
 #----------------------------------------------#
-qcopt_optimizer = get_gurobi()
+qcopt_optimizer = get_gurobi(solver_log = true)
 
 result = Dict{String,Any}()
 times = zeros(length(decompose_gates), 1)

@@ -889,6 +889,10 @@ function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
         cnot_ub = params["set_cnot_upper_bound"]
     end
 
+    if cnot_lb > data["maximum_depth"]
+        Memento.error(_LOGGER, "Invalid lower bound on the number of CNOT gates given the maximum depth")
+    end
+
     if cnot_lb < cnot_ub 
         if cnot_lb > 0
             data["cnot_lower_bound"] = params["set_cnot_lower_bound"]

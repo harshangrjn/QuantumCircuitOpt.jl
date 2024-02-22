@@ -31,10 +31,11 @@ end
 function objective_feasibility(qcm::QuantumCircuitModel)
 
     decomposition_type = qcm.data["decomposition_type"]
-    Memento.warn(_LOGGER, "Switching to a feasibility problem")
 
     if decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
         # Feasibility objective
+        Memento.warn(_LOGGER, "Switching to a feasibility problem")
+        
     elseif decomposition_type == "approximate"
         JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var_oa]))
     end 
