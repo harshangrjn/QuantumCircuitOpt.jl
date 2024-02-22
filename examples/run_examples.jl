@@ -3,7 +3,7 @@ using LinearAlgebra
 
 using JuMP
 using Gurobi
-using CPLEX
+# using CPLEX
 # using HiGHS
 
 include("optimizers.jl")
