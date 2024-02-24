@@ -113,7 +113,7 @@ end
     "num_qubits" => 3, 
     "maximum_depth" => 2,    
     "elementary_gates" => ["CU3_3_1", "CU3_1_3", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CU3_3_1", 3, angle = [0, 0, pi/4]),
+    "target_gate" => QCO.get_unitary("CU3_3_1", 3, angle = [0, 0, pi/4]),
     "CU3_θ_discretization" => [0, π/2],
     "CU3_ϕ_discretization" => [0],
     "CU3_λ_discretization" => [0, π/4],
@@ -165,7 +165,7 @@ end
     "num_qubits" => 3, 
     "maximum_depth" => 3,
     "elementary_gates" => ["CRX_1_2", "CRY_2_3", "CRZ_3_1", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_1_2", 3, angle = pi/4) * QCO.get_full_sized_gate("CRY_2_3", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_3_1", 3, angle=pi/4),
+    "target_gate" => QCO.get_unitary("CRX_1_2", 3, angle = pi/4) * QCO.get_unitary("CRY_2_3", 3, angle=pi/4) * QCO.get_unitary("CRZ_3_1", 3, angle=pi/4),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
@@ -190,7 +190,7 @@ end
     "num_qubits" => 3, 
     "maximum_depth" => 3,
     "elementary_gates" => ["CRX_3_1", "CRY_3_1", "CRZ_1_3", "Identity"],  
-    "target_gate" => QCO.get_full_sized_gate("CRX_3_1", 3, angle=pi/4) * QCO.get_full_sized_gate("CRY_3_1", 3, angle=pi/4) * QCO.get_full_sized_gate("CRZ_1_3", 3, angle = pi/2),
+    "target_gate" => QCO.get_unitary("CRX_3_1", 3, angle=pi/4) * QCO.get_unitary("CRY_3_1", 3, angle=pi/4) * QCO.get_unitary("CRZ_1_3", 3, angle = pi/2),
     "CRX_discretization" => [0, π/4],
     "CRY_discretization" => [π/4],
     "CRZ_discretization" => [π/2, π/4],
@@ -248,7 +248,7 @@ end
         "num_qubits" => 3, 
         "maximum_depth" => 2,    
         "elementary_gates" => ["CU3_1_2", "CU3_2_3", "CU3_1_3", "Identity"],  
-        "target_gate" => QCO.get_full_sized_gate("CRX_1_3", 3, angle = pi/4),
+        "target_gate" => QCO.get_unitary("CRX_1_3", 3, angle = pi/4),
         "CU3_θ_discretization" => [0, π/4],
         "CU3_ϕ_discretization" => [0, -π/2],
         "CU3_λ_discretization" => [0, π/2],    
@@ -381,8 +381,8 @@ end
 @testset "QC_model Tests: constraint_redundant_gate_product_pairs" begin
     
     function target_gate()
-        T1 = QCO.get_full_sized_gate("U3_2", 2, angle = [0,π/2,π])
-        T2 = QCO.get_full_sized_gate("U3_1", 2, angle = [π/2,π/2,-π/2])
+        T1 = QCO.get_unitary("U3_2", 2, angle = [0,π/2,π])
+        T2 = QCO.get_unitary("U3_1", 2, angle = [π/2,π/2,-π/2])
         return T1*T2
     end
     
@@ -445,12 +445,12 @@ end
     
     function target_gate()
         num_qubits = 4
-        CV_1_4 = QCO.get_full_sized_gate("CV_1_4", num_qubits);
-        CV_2_4 = QCO.get_full_sized_gate("CV_2_4", num_qubits);
-        CV_3_4 = QCO.get_full_sized_gate("CV_3_4", num_qubits);
-        CVdagger_3_4 = QCO.get_full_sized_gate("CVdagger_3_4", num_qubits);        
-        CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", num_qubits);
-        CNot_2_3 = QCO.get_full_sized_gate("CNot_2_3", num_qubits);
+        CV_1_4 = QCO.get_unitary("CV_1_4", num_qubits);
+        CV_2_4 = QCO.get_unitary("CV_2_4", num_qubits);
+        CV_3_4 = QCO.get_unitary("CV_3_4", num_qubits);
+        CVdagger_3_4 = QCO.get_unitary("CVdagger_3_4", num_qubits);        
+        CNot_1_2 = QCO.get_unitary("CNot_1_2", num_qubits);
+        CNot_2_3 = QCO.get_unitary("CNot_2_3", num_qubits);
 
         return CV_2_4 * CNot_1_2 * CV_3_4 * CV_1_4 * CNot_2_3 * CVdagger_3_4
     end
@@ -479,7 +479,7 @@ end
     
     num_qubits = 2
     GR1      = QCO.GRGate(num_qubits, π/6, π/3)
-    CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 2)
+    CNot_1_2 = QCO.get_unitary("CNot_1_2", 2)
     T        = QCO.round_complex_values(GR1 * CNot_1_2)
 
     params = Dict{String, Any}(
@@ -510,7 +510,7 @@ end
     "num_qubits" => 2,
     "maximum_depth" => 5, 
     "elementary_gates" => ["GR", "RZ_2", "CZ_1_2", "Identity"], 
-    "target_gate" => QCO.get_full_sized_gate("X_1", 2),
+    "target_gate" => QCO.get_unitary("X_1", 2),
     "objective" => "minimize_depth",
     "decomposition_type" => "exact_optimal",
     "GR_θ_discretization" => [-π/2, π/2],

@@ -1859,6 +1859,53 @@ function MargolusGate()
 end
 
 @doc raw"""
+    QFT3Gate()
+
+Three-qubit Quantum Fourier Transform (QFT) gate, where the QFT operation on n-qubits is given by: 
+```math
+|j\rangle \mapsto \frac{1}{2^{n/2}} \sum_{k=0}^{2^n - 1} e^{2\pi ijk / 2^n} |k\rangle
+```
+
+**Circuit Representation**
+```
+     ┌──────┐
+q_0: ┤      ├
+     │      │   
+q_1: ┤ QFT3 ├ 
+     │      │   
+q_3: ┤      ├ 
+     └──────┘ 
+```
+
+**Matrix Representation**
+
+```math
+M = \frac{1}{2\sqrt{2}} \begin{pmatrix}
+1   1        1        1        1   1        1        1 \\ 
+1       \frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}}            i      -\frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}}      -1      -\frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}}            -i       \frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}} \\ 
+1        i  -1             -i   1        i  -1             -i \\ 
+1      -\frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}}            -i       \frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}}      -1       \frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}}            i      -\frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}} \\ 
+1  -1        1       -1        1  -1        1       -1 \\ 
+1      -\frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}}            i       \frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}}      -1       \frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}}            -i      -\frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}} \\ 
+1        -i  -1             i   1        -i  -1             i \\ 
+1       \frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}}            -i      -\frac{1}{\sqrt{2}} - \frac{i}{\sqrt{2}}      -1      -\frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}}            i       \frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}} \\ 
+\end{pmatrix}
+```
+"""
+function QFT3Gate()
+    a = 1/sqrt(8)
+    b = 1/sqrt(2)
+    return Array{Complex{Float64},2}(a*[1+0.0im   1+0.0im        1+0.0im        1+0.0im        1+0.0im   1+0.0im        1+0.0im     1+0.0im
+                                        1+0.0im   (b)+(b)im      0.0+1im      -(b)+(b)im      -1+0.0im  -(b)-(b)im      0.0-1im     (b)-(b)im
+                                        1+0.0im   0.0+1im       -1+0.0im        0.0-1im        1+0.0im    0.0+1im      -1+0.0im     0.0-1im
+                                        1+0.0im   -(b)+(b)im     0.0-1im       (b)+(b)im      -1+0.0im    (b)-(b)im     0.0+1im     -(b)-(b)im
+                                        1+0.0im  -1+0.0im        1+0.0im       -1+0.0im        1+0.0im   -1+0.0im       1+0.0im     -1+0.0im
+                                        1+0.0im   -(b)-(b)im     0.0+1im       (b)-(b)im      -1+0.0im    (b)+(b)im     0.0-1im     -(b)+(b)im
+                                        1+0.0im    0.0-1im      -1+0.0im        0.0+1im        1+0.0im     0.0-1im     -1+0.0im      0.0+1im
+                                        1+0.0im    (b)-(b)im     0.0-1im      -(b)-(b)im      -1+0.0im    -(b)+(b)im    0.0+1im      (b)+(b)im])
+end
+
+@doc raw"""
     CiSwapGate()
 
 Three-qubit controlled version of the [iSwapGate](@ref).

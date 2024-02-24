@@ -97,7 +97,7 @@ function CNot_1_3()
     "maximum_depth" => 8,
     # "elementary_gates" => ["CNot_1_2", "CNot_2_3", "Identity"], 
     "elementary_gates" => ["H_1", "H_3", "H_2", "CNot_2_1", "CNot_3_2", "Identity"],
-    "target_gate" => QCOpt.get_full_sized_gate("CNot_1_3", 3),
+    "target_gate" => QCOpt.get_unitary("CNot_1_3", 3),
     "objective" => "minimize_depth",
     )
 end
@@ -132,11 +132,11 @@ function toffoli_left()
     # Reference: https://arxiv.org/pdf/0803.2316.pdf 
 
     function target_gate()
-        H_3 = QCOpt.get_full_sized_gate("H_3", 3)
-        Tdagger_3 = QCOpt.get_full_sized_gate("Tdagger_3", 3)
-        T_3 = QCOpt.get_full_sized_gate("T_3", 3)
-        cnot_23 = QCOpt.get_full_sized_gate("CNot_2_3", 3)
-        CNot_1_3 = QCOpt.get_full_sized_gate("CNot_1_3", 3)
+        H_3 = QCOpt.get_unitary("H_3", 3)
+        Tdagger_3 = QCOpt.get_unitary("Tdagger_3", 3)
+        T_3 = QCOpt.get_unitary("T_3", 3)
+        cnot_23 = QCOpt.get_unitary("CNot_2_3", 3)
+        CNot_1_3 = QCOpt.get_unitary("CNot_1_3", 3)
 
         return H_3 * cnot_23 * Tdagger_3 * CNot_1_3 * T_3 * cnot_23 * Tdagger_3
     end
@@ -157,13 +157,13 @@ function toffoli_right()
     # Reference: https://arxiv.org/pdf/0803.2316.pdf 
     
     function target_gate()
-        H_3 = QCOpt.get_full_sized_gate("H_3", 3)
-        Tdagger_2 = QCOpt.get_full_sized_gate("Tdagger_2", 3)
-        T_1 = QCOpt.get_full_sized_gate("T_1", 3)
-        T_2 = QCOpt.get_full_sized_gate("T_2", 3)
-        T_3 = QCOpt.get_full_sized_gate("T_3", 3)
-        CNot_1_2 = QCOpt.get_full_sized_gate("CNot_1_2", 3)
-        CNot_1_3 = QCOpt.get_full_sized_gate("CNot_1_3", 3)
+        H_3 = QCOpt.get_unitary("H_3", 3)
+        Tdagger_2 = QCOpt.get_unitary("Tdagger_2", 3)
+        T_1 = QCOpt.get_unitary("T_1", 3)
+        T_2 = QCOpt.get_unitary("T_2", 3)
+        T_3 = QCOpt.get_unitary("T_3", 3)
+        CNot_1_2 = QCOpt.get_unitary("CNot_1_2", 3)
+        CNot_1_3 = QCOpt.get_unitary("CNot_1_3", 3)
 
         return CNot_1_3 * T_2 * T_3 * CNot_1_2 * H_3 * T_1 * Tdagger_2 * CNot_1_2
     end
@@ -182,12 +182,12 @@ function miller()
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
 
     function target_gate()
-        CV_1_3 = QCOpt.get_full_sized_gate("CV_1_3", 3)
-        CV_2_3 = QCOpt.get_full_sized_gate("CV_2_3", 3)
-        CVdagger_2_3 = QCOpt.get_full_sized_gate("CVdagger_2_3", 3)
-        CNot_1_2 = QCOpt.get_full_sized_gate("CNot_1_2", 3)
-        CNot_3_1 = QCOpt.get_full_sized_gate("CNot_3_1", 3)
-        CNot_3_2 = QCOpt.get_full_sized_gate("CNot_3_2", 3)
+        CV_1_3 = QCOpt.get_unitary("CV_1_3", 3)
+        CV_2_3 = QCOpt.get_unitary("CV_2_3", 3)
+        CVdagger_2_3 = QCOpt.get_unitary("CVdagger_2_3", 3)
+        CNot_1_2 = QCOpt.get_unitary("CNot_1_2", 3)
+        CNot_3_1 = QCOpt.get_unitary("CNot_3_1", 3)
+        CNot_3_2 = QCOpt.get_unitary("CNot_3_2", 3)
 
         return CNot_3_1 * CNot_3_2 * CV_2_3 * CNot_1_2 * CVdagger_2_3 * CV_1_3 * CNot_3_1 * CNot_1_2
     end

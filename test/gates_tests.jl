@@ -39,91 +39,101 @@
     H2    = kron(QCO.IGate(1), QCO.HGate())
     @test isapprox(QCO.MGate(), QCO.CNotRevGate() * H2 * S1_S2)
 
-    Z1        = QCO.get_full_sized_gate("Z_1", 2);
-    Z2        = QCO.get_full_sized_gate("Z_2", 2);
-    T2        = QCO.get_full_sized_gate("T_2", 2);
-    Y_2       = QCO.get_full_sized_gate("Y_2", 2);
-    CNot_1_2  = QCO.get_full_sized_gate("CNot_1_2", 2);
-    CNot_2_1  = QCO.get_full_sized_gate("CNot_2_1", 2);
-    Sdagger1  = QCO.get_full_sized_gate("Sdagger_1", 2);
-    Tdagger1  = QCO.get_full_sized_gate("Tdagger_1", 2);
-    SX1       = QCO.get_full_sized_gate("SX_1", 2);
-    SXdagger2 = QCO.get_full_sized_gate("SXdagger_2", 2);
+    Z1        = QCO.get_unitary("Z_1", 2);
+    Z2        = QCO.get_unitary("Z_2", 2);
+    T2        = QCO.get_unitary("T_2", 2);
+    Y_2       = QCO.get_unitary("Y_2", 2);
+    CNot_1_2  = QCO.get_unitary("CNot_1_2", 2);
+    CNot_2_1  = QCO.get_unitary("CNot_2_1", 2);
+    Sdagger1  = QCO.get_unitary("Sdagger_1", 2);
+    Tdagger1  = QCO.get_unitary("Tdagger_1", 2);
+    SX1       = QCO.get_unitary("SX_1", 2);
+    SXdagger2 = QCO.get_unitary("SXdagger_2", 2);
     @test isapprox(-QCO.HCoinGate(), Z2 * CNot_2_1 * SXdagger2 * Y_2 * CNot_2_1 * Tdagger1 * Z1 * T2 * Sdagger1 * CNot_1_2 * Sdagger1 * SX1 * CNot_2_1 * CNot_1_2, atol = tol_0)
 
-    CV_23       = QCO.get_full_sized_gate("CV_2_3", 3);
-    CNot_1_2    = QCO.get_full_sized_gate("CNot_1_2", 3);
-    CVdagger_23 = QCO.get_full_sized_gate("CVdagger_2_3", 3);
-    CV_13       = QCO.get_full_sized_gate("CV_1_3", 3);
+    CV_23       = QCO.get_unitary("CV_2_3", 3);
+    CNot_1_2    = QCO.get_unitary("CNot_1_2", 3);
+    CVdagger_23 = QCO.get_unitary("CVdagger_2_3", 3);
+    CV_13       = QCO.get_unitary("CV_1_3", 3);
     @test isapprox(QCO.ToffoliGate(), CV_23 * CNot_1_2 * CVdagger_23 * CNot_1_2 * CV_13, atol = tol_0)
 
-    CVdagger_12 = QCO.get_full_sized_gate("CVdagger_1_2", 3);
-    CVdagger_31 = QCO.get_full_sized_gate("CVdagger_3_1", 3);
+    CVdagger_12 = QCO.get_unitary("CVdagger_1_2", 3);
+    CVdagger_31 = QCO.get_unitary("CVdagger_3_1", 3);
     @test isapprox(QCO.IGate(3), CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_12 * CVdagger_31 * CVdagger_31 * CVdagger_31 * CVdagger_31, atol = tol_0)
 
-    H_2      = QCO.get_full_sized_gate("H_2", 2);
-    T_1      = QCO.get_full_sized_gate("T_1", 2);
-    Tdagger2 = QCO.get_full_sized_gate("Tdagger_2", 2);
+    H_2      = QCO.get_unitary("H_2", 2);
+    T_1      = QCO.get_unitary("T_1", 2);
+    Tdagger2 = QCO.get_unitary("Tdagger_2", 2);
     @test isapprox(QCO.CVdaggerGate(), H_2 * Tdagger1 * CNot_2_1 * T_1 * Tdagger2 * CNot_2_1 * H_2, atol = tol_0)
 
     @test isapprox(QCO.CVGate(), QCO.CNotGate() * QCO.CVdaggerGate(), atol = tol_0)
 
     # Next 3 tests from: https://american-cse.org/csci2015/data/9795a059.pdf
 
-    CV_31       = QCO.get_full_sized_gate("CV_3_1", 3);
-    CNot_2_3    = QCO.get_full_sized_gate("CNot_2_3", 3);
-    CVdagger_31 = QCO.get_full_sized_gate("CVdagger_3_1", 3);
-    CV_21       = QCO.get_full_sized_gate("CV_2_1", 3);
+    CV_31       = QCO.get_unitary("CV_3_1", 3);
+    CNot_2_3    = QCO.get_unitary("CNot_2_3", 3);
+    CVdagger_31 = QCO.get_unitary("CVdagger_3_1", 3);
+    CV_21       = QCO.get_unitary("CV_2_1", 3);
 
-    CVdagger_21 = QCO.get_full_sized_gate("CVdagger_2_1", 3);
+    CVdagger_21 = QCO.get_unitary("CVdagger_2_1", 3);
 
     @test isapprox(CV_31 * CNot_2_3 * CVdagger_31 * CNot_2_3 * CV_21, CVdagger_21 * CNot_2_3 * CV_31 * CNot_2_3 * CVdagger_31, atol = tol_0)
 
-    CV_12       = QCO.get_full_sized_gate("CV_1_2", 3);
-    CV_32       = QCO.get_full_sized_gate("CV_3_2", 3);
-    CVdagger_32 = QCO.get_full_sized_gate("CVdagger_3_2", 3);
-    CVdagger_12 = QCO.get_full_sized_gate("CVdagger_1_2", 3);
-    CNot_1_3    = QCO.get_full_sized_gate("CNot_1_3", 3);
+    CV_12       = QCO.get_unitary("CV_1_2", 3);
+    CV_32       = QCO.get_unitary("CV_3_2", 3);
+    CVdagger_32 = QCO.get_unitary("CVdagger_3_2", 3);
+    CVdagger_12 = QCO.get_unitary("CVdagger_1_2", 3);
+    CNot_1_3    = QCO.get_unitary("CNot_1_3", 3);
 
     @test isapprox(CV_32 * CNot_1_3 * CVdagger_32 * CNot_1_3 * CV_12, CVdagger_32 * CNot_1_3 * CV_32 * CNot_1_3 * CVdagger_12, atol = tol_0)
 
-    CVdagger_13  = QCO.get_full_sized_gate("CVdagger_1_3", 3);
-    CNot_2_1     = QCO.get_full_sized_gate("CNot_2_1", 3);
+    CVdagger_13  = QCO.get_unitary("CVdagger_1_3", 3);
+    CNot_2_1     = QCO.get_unitary("CNot_2_1", 3);
     @test isapprox(CV_13 * CNot_2_1 * CVdagger_13 * CNot_2_1 * CV_23, CVdagger_13 * CNot_2_1 * CV_13 * CNot_2_1 * CVdagger_23, atol = tol_0)
 
     # 2-qubit Grover's diffusion operator (Ref: https://arxiv.org/pdf/1804.03719.pdf)
-    H_1      = QCO.get_full_sized_gate("H_1", 2);
-    X_2      = QCO.get_full_sized_gate("X_2", 2);
-    CNot_1_2 = QCO.get_full_sized_gate("CNot_1_2", 2);
+    H_1      = QCO.get_unitary("H_1", 2);
+    X_2      = QCO.get_unitary("X_2", 2);
+    CNot_1_2 = QCO.get_unitary("CNot_1_2", 2);
 
     @test isapprox(QCO.GroverDiffusionGate(), Y_2 * H_1 * X_2 * CNot_1_2 * H_1 * Y_2, atol=tol_0)
 
     # 2 Qubit QFT (Ref: https://www.cs.bham.ac.uk/internal/courses/intro-mqc/current/lecture06_handout.pdf)
 
-    SWAP = QCO.get_full_sized_gate("Swap_1_2", 2);
-    CU   = QCO.get_full_sized_gate("CU3_2_1", 2, angle = [0, π/4, π/4]);
+    SWAP = QCO.get_unitary("Swap_1_2", 2);
+    CU   = QCO.get_unitary("CU3_2_1", 2, angle = [0, π/4, π/4]);
 
     @test isapprox(QCO.QFT2Gate(), H_1 * CU * H_2 * SWAP)
 
+    # 3 Qubit QFT (Ref: Nielsen and Chuang, Quantum Computation and Quantum Information, Ch. 5.1)
+    CS_2_1 = QCO.get_unitary("CS_2_1", 3)
+    CS_3_2 = QCO.get_unitary("CS_3_2", 3)
+    CT_3_1 = QCO.get_unitary("CT_3_1", 3)
+    SWAP_1_3 = QCO.get_unitary("Swap_1_3", 3)
+    H_1 = QCO.get_unitary("H_1", 3)
+    H_2 = QCO.get_unitary("H_2", 3)
+    H_3 = QCO.get_unitary("H_3", 3)
+    @test isapprox(QCO.QFT3Gate(), H_1 * CS_2_1 * CT_3_1 * H_2 * CS_3_2 * H_3 * SWAP_1_3)
+
     # CRY Decomp (Ref: https://quantumcomputing.stackexchange.com/questions/2143/how-can-a-controlled-ry-be-made-from-cnots-and-rotations)
 
-    CNOT12   = QCO.get_full_sized_gate("CNot_1_2", 2);
-    U3_negpi = QCO.get_full_sized_gate("U3_2", 2, angle=[-pi/2, 0, 0]);
-    U3_pi    = QCO.get_full_sized_gate("U3_2", 2, angle=[pi/2, 0, 0]);
+    CNOT12   = QCO.get_unitary("CNot_1_2", 2);
+    U3_negpi = QCO.get_unitary("U3_2", 2, angle=[-pi/2, 0, 0]);
+    U3_pi    = QCO.get_unitary("U3_2", 2, angle=[pi/2, 0, 0]);
 
     @test isapprox(QCO.CRYGate(pi), CNOT12 * U3_negpi * CNOT12 * U3_pi, atol = tol_0)
 
     # Identity tests
 
     Id     = QCO.IGate(2);
-    CRXRev = QCO.get_full_sized_gate("CRX_2_1", 2, angle=pi);
+    CRXRev = QCO.get_unitary("CRX_2_1", 2, angle=pi);
 
     @test isapprox(Id, CRXRev * CRXRev * CRXRev * CRXRev, atol = tol_0)
 
-    CRYRev = QCO.get_full_sized_gate("CRY_2_1", 2, angle=pi);
+    CRYRev = QCO.get_unitary("CRY_2_1", 2, angle=pi);
     @test isapprox(Id, CRYRev * CRYRev * CRYRev * CRYRev, atol = tol_0)
 
-    CRZRev = QCO.get_full_sized_gate("CRZ_2_1", 2, angle=pi);
+    CRZRev = QCO.get_unitary("CRZ_2_1", 2, angle=pi);
     @test isapprox(Id, CRZRev * CRZRev * CRZRev * CRZRev, atol = tol_0)
 
     # Rev gate tests for involution
@@ -140,38 +150,38 @@
     @test isapprox(QCO.WGate(), QCO.HCoinGate(), atol = tol_0)
 
     # Fredkin test = CSwapGate
-    CNot_3_2    = QCO.get_full_sized_gate("CNot_3_2", 3)
-    CV_23       = QCO.get_full_sized_gate("CV_2_3", 3)
-    CV_13       = QCO.get_full_sized_gate("CV_1_3", 3)
-    CNot_1_2    = QCO.get_full_sized_gate("CNot_1_2", 3)
-    CVdagger_23 = QCO.get_full_sized_gate("CVdagger_2_3", 3)
+    CNot_3_2    = QCO.get_unitary("CNot_3_2", 3)
+    CV_23       = QCO.get_unitary("CV_2_3", 3)
+    CV_13       = QCO.get_unitary("CV_1_3", 3)
+    CNot_1_2    = QCO.get_unitary("CNot_1_2", 3)
+    CVdagger_23 = QCO.get_unitary("CVdagger_2_3", 3)
     @test isapprox(QCO.CSwapGate(), CNot_3_2 * CV_23 * CV_13 * CNot_1_2 * CVdagger_23 * CNot_1_2 * CNot_3_2, atol = tol_0)
 
     # CCZGate test: CCZ is equivalent to Toffoli when the target qubit is conjugated by Hadamard gates
-    H_3 = QCO.get_full_sized_gate("H_3", 3)
+    H_3 = QCO.get_unitary("H_3", 3)
     @test isapprox(QCO.ToffoliGate(), H_3 * QCO.CCZGate() * H_3, atol = tol_0)
 
     # Peres test 
-    CVdagger_13 = QCO.get_full_sized_gate("CVdagger_1_3", 3)
+    CVdagger_13 = QCO.get_unitary("CVdagger_1_3", 3)
     @test isapprox(QCO.PeresGate(), QCO.ToffoliGate() * CNot_1_2, atol = tol_0)
     @test isapprox(QCO.PeresGate(), CVdagger_13 * CVdagger_23 * CNot_1_2 * CV_23, atol = tol_0)
 
     # iSwap test 
-    @test isapprox(QCO.get_full_sized_gate("iSwap_2_1", 3), QCO.get_full_sized_gate("iSwap_1_2", 3), atol = tol_0)
-    @test isapprox(QCO.get_full_sized_gate("iSwap_2_3", 4), QCO.get_full_sized_gate("iSwap_3_2", 4), atol = tol_0)
-    @test isapprox(QCO.get_full_sized_gate("iSwap_3_5", 5), QCO.get_full_sized_gate("iSwap_5_3", 5), atol = tol_0)
+    @test isapprox(QCO.get_unitary("iSwap_2_1", 3), QCO.get_unitary("iSwap_1_2", 3), atol = tol_0)
+    @test isapprox(QCO.get_unitary("iSwap_2_3", 4), QCO.get_unitary("iSwap_3_2", 4), atol = tol_0)
+    @test isapprox(QCO.get_unitary("iSwap_3_5", 5), QCO.get_unitary("iSwap_5_3", 5), atol = tol_0)
 
     # Sycamore test
     @test isapprox(QCO.SycamoreGate()^12, QCO.IGate(2), atol = tol_0)
 
     # RCCX test
-    T_3       = QCO.get_full_sized_gate("T_3", 3)
-    Tdagger_3 = QCO.get_full_sized_gate("Tdagger_3", 3)
+    T_3       = QCO.get_unitary("T_3", 3)
+    Tdagger_3 = QCO.get_unitary("Tdagger_3", 3)
     @test isapprox(QCO.RCCXGate(),  H_3 * Tdagger_3 * CNot_2_3 * T_3 * CNot_1_3 * Tdagger_3 * CNot_2_3 * T_3 * H_3, atol = tol_0)
 
     # Margolus test 
-    RY_a = QCO.get_full_sized_gate("RY_3", 3, angle = -π/4)
-    RY_b = QCO.get_full_sized_gate("RY_3", 3, angle = π/4)
+    RY_a = QCO.get_unitary("RY_3", 3, angle = -π/4)
+    RY_b = QCO.get_unitary("RY_3", 3, angle = π/4)
     @test isapprox(QCO.MargolusGate(),  RY_a * CNot_2_3 * RY_a * CNot_1_3 * RY_b * CNot_2_3 * RY_b, atol = tol_0)
     
     # CiSwap test 
@@ -186,11 +196,11 @@
     @test isapprox(R1, U3; atol = tol_0)
 
     # CS, CSdagger gate test
-    H1    = QCO.get_full_sized_gate("H_1", 2)
-    H2    = QCO.get_full_sized_gate("H_2", 2)
-    CS_12 = QCO.get_full_sized_gate("CS_1_2", 2)
-    Swap  = QCO.SwapGate()
-    @test isapprox(H1 * CS_12 * H2 * Swap, QCO.QFT2Gate(), atol = tol_0)
+    # H1    = QCO.get_unitary("H_1", 2)
+    # H2    = QCO.get_unitary("H_2", 2)
+    CS_12 = QCO.get_unitary("CS_1_2", 2)
+    # Swap  = QCO.SwapGate()
+    @test isapprox(H_1 * CS_12 * H_2 * SWAP, QCO.QFT2Gate(), atol = tol_0)
     @test isapprox(QCO.CSGate() *  QCO.CSdaggerGate(), QCO.IGate(2), atol = tol_0)
 
     #SSwapGate test
@@ -200,12 +210,12 @@
     @test isapprox(QCO.CTGate() *  QCO.CTdaggerGate(), QCO.IGate(2), atol = tol_0)
 
     # Test for elementary gates with kron symbols
-    M1 = QCO.get_full_sized_gate("I_1xCZ_2_4xH_5", 5)
-    M2 = kron(kron(QCO.IGate(1), QCO.get_full_sized_gate("CZ_1_3", 3)), QCO.HGate())
+    M1 = QCO.get_unitary("I_1xCZ_2_4xH_5", 5)
+    M2 = kron(kron(QCO.IGate(1), QCO.get_unitary("CZ_1_3", 3)), QCO.HGate())
     @test isapprox(M1, M2, atol = tol_0)
 
-    M1 = QCO.get_full_sized_gate("CV_4_1xH_5xZ_6", 6)
-    M2 = kron(kron(QCO.get_full_sized_gate("CV_4_1", 4), QCO.HGate()), QCO.ZGate())
+    M1 = QCO.get_unitary("CV_4_1xH_5xZ_6", 6)
+    M2 = kron(kron(QCO.get_unitary("CV_4_1", 4), QCO.HGate()), QCO.ZGate())
     @test isapprox(M1, M2, atol = tol_0)
 
 end

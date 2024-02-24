@@ -3,7 +3,10 @@ QuantumCircuitOpt.jl Change Log
 
 ### v0.5.9
 - Catch error in `data.jl` if `set_cnot_lower_bound` > `maximum_depth`
-- Feasibility switching warning moved to the correct condition in `objective.jl`
+- Feasibility switching warning moved to the correct condition in objective.jl
+- Renamed function `get_full_sized_gate` -> `get_unitary`
+- Added 3-qubit `QFT3Gate` to gates.jl
+- Updated docs and unit tests to reflect above changes
 
 ### v0.5.8 
 - Readme update for dark/light theme logo display

@@ -198,8 +198,8 @@ end
     maximum_depth = 3
 
     # Input gates
-    H1 = QCO.complex_to_real_gate(QCO.get_full_sized_gate("H_1", num_qubits))
-    CNot_1_2 = QCO.complex_to_real_gate(QCO.get_full_sized_gate("CNot_1_2", num_qubits))
+    H1 = QCO.complex_to_real_gate(QCO.get_unitary("H_1", num_qubits))
+    CNot_1_2 = QCO.complex_to_real_gate(QCO.get_unitary("CNot_1_2", num_qubits))
     Id = QCO.complex_to_real_gate(QCO.IGate(num_qubits))
 
     # Assuming only H1 in elementary gates
