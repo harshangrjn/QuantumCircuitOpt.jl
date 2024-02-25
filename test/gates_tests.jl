@@ -196,11 +196,10 @@
     @test isapprox(R1, U3; atol = tol_0)
 
     # CS, CSdagger gate test
-    # H1    = QCO.get_unitary("H_1", 2)
-    # H2    = QCO.get_unitary("H_2", 2)
+    H1    = QCO.get_unitary("H_1", 2)
+    H2    = QCO.get_unitary("H_2", 2)
     CS_12 = QCO.get_unitary("CS_1_2", 2)
-    # Swap  = QCO.SwapGate()
-    @test isapprox(H_1 * CS_12 * H_2 * SWAP, QCO.QFT2Gate(), atol = tol_0)
+    @test isapprox(H1 * CS_12 * H2 * QCO.SwapGate(), QCO.QFT2Gate(), atol = tol_0)
     @test isapprox(QCO.CSGate() *  QCO.CSdaggerGate(), QCO.IGate(2), atol = tol_0)
 
     #SSwapGate test
