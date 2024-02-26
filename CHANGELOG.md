@@ -6,6 +6,7 @@ QuantumCircuitOpt.jl Change Log
 - Feasibility switching warning moved to the correct condition in objective.jl
 - Renamed function `get_full_sized_gate` -> `get_unitary`
 - Added 3-qubit `QFT3Gate` to gates.jl
+- Added `QFT3` circuit using controlled-phase gates in examples
 - Updated docs and unit tests to reflect above changes
 
 ### v0.5.8 
