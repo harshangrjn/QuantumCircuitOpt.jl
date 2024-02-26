@@ -336,7 +336,7 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
             end
         
         else 
-            M = QCO.get_full_sized_gate(elementary_gates[i], num_qubits)
+            M = QCO.get_unitary(elementary_gates[i], num_qubits)
             gates_dict["$counter"] = Dict{String, Any}("type"   => [elementary_gates[i]],
                                                        "matrix" => M)
             counter += 1
@@ -394,7 +394,7 @@ function get_discretized_one_angle_gates(gate_type::String, M1::Dict{String, Any
                 qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
             end
             
-            M1["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+            M1["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
         end
     end 
 
@@ -451,9 +451,9 @@ function get_discretized_two_angle_gates(gate_type::String, M2::Dict{String, Any
                     qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
                 end             
 
-                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
             else 
-                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["multi_qubits"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["multi_qubits"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
             end
 
             counter += 1
@@ -514,7 +514,7 @@ function get_discretized_three_angle_gates(gate_type::String, M3::Dict{String, A
                     qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
                 end             
 
-                M3["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_full_sized_gate(gate_type, num_qubits, angle = angles)
+                M3["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
                 counter += 1
             end
         end
@@ -524,7 +524,7 @@ function get_discretized_three_angle_gates(gate_type::String, M3::Dict{String, A
 end
 
 """
-    get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
+    get_unitary(input::String, num_qubits::Int64; angle = nothing)
 
 Given an input string representing the gate and number of qubits of the circuit, this function returns a full-sized 
 gate with respect to the input number of qubits. For example, if `num_qubits = 3` and the input gate in `H_3` 
@@ -532,7 +532,7 @@ gate with respect to the input number of qubits. For example, if `num_qubits = 3
 qubit Identity and Hadamard gates, respectively. Note that `angle` vector is an optional input which is 
 necessary when the input gate is parametrized by Euler angles.
 """
-function get_full_sized_gate(input::String, num_qubits::Int64; angle = nothing)
+function get_unitary(input::String, num_qubits::Int64; angle = nothing)
 
     if num_qubits > 10
         Memento.error(_LOGGER, "Greater than 10 qubits is currently not supported")
@@ -687,9 +687,9 @@ function get_full_sized_kron_gate(input::String, num_qubits::Int64)
                 end
             else
                 if (qubit_loc[1] < qubit_loc[2]) || (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
-                    kron_gate = QCO.get_full_sized_gate(string(gate_type, qubit_separator, 1, qubit_separator, Int(gate_width + 1)), (gate_width + 1))
+                    kron_gate = QCO.get_unitary(string(gate_type, qubit_separator, 1, qubit_separator, Int(gate_width + 1)), (gate_width + 1))
                 else 
-                    kron_gate = QCO.get_full_sized_gate(string(gate_type, qubit_separator, Int(gate_width + 1), qubit_separator, 1), (gate_width + 1))
+                    kron_gate = QCO.get_unitary(string(gate_type, qubit_separator, Int(gate_width + 1), qubit_separator, 1), (gate_width + 1))
                 end
                 M = kron(M, kron_gate)
             end
@@ -887,6 +887,10 @@ function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
 
     if "set_cnot_upper_bound" in keys(params)
         cnot_ub = params["set_cnot_upper_bound"]
+    end
+
+    if cnot_lb > data["maximum_depth"]
+        Memento.error(_LOGGER, "Invalid lower bound on the number of CNOT gates given the maximum depth")
     end
 
     if cnot_lb < cnot_ub 

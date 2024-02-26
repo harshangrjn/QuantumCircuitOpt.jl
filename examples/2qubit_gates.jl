@@ -7,7 +7,7 @@ function hadamard()
     "num_qubits" => 2, 
     "maximum_depth" => 3,    
     "elementary_gates" => ["U3_1", "CNot_1_2", "Identity"], 
-    "target_gate" => QCOpt.get_full_sized_gate("H_1", 2),
+    "target_gate" => QCOpt.get_unitary("H_1", 2),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact_optimal",
        
@@ -152,7 +152,7 @@ function S_using_U3()
         "num_qubits" => 2, 
         "maximum_depth" => 3,
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
-        "target_gate" => QCOpt.get_full_sized_gate("S_1", 2),
+        "target_gate" => QCOpt.get_unitary("S_1", 2),
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact_optimal",
            
@@ -378,9 +378,9 @@ end
 function GR_using_R()
     println(">>>>> GRGate testing <<<<<")
 
-    GR1 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/6, π/3])
-    # GR2 = QCOpt.get_full_sized_gate("GR", 2; angle = [π/3, π/6])
-    CNot_1_2 = QCOpt.get_full_sized_gate("CNot_1_2", 2)
+    GR1 = QCOpt.get_unitary("GR", 2; angle = [π/6, π/3])
+    # GR2 = QCOpt.get_unitary("GR", 2; angle = [π/3, π/6])
+    CNot_1_2 = QCOpt.get_unitary("CNot_1_2", 2)
     T = QCOpt.round_complex_values(GR1 * CNot_1_2)
 
     return Dict{String, Any}(
@@ -405,7 +405,7 @@ function X_using_GR()
     "num_qubits" => 2,
     "maximum_depth" => 5, 
     "elementary_gates" => ["GR", "R_1", "R_2", "CZ_1_2", "Identity"], 
-    "target_gate" => QCOpt.get_full_sized_gate("X_1", 2),
+    "target_gate" => QCOpt.get_unitary("X_1", 2),
     "objective" => "minimize_depth",
     "decomposition_type" => "exact_optimal",
     "GR_θ_discretization" => [-π, -π/2, 0, π/2, π],
