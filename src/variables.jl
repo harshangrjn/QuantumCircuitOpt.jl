@@ -132,7 +132,7 @@ function variable_gate_products_linearization(qcm::QuantumCircuitModel)
         U_var_l = JuMP.lower_bound(U_var[i,j,d])
         U_var_u = JuMP.upper_bound(U_var[i,j,d])
 
-        if isapprox(U_var_l, 0, atol = 1E-6) && isapprox(U_var_u, 0, atol = 1E-6)
+        if QCO.is_zero(U_var_l) && QCO.is_zero(U_var_u)
             JuMP.set_lower_bound(zU_var[i,j,k,d], 0)
             JuMP.set_upper_bound(zU_var[i,j,k,d], 0)
         else
@@ -155,7 +155,7 @@ function variable_slack_for_feasibility(qcm::QuantumCircuitModel)
     for i=1:n_r, j=1:n_c
         lb = JuMP.lower_bound(U_var[i,j,max_depth-1])
         ub = JuMP.upper_bound(U_var[i,j,max_depth-1])
-        if isapprox(lb, 0, atol = 1E-6) && isapprox(ub, 0, atol = 1E-6)
+        if QCO.is_zero(lb) && QCO.is_zero(ub)
             JuMP.set_lower_bound(slack_var[i,j], 0)
             JuMP.set_upper_bound(slack_var[i,j], 0)
         else 

@@ -9,7 +9,7 @@ function _orientation(x::Tuple{<:Number, <:Number},
                       z::Tuple{<:Number, <:Number})
     a = ((y[2] - x[2]) * (z[1] - y[1]) - (y[1] - x[1]) * (z[2] - y[2]))
 
-    if isapprox(a, 0, atol=1e-6)
+    if QCO.is_zero(a)
         return 0 # collinear
     elseif a > 0 
         return 1 # clock-wise

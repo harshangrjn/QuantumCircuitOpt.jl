@@ -158,34 +158,47 @@ function constraint_target_gate_condition_glphase(qcm::QuantumCircuitModel)
     max_depth      = qcm.data["maximum_depth"]
     n_r            = size(qcm.data["gates_real"])[1]
     n_c            = size(qcm.data["gates_real"])[2]
+    target_gate    = qcm.data["target_gate"]
 
     U_var = qcm.variables[:U_var]    
 
     if qcm.data["are_gates_real"] 
-        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(Array{Complex{Float64},2}(qcm.data["target_gate"]))
-
+        ref_r, ref_c = QCO._get_nonzero_idx_of_complex_matrix(Array{Complex{Float64},2}(target_gate))
+    
         for i=1:n_r, j=1:n_c
-            if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6)
+            if QCO.is_zero(target_gate[i,j])
                 JuMP.@constraint(qcm.model, U_var[i,j,max_depth] == 0)
             else
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] == qcm.data["target_gate"][i,j]*U_var[ref_nonzero_r,ref_nonzero_c,max_depth])
+                if !((i == ref_r) && (j == ref_c))
+                    JuMP.@constraint(qcm.model, U_var[i,j,max_depth] * target_gate[ref_r,ref_c] == 
+                                                U_var[ref_r,ref_c,max_depth] * target_gate[i,j])
+                end
             end
         end
-
+    
     else
-        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_to_real_matrix(qcm.data["target_gate"])
-
-        for i=1:2:n_r, j=1:2:n_c
-            if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6) && isapprox(qcm.data["target_gate"][i,j+1], 0, atol=1E-6)
+        ref_r, ref_c = QCO._get_nonzero_idx_of_complex_to_real_matrix(target_gate)
+    
+        for i=1:2:n_r, j=i:2:n_c
+            isapprox(target_gate[i,j], target_gate[j,i], atol = 1E-6) 
+            if QCO.is_zero(target_gate[i,j]) && QCO.is_zero(target_gate[i,j+1])
                 JuMP.@constraint(qcm.model, U_var[i,j,max_depth] == 0.0)
                 JuMP.@constraint(qcm.model, U_var[i,(j+1),max_depth] == 0.0)
+                
             else
-                #real parts equal
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] - U_var[i,(j+1),max_depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] ==
-                    U_var[ref_nonzero_r,ref_nonzero_c,max_depth]*qcm.data["target_gate"][i,j] - U_var[ref_nonzero_r,(ref_nonzero_c+1),max_depth]*qcm.data["target_gate"][i,(j+1)])       
-                #complex parts equal
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] + U_var[i,(j+1),max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] ==
-                    U_var[ref_nonzero_r,ref_nonzero_c,max_depth]*qcm.data["target_gate"][i,(j+1)] + U_var[ref_nonzero_r,(ref_nonzero_c+1),max_depth]*qcm.data["target_gate"][i,j]) 
+                if !((i == ref_r) && (j == ref_c))
+                    
+                    #real parts equal
+                    JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*target_gate[ref_r,ref_c] - 
+                                                U_var[i,(j+1),max_depth]*target_gate[ref_r,(ref_c+1)] ==
+                                                U_var[ref_r,ref_c,max_depth]*target_gate[i,j] - 
+                                                U_var[ref_r,(ref_c+1),max_depth]*target_gate[i,(j+1)])       
+                    #complex parts equal
+                    JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*target_gate[ref_r,(ref_c+1)] + 
+                                                U_var[i,(j+1),max_depth]*target_gate[ref_r,ref_c] ==
+                                                U_var[ref_r,ref_c,max_depth]*target_gate[i,(j+1)] + 
+                                                U_var[ref_r,(ref_c+1),max_depth]*target_gate[i,j]) 
+                end
             end
         end
     end
@@ -401,7 +414,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
                 slope, intercept = QCO._get_constraint_slope_intercept(vertices[1], vertices[2])
 
                 if !isinf(slope)
-                    if isapprox(abs(slope), 0, atol=1E-6)
+                    if QCO.is_zero(abs(slope))
                         JuMP.@constraint(qcm.model, [d=1:max_depth], 
                                         sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept == 0)
                     else
@@ -453,7 +466,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
                             if v3[2] - slope*v3[1] - intercept <= -1E-6
 
-                                if isapprox(abs(slope), 0, atol=1E-6)             
+                                if QCO.is_zero(abs(slope))             
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept <= 0)
                                 else           
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
@@ -463,7 +476,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
                             elseif v3[2] - slope*v3[1] - intercept >= 1E-6
 
-                                if isapprox(abs(slope), 0, atol=1E-6)
+                                if QCO.is_zero(abs(slope))
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept >= 0)
                                 else
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 

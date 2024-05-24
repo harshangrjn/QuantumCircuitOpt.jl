@@ -547,7 +547,7 @@ end
     @test isapprox(sum(z_sol[2:4, :]), 4, atol = tol_0)
 end
 
-@testset "QC_model Tests: Approximate decomposition using outer approximation" begin
+@testset "QC_model Tests: Approximate decomposition using outer approximation-1" begin
     params = Dict{String, Any}(
         "num_qubits" => 2,
         "maximum_depth" => 5,
@@ -563,7 +563,7 @@ end
     @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
 end
 
-@testset "QC_model Tests: Approximate decomposition using outer approximation" begin
+@testset "QC_model Tests: Approximate decomposition using outer approximation-2" begin
     params = Dict{String, Any}(
         "num_qubits" => 2,
         "maximum_depth" => 5,

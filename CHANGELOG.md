@@ -1,6 +1,13 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.6.0 
+- Minor clean up in global phase enforcing constraints 
+- Added `is_zero` function with a `tol` option
+- Added `QFT3Gate` to docs
+- Dropped support for `controlled_gate`  
+- Added a generic `multi_controlled_gate` function to evaluate multi-qubit gates with multiple controls for any single-qubit target gate (e.g. multiple-control Toffoli)
+
 ### v0.5.9
 - Catch error in `data.jl` if `set_cnot_lower_bound` > `maximum_depth`
 - Feasibility switching warning moved to the correct condition in objective.jl

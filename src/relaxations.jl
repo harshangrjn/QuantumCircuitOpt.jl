@@ -33,13 +33,13 @@ function relaxation_bilinear(m::JuMP.Model, xy::JuMP.VariableRef, x::JuMP.Variab
     lb_x, ub_x = variable_domain(x)
     lb_y, ub_y = variable_domain(y)
 
-    (isapprox(lb_x, 0, atol = 1E-6)) && (lb_x = 0)
-    (isapprox(lb_y, 0, atol = 1E-6)) && (lb_y = 0)
+    (QCO.is_zero(lb_x)) && (lb_x = 0)
+    (QCO.is_zero(lb_y)) && (lb_y = 0)
     (isapprox(lb_x, 1, atol = 1E-6)) && (lb_x = 1)
     (isapprox(lb_y, 1, atol = 1E-6)) && (lb_y = 1)
 
-    (isapprox(ub_x, 0, atol = 1E-6)) && (ub_x = 0)
-    (isapprox(ub_y, 0, atol = 1E-6)) && (ub_y = 0)
+    (QCO.is_zero(ub_x)) && (ub_x = 0)
+    (QCO.is_zero(ub_y)) && (ub_y = 0)
     (isapprox(ub_x, 1, atol = 1E-6)) && (ub_x = 1)
     (isapprox(ub_y, 1, atol = 1E-6)) && (ub_y = 1)
     

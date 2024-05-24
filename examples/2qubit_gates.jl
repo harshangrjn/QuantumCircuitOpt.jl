@@ -1,3 +1,18 @@
+function test_global_phase()
+
+    println(">>>>> Global Phase Gate <<<<<")
+
+    return Dict{String, Any}(
+    
+    "num_qubits" => 2,
+    "maximum_depth" => 3,
+    "elementary_gates" => ["CS_1_2", "Identity"],
+    "target_gate" => -im*QCOpt.multi_controlled_gate(QCOpt.SGate(), [1], 2, 2),
+    "objective" => "minimize_depth",
+    "decomposition_type" => "optimal_global_phase",
+    )
+end
+
 function hadamard()
 
     println(">>>>> Hadamard Gate <<<<<")

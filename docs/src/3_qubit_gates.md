@@ -8,6 +8,10 @@ CurrentModule = QuantumCircuitOpt
 ```@docs
 ToffoliGate
 ```
+## QFT3Gate
+```@docs
+QFT3Gate
+```
 ## CSwapGate
 ```@docs
 CSwapGate
