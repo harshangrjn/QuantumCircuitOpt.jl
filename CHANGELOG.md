@@ -7,6 +7,7 @@ QuantumCircuitOpt.jl Change Log
 - Added `QFT3Gate` to docs
 - Dropped support for `controlled_gate`  
 - Added a generic `multi_controlled_gate` function to evaluate multi-qubit gates with multiple controls for any single-qubit target gate (e.g. multiple-control Toffoli)
+- Cleaned up angle discretization code, which is generic now - `get_all_angle_gates` and `get_discretized_angle_gates` 
 
 ### v0.5.9
 - Catch error in `data.jl` if `set_cnot_lower_bound` > `maximum_depth`

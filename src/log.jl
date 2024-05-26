@@ -142,7 +142,7 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
                 if "angle" in keys(gate_id)
 
                     if length(keys(gate_id["angle"])) == 1 
-                        θ = round(rad2deg(gate_id["angle"]), digits = 3)
+                        θ = round(rad2deg(gate_id["angle"]["θ"]), digits = 3)
                         s3 = "$(θ)"
                         push!(gates_sol, string(s1,"(", s3, ")"))
 

@@ -190,6 +190,7 @@ function miller()
     "maximum_depth" => 8,
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
     "target_gate" => target_gate(),
+    "decomposition_type" => "exact_optimal",
     "objective" => "minimize_depth"
     )
 end
@@ -203,6 +204,7 @@ function relative_toffoli()
         "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
         "target_gate" => QCOpt.RCCXGate(),
         "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal",
 
         "set_cnot_upper_bound" => 3
     )

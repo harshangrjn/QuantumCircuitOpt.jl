@@ -15,6 +15,9 @@ const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", 
 # >= 3 qubit gates
 const MULTI_QUBIT_GATES_ANGLE_PARAMETERS   = ["GR"]
 
+# >= 2 qubit gates
+const MULTI_CONTROLLED_GATES   = ["MC_gates"]
+
 # Gates invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "SSwap", "iSwap", "Sycamore", "DCX", "W", "M", "CZ",
                                               "QFT2", "HCoin", "GroverDiffusion", "CS", "CSdagger", 
@@ -35,7 +38,8 @@ const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS,
                                         QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
 
 # >= 3 qubit gates
-const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
+const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS, 
+                                        QCO.MULTI_CONTROLLED_GATES)
 
 """
     _catch_gate_name_error()
