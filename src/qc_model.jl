@@ -136,6 +136,7 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
             QCO.constraint_identity_gate_symmetry(qcm)
             QCO.constraint_convex_hull_complex_gates(qcm)
             QCO.constraint_unitary_property(qcm)
+            QCO.constraint_tight_unitary_bounds(qcm)
             
         elseif qcm.options.all_valid_constraints == 0 
             qcm.options.commute_gate_constraints            && QCO.constraint_commutative_gate_pairs(qcm)
@@ -145,6 +146,7 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
             qcm.options.identity_gate_symmetry_constraints  && QCO.constraint_identity_gate_symmetry(qcm)
             qcm.options.convex_hull_gate_constraints        && QCO.constraint_convex_hull_complex_gates(qcm)
             qcm.options.unitary_constraints                 && QCO.constraint_unitary_property(qcm)
+            qcm.options.tight_unitary_bounds                && QCO.constraint_tight_unitary_bounds(qcm)
         end
 
     end

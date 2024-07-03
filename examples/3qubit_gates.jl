@@ -187,7 +187,7 @@ function miller()
 
     return Dict{String, Any}(
     "num_qubits" => 3,
-    "maximum_depth" => 8,
+    "maximum_depth" => 10,
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
     "target_gate" => target_gate(),
     "decomposition_type" => "exact_optimal",
@@ -249,7 +249,7 @@ function QFT3()
         "elementary_gates" => ["H_1", "H_2", "H_3", "CU3_2_1", "CU3_3_2", "CU3_3_1", "Swap_1_3", "Identity"],
         "CU3_θ_discretization" => [0],
         "CU3_ϕ_discretization" => [0],
-        "CU3_λ_discretization" => [π/2, π/4],
+        "CU3_λ_discretization" => 0:π/4:π,
         "target_gate" => QCOpt.QFT3Gate(),
         "objective" => "minimize_depth",
         "decomposition_type" => "exact_optimal",

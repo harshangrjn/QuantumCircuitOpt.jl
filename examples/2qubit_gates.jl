@@ -286,7 +286,7 @@ function hadamard_coin()
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.HCoinGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact_feasible",
+        "decomposition_type" => "exact_optimal",
         )
 end
 

@@ -11,7 +11,7 @@ include("optimizers.jl")
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-# decompose_gates = ["iSwap"]
+decompose_gates = ["qubit_routing_circuit"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -29,7 +29,7 @@ for gates = 1:length(decompose_gates)
         :convex_hull_gate_constraints => false,
         :idempotent_gate_constraints  => false,
         :unitary_constraints          => false,
-        :fix_unitary_variables        => true,
+        :tight_unitary_bounds         => false,
     )
 
     global result = QCOpt.run_QCModel(params, qcopt_optimizer; options = model_options)

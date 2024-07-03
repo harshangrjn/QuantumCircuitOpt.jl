@@ -18,6 +18,7 @@ mutable struct QCModelOptions
     idempotent_gate_constraints        :: Bool
     convex_hull_gate_constraints       :: Bool
     unitary_constraints                :: Bool
+    tight_unitary_bounds                 :: Bool
 
     time_limit                         :: Float64
     relax_integrality                  :: Bool
@@ -32,17 +33,18 @@ This function returns the default options for building the struct `QCModelOption
 function get_default_options()
     model_type                         = "compact_formulation" # check MODEL_TYPES in src/qc_model.jl for options
     
-    all_valid_constraints              = 0    # -1, 0, 1
-    commute_gate_constraints           = true # true, false
-    involutory_gate_constraints        = true # true, false
-    redundant_gate_pair_constraints    = true # true, false
-    identity_gate_symmetry_constraints = true # true, false
-    fix_unitary_variables              = true # true, false
-    visualize_solution                 = true # true, false
+    all_valid_constraints              = 0     # -1, 0, 1
+    commute_gate_constraints           = true  # true, false
+    involutory_gate_constraints        = true  # true, false
+    redundant_gate_pair_constraints    = true  # true, false
+    identity_gate_symmetry_constraints = true  # true, false
+    fix_unitary_variables              = false # true, false
+    visualize_solution                 = true  # true, false
 
     idempotent_gate_constraints        = false # true, false
     convex_hull_gate_constraints       = false # true, false
     unitary_constraints                = false # true, false
+    tight_unitary_bounds                 = true  # true, false
 
     time_limit                         = 10800 # float value
     relax_integrality                  = false # true, false
@@ -60,6 +62,7 @@ function get_default_options()
                           idempotent_gate_constraints,
                           convex_hull_gate_constraints,
                           unitary_constraints,
+                          tight_unitary_bounds,
                           time_limit,
                           relax_integrality,
                           optimizer_log,

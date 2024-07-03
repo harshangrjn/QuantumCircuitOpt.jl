@@ -96,3 +96,33 @@ function double_peres()
     "decomposition_type" => "exact_optimal"
     )
 end
+
+function qubit_routing_circuit()
+
+    # Reference: https://doi.org/10.1007/s10957-023-02229-w
+    
+    num_qubits = 4
+
+    function target_gate()
+        # Gates which do not satisfy qubit connectivity
+        H_1 = QCOpt.get_unitary("H_1", num_qubits)
+        S_1 = QCOpt.get_unitary("S_1", num_qubits)
+        X_4 = QCOpt.get_unitary("X_4", num_qubits)
+        CX_2_4 = QCOpt.get_unitary("CX_2_4", num_qubits);
+        CY_2_3 = QCOpt.get_unitary("CY_2_3", num_qubits);
+        CZ_1_2 = QCOpt.get_unitary("CZ_1_2", num_qubits);
+        
+        return H_1 * CX_2_4 * CZ_1_2 * X_4 * S_1 * CY_2_3
+    end
+
+    return Dict{String, Any}(
+
+    "num_qubits" => 4,
+    "maximum_depth" => 8,
+    # gates which satisfy qubit connectivity :  |1⟩ -> |2⟩ -> |3⟩ -> |4⟩
+    "elementary_gates" => ["H_1", "S_1", "X_3", "X_4", "CY_2_3", "CX_2_3", "CX_3_2", "CX_3_4", "CX_4_3", "CZ_1_2", "Identity"],
+    "target_gate" => target_gate(),
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal"
+    )
+end

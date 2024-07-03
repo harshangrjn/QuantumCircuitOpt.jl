@@ -559,3 +559,32 @@ function constraint_unitary_property(qcm::QuantumCircuitModel)
 
     return
 end
+
+function constraint_tight_unitary_bounds(qcm::QuantumCircuitModel)
+    max_depth  = qcm.data["maximum_depth"]
+    z_bin_var  = qcm.variables[:z_bin_var]
+    U_var  = qcm.variables[:U_var]
+    gates_real = qcm.data["gates_real"]
+
+    num_gates  = size(gates_real)[3]
+
+    if max_depth >= 3
+        JuMP.@constraint(qcm.model, U_var[:, :, (max_depth-1)] .== 
+                                    qcm.data["target_gate"] *
+                                    sum(z_bin_var[i, (max_depth)] *  
+                                    (gates_real[:,:,i]') for i=1:num_gates)
+                        )
+    end
+
+    if max_depth >= 4
+        JuMP.@constraint(qcm.model, U_var[:, :, (max_depth-2)] .== 
+                                    qcm.data["target_gate"] *
+                                    sum(z_bin_var[i, (max_depth)] *  
+                                    (gates_real[:,:,i]') for i=1:num_gates) * 
+                                    sum(z_bin_var[i, (max_depth-1)] *  
+                                    (gates_real[:,:,i]') for i=1:num_gates)
+                        )
+    end
+
+    return 
+end
