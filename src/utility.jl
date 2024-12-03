@@ -652,46 +652,39 @@ end
 """
     _determinant_test_for_infeasibility(data::Dict{String,Any})
 
-Given the processed data dictionary, this function performs a few simple tests based on the determinant values of 
-elementary and target gates to detect MIP infeasibility. 
+This function performs determinant-based checks on the target and elementary gates in the given 
+    data dictionary to detect potential MIP infeasibility.
 """
 function _determinant_test_for_infeasibility(data::Dict{String,Any})
 
-    if data["are_gates_real"]
-        det_target = LA.det(data["target_gate"])
-    else
-        det_target = LA.det(QCO.real_to_complex_gate(data["target_gate"]))
-    end
+    det_target = data["are_gates_real"] ? LA.det(data["target_gate"]) : 
+                                          LA.det(QCO.real_to_complex_gate(data["target_gate"]))
 
-    if QCO.is_zero(imag(det_target)) 
-        if isapprox(det_target, -1, atol=1E-6)
-            sum_det = 0
-            for k = 1:length(keys(data["gates_dict"]))
-                det_val = LA.det(data["gates_dict"]["$k"]["matrix"])
-                if QCO.is_zero(imag(det_val)) 
-                    sum_det += det_val
-                end
-            end
-            
-            if (isapprox(sum_det, length(keys(data["gates_dict"])), atol = 1E-6)) && (data["decomposition_type"] == "exact_optimal")
-                Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
+    if QCO.is_zero(imag(det_target))
+        if isapprox(det_target, -1, atol=1e-6)
+            # Sum determinants of elementary gates
+            sum_det = sum(
+                LA.det(g["matrix"]) for g in values(data["gates_dict"])
+                if QCO.is_zero(imag(LA.det(g["matrix"])))
+            )
+
+            if isapprox(sum_det, length(data["gates_dict"]), atol=1e-6) &&
+                data["decomposition_type"] == "exact_optimal"
+                Memento.error(_LOGGER, 
+                    "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
             end
         end
     else
-        det_gates_real = true
-        for k = 1:length(keys(data["gates_dict"]))
-            if !(QCO.is_zero(imag(LA.det(data["gates_dict"]["$k"]["matrix"]))))
-                det_gates_real = false
-                continue
-            end
-        end
-        
-        if det_gates_real && (data["decomposition_type"] == "exact_optimal")
-            Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
-        end
+        # Check if all elementary gate determinants are real
+        det_gates_real = all(
+            QCO.is_zero(imag(LA.det(g["matrix"]))) for g in values(data["gates_dict"])
+        )
 
+        if det_gates_real && data["decomposition_type"] == "exact_optimal"
+            Memento.error(_LOGGER, 
+                "Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
+        end
     end
-
 end
 
 """
@@ -883,47 +876,3 @@ end
 
 
 is_zero(x; tol = 1E-6) = isapprox(x, 0, atol = tol)
-
-
-#=
-"""
-    controlled_gate(gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
-
-Given a complex-valued matrix (`gate`) of `N` qubits, and number of control qubits (`NCQ`), 
-this function returns a complex-valued controlled gate representable in `N+NCQ` qubits. 
-The state of control qubit is applied `NCQ` times to every wire preceeding the location 
-of the input gate. Note that this function does not account for the actual location
-of the controlled gate in the circuit. Here are a few examples:
-(a) [ToffoliGate](@ref) = controlled_gate(XGate(), 2) = controlled_gate(CNotGate(), 1)
-(b) CCCCCZGate = controlled_gate(ZGate(), 5)
-(c) TCCGate = controlled(TGate(), 2, reverse = true)
-"""
-function controlled_gate(ctrl_gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
-
-    if num_control_qubits < 0
-        Memento.error(_LOGGER, "Number of control qubits has to be a non-negative integer")
-    end
-    
-    M_0 = Array{Complex{Float64},2}([1 0; 0 0])
-    M_1 = Array{Complex{Float64},2}([0 0; 0 1])
-
-    for _ = 1:num_control_qubits
-        num_qubits = Int(log2(size(ctrl_gate)[1]))
-
-        if !reverse 
-            # |0⟩⟨0| ⊗ I
-            control_0 = kron(M_0, QCO.IGate(num_qubits))
-            # |1⟩⟨1| ⊗ G
-            control_1 = kron(M_1, ctrl_gate)
-        else
-            # I ⊗ |0⟩⟨0|
-            control_0 = kron(QCO.IGate(num_qubits), M_0)
-            # G ⊗ |1⟩⟨1|
-            control_1 = kron(ctrl_gate, M_1)
-        end
-        ctrl_gate = control_0 + control_1
-    end
-
-    return ctrl_gate
-end
-=#

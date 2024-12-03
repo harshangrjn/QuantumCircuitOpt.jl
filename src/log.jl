@@ -9,19 +9,17 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
     _header_color = :cyan 
     _main_color   = :White
 
-    if !(results["primal_status"] in [MOI.FEASIBLE_POINT, MOI.NEARLY_FEASIBLE_POINT])  
-        
-        if results["termination_status"]  == MOI.TIME_LIMIT 
-            Memento.warn(_LOGGER, "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate")
-        else
-            Memento.warn(_LOGGER, "Infeasible primal status. Gate decomposition may be inaccurate")
-        end
-
-        return
-    else
-        gates_sol, gates_sol_compressed = QCO.get_postprocessed_circuit(results, data)
-    end
-
+    if !(results["primal_status"] in [MOI.FEASIBLE_POINT, MOI.NEARLY_FEASIBLE_POINT]) || 
+        (results["termination_status"] == MOI.INFEASIBLE)
+         msg = results["termination_status"] == MOI.TIME_LIMIT ? 
+               "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate" : 
+               "Infeasible primal status. Gate decomposition may be inaccurate"
+         Memento.warn(_LOGGER, msg)
+         return
+     end
+     
+    gates_sol, gates_sol_compressed = QCO.get_postprocessed_circuit(results, data)
+    
     if !isempty(gates_sol_compressed)
 
         printstyled("\n","=============================================================================","\n"; color = _main_color)

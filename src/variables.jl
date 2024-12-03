@@ -181,3 +181,10 @@ function variable_binary_products(qcm::QuantumCircuitModel)
     qcm.variables[:Z_var] = JuMP.@variable(qcm.model, 0 <= Z[1:num_gates, 1:num_gates, 1:max_depth] <= 1)
     return
 end
+
+function variable_tight_unitary_linearization(qcm::QuantumCircuitModel)
+    num_gates = size(qcm.data["gates_real"])[3]
+
+    qcm.variables[:Z_lin_var] = JuMP.@variable(qcm.model, 0 <= Z_lin_var[1:num_gates, 1:num_gates] <= 1)
+    return
+end
