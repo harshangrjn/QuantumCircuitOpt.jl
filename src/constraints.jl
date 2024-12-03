@@ -560,7 +560,10 @@ function constraint_unitary_property(qcm::QuantumCircuitModel)
     return
 end
 
-function constraint_unitary_complex_conjugate(qcm::QuantumCircuitModel)
+function constraint_unitary_complex_conjugate(qcm::QuantumCircuitModel; 
+                                              quadratic_constraint = true,
+                                              num_gates_bnd = 50)
+
     max_depth  = qcm.data["maximum_depth"]
     z_bin_var  = qcm.variables[:z_bin_var]
     U_var  = qcm.variables[:U_var]
@@ -568,7 +571,7 @@ function constraint_unitary_complex_conjugate(qcm::QuantumCircuitModel)
 
     num_gates  = size(gates_real)[3]
 
-    if max_depth >= 3
+    if max_depth >= 2
         JuMP.@constraint(qcm.model, U_var[:, :, (max_depth-1)] .== 
                                     qcm.data["target_gate"] *
                                     sum(z_bin_var[i, (max_depth)] *  
@@ -576,15 +579,17 @@ function constraint_unitary_complex_conjugate(qcm::QuantumCircuitModel)
                         )
     end
 
-    if max_depth >= 4
-        # Quadratic constraint
+    # Quadratic constraint
+    if (max_depth >= 3) && (num_gates <= num_gates_bnd) && (quadratic_constraint)
+        Memento.info(_LOGGER, "Applying quadratic unitary complex-congugate constraints")
+        
         JuMP.@constraint(qcm.model, U_var[:, :, (max_depth-2)] .== 
                                     qcm.data["target_gate"] *
                                     sum(z_bin_var[i, (max_depth)] *  
                                     (gates_real[:,:,i]') for i=1:num_gates) * 
                                     sum(z_bin_var[i, (max_depth-1)] *  
                                     (gates_real[:,:,i]') for i=1:num_gates)
-                        )
+    )
 
     end
 

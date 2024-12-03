@@ -144,27 +144,44 @@ function variable_gate_products_linearization(qcm::QuantumCircuitModel)
     return
 end
 
-function variable_slack_for_feasibility(qcm::QuantumCircuitModel)
-    n_r     = size(qcm.data["gates_real"])[1]
-    n_c     = size(qcm.data["gates_real"])[2]
-    max_depth   = qcm.data["maximum_depth"]
-    U_var = qcm.variables[:U_var]
+# function variable_slack_for_feasibility(qcm::QuantumCircuitModel)
+#     n_r     = size(qcm.data["gates_real"])[1]
+#     n_c     = size(qcm.data["gates_real"])[2]
+#     max_depth   = qcm.data["maximum_depth"]
+#     U_var = qcm.variables[:U_var]
     
+#     qcm.variables[:slack_var] = JuMP.@variable(qcm.model, slack_var[1:n_r, 1:n_c])
+
+#     for i=1:n_r, j=1:n_c
+#         lb = JuMP.lower_bound(U_var[i,j,max_depth-1])
+#         ub = JuMP.upper_bound(U_var[i,j,max_depth-1])
+#         if QCO.is_zero(lb) && QCO.is_zero(ub)
+#             JuMP.set_lower_bound(slack_var[i,j], 0)
+#             JuMP.set_upper_bound(slack_var[i,j], 0)
+#         else 
+#             JuMP.set_lower_bound(slack_var[i,j], -1)
+#             JuMP.set_upper_bound(slack_var[i,j],  1)
+#         end
+#     end
+#     return
+# end   
+
+function variable_slack_for_feasibility(qcm::QuantumCircuitModel)
+    n_r, n_c = size(qcm.data["gates_real"])[1:2]
+    max_depth = qcm.data["maximum_depth"]
+    U_var = qcm.variables[:U_var]
+
     qcm.variables[:slack_var] = JuMP.@variable(qcm.model, slack_var[1:n_r, 1:n_c])
 
-    for i=1:n_r, j=1:n_c
-        lb = JuMP.lower_bound(U_var[i,j,max_depth-1])
-        ub = JuMP.upper_bound(U_var[i,j,max_depth-1])
-        if QCO.is_zero(lb) && QCO.is_zero(ub)
-            JuMP.set_lower_bound(slack_var[i,j], 0)
-            JuMP.set_upper_bound(slack_var[i,j], 0)
-        else 
-            JuMP.set_lower_bound(slack_var[i,j], -1)
-            JuMP.set_upper_bound(slack_var[i,j],  1)
-        end
+    # Set bounds for slack variables
+    for i in 1:n_r, j in 1:n_c
+        lb, ub = JuMP.lower_bound(U_var[i, j, max_depth - 1]), JuMP.upper_bound(U_var[i, j, max_depth - 1])
+        bounds = (QCO.is_zero(lb) && QCO.is_zero(ub)) ? (0, 0) : (-1, 1)
+        JuMP.set_lower_bound(slack_var[i, j], bounds[1])
+        JuMP.set_upper_bound(slack_var[i, j], bounds[2])
     end
-    return
 end
+
 
 function variable_slack_var_outer_approximation(qcm::QuantumCircuitModel)
     n_r     = size(qcm.data["gates_real"])[1]
