@@ -14,7 +14,7 @@
 
     model_options = Dict{Symbol, Any}(:model_type => "compact_formulation_1", # Testing incorrect model_type
                                       :all_valid_constraints => 2,            # Testing incorrect all_valid_constraints
-                                      :unitary_complex_conjugate => false,
+                                      :unitary_complex_conjugate => 1,
                                      )
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
@@ -44,7 +44,7 @@ end
     
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
                                       :all_valid_constraints => 1,
-                                      :unitary_complex_conjugate => false
+                                      :unitary_complex_conjugate => 1,
                                       )
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
@@ -152,7 +152,8 @@ end
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
-                                      :commute_gate_constraints => true)
+                                      :commute_gate_constraints => true,
+                                      :unitary_complex_conjugate => 1,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
 
@@ -177,7 +178,8 @@ end
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
-                                      :commute_gate_constraints => true)
+                                      :commute_gate_constraints => true,
+                                      :unitary_complex_conjugate => 1,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
 
@@ -202,7 +204,8 @@ end
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
-                                      :commute_gate_constraints => true)
+                                      :commute_gate_constraints => true,
+                                      :unitary_complex_conjugate => 1,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
 
@@ -227,7 +230,8 @@ end
     "decomposition_type" => "exact_optimal"                   
     )
 
-    model_options = Dict{Symbol, Any}(:model_type => "balas_formulation")
+    model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
+                                      :unitary_complex_conjugate => 1,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
     
@@ -259,7 +263,8 @@ end
         "decomposition_type" => "exact_optimal"                  
     )
 
-    model_options = Dict{Symbol, Any}(:model_type => "balas_formulation")
+    model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
+                                      :unitary_complex_conjugate => 1,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
     
@@ -322,7 +327,7 @@ end
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact_optimal"
     )
-    model_options = Dict{Symbol, Any}(:unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -354,7 +359,7 @@ end
             @test (parse(Int, i) in involutory_gates)
         end
     end
-    model_options = Dict{Symbol, Any}(:unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -374,7 +379,7 @@ end
     )
 
     model_options = Dict{Symbol, Any}(:time_limit => 0.1,
-                                      :unitary_complex_conjugate => false)
+                                      :unitary_complex_conjugate => 1,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.TIME_LIMIT
@@ -429,7 +434,8 @@ end
     idempotent_pairs = QCO.get_idempotent_gates(data["gates_dict"], data["decomposition_type"])
     @test length(idempotent_pairs) == 2
 
-    model_options = Dict{Symbol, Any}(:idempotent_gate_constraints => true)
+    model_options = Dict{Symbol, Any}(:idempotent_gate_constraints => true,
+                                      :unitary_complex_conjugate => 1,)
     
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
@@ -470,7 +476,7 @@ end
                                       :convex_hull_gate_constraints => true,
                                       :fix_unitary_variables => true,
                                       :optimizer_log => false,
-                                      :unitary_complex_conjugate => false,
+                                      :unitary_complex_conjugate => 1,
                                       )
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
@@ -498,7 +504,10 @@ end
     "decomposition_type" => "exact_optimal",
     )
     
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :fix_unitary_variables => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, 
+                                      :fix_unitary_variables => false,
+                                      :unitary_complex_conjugate => 1,)
+                                      
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
@@ -525,7 +534,7 @@ end
     
     model_options = Dict{Symbol, Any}(:optimizer_log => false, 
                                       :unitary_constraints => true,
-                                      :unitary_complex_conjugate => false)
+                                      :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
 
     @test result_qc["termination_status"] == MOI.OPTIMAL
@@ -545,7 +554,7 @@ end
         "decomposition_type" => "exact_feasible",
         )
 
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -563,7 +572,7 @@ end
         "objective" => "minimize_depth",
         "decomposition_type" => "approximate",
         )
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -579,14 +588,14 @@ end
         "objective" => "minimize_depth",
         "decomposition_type" => "approximate",
         )
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 5.0, atol = tol_0)
 
     # Testing approximate decomposition for balas_formulation
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :model_type => "balas_formulation", :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :model_type => "balas_formulation", :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -594,7 +603,7 @@ end
 
     # Testing approximate decomposition for feasibility case
     params["elementary_gates"] = ["H_1", "H_2", "CNot_1_2"]
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -603,7 +612,7 @@ end
     # Testing approximate decomposition for minimizing CNOT gates
     params["elementary_gates"] = ["H_1", "H_2", "CNot_1_2", "Identity"]
     params["objective"] = "minimize_cnot"
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -618,7 +627,7 @@ end
     "objective" => "minimize_depth",
     "decomposition_type" => "approximate"
     )
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :relax_integrality => true, :fix_unitary_variables => true, :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :relax_integrality => true, :fix_unitary_variables => true, :unitary_complex_conjugate => 1,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
@@ -636,7 +645,7 @@ end
         "target_gate" => - QCO.CNotRevGate(),
         "objective" => "minimize_depth",
         )
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => false)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :unitary_complex_conjugate => 1,)
 
     # Without global phase constraints
     params["decomposition_type"] = "exact_optimal"

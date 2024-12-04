@@ -114,35 +114,56 @@ function variable_gate_products_copy(qcm::QuantumCircuitModel)
     return
 end
 
+# function variable_gate_products_linearization(qcm::QuantumCircuitModel)
+#     n_r     = size(qcm.data["gates_real"])[1]
+#     n_c     = size(qcm.data["gates_real"])[2]
+#     max_depth   = qcm.data["maximum_depth"]
+#     num_gates = size(qcm.data["gates_real"])[3]
+
+#     if !qcm.options.fix_unitary_variables
+#         qcm.variables[:zU_var] = JuMP.@variable(qcm.model, -1 <= zU_var[1:n_r, 1:n_c, 1:num_gates, 1:(max_depth-1)] <= 1)
+#         return 
+#     end
+
+#     U_var = qcm.variables[:U_var]
+#     qcm.variables[:zU_var] = JuMP.@variable(qcm.model, zU_var[1:n_r, 1:n_c, 1:num_gates, 1:(max_depth-1)])
+
+#     for d = 1:(max_depth-1), i = 1:n_r, j = 1:n_c, k = 1:num_gates
+#         U_var_l = JuMP.lower_bound(U_var[i,j,d])
+#         U_var_u = JuMP.upper_bound(U_var[i,j,d])
+
+#         if QCO.is_zero(U_var_l) && QCO.is_zero(U_var_u)
+#             JuMP.set_lower_bound(zU_var[i,j,k,d], 0)
+#             JuMP.set_upper_bound(zU_var[i,j,k,d], 0)
+#         else
+#             JuMP.set_lower_bound(zU_var[i,j,k,d], -1)
+#             JuMP.set_upper_bound(zU_var[i,j,k,d],  1)
+#         end
+#     end 
+    
+#     return
+# end
+
 function variable_gate_products_linearization(qcm::QuantumCircuitModel)
-    n_r     = size(qcm.data["gates_real"])[1]
-    n_c     = size(qcm.data["gates_real"])[2]
-    max_depth   = qcm.data["maximum_depth"]
-    num_gates = size(qcm.data["gates_real"])[3]
+    n_r, n_c, num_gates = size(qcm.data["gates_real"])[1:3]
+    max_depth = qcm.data["maximum_depth"]
 
     if !qcm.options.fix_unitary_variables
         qcm.variables[:zU_var] = JuMP.@variable(qcm.model, -1 <= zU_var[1:n_r, 1:n_c, 1:num_gates, 1:(max_depth-1)] <= 1)
-        return 
+        return
     end
 
     U_var = qcm.variables[:U_var]
     qcm.variables[:zU_var] = JuMP.@variable(qcm.model, zU_var[1:n_r, 1:n_c, 1:num_gates, 1:(max_depth-1)])
 
-    for d = 1:(max_depth-1), i = 1:n_r, j = 1:n_c, k = 1:num_gates
-        U_var_l = JuMP.lower_bound(U_var[i,j,d])
-        U_var_u = JuMP.upper_bound(U_var[i,j,d])
-
-        if QCO.is_zero(U_var_l) && QCO.is_zero(U_var_u)
-            JuMP.set_lower_bound(zU_var[i,j,k,d], 0)
-            JuMP.set_upper_bound(zU_var[i,j,k,d], 0)
-        else
-            JuMP.set_lower_bound(zU_var[i,j,k,d], -1)
-            JuMP.set_upper_bound(zU_var[i,j,k,d],  1)
-        end
-    end 
-    
-    return
+    for d in 1:(max_depth-1), i in 1:n_r, j in 1:n_c, k in 1:num_gates
+        lb, ub = JuMP.lower_bound(U_var[i, j, d]), JuMP.upper_bound(U_var[i, j, d])
+        bounds = (QCO.is_zero(lb) && QCO.is_zero(ub)) ? (0, 0) : (-1, 1)
+        JuMP.set_lower_bound(qcm.variables[:zU_var][i, j, k, d], bounds[1])
+        JuMP.set_upper_bound(qcm.variables[:zU_var][i, j, k, d], bounds[2])
+    end
 end
+
 
 # function variable_slack_for_feasibility(qcm::QuantumCircuitModel)
 #     n_r     = size(qcm.data["gates_real"])[1]
@@ -196,12 +217,5 @@ function variable_binary_products(qcm::QuantumCircuitModel)
     max_depth = qcm.data["maximum_depth"]
     
     qcm.variables[:Z_var] = JuMP.@variable(qcm.model, 0 <= Z[1:num_gates, 1:num_gates, 1:max_depth] <= 1)
-    return
-end
-
-function variable_tight_unitary_linearization(qcm::QuantumCircuitModel)
-    num_gates = size(qcm.data["gates_real"])[3]
-
-    qcm.variables[:Z_lin_var] = JuMP.@variable(qcm.model, 0 <= Z_lin_var[1:num_gates, 1:num_gates] <= 1)
     return
 end

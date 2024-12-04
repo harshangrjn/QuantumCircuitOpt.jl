@@ -201,9 +201,9 @@ function revcnot()
     "num_qubits" => 2, 
     "maximum_depth" => 5,
     "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
-    "target_gate" => QCOpt.CNotRevGate(),
+    "target_gate" => -QCOpt.CNotRevGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact_optimal"
+    "decomposition_type" => "optimal_global_phase"
     )
 end
 
