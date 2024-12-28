@@ -231,7 +231,7 @@ end
     )
 
     model_options = Dict{Symbol, Any}(:model_type => "balas_formulation",
-                                      :unitary_complex_conjugate => 1,)
+                                      :unitary_complex_conjugate => 0,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options =  model_options)
     
@@ -379,7 +379,7 @@ end
     )
 
     model_options = Dict{Symbol, Any}(:time_limit => 0.1,
-                                      :unitary_complex_conjugate => 1,)
+                                      :unitary_complex_conjugate => 0,)
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.TIME_LIMIT
@@ -476,7 +476,7 @@ end
                                       :convex_hull_gate_constraints => true,
                                       :fix_unitary_variables => true,
                                       :optimizer_log => false,
-                                      :unitary_complex_conjugate => 1,
+                                      :unitary_complex_conjugate => 0,
                                       )
 
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
@@ -627,7 +627,7 @@ end
     "objective" => "minimize_depth",
     "decomposition_type" => "approximate"
     )
-    model_options = Dict{Symbol, Any}(:optimizer_log => false, :relax_integrality => true, :fix_unitary_variables => true, :unitary_complex_conjugate => 1,)
+    model_options = Dict{Symbol, Any}(:optimizer_log => false, :relax_integrality => true, :fix_unitary_variables => true, :unitary_complex_conjugate => 0,)
     result_qc = QCO.run_QCModel(params, MIP_SOLVER; options = model_options)
     @test result_qc["termination_status"] == MOI.OPTIMAL
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT

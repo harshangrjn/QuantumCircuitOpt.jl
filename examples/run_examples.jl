@@ -11,7 +11,7 @@ include("optimizers.jl")
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-decompose_gates = ["revcnot"]
+# decompose_gates = ["QFT3"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

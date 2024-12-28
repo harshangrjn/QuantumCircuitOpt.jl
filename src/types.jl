@@ -44,7 +44,7 @@ function get_default_options()
     idempotent_gate_constraints        = false # true, false
     convex_hull_gate_constraints       = false # true, false
     unitary_constraints                = false # true, false
-    unitary_complex_conjugate          = 2     # 0, 1 (linear), 2 (linear + quadratic)
+    unitary_complex_conjugate          = 1     # 0, 1 (linear), 2 (linear + quadratic)
 
     time_limit                         = 10800 # float value
     relax_integrality                  = false # true, false

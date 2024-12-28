@@ -219,6 +219,7 @@ function margolus()
         "elementary_gates" => ["RY_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
         "target_gate" => QCOpt.MargolusGate(),
         "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal",
 
         "RY_discretization" => -π:π/4:π,
         # "set_cnot_lower_bound" => 3,
