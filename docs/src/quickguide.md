@@ -161,7 +161,7 @@ QCOpt currently supports the visualization of optimal circuit decompositions obt
 data = QCOpt.get_data(params)
 QCOpt.visualize_solution(results, data)
 ```
-For example, for the above controlled-Z gate decomposition, the processed QCOpt output is shown below (on Apple M3 Pro with Gurobi 12.0.0): 
+For example, for the above controlled-Z gate decomposition, the processed QCOpt output is shown below (on Apple M4 Max with Gurobi 12.0.0): 
 ```
 =============================================================================
 QuantumCircuitOpt version: 0.6.0
@@ -180,7 +180,7 @@ Quantum Circuit Model Data
 Optimal Circuit Decomposition
   U3_2(-90.0,0.0,0.0) * CNot_1_2 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 1.45 sec.
+  Optimizer run time: 1.31 sec.
 =============================================================================
 ```
 
