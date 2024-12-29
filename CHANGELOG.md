@@ -1,6 +1,18 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.6.0 
+- Minor clean up in global phase enforcing constraints 
+- Added support for `unitary_complex_conjugate` constraints (for both with and without global phase), which significantly speeds up QCOpt’s decomposition methods.
+- Added `is_zero` function with a `tol` option
+- Added `QFT3Gate` to docs
+- Dropped support for `controlled_gate`
+- Added `controlled_H_with_clifford` to `2qubit_gates.jl`
+- Added a generic `multi_controlled_gate` function to evaluate multi-qubit gates with multiple controls for any single-qubit target gate (e.g. multiple-control Toffoli)
+- Cleaned up angle discretization code, which is generic now - `get_all_angle_gates` and `get_discretized_angle_gates` 
+- Cleaned up determinant-based infeasibility tests (`_determinant_test_for_infeasibility`)
+- Qubit routing example (4-qubit gate) added
+
 ### v0.5.9
 - Catch error in `data.jl` if `set_cnot_lower_bound` > `maximum_depth`
 - Feasibility switching warning moved to the correct condition in objective.jl

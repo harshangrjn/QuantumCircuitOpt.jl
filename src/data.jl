@@ -198,41 +198,25 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
     one_angle_gates, two_angle_gates, three_angle_gates = QCO._get_angle_gates_idx(data["elementary_gates"])
 
     if !isempty(union(one_angle_gates, two_angle_gates, three_angle_gates)) 
-
-        if length(findall(x -> (occursin("discretization", x)), collect(keys(params)))) == 0
-            Memento.error(_LOGGER, "Enter valid discretization angles in the imput params")
+        if length(findall(x -> occursin("discretization", x), collect(keys(params)))) == 0
+            Memento.error(_LOGGER, "Enter valid discretization angles in the input params")
         end
 
         data["discretization"] = Dict{String, Any}()
+        angle_types = [one_angle_gates   => ["_discretization"],
+                       two_angle_gates   => ["_θ_discretization", "_ϕ_discretization"],
+                       three_angle_gates => ["_θ_discretization", "_ϕ_discretization", "_λ_discretization"]]
 
-        if !isempty(one_angle_gates)
-            for i in one_angle_gates
+        for (gates, suffixes) in angle_types
+            for i in gates
                 gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
-
-                data["discretization"][gate_type] = Float64.(params["$(gate_type)_discretization"])
+                for suffix in suffixes
+                    key = "$(gate_type)$(suffix)"
+                    data["discretization"][key] = Float64.(params[key])
+                end
             end
         end
 
-        if !isempty(two_angle_gates)
-            for i in two_angle_gates
-                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
-            
-                data["discretization"]["$(gate_type)_θ"] = Float64.(params["$(gate_type)_θ_discretization"])
-                data["discretization"]["$(gate_type)_ϕ"] = Float64.(params["$(gate_type)_ϕ_discretization"])
-                
-            end
-        end
-
-        if !isempty(three_angle_gates)
-            for i in three_angle_gates
-                gate_type = QCO._parse_gate_string(data["elementary_gates"][i], type = true)
-            
-                data["discretization"]["$(gate_type)_θ"] = Float64.(params["$(gate_type)_θ_discretization"])
-                data["discretization"]["$(gate_type)_ϕ"] = Float64.(params["$(gate_type)_ϕ_discretization"])
-                data["discretization"]["$(gate_type)_λ"] = Float64.(params["$(gate_type)_λ_discretization"])
-                
-            end
-        end
     end
 
     return data
@@ -285,52 +269,34 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
     num_qubits = params["num_qubits"]
 
     one_angle_gates, two_angle_gates, three_angle_gates = QCO._get_angle_gates_idx(elementary_gates)
+    angle_gates = [one_angle_gates, two_angle_gates, three_angle_gates]
+    num_angle_gates = [1, 2, 3]
+    angle_gates_dicts = [Dict{String, Any}() for _ in 1:length(num_angle_gates)]
 
-    one_angle_gates_dict   = Dict{String,Any}()
-    two_angle_gates_dict   = Dict{String,Any}()
-    three_angle_gates_dict = Dict{String,Any}()
+    for (i, gates) in enumerate(angle_gates)
+        if !isempty(gates)
+            angle_gates_dicts[i] = QCO.get_all_angle_gates(params, elementary_gates, gates, num_angle_gates[i])
+        end
+    end
+    all_angle_gates_dict = merge(angle_gates_dicts...)
 
-    if !isempty(one_angle_gates)
-        one_angle_gates_dict   = QCO.get_all_one_angle_gates(params, elementary_gates, one_angle_gates)
-    end
-    if !isempty(two_angle_gates)
-        two_angle_gates_dict   = QCO.get_all_two_angle_gates(params, elementary_gates, two_angle_gates)
-    end
-    if !isempty(three_angle_gates)
-        three_angle_gates_dict = QCO.get_all_three_angle_gates(params, elementary_gates, three_angle_gates)
-    end
-    
-    all_angle_gates_dict = merge(one_angle_gates_dict, two_angle_gates_dict, three_angle_gates_dict)
-    
     gates_dict = Dict{String, Any}()
-
     counter = 1
+    angle_keys = Dict(1 => ["θ"], 2 => ["θ", "ϕ"], 3 => ["θ", "ϕ", "λ"])
 
     for i=1:length(elementary_gates)
 
         if i in union(one_angle_gates, two_angle_gates, three_angle_gates)       
             M_elementary_dict = all_angle_gates_dict[elementary_gates[i]]
+            num_angles = i in one_angle_gates ? 1 : i in two_angle_gates ? 2 : i in three_angle_gates ? 3 : 0
+            
             for k in keys(M_elementary_dict) # Angle
                 for l in keys(M_elementary_dict[k]["$(num_qubits)qubit_rep"]) # qubits (which will now be 1)
 
                     gates_dict["$counter"] = Dict{String, Any}("type"      => [elementary_gates[i]],
-                                                               "angle"     => Any,
+                                                               "angle"     => Dict(key => M_elementary_dict[k][key] for key in angle_keys[num_angles]),
                                                                "qubit_loc" => l,
                                                                "matrix"    => M_elementary_dict[k]["$(num_qubits)qubit_rep"][l])
-
-                    if i in one_angle_gates
-                        gates_dict["$counter"]["angle"] = M_elementary_dict[k]["angle"]
-                    
-                    elseif i in two_angle_gates
-                        gates_dict["$counter"]["angle"] = Dict{String, Any}("θ" => M_elementary_dict[k]["θ"],
-                                                                            "ϕ" => M_elementary_dict[k]["ϕ"])
-
-                    elseif i in three_angle_gates
-                        gates_dict["$counter"]["angle"] = Dict{String, Any}("θ" => M_elementary_dict[k]["θ"],
-                                                                            "ϕ" => M_elementary_dict[k]["ϕ"],
-                                                                            "λ" => M_elementary_dict[k]["λ"],)
-                    end
-
                     counter += 1
                 end
             end
@@ -344,183 +310,62 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
 
     end
 
-    are_elementary_gates_real = true
-
-    for i in keys(gates_dict)
-        if !(QCO.is_gate_real(gates_dict[i]["matrix"]))
-            are_elementary_gates_real = false
-            continue
-        end
-    end
-
+    are_elementary_gates_real = all(QCO.is_gate_real(gate["matrix"]) for gate in values(gates_dict))
     return gates_dict, are_elementary_gates_real
 end
 
-function get_all_one_angle_gates(params::Dict{String, Any}, elementary_gates::Array{String,1}, gates_idx::Vector{Int64})
+function get_all_angle_gates(params::Dict{String, Any}, 
+    elementary_gates::Array{String,1}, 
+    gates_idx::Vector{Int64}, 
+    num_angles::Int)
 
     gates_complex = Dict{String, Any}()
+    angles = ["θ", "ϕ", "λ"][1:num_angles]
 
-    if length(gates_idx) >= 1 
-        for i=1:length(gates_idx)
-            input_gate = elementary_gates[gates_idx[i]]
-            gate_name = QCO._parse_gate_string(input_gate, type=true)
-            
-            if isempty(params[string(gate_name,"_discretization")])
-                Memento.error(_LOGGER, "Empty discretization angles for $(input_gate) gate. Input a valid angle")
-            end
+    for i in gates_idx
+        input_gate = elementary_gates[i]
+        gate_name = QCO._parse_gate_string(input_gate, type=true)
 
-            angle_disc = Float64.(params[string(gate_name,"_discretization")])
+        disc_angles = [Float64.(params["$(gate_name)_$(num_angles == 1 ? "" : "$(angle)_")discretization"]) for angle in angles]
 
-            gates_complex[input_gate] = Dict{String, Any}()    
-            gates_complex[input_gate] = QCO.get_discretized_one_angle_gates(input_gate, gates_complex[input_gate], angle_disc, params["num_qubits"])
+        if any(isempty, disc_angles)
+            Memento.error(_LOGGER, "Empty discretization angle for $input_gate gate. Input a valid angle")
         end
+
+        gates_complex[input_gate] = QCO.get_discretized_angle_gates(input_gate, Dict{String, Any}(), disc_angles, params["num_qubits"])
     end
 
     return gates_complex
 end
 
-function get_discretized_one_angle_gates(gate_type::String, M1::Dict{String, Any}, discretization::Array{Float64,1}, num_qubits::Int64)
-
-    if length(discretization) >= 1
-        for i=1:length(discretization)
-            angles = discretization[i]
-            M1["angle_$i"] = Dict{String, Any}("angle" => angles,
-                                             "$(num_qubits)qubit_rep" => Dict{String, Any}() )
-            
-            qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
-            if length(qubit_loc) == 1
-                qubit_loc_str = string(qubit_loc[1])
-            elseif length(qubit_loc) == 2 
-                qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
-            end
-            
-            M1["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
-        end
-    end 
-
-    return M1
-end
-
-# This function assumes that θ and ϕ are the only angle paramters in the input gate (like QCO.RGate())
-function get_all_two_angle_gates(params::Dict{String, Any}, elementary_gates::Array{String,1}, gates_idx::Vector{Int64})
-
-    gates_complex = Dict{String, Any}()
-    
-    if length(gates_idx) >= 1     
-        for i=1:length(gates_idx)
-
-            input_gate = elementary_gates[gates_idx[i]]
-            gate_name  = QCO._parse_gate_string(input_gate, type = true)
-            gates_complex[input_gate] = Dict{String, Any}()    
-            
-            for angle in ["θ", "ϕ"]
-                if isempty(params["$(gate_name)_$(angle)_discretization"])
-                    Memento.error(_LOGGER, "Empty $(angle) discretization angle for $input_gate gate. Input atleast one valid angle")
-                end
-            end
-
-            θ_disc = Vector{Float64}(params["$(gate_name)_θ_discretization"])
-            ϕ_disc = Vector{Float64}(params["$(gate_name)_ϕ_discretization"])
-            
-            gates_complex[input_gate] = QCO.get_discretized_two_angle_gates(input_gate, gates_complex[input_gate], θ_disc, ϕ_disc, params["num_qubits"]) 
-            
-        end
-    end
-    
-    return gates_complex    
-end
-
-# This function assumes that θ and ϕ are the only angle paramters in the input gate (like QCO.RGate())
-function get_discretized_two_angle_gates(gate_type::String, M2::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, num_qubits::Int64) 
-
+function get_discretized_angle_gates(gate_type::String, 
+                                     M::Dict{String, Any}, 
+                                     discretizations::Array{Array{Float64,1},1}, 
+                                     num_qubits::Int64)
+  
     counter = 1
+    product_iterator = Base.Iterators.product(reverse(discretizations)...)
 
-    for i=1:length(θ_discretization)
-        for j=1:length(ϕ_discretization)
-            angles = [θ_discretization[i], ϕ_discretization[j]]
+    for p_iter in product_iterator
+        angles = collect(reverse(p_iter))
 
-            M2["angle_$(counter)"] = Dict{String, Any}("θ" => angles[1],
-                                                       "ϕ" => angles[2],
-                                                       "$(num_qubits)qubit_rep" => Dict{String, Any}()
-                                                      )
-            if !(gate_type in QCO.MULTI_QUBIT_GATES)
-                qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
-                if length(qubit_loc) == 1
-                    qubit_loc_str = string(qubit_loc[1])
-                elseif length(qubit_loc) == 2
-                    qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
-                end             
+        angle_dict = Dict{String, Any}(["θ", "ϕ", "λ"][1:length(angles)] .=> angles)
+        angle_dict["$(num_qubits)qubit_rep"] = Dict{String, Any}()
 
-                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
-            else 
-                M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["multi_qubits"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
-            end
+        qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
+        qubit_loc_str = join(qubit_loc, QCO.qubit_separator)
 
-            counter += 1
+        if !(gate_type in QCO.MULTI_QUBIT_GATES)
+            angle_dict["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
+        else
+            angle_dict["$(num_qubits)qubit_rep"]["multi_qubits"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
         end
+
+        M["angle_$(counter)"] = angle_dict
+        counter += 1
     end
-    
-    return M2
-end
 
-
-function get_all_three_angle_gates(params::Dict{String, Any}, elementary_gates::Array{String,1}, gates_idx::Vector{Int64})
-
-    gates_complex = Dict{String, Any}()
-
-    if length(gates_idx) >= 1     
-        for i=1:length(gates_idx)
-
-            input_gate = elementary_gates[gates_idx[i]]
-            gate_name  = QCO._parse_gate_string(input_gate, type = true)
-            gates_complex[input_gate] = Dict{String, Any}()    
-            
-            for angle in ["θ", "ϕ", "λ"]
-                if isempty(params["$(gate_name)_$(angle)_discretization"])
-                    Memento.error(_LOGGER, "Empty $(angle) discretization angle for $input_gate gate. Input atleast one valid angle")
-                end
-            end
-
-            θ_disc = Vector{Float64}(params["$(gate_name)_θ_discretization"])
-            ϕ_disc = Vector{Float64}(params["$(gate_name)_ϕ_discretization"])
-            λ_disc = Vector{Float64}(params["$(gate_name)_λ_discretization"])
-
-            gates_complex[input_gate] = QCO.get_discretized_three_angle_gates(input_gate, gates_complex[input_gate], θ_disc, ϕ_disc, λ_disc, params["num_qubits"]) 
-
-        end
-    end
-    
-    return gates_complex    
-end
-
-function get_discretized_three_angle_gates(gate_type::String, M3::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, λ_discretization::Array{Float64,1}, num_qubits::Int64) 
-
-    counter = 1
-
-    for i=1:length(θ_discretization)
-        for j=1:length(ϕ_discretization)
-            for k=1:length(λ_discretization)
-                angles = [θ_discretization[i], ϕ_discretization[j], λ_discretization[k]]
-
-                M3["angle_$(counter)"] = Dict{String, Any}("θ" => angles[1],
-                                                           "ϕ" => angles[2],
-                                                           "λ" => angles[3],
-                                                           "$(num_qubits)qubit_rep" => Dict{String, Any}()
-                                                          )
-                qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
-                if length(qubit_loc) == 1
-                    qubit_loc_str = string(qubit_loc[1])
-                elseif length(qubit_loc) == 2 
-                    qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
-                end             
-
-                M3["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
-                counter += 1
-            end
-        end
-    end
-    
-    return M3
+    return M
 end
 
 """
@@ -877,23 +722,12 @@ function _get_angle_gates_idx(elementary_gates::Array{String,1})
 end
 
 function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
-
-    cnot_lb = 0
-    cnot_ub = data["maximum_depth"]
-    
-    if "set_cnot_lower_bound" in keys(params)
-        cnot_lb = params["set_cnot_lower_bound"]
-    end
-
-    if "set_cnot_upper_bound" in keys(params)
-        cnot_ub = params["set_cnot_upper_bound"]
-    end
+    cnot_lb = get(params, "set_cnot_lower_bound", 0)
+    cnot_ub = get(params, "set_cnot_upper_bound", data["maximum_depth"])
 
     if cnot_lb > data["maximum_depth"]
         Memento.error(_LOGGER, "Invalid lower bound on the number of CNOT gates given the maximum depth")
-    end
-
-    if cnot_lb < cnot_ub 
+    elseif cnot_lb < cnot_ub
         if cnot_lb > 0
             data["cnot_lower_bound"] = params["set_cnot_lower_bound"]
         end
@@ -907,5 +741,174 @@ function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
         Memento.warn(_LOGGER, "Invalid CNot-gate lower/upper bound")
     end
 
-    return data 
+    return data
 end
+
+
+
+# function get_all_one_angle_gates(params::Dict{String, Any}, elementary_gates::Array{String,1}, gates_idx::Vector{Int64})
+
+#     gates_complex = Dict{String, Any}()
+
+#     if length(gates_idx) >= 1 
+#         for i=1:length(gates_idx)
+#             input_gate = elementary_gates[gates_idx[i]]
+#             gate_name = QCO._parse_gate_string(input_gate, type=true)
+            
+#             if isempty(params[string(gate_name,"_discretization")])
+#                 Memento.error(_LOGGER, "Empty discretization angles for $(input_gate) gate. Input a valid angle")
+#             end
+
+#             angle_disc = Float64.(params[string(gate_name,"_discretization")])
+
+#             gates_complex[input_gate] = Dict{String, Any}()    
+#             gates_complex[input_gate] = QCO.get_discretized_one_angle_gates(input_gate, gates_complex[input_gate], angle_disc, params["num_qubits"])
+#         end
+#     end
+
+#     return gates_complex
+# end
+
+# function get_discretized_one_angle_gates(gate_type::String, M1::Dict{String, Any}, discretization::Array{Float64,1}, num_qubits::Int64)
+
+#     if length(discretization) >= 1
+#         for i=1:length(discretization)
+#             angles = discretization[i]
+#             M1["angle_$i"] = Dict{String, Any}("angle" => angles,
+#                                              "$(num_qubits)qubit_rep" => Dict{String, Any}() )
+            
+#             qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
+#             if length(qubit_loc) == 1
+#                 qubit_loc_str = string(qubit_loc[1])
+#             elseif length(qubit_loc) == 2 
+#                 qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
+#             end
+            
+#             M1["angle_$i"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
+#         end
+#     end 
+
+#     return M1
+# end
+
+# # This function assumes that θ and ϕ are the only angle paramters in the input gate (like QCO.RGate())
+# function get_all_two_angle_gates(params::Dict{String, Any}, elementary_gates::Array{String,1}, gates_idx::Vector{Int64})
+
+#     gates_complex = Dict{String, Any}()
+    
+#     if length(gates_idx) >= 1     
+#         for i=1:length(gates_idx)
+
+#             input_gate = elementary_gates[gates_idx[i]]
+#             gate_name  = QCO._parse_gate_string(input_gate, type = true)
+#             gates_complex[input_gate] = Dict{String, Any}()    
+            
+#             for angle in ["θ", "ϕ"]
+#                 if isempty(params["$(gate_name)_$(angle)_discretization"])
+#                     Memento.error(_LOGGER, "Empty $(angle) discretization angle for $input_gate gate. Input atleast one valid angle")
+#                 end
+#             end
+
+#             θ_disc = Vector{Float64}(params["$(gate_name)_θ_discretization"])
+#             ϕ_disc = Vector{Float64}(params["$(gate_name)_ϕ_discretization"])
+            
+#             gates_complex[input_gate] = QCO.get_discretized_two_angle_gates(input_gate, gates_complex[input_gate], θ_disc, ϕ_disc, params["num_qubits"]) 
+            
+#         end
+#     end
+    
+#     return gates_complex    
+# end
+
+# # This function assumes that θ and ϕ are the only angle paramters in the input gate (like QCO.RGate())
+# function get_discretized_two_angle_gates(gate_type::String, M2::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, num_qubits::Int64) 
+
+#     counter = 1
+
+#     for i=1:length(θ_discretization)
+#         for j=1:length(ϕ_discretization)
+#             angles = [θ_discretization[i], ϕ_discretization[j]]
+
+#             M2["angle_$(counter)"] = Dict{String, Any}("θ" => angles[1],
+#                                                        "ϕ" => angles[2],
+#                                                        "$(num_qubits)qubit_rep" => Dict{String, Any}()
+#                                                       )
+#             if !(gate_type in QCO.MULTI_QUBIT_GATES)
+#                 qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
+#                 if length(qubit_loc) == 1
+#                     qubit_loc_str = string(qubit_loc[1])
+#                 elseif length(qubit_loc) == 2
+#                     qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
+#                 end             
+
+#                 M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
+#             else 
+#                 M2["angle_$(counter)"]["$(num_qubits)qubit_rep"]["multi_qubits"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
+#             end
+
+#             counter += 1
+#         end
+#     end
+    
+#     return M2
+# end
+
+
+# function get_all_three_angle_gates(params::Dict{String, Any}, elementary_gates::Array{String,1}, gates_idx::Vector{Int64})
+
+#     gates_complex = Dict{String, Any}()
+
+#     if length(gates_idx) >= 1     
+#         for i=1:length(gates_idx)
+
+#             input_gate = elementary_gates[gates_idx[i]]
+#             gate_name  = QCO._parse_gate_string(input_gate, type = true)
+#             gates_complex[input_gate] = Dict{String, Any}()    
+            
+#             for angle in ["θ", "ϕ", "λ"]
+#                 if isempty(params["$(gate_name)_$(angle)_discretization"])
+#                     Memento.error(_LOGGER, "Empty $(angle) discretization angle for $input_gate gate. Input atleast one valid angle")
+#                 end
+#             end
+
+#             θ_disc = Vector{Float64}(params["$(gate_name)_θ_discretization"])
+#             ϕ_disc = Vector{Float64}(params["$(gate_name)_ϕ_discretization"])
+#             λ_disc = Vector{Float64}(params["$(gate_name)_λ_discretization"])
+
+#             gates_complex[input_gate] = QCO.get_discretized_three_angle_gates(input_gate, gates_complex[input_gate], θ_disc, ϕ_disc, λ_disc, params["num_qubits"]) 
+
+#         end
+#     end
+    
+#     return gates_complex    
+# end
+
+# function get_discretized_three_angle_gates(gate_type::String, M3::Dict{String, Any}, θ_discretization::Array{Float64,1}, ϕ_discretization::Array{Float64,1}, λ_discretization::Array{Float64,1}, num_qubits::Int64) 
+
+#     counter = 1
+
+#     for i=1:length(θ_discretization)
+#         for j=1:length(ϕ_discretization)
+#             for k=1:length(λ_discretization)
+#                 angles = [θ_discretization[i], ϕ_discretization[j], λ_discretization[k]]
+
+#                 M3["angle_$(counter)"] = Dict{String, Any}("θ" => angles[1],
+#                                                            "ϕ" => angles[2],
+#                                                            "λ" => angles[3],
+#                                                            "$(num_qubits)qubit_rep" => Dict{String, Any}()
+#                                                           )
+#                 qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
+#                 if length(qubit_loc) == 1
+#                     qubit_loc_str = string(qubit_loc[1])
+#                 elseif length(qubit_loc) == 2 
+#                     qubit_loc_str = string(qubit_loc[1], qubit_separator, qubit_loc[2])
+#                 end
+
+#                 M3["angle_$(counter)"]["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
+#                 counter += 1
+#             end
+#         end
+#     end
+    
+#     return M3
+# end

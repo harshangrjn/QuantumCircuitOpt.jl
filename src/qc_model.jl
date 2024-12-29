@@ -9,8 +9,8 @@ function build_QCModel(data::Dict{String, Any}; options = nothing)
 
     # Update defaults to user-defined options
     if options !== nothing
-        for i in keys(options)
-            QCO.set_option(m_qc, i, options[i])
+        for (key, value) in options
+            QCO.set_option(m_qc, key, value)
         end
     end
 
@@ -18,16 +18,13 @@ function build_QCModel(data::Dict{String, Any}; options = nothing)
 
     # convex-hull formulation per depth, but larger number of variables and constraints
     if m_qc.options.model_type == "balas_formulation" 
-
         QCO.variable_QCModel_balas(m_qc)
         QCO.constraint_QCModel_balas(m_qc)
-
+        
     # minimal variables and constraints, but not a convex-hull formulation per depth
     elseif m_qc.options.model_type == "compact_formulation" 
-        
         QCO.variable_QCModel_compact(m_qc)                                    
         QCO.constraint_QCModel_compact(m_qc)
-
     end
 
     QCO.objective_QCModel(m_qc)
@@ -136,6 +133,7 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
             QCO.constraint_identity_gate_symmetry(qcm)
             QCO.constraint_convex_hull_complex_gates(qcm)
             QCO.constraint_unitary_property(qcm)
+            QCO.constraint_unitary_complex_conjugate(qcm)
             
         elseif qcm.options.all_valid_constraints == 0 
             qcm.options.commute_gate_constraints            && QCO.constraint_commutative_gate_pairs(qcm)
@@ -145,6 +143,7 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
             qcm.options.identity_gate_symmetry_constraints  && QCO.constraint_identity_gate_symmetry(qcm)
             qcm.options.convex_hull_gate_constraints        && QCO.constraint_convex_hull_complex_gates(qcm)
             qcm.options.unitary_constraints                 && QCO.constraint_unitary_property(qcm)
+            (qcm.options.unitary_complex_conjugate > 0)     && QCO.constraint_unitary_complex_conjugate(qcm)
         end
 
     end

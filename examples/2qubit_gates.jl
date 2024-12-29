@@ -71,6 +71,21 @@ function controlled_H()
     )
 end
 
+function controlled_H_with_clifford()
+
+    println(">>>>> Controlled-H Gate <<<<<")
+
+    return Dict{String, Any}(
+    
+    "num_qubits" => 2, 
+    "maximum_depth" => 7,
+    "elementary_gates" => ["S_1", "S_2", "T_1", "T_2", "H_1", "H_2", "Sdagger_1", "Sdagger_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "Identity"], 
+    "target_gate" => QCOpt.CHGate(),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact_optimal",
+    )
+end
+
 function controlled_H_with_R()
 
     println(">>>>> Controlled-H with R Gate <<<<<")
@@ -171,9 +186,9 @@ function revcnot()
     "num_qubits" => 2, 
     "maximum_depth" => 5,
     "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],  
-    "target_gate" => QCOpt.CNotRevGate(),
+    "target_gate" => -QCOpt.CNotRevGate(),
     "objective" => "minimize_depth", 
-    "decomposition_type" => "exact_optimal"
+    "decomposition_type" => "optimal_global_phase"
     )
 end
 
@@ -271,7 +286,7 @@ function hadamard_coin()
         "elementary_gates" => ["Y_1", "Y_2", "Z_1", "Z_2", "T_2", "Tdagger_1", "Sdagger_1", "SX_1", "SXdagger_2", "CNot_2_1", "CNot_1_2", "Identity"], 
         "target_gate" => QCOpt.HCoinGate(),
         "objective" => "minimize_depth",
-        "decomposition_type" => "exact_feasible",
+        "decomposition_type" => "exact_optimal",
         )
 end
 
@@ -334,7 +349,7 @@ function iSwap()
 
     return Dict{String, Any}(
     
-        "num_qubits" => 2, 
+        "num_qubits" => 2,
         "maximum_depth" => 10,
         "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"],
         # "elementary_gates" => ["S_1", "S_2", "Sdagger_1", "Sdagger_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"],
@@ -349,7 +364,7 @@ function qft2_using_R()
 
     return Dict{String, Any}(
     
-        "num_qubits" => 2, 
+        "num_qubits" => 2,
         "maximum_depth" => 10,
         "elementary_gates" => ["RX_1", "RZ_1", "RZ_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.QFT2Gate(),

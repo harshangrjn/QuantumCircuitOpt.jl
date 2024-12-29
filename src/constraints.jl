@@ -132,7 +132,7 @@ function constraint_intermediate_products_compact(qcm::QuantumCircuitModel)
 
     JuMP.@constraint(qcm.model, [d=2:max_depth], qcm.variables[:U_var][:,:,d] .== 
                                         sum((qcm.variables[:zU_var][:,:,n,(d-1)]) * qcm.data["gates_real"][:,:,n] for n=1:num_gates))
-
+                                        
     return
 end
 
@@ -153,44 +153,64 @@ function constraint_target_gate_condition_compact(qcm::QuantumCircuitModel)
     return
 end
 
+# Helper function for global phase constraints
+function _real_phase_difference(U_var, target_gate, ref_r, ref_c, i, j, depth)
+    return U_var[i, j, depth]*target_gate[ref_r, ref_c] -
+           U_var[ref_r, ref_c, depth]*target_gate[i, j]
+end
+
+# Helper function for global phase constraints
+function _complex_phase_differences(U_var, target_gate, ref_r, ref_c, i, j, depth)
+    realLHS = U_var[i, j, depth]   * target_gate[ref_r, ref_c] -
+              U_var[i, j+1, depth] * target_gate[ref_r, ref_c+1]
+    realRHS = U_var[ref_r, ref_c, depth]   * target_gate[i, j] -
+              U_var[ref_r, ref_c+1, depth] * target_gate[i, j+1]
+
+    imagLHS = U_var[i, j, depth]   * target_gate[ref_r, ref_c+1] +
+              U_var[i, j+1, depth] * target_gate[ref_r, ref_c]
+    imagRHS = U_var[ref_r, ref_c, depth]   * target_gate[i, j+1] +
+              U_var[ref_r, ref_c+1, depth] * target_gate[i, j]
+
+    return realLHS, realRHS, imagLHS, imagRHS
+end
+
 function constraint_target_gate_condition_glphase(qcm::QuantumCircuitModel)
-    
     max_depth      = qcm.data["maximum_depth"]
     n_r            = size(qcm.data["gates_real"])[1]
     n_c            = size(qcm.data["gates_real"])[2]
+    target_gate    = qcm.data["target_gate"]
+    U_var          = qcm.variables[:U_var]
 
-    U_var = qcm.variables[:U_var]    
+    if qcm.data["are_gates_real"]
+        ref_r, ref_c = QCO._get_nonzero_idx_of_complex_matrix(Array{ComplexF64}(target_gate))
 
-    if qcm.data["are_gates_real"] 
-        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(Array{Complex{Float64},2}(qcm.data["target_gate"]))
+        for i in 1:n_r, j in 1:n_c
+            if QCO.is_zero(target_gate[i, j])
+                JuMP.@constraint(qcm.model, U_var[i, j, max_depth] == 0)
 
-        for i=1:n_r, j=1:n_c
-            if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6)
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth] == 0)
-            else
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] == qcm.data["target_gate"][i,j]*U_var[ref_nonzero_r,ref_nonzero_c,max_depth])
+            elseif !((i == ref_r) && (j == ref_c))
+                LHS = QCO._real_phase_difference(U_var, target_gate, ref_r, ref_c, i, j, max_depth)
+                JuMP.@constraint(qcm.model, LHS == 0)
             end
         end
 
     else
-        ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_to_real_matrix(qcm.data["target_gate"])
+        ref_r, ref_c = QCO._get_nonzero_idx_of_complex_to_real_matrix(target_gate)
+        for i in 1:2:n_r, j in 1:2:n_c
+            if QCO.is_zero(target_gate[i, j]) && QCO.is_zero(target_gate[i, j+1])
+                JuMP.@constraint(qcm.model, U_var[i, j, max_depth] == 0.0)
+                JuMP.@constraint(qcm.model, U_var[i, j+1, max_depth] == 0.0)
 
-        for i=1:2:n_r, j=1:2:n_c
-            if isapprox(qcm.data["target_gate"][i,j], 0, atol=1E-6) && isapprox(qcm.data["target_gate"][i,j+1], 0, atol=1E-6)
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth] == 0.0)
-                JuMP.@constraint(qcm.model, U_var[i,(j+1),max_depth] == 0.0)
-            else
-                #real parts equal
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] - U_var[i,(j+1),max_depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] ==
-                    U_var[ref_nonzero_r,ref_nonzero_c,max_depth]*qcm.data["target_gate"][i,j] - U_var[ref_nonzero_r,(ref_nonzero_c+1),max_depth]*qcm.data["target_gate"][i,(j+1)])       
-                #complex parts equal
-                JuMP.@constraint(qcm.model, U_var[i,j,max_depth]*qcm.data["target_gate"][ref_nonzero_r,(ref_nonzero_c+1)] + U_var[i,(j+1),max_depth]*qcm.data["target_gate"][ref_nonzero_r,ref_nonzero_c] ==
-                    U_var[ref_nonzero_r,ref_nonzero_c,max_depth]*qcm.data["target_gate"][i,(j+1)] + U_var[ref_nonzero_r,(ref_nonzero_c+1),max_depth]*qcm.data["target_gate"][i,j]) 
+            elseif !((i == ref_r) && (j == ref_c))
+                realLHS, realRHS, imagLHS, imagRHS = QCO._complex_phase_differences(U_var, target_gate, ref_r, ref_c, i, j, max_depth)
+        
+                JuMP.@constraint(qcm.model, realLHS == realRHS)
+                JuMP.@constraint(qcm.model, imagLHS == imagRHS)
             end
         end
     end
 
-    return    
+    return
 end
 
 function constraint_slack_var_outer_approximation(qcm::QuantumCircuitModel)
@@ -401,7 +421,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
                 slope, intercept = QCO._get_constraint_slope_intercept(vertices[1], vertices[2])
 
                 if !isinf(slope)
-                    if isapprox(abs(slope), 0, atol=1E-6)
+                    if QCO.is_zero(abs(slope))
                         JuMP.@constraint(qcm.model, [d=1:max_depth], 
                                         sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept == 0)
                     else
@@ -453,7 +473,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
                             if v3[2] - slope*v3[1] - intercept <= -1E-6
 
-                                if isapprox(abs(slope), 0, atol=1E-6)             
+                                if QCO.is_zero(abs(slope))             
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept <= 0)
                                 else           
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
@@ -463,7 +483,7 @@ function constraint_convex_hull_complex_gates(qcm::QuantumCircuitModel)
 
                             elseif v3[2] - slope*v3[1] - intercept >= 1E-6
 
-                                if isapprox(abs(slope), 0, atol=1E-6)
+                                if QCO.is_zero(abs(slope))
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) - intercept >= 0)
                                 else
                                     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(gates_real[(2*I-1),(2*J), n_g] * z_bin_var[n_g,d] for n_g = 1:num_gates) 
@@ -543,6 +563,97 @@ function constraint_unitary_property(qcm::QuantumCircuitModel)
     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(Z_var[i,j,d]* QCO.round_real_value.(gates_real[:,:,i] * gates_adjoint[:,:,j] + 
                                                  gates_real[:,:,j] * gates_adjoint[:,:,i]) for i=1:(num_gates-1), 
                                                  j=(i+1):num_gates) .== zeros(n_r, n_c))
+
+    return
+end
+
+function constraint_unitary_complex_conjugate(qcm::QuantumCircuitModel; 
+                                              num_gates_bnd = 50)
+
+    max_depth   = qcm.data["maximum_depth"]
+    z_bin_var   = qcm.variables[:z_bin_var]
+    U_var       = qcm.variables[:U_var]
+    gates_real  = qcm.data["gates_real"]
+    n_r         = size(gates_real)[1]
+    n_c         = size(gates_real)[2]
+    num_gates   = size(gates_real)[3]
+
+    decomposition_type = qcm.data["decomposition_type"]
+    conj_option        = qcm.options.unitary_complex_conjugate
+    target_gate        = qcm.data["target_gate"]
+
+    # Helper for repeated sums of gates
+    function sum_of_bin_vars(depth)
+        sum(z_bin_var[i, depth] * (gates_real[:, :, i]') for i in 1:num_gates)
+    end
+
+    # Decomposition without global phase
+    if decomposition_type !== "optimal_global_phase"
+
+        # Linear constraints
+        if (max_depth >= 2) && (conj_option in [1, 2])
+            Memento.info(_LOGGER, "Applying linear unitary complex-conjugate constraints")
+            JuMP.@constraint(qcm.model,
+                U_var[:, :, max_depth-1] .== target_gate * sum_of_bin_vars(max_depth)
+            )
+        end
+
+        # Quadratic constraints
+        if (max_depth >= 3) && (num_gates <= num_gates_bnd) && (conj_option in [2])
+            Memento.info(_LOGGER, "Applying quadratic unitary complex-conjugate constraints")
+            JuMP.@constraint(qcm.model, U_var[:, :, max_depth-2] .== target_gate * 
+                        sum_of_bin_vars(max_depth) * sum_of_bin_vars(max_depth-1))
+        end
+    end
+
+    # Decomposition with global phase
+    if decomposition_type == "optimal_global_phase"
+
+        # Linear constraints
+        if (max_depth >= 2) && (conj_option in [1, 2])
+            Memento.info(_LOGGER, "Applying linear unitary complex-conjugate constraints (global-phase)")
+
+            for gate in 1:num_gates
+                product_gate = target_gate * gates_real[:, :, gate]'
+
+                if qcm.data["are_gates_real"]
+                    ref_r, ref_c = QCO._get_nonzero_idx_of_complex_matrix(Array{ComplexF64}(product_gate))
+
+                    for i in 1:n_r, j in 1:n_c
+                        if QCO.is_zero(product_gate[i, j])
+                            JuMP.@constraint(qcm.model, U_var[i, j, max_depth-1] ≥ -(1 - z_bin_var[gate, max_depth]))
+                            JuMP.@constraint(qcm.model, U_var[i, j, max_depth-1] ≤  (1 - z_bin_var[gate, max_depth]))
+
+                        elseif !((i == ref_r) && (j == ref_c))
+                            expr_diff = QCO._real_phase_difference(U_var, product_gate, ref_r, ref_c, i, j, max_depth-1)
+
+                            big_M = 2  # assumes that all elementary and target gate elements lie within the range [-1, 1].
+                            JuMP.@constraint(qcm.model, expr_diff ≥ -big_M * (1 - z_bin_var[gate, max_depth]))
+                            JuMP.@constraint(qcm.model, expr_diff ≤  big_M * (1 - z_bin_var[gate, max_depth]))
+                        end
+                    end
+
+                else
+                    ref_r, ref_c = QCO._get_nonzero_idx_of_complex_to_real_matrix(product_gate)
+                    for i in 1:2:n_r, j in 1:2:n_c
+                        if QCO.is_zero(product_gate[i, j]) && QCO.is_zero(product_gate[i, j+1])
+                            JuMP.@constraint(qcm.model, U_var[i, j, max_depth-1] ≥ -(1 - z_bin_var[gate, max_depth]))
+                            JuMP.@constraint(qcm.model, U_var[i, j+1, max_depth-1] ≤  (1 - z_bin_var[gate, max_depth]))
+
+                        elseif !((i == ref_r) && (j == ref_c))
+                            realLHS, realRHS, imagLHS, imagRHS = QCO._complex_phase_differences(U_var, product_gate, ref_r, ref_c, i, j, max_depth-1)
+                            
+                            big_M = 2  # assumes that all elementary and target gate elements lie within the range [-1, 1].
+                            JuMP.@constraint(qcm.model, realLHS - realRHS ≥ -big_M * (1 - z_bin_var[gate, max_depth]))
+                            JuMP.@constraint(qcm.model, realLHS - realRHS ≤  big_M * (1 - z_bin_var[gate, max_depth]))
+                            JuMP.@constraint(qcm.model, imagLHS - imagRHS ≥ -big_M * (1 - z_bin_var[gate, max_depth]))
+                            JuMP.@constraint(qcm.model, imagLHS - imagRHS ≤  big_M * (1 - z_bin_var[gate, max_depth]))
+                        end
+                    end
+                end
+            end
+        end
+    end
 
     return
 end

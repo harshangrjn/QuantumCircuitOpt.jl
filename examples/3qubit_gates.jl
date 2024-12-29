@@ -187,9 +187,10 @@ function miller()
 
     return Dict{String, Any}(
     "num_qubits" => 3,
-    "maximum_depth" => 8,
+    "maximum_depth" => 10,
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
     "target_gate" => target_gate(),
+    "decomposition_type" => "exact_optimal",
     "objective" => "minimize_depth"
     )
 end
@@ -203,6 +204,7 @@ function relative_toffoli()
         "elementary_gates" => ["H_3", "T_3", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
         "target_gate" => QCOpt.RCCXGate(),
         "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal",
 
         "set_cnot_upper_bound" => 3
     )
@@ -217,6 +219,7 @@ function margolus()
         "elementary_gates" => ["RY_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
         "target_gate" => QCOpt.MargolusGate(),
         "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal",
 
         "RY_discretization" => -π:π/4:π,
         # "set_cnot_lower_bound" => 3,
@@ -247,7 +250,7 @@ function QFT3()
         "elementary_gates" => ["H_1", "H_2", "H_3", "CU3_2_1", "CU3_3_2", "CU3_3_1", "Swap_1_3", "Identity"],
         "CU3_θ_discretization" => [0],
         "CU3_ϕ_discretization" => [0],
-        "CU3_λ_discretization" => [π/2, π/4],
+        "CU3_λ_discretization" => 0:π/4:π,
         "target_gate" => QCOpt.QFT3Gate(),
         "objective" => "minimize_depth",
         "decomposition_type" => "exact_optimal",

@@ -216,24 +216,18 @@ of dimensions 2Nx2N.
 function complex_to_real_gate(M::Array{Complex{Float64},2})
 
     n = size(M)[1]
-    M_real = zeros(2*n, 2*n)
+    M_real = zeros(2n, 2n)
   
     ii = 1; jj = 1;
-    for i = collect(1:2:2*n)
-        for j = collect(1:2:2*n)
+    for i = collect(1:2:2n)
+        for j = collect(1:2:2n)
 
-            if isapprox(real(M[ii,jj]), 0, atol=1E-6)
-                M_real[i,j] = 0
-                M_real[i+1,j+1] = 0
-            else
+            if !QCO.is_zero(real(M[ii,jj]))
                 M_real[i,j] = real(M[ii,jj])
                 M_real[i+1,j+1] = real(M[ii,jj])
             end
 
-            if isapprox(imag(M[ii,jj]), 0, atol=1E-6)
-                M_real[i,j+1] = 0
-                M_real[i+1,j] = 0
-            else
+            if !QCO.is_zero(imag(M[ii,jj]))
                 M_real[i,j+1] = imag(M[ii,jj])
                 M_real[i+1,j] = -imag(M[ii,jj])
             end
@@ -273,8 +267,8 @@ function real_to_complex_gate(M::Array{Float64,2})
 
             M_re = M[i,j]
             M_im = M[i,j+1]
-            (isapprox(M_re, 0, atol=1E-6)) && (M_re = 0)
-            (isapprox(M_im, 0, atol=1E-6)) && (M_im = 0)
+            (QCO.is_zero(M_re)) && (M_re = 0)
+            (QCO.is_zero(M_im)) && (M_im = 0)
             
             M_complex[ii,jj] = complex(M_re, M_im)
             jj += 1
@@ -318,7 +312,7 @@ end
 Given a real-valued number, this function returns a real-value which rounds the values closest to 0, 1 and -1. 
 """
 function round_real_value(x::T) where T <: Number
-    if isapprox(abs(x), 0, atol=1E-6)
+    if QCO.is_zero(abs(x))
         x = 0
     elseif isapprox(x,  1, atol=1E-6)
         x = 1
@@ -658,46 +652,39 @@ end
 """
     _determinant_test_for_infeasibility(data::Dict{String,Any})
 
-Given the processed data dictionary, this function performs a few simple tests based on the determinant values of 
-elementary and target gates to detect MIP infeasibility. 
+This function performs determinant-based checks on the target and elementary gates in the given 
+    data dictionary to detect potential MIP infeasibility.
 """
 function _determinant_test_for_infeasibility(data::Dict{String,Any})
 
-    if data["are_gates_real"]
-        det_target = LA.det(data["target_gate"])
-    else
-        det_target = LA.det(QCO.real_to_complex_gate(data["target_gate"]))
-    end
+    det_target = data["are_gates_real"] ? LA.det(data["target_gate"]) : 
+                                          LA.det(QCO.real_to_complex_gate(data["target_gate"]))
 
-    if isapprox(imag(det_target), 0, atol = 1E-6) 
-        if isapprox(det_target, -1, atol=1E-6)
-            sum_det = 0
-            for k = 1:length(keys(data["gates_dict"]))
-                det_val = LA.det(data["gates_dict"]["$k"]["matrix"])
-                if isapprox(imag(det_val), 0, atol = 1E-6) 
-                    sum_det += det_val
-                end
-            end
-            
-            if (isapprox(sum_det, length(keys(data["gates_dict"])), atol = 1E-6)) && (data["decomposition_type"] == "exact_optimal")
-                Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
+    if QCO.is_zero(imag(det_target))
+        if isapprox(det_target, -1, atol=1e-6)
+            # Sum determinants of elementary gates
+            sum_det = sum(
+                LA.det(g["matrix"]) for g in values(data["gates_dict"])
+                if QCO.is_zero(imag(LA.det(g["matrix"])))
+            )
+
+            if isapprox(sum_det, length(data["gates_dict"]), atol=1e-6) &&
+                data["decomposition_type"] == "exact_optimal"
+                Memento.error(_LOGGER, 
+                    "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
             end
         end
     else
-        det_gates_real = true
-        for k = 1:length(keys(data["gates_dict"]))
-            if !(isapprox(imag(LA.det(data["gates_dict"]["$k"]["matrix"])), 0, atol=1E-6))
-                det_gates_real = false
-                continue
-            end
-        end
-        
-        if det_gates_real && (data["decomposition_type"] == "exact_optimal")
-            Memento.error(_LOGGER, "Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
-        end
+        # Check if all elementary gate determinants are real
+        det_gates_real = all(
+            QCO.is_zero(imag(LA.det(g["matrix"]))) for g in values(data["gates_dict"])
+        )
 
+        if det_gates_real && data["decomposition_type"] == "exact_optimal"
+            Memento.error(_LOGGER, 
+                "Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
+        end
     end
-
 end
 
 """
@@ -708,7 +695,7 @@ returns the first non-zero index it locates within `M`.
 """
 function _get_nonzero_idx_of_complex_to_real_matrix(M::Array{Float64,2})
     for i=1:2:size(M)[1], j=1:2:size(M)[2]
-        if !isapprox(M[i,j], 0, atol=1E-6) || !isapprox(M[i,j+1], 0, atol=1E-6)
+        if !QCO.is_zero(M[i,j]) || !QCO.is_zero(M[i,j+1])
             return i,j
         end
     end
@@ -722,7 +709,7 @@ function returns the first non-zero index it locates within `M`, either in real 
 """
 function _get_nonzero_idx_of_complex_matrix(M::Array{Complex{Float64},2})
     for i=1:size(M)[1], j=1:size(M)[2]
-        if !isapprox(M[i,j], 0, atol=1E-6) 
+        if !QCO.is_zero(M[i,j]) 
             return i,j
         end
     end
@@ -804,14 +791,14 @@ function _get_matrix_product_fixed_indices(left_matrix_fixed_idx::Dict{Tuple{Int
 
     for row = 1:N
         left_matrix_constants_row = filter(p -> (p.first[1] == row), left_matrix_fixed_idx)
-        left_matrix_zeros_row = filter(p -> (isapprox(p.second["value"], 0, atol = 1E-6)), left_matrix_constants_row)
+        left_matrix_zeros_row = filter(p -> (QCO.is_zero(p.second["value"])), left_matrix_constants_row)
 
         v_constants_row = keys(left_matrix_constants_row) |> collect .|> last
         v_zeros_row = keys(left_matrix_zeros_row) |> collect .|> last
     
         for col = 1:N
             right_matrix_constants_col = filter(p -> (p.first[2] == col), right_matrix_fixed_idx)
-            right_matrix_zeros_col = filter(p -> (isapprox(p.second["value"], 0, atol=1E-6)), right_matrix_constants_col)
+            right_matrix_zeros_col = filter(p -> (QCO.is_zero(p.second["value"])), right_matrix_constants_col)
 
             v_constants_col = keys(right_matrix_constants_col) |> collect .|> first
             v_zeros_col = keys(right_matrix_zeros_col) |> collect .|> first
@@ -839,43 +826,53 @@ function _get_matrix_product_fixed_indices(left_matrix_fixed_idx::Dict{Tuple{Int
 end
 
 """
-    controlled_gate(gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
+    multi_controlled_gate(target_gate::Array{Complex{Float64},2}, 
+                          control_qubits::Vector{Int64}, 
+                          target_qubit::Int64, 
+                          num_qubits::Int64)
 
-Given a complex-valued matrix (`gate`) of `N` qubits, and number of control qubits (`NCQ`), 
-this function returns a complex-valued controlled gate representable in `N+NCQ` qubits. 
-The state of control qubit is applied `NCQ` times to every wire preceeding the location 
-of the input gate. Note that this function does not account for the actual location
-of the controlled gate in the circuit. Here are a few examples:
-(a) [ToffoliGate](@ref) = controlled_gate(XGate(), 2) = controlled_gate(CNotGate(), 1)
-(b) CCCCCZGate = controlled_gate(ZGate(), 5)
-(c) TCCGate = controlled(TGate(), 2, reverse = true)
+Given a single-qubit complex-valued target gate, a vector of control qubits (`control_qubits`), and a target qubit, 
+this function returns a complex-valued multi-controlled gate (MCT) representable in `num_qubits`. 
+The states of control qubits can be any wire preceeding or succeeding the location 
+of the input gate's target qubit. Here are a few examples:
+(a) [ToffoliGate](@ref) = multi_controlled_gate(XGate(), [1,2], 3, 3)
+(b) Reverse [ToffoliGate](@ref) with one ancilla = multi_controlled_gate(XGate(), [2,3], 1, 4)
+(c) [CHRevGate](@ref) = multi_controlled_gate(HGate(), [2], 1, 2)
+(d) [CCZGate](@ref) = multi_controlled_gate(ZGate(), [1,2], 3, 3)
+(e) [CU3Gate](@ref)(θ,ϕ,λ) = multi_controlled_gate(U3Gate(θ,ϕ,λ), [1], 2, 2)
+
+Notes: For any single qubit target gate, an MCT gate, controlled off 𝑖 and targeting 𝑗, is given by
+1^⊗𝑁 + 1⊗(𝑖−1) ⊗ |1⟩⟨1| ⊗ {1^⊗(𝑗−𝑖−1)} ⊗ (target_gate − I^⊗1) ⊗ {1^⊗(𝑁−𝑗)}
 """
-function controlled_gate(gate::Array{Complex{Float64},2}, num_control_qubits::Int64; reverse = false)
+function multi_controlled_gate(target_gate::Array{Complex{Float64},2}, 
+                               control_qubits::Vector{Int64}, 
+                               target_qubit::Int64, 
+                               num_qubits::Int64)
 
-    if num_control_qubits < 0 
-        Memento.error(_LOGGER, "Number of control qubits has to be a non-negative integer")
-    end
-    
-    M_0 = Array{Complex{Float64},2}([1 0; 0 0])
-    M_1 = Array{Complex{Float64},2}([0 0; 0 1])
+    (maximum(vcat(control_qubits, target_qubit)) > num_qubits) && (Memento.error(_LOGGER, "Control and target qubits have to be lesser than num_qubits"))
 
-    ctrl_gate = gate
-    for _ = 1:num_control_qubits
-        num_qubits = Int(log2(size(ctrl_gate)[1]))
+    (target_qubit in control_qubits) && (Memento.error(_LOGGER, "Same qubit cannot serve as both target and a control qubit"))
 
-        if !reverse 
-            # |0⟩⟨0| ⊗ I
-            control_0 = kron(M_0, QCO.IGate(num_qubits))
-            # |1⟩⟨1| ⊗ G
-            control_1 = kron(M_1, ctrl_gate)
+    (Int(log2(size(target_gate)[1])) > 1) && (Memento.error(_LOGGER, "Target gate cannot be on multiple qubits"))
+
+    M_1 = Array{Complex{Float64},2}([0 0; 0 1]) # |1⟩⟨1|
+
+    MCT = 1
+
+    for qubit in 1:num_qubits
+        if (qubit in control_qubits) && (qubit !== target_qubit)
+            MCT = kron(MCT, M_1)
+        elseif (qubit == target_qubit)
+            target_matrix = copy(target_gate)
+            target_matrix[LA.diagind(target_matrix)] .-= 1
+            MCT = kron(MCT, target_matrix)
         else
-            # I ⊗ |0⟩⟨0|
-            control_0 = kron(QCO.IGate(num_qubits), M_0)
-            # G ⊗ |1⟩⟨1|
-            control_1 = kron(ctrl_gate, M_1)
+            MCT = kron(MCT, QCO.IGate(1))
         end
-        ctrl_gate = control_0 + control_1
     end
 
-    return ctrl_gate
+    return MCT + QCO.IGate(num_qubits)
 end
+
+
+is_zero(x; tol = 1E-6) = isapprox(x, 0, atol = tol)

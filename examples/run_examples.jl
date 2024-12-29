@@ -3,7 +3,7 @@ using LinearAlgebra
 
 using JuMP
 using Gurobi
-# using CPLEX
+using CPLEX
 # using HiGHS
 
 include("optimizers.jl")
@@ -11,7 +11,7 @@ include("optimizers.jl")
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-# decompose_gates = ["iSwap"]
+# decompose_gates = ["QFT3"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
@@ -28,8 +28,8 @@ for gates = 1:length(decompose_gates)
         :model_type => "compact_formulation",
         :convex_hull_gate_constraints => false,
         :idempotent_gate_constraints  => false,
-        :unitary_constraints          => false,
-        :fix_unitary_variables        => true,
+        :fix_unitary_variables        => false,
+        :unitary_complex_conjugate    => 1,
     )
 
     global result = QCOpt.run_QCModel(params, qcopt_optimizer; options = model_options)

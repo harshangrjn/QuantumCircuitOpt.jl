@@ -4,6 +4,7 @@ decompose_gates = [
         "controlled_Z",
         "controlled_V",
         "controlled_H",
+        "controlled_H_with_clifford",
         "controlled_H_with_R",
         "magic", 
         "magic_using_CNOT_1_2",
