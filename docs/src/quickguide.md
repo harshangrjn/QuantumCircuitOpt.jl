@@ -91,6 +91,7 @@ The second set of inputs for QCOpt contains all the optional specifications for 
 |`idempotent_gate_constraints`| This option activates the valid constraints to eliminate idempotent gates in the elementary (native) gates set (default: `false`)| 
 |`convex_hull_gate_constraints`| This option activates the valid constraints to apply convex hull of complex entries in the elementary (native) gates set (default: `false`)| 
 |`fix_unitary_variables`| This option evaluates all the fixed-valued indices of unitary matrix varaibles (`U_var`) at every depth, and appropriately builds the optimization model (default: `true`)|
+|`unitary_complex_conjugate`| Exploits the complex-conjugate transpose of gates at `max_depth` to impose valid constraints on the unitary matrix variables (`U_var`) at `max_depth-1`. (Default: `1`)|
 |`visualize_solution`| This option activates the visualization of the optimal circuit decomposition (default: `true`)| 
 | `relax_integrality` | This option transforms integer variables into continuous variables (default: `false`).  |
 | `optimizer_log` | This option enables or disables console logging for the `optimizer` (default: `true`).|
@@ -160,10 +161,10 @@ QCOpt currently supports the visualization of optimal circuit decompositions obt
 data = QCOpt.get_data(params)
 QCOpt.visualize_solution(results, data)
 ```
-For example, for the above controlled-Z gate decomposition, the processed output of QCOpt is as follows: 
+For example, for the above controlled-Z gate decomposition, the processed QCOpt output is shown below (on Apple M3 Pro with Gurobi 12.0.0): 
 ```
 =============================================================================
-QuantumCircuitOpt version: v0.5.1
+QuantumCircuitOpt version: 0.6.0
 
 Quantum Circuit Model Data
   Number of qubits: 2
@@ -179,7 +180,7 @@ Quantum Circuit Model Data
 Optimal Circuit Decomposition
   U3_2(-90.0,0.0,0.0) * CNot_1_2 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 3.01 sec.
+  Optimizer run time: 1.45 sec.
 =============================================================================
 ```
 
