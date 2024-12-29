@@ -6,3 +6,5 @@ status:
         threshold: 5%        # allowed to drop X% and still result in a "success" PR status
       branches:
         threshold: 5%        # allowed to drop X% and still result in a "success" commit status
+codecov: 
+    token: 6f8e623b-b7e4-44db-8db0-3d769aac9d87
