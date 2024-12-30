@@ -1370,6 +1370,31 @@ function SwapGate()
 end
 
 @doc raw"""
+    fSwapGate()
+
+Two-qubit, symmetric, Fermionic SWAP gate, that swaps adjacent fermionic modes 
+in the Jordan-Wigner representation. Because the qubits represent identical 
+fermions, swapping two particles applies a -1 phase to the state.
+
+Reference: https://doi.org/10.22331/q-2018-12-21-114
+
+**Matrix Representation**
+
+```math
+fSWAP = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & -1
+\end{pmatrix}
+```
+"""
+function fSwapGate()
+    return Array{Complex{Float64},2}([1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 -1])
+end
+
+
+@doc raw"""
     SSwapGate()
 
 Two-qubit, square root version of the [SwapGate](@ref). 

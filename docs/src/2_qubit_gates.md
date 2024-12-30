@@ -116,6 +116,10 @@ CU3RevGate
 ```@docs
 SwapGate
 ```
+## fSwapGate
+```@docs
+fSwapGate
+```
 ## SSwapGate
 ```@docs
 SSwapGate

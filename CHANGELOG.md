@@ -3,6 +3,7 @@ QuantumCircuitOpt.jl Change Log
 
 ### v0.6.0 
 - Minor clean up in global phase enforcing constraints 
+- Added 2-qubit Fermionic SWAP gate, that swaps adjacent fermionic modes
 - Added support for `unitary_complex_conjugate` constraints (for both with and without global phase), which significantly speeds up QCOpt’s decomposition methods.
 - Added `is_zero` function with a `tol` option
 - Added `QFT3Gate` to docs

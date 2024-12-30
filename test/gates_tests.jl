@@ -207,4 +207,7 @@
     M1 = QCO.multi_controlled_gate(QCO.HGate(), [1], 2, 3)
     M2 = kron(QCO.CHGate(), QCO.IGate(1))
     @test isapprox(M1, M2, atol=tol_0)
+
+    # Test Fermionic-Swap gate
+    @test isapprox(QCO.fSwapGate(), QCO.SwapGate()*QCO.CZGate(), atol=tol_0)
 end
