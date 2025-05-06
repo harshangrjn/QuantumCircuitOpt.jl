@@ -69,7 +69,7 @@ function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::Str
     
     # Check if we're using global phase comparison
     use_global_phase = decomposition_type in ["optimal_global_phase"]
-    compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
+    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
     
     # Find commuting pairs
     for i = 1:(num_gates-1), j = (i+1):num_gates
@@ -82,8 +82,8 @@ function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::Str
         M_ij, M_ji = M_i*M_j, M_j*M_i
         
         # Check for commuting pairs
-        compare_func(M_ij, Id) && push!(commute_pairs_prodIdentity, (i,j))
-        compare_func(M_ij, M_ji) && push!(commute_pairs, (i,j))
+        _compare_func(M_ij, Id) && push!(commute_pairs_prodIdentity, (i,j))
+        _compare_func(M_ij, M_ji) && push!(commute_pairs, (i,j))
     end
     
     # Add Identity pairs if requested
@@ -313,7 +313,12 @@ Given number of qubits of the circuit, the complex-valued two-qubit gate and the
 target qubit locations ("q1","q2',"q3",...), this function returns a full-sized gate after applying 
 appropriate kronecker products. This function supports any number of integer-valued qubits.  
 """
-function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit_loc::String, t_qubit_loc::String)
+function kron_two_qubit_gate(
+    num_qubits::Int64, 
+    M::Array{Complex{Float64},2}, 
+    c_qubit_loc::String, 
+    t_qubit_loc::String
+    )
     
     if size(M)[1] != 4
         Memento.error(_LOGGER, "Input should be a two-qubit gate")

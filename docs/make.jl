@@ -1,4 +1,4 @@
-using Documenter
+import Documenter
 using QuantumCircuitOpt
 using DocumenterTools: Themes
 
@@ -17,7 +17,7 @@ Themes.compile(
     joinpath(@__DIR__, "src/assets/themes/dark.scss"),
 )
 
-makedocs(
+Documenter.makedocs(
     modules = [QuantumCircuitOpt],
     sitename = "QuantumCircuitOpt.jl",
     format = Documenter.HTML(mathengine = Documenter.MathJax(), 
@@ -28,6 +28,7 @@ makedocs(
                              ),
     # strict = true,
     authors = "Harsha Nagarajan",
+    # checkdocs = :none,
     pages = [
         "Introduction" => "index.md",
         "Quick Start guide" => "quickguide.md",
@@ -41,7 +42,7 @@ makedocs(
     ],
 )
 
-deploydocs(
+Documenter.deploydocs(
     repo = "github.com/harshangrjn/QuantumCircuitOpt.jl.git",
     push_preview = true
 )
