@@ -323,7 +323,6 @@ function GroverDiffusion_using_Clifford()
         )
 end
 
-
 function GroverDiffusion_using_U3()
 
     println(">>>>> Grover's Diffusion Operator using U3 gate <<<<<")
@@ -382,7 +381,7 @@ function qft2_using_HT()
     return Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 8,
+        "maximum_depth" => 10,
         "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.QFT2Gate(),
         "objective" => "minimize_depth",

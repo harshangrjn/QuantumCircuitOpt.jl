@@ -154,10 +154,11 @@ end
 function objective_QCModel(qcm::QuantumCircuitModel)
     
     if qcm.data["objective"] == "minimize_depth"
-        QCO.objective_minimize_total_depth(qcm)
-        
+        QCO.objective_minimize_total_depth(qcm)        
     elseif qcm.data["objective"] == "minimize_cnot"
-        QCO.objective_minimize_cnot_gates(qcm)
+        QCO.objective_minimize_specific_gates(qcm, "cnot_gate")
+    elseif qcm.data["objective"] == "minimize_T"
+        QCO.objective_minimize_specific_gates(qcm, "T_gate")
     end
 
     return

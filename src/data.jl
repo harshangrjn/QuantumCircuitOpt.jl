@@ -54,7 +54,8 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
 
     target_real, is_target_real = QCO.get_target_gate(params, are_elementary_gates_real, decomposition_type)
 
-    gates_dict_unique, M_real_unique, identity_idx, cnot_idx = QCO.eliminate_nonunique_gates(gates_dict, are_elementary_gates_real, eliminate_identical_gates = eliminate_identical_gates)
+    gates_dict_unique, M_real_unique, identity_idx, cnot_idx, T_idx = 
+            QCO.eliminate_nonunique_gates(gates_dict, are_elementary_gates_real, eliminate_identical_gates = eliminate_identical_gates)
 
     # Pick "Identity" if user didn't specify
     initial_gate_str = get(params, "initial_gate", "Identity")
@@ -75,6 +76,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
                              "initial_gate" => initial_gate,
                              "identity_idx" => identity_idx,
                              "cnot_idx" => cnot_idx,
+                             "T_idx" => T_idx,
                              "elementary_gates" => elementary_gates,
                              "target_gate" => target_real,
                              "are_gates_real" => (are_elementary_gates_real && is_target_real),
@@ -156,8 +158,9 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}, are_elementary
     end
 
     cnot_idx = QCO._get_cnot_idx(gates_dict_unique)
-
-    return gates_dict_unique, M_real_unique, identity_idx, cnot_idx
+    T_idx = QCO._get_T_idx(gates_dict_unique)
+    
+    return gates_dict_unique, M_real_unique, identity_idx, cnot_idx, T_idx
 end
 
 function _populate_data_angle_discretization!(data::Dict{String, Any}, params::Dict{String, Any})
@@ -519,40 +522,33 @@ end
 Given the user input circuit which serves as a warm-start to the optimization model, and user input params dictionary, 
 this function outputs the post-processed dictionary of the input circuit which is used by the optimization model. 
 """
-function get_input_circuit_dict(input_circuit::Vector{Tuple{Int64,String}}, params::Dict{String,Any})
-
+function get_input_circuit_dict(
+    input_circuit::Vector{Tuple{Int64,String}}, 
+    params::Dict{String,Any}
+    )
+    
     input_circuit_dict = Dict{String, Any}()
-
-    status = true
-    gate_type = []
     
-    for i = 1:length(input_circuit)
-        if !(input_circuit[i][2] in params["elementary_gates"])
-            status = false
-            gate_type = input_circuit[i][2]
-        end
+    # Check if all gates are in elementary gates
+    invalid_gate = findfirst(g -> !(g[2] in params["elementary_gates"]), input_circuit)
+    if invalid_gate !== nothing
+        Memento.warn(_LOGGER, "Neglecting the input circuit as gate $(input_circuit[invalid_gate][2]) is not in input elementary gates")
+        return input_circuit_dict
     end
-
-    if status  
-        for i = 1:length(input_circuit)
     
-            if i == input_circuit[i][1]
-                input_circuit_dict["$i"] = Dict{String, Any}("depth" => input_circuit[i][1],
-                                                             "gate" => input_circuit[i][2])
-                # Later: add support for universal and rotation gates here
-            else
-                input_circuit_dict = Dict{String, Any}()          
-                Memento.warn(_LOGGER, "Neglecting the input circuit as multiple gates cannot be input at the same depth")
-                break
-            end
-
+    # Process valid gates
+    for i = 1:length(input_circuit)
+        if i == input_circuit[i][1]
+            input_circuit_dict["$i"] = Dict{String, Any}("depth" => input_circuit[i][1], "gate" => input_circuit[i][2])
+            # Later: add support for universal and rotation gates here
+        else
+            Memento.warn(_LOGGER, "Neglecting the input circuit as multiple gates cannot be input at the same depth")
+            return Dict{String, Any}()
         end
-    else
-        Memento.warn(_LOGGER, "Neglecting the input circuit as gate $gate_type is not in input elementary gates")
     end
     
     return input_circuit_dict
-end 
+end
 
 """
     _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String)
@@ -560,7 +556,13 @@ end
 Given an input gate string, number of qubits of the circuit and the qubit locations for the input gate, 
 this function catches and throws any errors, should the input gate type and qubits are invalid. 
 """
-function _catch_input_gate_errors(gate_type::String, qubit_loc::Vector{Int64}, num_qubits::Int64, input_gate::String; angle = nothing)
+function _catch_input_gate_errors(
+    gate_type::String, 
+    qubit_loc::Vector{Int64}, 
+    num_qubits::Int64, 
+    input_gate::String; 
+    angle = nothing
+    )
 
     if num_qubits <= 0
         Memento.error(_LOGGER, "Specified number of qubits has to be >= 1")
@@ -626,49 +628,34 @@ function _get_Phase_gates_idx(elementary_gates::Array{String, 1})
 end
 
 function _get_identity_idx(M::Array{Float64,3})
-    identity_idx = Int64[]
-    
-    for i=1:size(M)[3]
-        if isapprox(M[:,:,i], Matrix(I, size(M)[1], size(M)[2]), atol=1E-5)   
-            push!(identity_idx, i)
-        end
-    end
-
-    return identity_idx
+    [i for i=1:size(M)[3] if isapprox(M[:,:,i], Matrix(I, size(M)[1], size(M)[2]), atol=1E-5)]
 end
 
-function _get_cnot_idx(gates_dict::Dict{String, Any})
+function _get_gate_idx(gates_dict::Dict{String, Any}, gate_type::String)
+    local is_gate_type
     
-    cnot_idx = Int64[]
-
-    # Counts for both (CNot_i_j and CNot_j_i) or (CX_i_j and CX_j_i)
-    for i in keys(gates_dict)
-        # Input gates with kron symbols
-        if occursin(kron_symbol, gates_dict[i]["type"][1])
-            gate_types = QCO._parse_gates_with_kron_symbol(gates_dict[i]["type"][1])
-            
-            for j = 1:length(gate_types)
-                gate_type = QCO._parse_gate_string(gate_types[j], type = true)
-                if gate_type in ["CNot", "CX"]
-                    push!(cnot_idx, parse(Int64, i))
-                end
-            end
-        else
-
-        # Single input gate per depth
-            if "Identity" in gates_dict[i]["type"]
-                continue
-            end
-
-            gate_type = QCO._parse_gate_string(gates_dict[i]["type"][1], type = true)
-            if gate_type in ["CNot", "CX"]
-                push!(cnot_idx, parse(Int64, i))
-            end
-        end
+    if gate_type == "cnot_gate"
+        is_gate_type = t -> (gt = QCO._parse_gate_string(t, type=true)) == "CNot" || gt == "CX"
+    elseif gate_type == "T_gate"
+        is_gate_type = t -> (gt = QCO._parse_gate_string(t, type=true)) == "T" || gt == "Tdagger"
+    else
+        Memento.error(_LOGGER, "Unsupported gate type: $gate_type")
     end
-    
-    return cnot_idx
+
+    [ parse(Int, idx_str) 
+      for (idx_str, gate) in pairs(gates_dict)
+      if any(
+           is_gate_type,
+           occursin(kron_symbol, gate["type"][1]) ?
+             QCO._parse_gates_with_kron_symbol(gate["type"][1]) :
+             (gate["type"][1],)
+         )
+    ]
 end
+
+# Backward compatibility with existing function names
+_get_cnot_idx(gates_dict::Dict{String, Any}) = QCO._get_gate_idx(gates_dict, "cnot_gate")
+_get_T_idx(gates_dict::Dict{String, Any}) = QCO._get_gate_idx(gates_dict, "T_gate")
 
 function _get_angle_gates_idx(elementary_gates::Array{String,1})
 
@@ -691,16 +678,13 @@ end
 function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
     cnot_lb = get(params, "set_cnot_lower_bound", 0)
     cnot_ub = get(params, "set_cnot_upper_bound", data["maximum_depth"])
+    max_depth = data["maximum_depth"]
 
-    if cnot_lb > data["maximum_depth"]
+    if cnot_lb > max_depth
         Memento.error(_LOGGER, "Invalid lower bound on the number of CNOT gates given the maximum depth")
     elseif cnot_lb < cnot_ub
-        if cnot_lb > 0
-            data["cnot_lower_bound"] = params["set_cnot_lower_bound"]
-        end
-        if cnot_ub < data["maximum_depth"]
-            data["cnot_upper_bound"] = params["set_cnot_upper_bound"]
-        end
+        cnot_lb > 0 && (data["cnot_lower_bound"] = cnot_lb)
+        cnot_ub < max_depth && (data["cnot_upper_bound"] = cnot_ub)
     elseif isapprox(cnot_lb, cnot_ub, atol=1E-6)
         data["cnot_lower_bound"] = cnot_lb
         data["cnot_upper_bound"] = cnot_ub

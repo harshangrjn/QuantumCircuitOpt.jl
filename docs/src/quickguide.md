@@ -47,7 +47,7 @@ QCOpt takes two types of user-defined input specifications. The first type of in
 | `maximum_depth`   | Maximum allowable depth for decomposition of the circuit (≥ 2).   |
 | `elementary_gates` | Vector of all one and two qubit elementary gates. The menagerie of quantum gates currently supported in QCOpt can be found in [gates.jl](https://github.com/harshangrjn/QuantumCircuitOpt.jl/blob/master/src/gates.jl). |
 | `target_gate` | Target unitary gate which you wish to decompose using the above-mentioned `elementary_gates`.|
-| `objective` | Choose one of the following: (a) `minimize_depth`, which minimizes the total number of one- and two-qubit gates. For this option, include `Identity` matrix in the above-mentioned `elementary_gates`, (b) `minimize_cnot`, which minimizes the number of CNOT gates in the decomposition. (default: `minimize_depth`) |
+| `objective` | Choose one of the following: (a) `minimize_depth`, which minimizes the total number of one- and two-qubit gates. For this option, include `Identity` matrix in the above-mentioned `elementary_gates`, (b) `minimize_cnot`, which minimizes the number of CNOT gates in the decomposition, (c) `minimize_T`, which minimizes the number of T gates in the circuit (default: `minimize_depth`) |
 | `decomposition_type` | Choose one of the following: (a) `exact_optimal`, which finds an exact, provably optimal, decomposition if it exists, (b) `exact_feasible`, which finds any feasible exact decomposition, but not necessarily an optimal one if it exists, (c) `optimal_global_phase`, which finds an optimal (best) circuit decomposition if it exists, up to a global phase (d) `approximate`, which finds an approximate decomposition if an exact one does not exist; otherwise it will return an exact decomposition (default: `exact_optimal`)|
 
 If the above-specified `elementary_gates` contain gates with continuous angle parameters, then the following mandarotry input angle discretizations have to be specified in addition to the above inputs: 
@@ -137,7 +137,7 @@ If you prefer to decompose a target gate of your choice, update the `target_gate
 set of `elementary_gates` accordingly in the above sample code. For more such circuit decompositions, with various types of elementary gates, refer to [examples](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples) folder. 
 
 !!! warning
-    Note that [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute in the size of `num_qubits`, `maximum_depth` and `elementary_gates`. 
+    Note that [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl) tries to find the global minima of a specified objective function (T-gate/CNOT-gate/Depth count) for a given set of input one- and two-qubit gates, target gate and the total depth of the decomposition. This combinatiorial optimization problem is known to be NP-hard to compute in the size of `num_qubits`, `maximum_depth` and `elementary_gates` [link](https://arxiv.org/pdf/2310.05958). 
 
 !!! tip
     Run times of [QCOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl)'s mathematical optimization models are significantly faster using [Gurobi](https://www.gurobi.com) as the underlying mixed-integer programming (MIP) solver. Note that this solver's individual-usage license is available [free](https://www.gurobi.com/academia/academic-program-and-licenses/) for academic purposes. 
@@ -161,10 +161,10 @@ QCOpt currently supports the visualization of optimal circuit decompositions obt
 data = QCOpt.get_data(params)
 QCOpt.visualize_solution(results, data)
 ```
-For example, for the above controlled-Z gate decomposition, the processed QCOpt output is shown below (on Apple M4 Max with Gurobi 12.0.0): 
+For example, for the above controlled-Z gate decomposition, the processed QCOpt output is shown below (on Apple M4 Max with Gurobi 12.0.1): 
 ```
 =============================================================================
-QuantumCircuitOpt version: 0.6.0
+QuantumCircuitOpt version: 0.6.1
 
 Quantum Circuit Model Data
   Number of qubits: 2
@@ -180,7 +180,7 @@ Quantum Circuit Model Data
 Optimal Circuit Decomposition
   U3_2(-90.0,0.0,0.0) * CNot_1_2 * U3_2(90.0,0.0,0.0) = Target gate
   Minimum optimal depth: 3
-  Optimizer run time: 1.31 sec.
+  Optimizer run time: 1.18 sec.
 =============================================================================
 ```
 

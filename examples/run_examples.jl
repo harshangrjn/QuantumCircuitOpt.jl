@@ -3,7 +3,7 @@ using LinearAlgebra
 
 using JuMP
 using Gurobi
-using CPLEX
+# using CPLEX
 # using HiGHS
 
 include("optimizers.jl")
@@ -11,7 +11,7 @@ include("optimizers.jl")
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-# decompose_gates = ["QFT3"]
+# decompose_gates = ["QFT2"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

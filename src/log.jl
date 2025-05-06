@@ -75,17 +75,18 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                 printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = _main_color)
             end
 
-        elseif data["objective"] == "minimize_cnot"
+        elseif data["objective"] in ["minimize_cnot", "minimize_T"]
+            gate_type = data["objective"] == "minimize_cnot" ? "CNOT" : "T"
+            idx_key = data["objective"] == "minimize_cnot" ? "cnot_idx" : "T_idx"
 
-            if !isempty(data["cnot_idx"])
-                
+            if !isempty(data[idx_key])
                 if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
-                    printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = _main_color)
+                    printstyled("  ","Minimum number of $gate_type gates: ", round(results["objective"], digits = 6),"\n"; color = _main_color)
                 
                 elseif data["decomposition_type"] == "approximate"
-                    printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = _main_color)
+                    printstyled("  ","Minimum number of $gate_type gates: ", round((results["objective"] - 
+                        results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = _main_color)
                 end
-            
             end
 
         end
