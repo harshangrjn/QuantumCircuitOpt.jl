@@ -43,27 +43,35 @@ function objective_feasibility(qcm::QuantumCircuitModel)
     return
 end
 
-function objective_minimize_cnot_gates(qcm::QuantumCircuitModel)
+function objective_minimize_specific_gates(
+    qcm::QuantumCircuitModel,
+    gate_type::String
+    )
     
-    max_depth = qcm.data["maximum_depth"] 
-    cnot_idx  = qcm.data["cnot_idx"]
-
+    max_depth = qcm.data["maximum_depth"]
     decomposition_type = qcm.data["decomposition_type"]
     
-    if !isempty(qcm.data["cnot_idx"])
-
+    if gate_type == "cnot_gate"
+        gate_idx = qcm.data["cnot_idx"]
+        gate_name = "CNot"
+    elseif gate_type == "T_gate"
+        gate_idx = qcm.data["T_idx"]
+        gate_name = "T"
+    else
+        Memento.error(_LOGGER, "Unsupported gate type: $gate_type")
+    end
+    
+    if !isempty(gate_idx)
         if decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
-            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n in cnot_idx, d=1:max_depth))
+            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n in gate_idx, d=1:max_depth))
             
         elseif decomposition_type == "approximate"            
-            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n in cnot_idx, d=1:max_depth) 
+            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n in gate_idx, d=1:max_depth) 
             + (qcm.options.objective_slack_penalty * sum(qcm.variables[:slack_var_oa])))
-
         end
     else
-        Memento.error(_LOGGER, "CNot (CX) gate not found in input elementary gates")
+        Memento.error(_LOGGER, "$gate_name gate not found in input elementary gates")
     end
 
     return
 end
- 

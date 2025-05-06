@@ -75,17 +75,18 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
                 printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = _main_color)
             end
 
-        elseif data["objective"] == "minimize_cnot"
+        elseif data["objective"] in ["minimize_cnot", "minimize_T"]
+            gate_type = data["objective"] == "minimize_cnot" ? "CNOT" : "T"
+            idx_key = data["objective"] == "minimize_cnot" ? "cnot_idx" : "T_idx"
 
-            if !isempty(data["cnot_idx"])
-                
+            if !isempty(data[idx_key])
                 if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
-                    printstyled("  ","Minimum number of CNOT gates: ", round(results["objective"], digits = 6),"\n"; color = _main_color)
+                    printstyled("  ","Minimum number of $gate_type gates: ", round(results["objective"], digits = 6),"\n"; color = _main_color)
                 
                 elseif data["decomposition_type"] == "approximate"
-                    printstyled("  ","Minimum number of CNOT gates: ", round((results["objective"] - results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = _main_color)
+                    printstyled("  ","Minimum number of $gate_type gates: ", round((results["objective"] - 
+                        results["objective_slack_penalty"]*LA.norm(results["solution"]["slack_var"])^2), digits = 6),"\n"; color = _main_color)
                 end
-            
             end
 
         end
@@ -220,12 +221,7 @@ function get_depth_compressed_circuit(num_qubits::Int64, gates_sol::Array{String
     angle_param_gate = false
     for i=1:length(gates_sol)
         if !occursin(kron_symbol, gates_sol[i])
-            if !occursin("GR", gates_sol[i])
-                gates_sol_type = QCO._parse_gate_string(gates_sol[i], type = true)
-            else 
-                gates_sol_type = "GR"
-            end
-            
+            gates_sol_type = !occursin("GR", gates_sol[i]) ? QCO._parse_gate_string(gates_sol[i], type = true) : "GR"
             if gates_sol_type in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS, QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)
                 angle_param_gate = true
                 break
@@ -233,47 +229,28 @@ function get_depth_compressed_circuit(num_qubits::Int64, gates_sol::Array{String
         end       
     end
 
-    if !angle_param_gate
-        
-        status = false
-
-        for i=1:(length(gates_sol))
-            if i <= length(gates_sol) - 1
-                if status 
-                    status = false
-                    continue
-                else
-                    gate_i = QCO.is_multi_qubit_gate(gates_sol[i])
-                    gate_iplus1 = QCO.is_multi_qubit_gate(gates_sol[i+1])
-
-                    if !(gate_i) && !(gate_iplus1)
-                        if (occursin('1', gates_sol[i]) && occursin('2', gates_sol[i+1])) || (occursin('2', gates_sol[i]) && occursin('1', gates_sol[i+1])) 
-                            if occursin('1', gates_sol[i])
-                                gate_string = string(gates_sol[i],"x",gates_sol[i+1])
-                            else 
-                                gate_string = string(gates_sol[i+1],"x",gates_sol[i])
-                            end
-                            push!(gates_sol_compressed, gate_string)
-                            status = true
-                            continue
-                        else
-                            push!(gates_sol_compressed, gates_sol[i])
-
-                        end
-                    else
-                        push!(gates_sol_compressed, gates_sol[i])
-
-                    end
-                end
-            else
-                if !status
-                    push!(gates_sol_compressed, gates_sol[i])
-                end
-            end
-        end 
-
-    else 
+    if angle_param_gate
         return gates_sol
+    end
+    
+    i = 1
+    while i <= length(gates_sol)
+        if i < length(gates_sol) && 
+           !QCO.is_multi_qubit_gate(gates_sol[i]) && !QCO.is_multi_qubit_gate(gates_sol[i+1]) &&
+           ((occursin('1', gates_sol[i]) && occursin('2', gates_sol[i+1])) || 
+            (occursin('2', gates_sol[i]) && occursin('1', gates_sol[i+1])))
+            
+            # Determine order for kronecker product
+            gate_string = occursin('1', gates_sol[i]) ? 
+                          string(gates_sol[i], "x", gates_sol[i+1]) : 
+                          string(gates_sol[i+1], "x", gates_sol[i])
+            
+            push!(gates_sol_compressed, gate_string)
+            i += 2  # Skip the next gate as we've already processed it
+        else
+            push!(gates_sol_compressed, gates_sol[i])
+            i += 1
+        end
     end
 
     if isempty(gates_sol_compressed)
@@ -283,13 +260,5 @@ function get_depth_compressed_circuit(num_qubits::Int64, gates_sol::Array{String
     return gates_sol_compressed
 end
 
-function _gate_id_sequence(z_val::Matrix{<:Number}, maximum_depth::Int64)
-    id_sequence = Array{Int64,1}()
-
-    for d = 1:maximum_depth
-        id = findall(isone.(round.(abs.(z_val[:,d]), digits=3)))[1]
-        push!(id_sequence, id)
-    end
-
-    return id_sequence 
-end
+_gate_id_sequence(z_val::Matrix{<:Number}, maximum_depth::Int64) = 
+[findall(isone.(round.(abs.(z_val[:,d]), digits=3)))[1] for d = 1:maximum_depth]

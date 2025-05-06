@@ -5,13 +5,11 @@ Given a vector of JuMP variables (maximum 4 variables), this function returns th
 bounds, the product of these input variables can admit.  
 """
 function auxiliary_variable_bounds(v::Array{JuMP.VariableRef,1}) 
-
     v_l = [JuMP.lower_bound(v[1]), JuMP.upper_bound(v[1])]
     v_u = [JuMP.lower_bound(v[2]), JuMP.upper_bound(v[2])]
     M = v_l * v_u'
  
     if length(v) == 2 
-       # Bilinear
         return minimum(M), maximum(M)
  
     elseif (length(v) == 3) || (length(v) == 4) 
@@ -63,54 +61,41 @@ Given a dictionary of elementary quantum gates, this function returns all pairs 
 gates. Optional argument, `identity_pairs` can be set to `false` if identity matrix need not be part of the commuting pairs. 
 """
 function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::String; identity_in_pairs = true)
-    
     num_gates = length(keys(M))
     commute_pairs = Array{Tuple{Int64,Int64},1}()
     commute_pairs_prodIdentity = Array{Tuple{Int64,Int64},1}()
-
-    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])[1], size(M["1"]["matrix"])[2]))
-
+    
+    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
+    
+    # Check if we're using global phase comparison
+    use_global_phase = decomposition_type in ["optimal_global_phase"]
+    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
+    
+    # Find commuting pairs
     for i = 1:(num_gates-1), j = (i+1):num_gates
-        M_i = M["$i"]["matrix"]
-        M_j = M["$j"]["matrix"]
-        
+        # Skip if either gate is Identity
         if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
             continue
         end
         
-        M_ij = M_i*M_j
-        M_ji = M_j*M_i
-
-        if decomposition_type in ["optimal_global_phase"]
-            # Commuting pairs up to a global phase
-            QCO.isapprox_global_phase(M_ij, Id)   && push!(commute_pairs_prodIdentity, (i,j))
-            QCO.isapprox_global_phase(M_ij, M_ji) && push!(commute_pairs, (i,j))
-        else
-            # Commuting pairs == Identity
-            isapprox(M_ij, Id, atol = 1E-4)   && push!(commute_pairs_prodIdentity, (i,j))
-            isapprox(M_ij, M_ji, atol = 1E-4) && push!(commute_pairs, (i,j))
-        end        
+        M_i, M_j = M["$i"]["matrix"], M["$j"]["matrix"]
+        M_ij, M_ji = M_i*M_j, M_j*M_i
+        
+        # Check for commuting pairs
+        _compare_func(M_ij, Id) && push!(commute_pairs_prodIdentity, (i,j))
+        _compare_func(M_ij, M_ji) && push!(commute_pairs, (i,j))
     end
-
-    if identity_in_pairs
-        # Commuting pairs involving Identity
-        identity_idx = []
-        for i in keys(M)
-            ("Identity" in M[i]["type"]) && push!(identity_idx, parse(Int64, i))
-        end
-
-        if length(identity_idx) > 0
-            for i = 1:length(identity_idx)
-                for j = 1:num_gates 
-                    (j != identity_idx[i]) && push!(commute_pairs, (j, identity_idx[i]))
-                end
-            end
-        end
-
-    end 
-
-    return commute_pairs, commute_pairs_prodIdentity
     
+    # Add Identity pairs if requested
+    if identity_in_pairs
+        identity_idx = [parse(Int64, i) for i in keys(M) if "Identity" in M[i]["type"]]
+        
+        for id_idx in identity_idx, j = 1:num_gates
+            j != id_idx && push!(commute_pairs, (j, id_idx))
+        end
+    end
+    
+    return commute_pairs, commute_pairs_prodIdentity
 end
 
 """
@@ -188,23 +173,13 @@ Given the dictionary of complex gates `G_1, G_2, ..., G_n`, this function return
 which are involutory, i.e, `G_i^2 = Identity`, excluding the Identity gate. 
 """
 function get_involutory_gates(M::Dict{String,Any})
-    num_gates = length(keys(M))
-    involutory_gates_idx = Vector{Int64}()
-
-    if num_gates > 0
-        n_r = size(M["1"]["matrix"])[1]
-        n_c = size(M["1"]["matrix"])[2]
-    end
-    Id = Matrix{ComplexF64}(LA.I, n_r, n_c)
-
-    # Excluding Identity gate in input 
-    for i=1:num_gates
-        if !("Identity" in M["$i"]["type"]) && (isapprox((M["$i"]["matrix"])^2, Id, atol=1E-5))
-            push!(involutory_gates_idx, i)
-        end
-    end
-
-    return involutory_gates_idx
+    isempty(M) && return Int[]
+    
+    Id = I(size(first(values(M))["matrix"], 1))
+    
+    return [parse(Int, i) for (i, gate) in M if 
+            !("Identity" in gate["type"]) && 
+            isapprox(gate["matrix"]^2, Id, atol=1e-5)] 
 end
 
 """
@@ -214,31 +189,21 @@ Given a complex-valued two-dimensional quantum gate of size NxN, this function r
 of dimensions 2Nx2N. 
 """
 function complex_to_real_gate(M::Array{Complex{Float64},2})
-
-    n = size(M)[1]
+    n = size(M, 1)
     M_real = zeros(2n, 2n)
-  
-    ii = 1; jj = 1;
-    for i = collect(1:2:2n)
-        for j = collect(1:2:2n)
-
-            if !QCO.is_zero(real(M[ii,jj]))
-                M_real[i,j] = real(M[ii,jj])
-                M_real[i+1,j+1] = real(M[ii,jj])
-            end
-
-            if !QCO.is_zero(imag(M[ii,jj]))
-                M_real[i,j+1] = imag(M[ii,jj])
-                M_real[i+1,j] = -imag(M[ii,jj])
-            end
-            
-            jj += 1
+    
+    for ii in 1:n, jj in 1:n
+        i, j = 2ii-1, 2jj-1
+        re, im = real(M[ii,jj]), imag(M[ii,jj])
+        
+        QCO.is_zero(re) || (M_real[i,j] = M_real[i+1,j+1] = re)
+        if !QCO.is_zero(im)
+            M_real[i,j+1] = im
+            M_real[i+1,j] = -im
         end
-        jj = 1
-        ii += 1
     end
-  
-    return M_real
+    
+    M_real
 end
 
 """
@@ -248,36 +213,25 @@ Given a real-valued two-dimensional quantum gate of size 2Nx2N, this function re
 of size NxN, if the input gate is in a valid complex form. 
 """
 function real_to_complex_gate(M::Array{Float64,2})
+    n = size(M, 1)
+    iseven(n) || Memento.error(_LOGGER, "Specified gate can admit only even dimensions")
     
-    n = size(M)[1]
-
-    if !iseven(n)
-        Memento.error(_LOGGER, "Specified gate can admit only even numbered columns and rows")
+    half_n = div(n, 2)
+    M_complex = zeros(ComplexF64, half_n, half_n)
+    
+    for ii in 1:half_n, jj in 1:half_n
+        i, j = 2ii-1, 2jj-1
+        
+        isapprox(M[i,j], M[i+1,j+1], atol=1e-5) && 
+        isapprox(M[i+1,j], -M[i,j+1], atol=1e-5) || Memento.error(_LOGGER, "Invalid complex form")
+        
+        M_complex[ii,jj] = complex(
+            QCO.is_zero(M[i,j]) ? 0.0 : M[i,j],
+            QCO.is_zero(M[i,j+1]) ? 0.0 : M[i,j+1]
+        )
     end
     
-    M_complex = zeros(Complex{Float64}, (Int(n/2), Int(n/2)))
-  
-    ii = 1; jj = 1;
-    for i = collect(1:2:n)
-        for j = collect(1:2:n)
-
-            if !isapprox(M[i,j], M[i+1, j+1], atol = 1E-5) || !isapprox(M[i+1,j], -M[i,j+1], atol = 1E-5)
-                Memento.error(_LOGGER, "Specified real form of the complex gate is invalid")
-            end
-
-            M_re = M[i,j]
-            M_im = M[i,j+1]
-            (QCO.is_zero(M_re)) && (M_re = 0)
-            (QCO.is_zero(M_im)) && (M_im = 0)
-            
-            M_complex[ii,jj] = complex(M_re, M_im)
-            jj += 1
-        end
-        jj = 1
-        ii += 1
-    end
-
-    return M_complex
+    M_complex
 end
 
 """
@@ -286,40 +240,21 @@ end
 Given a complex-valued matrix, this function returns a complex-valued matrix which 
 rounds the values closest to 0, 1 and -1. This is useful to avoid numerical issues. 
 """
-function round_complex_values(M::Array{Complex{Float64},2})
-
-    if length(size(M)) == 2
-        n_r = size(M)[1]
-        n_c = size(M)[2]
-
-        M_round = Array{Complex{Float64},2}(zeros(n_r,n_c))
-        
-        for i=1:n_r
-            for j=1:n_c 
-                M_round[i,j] = complex(QCO.round_real_value(real(M[i,j])), QCO.round_real_value(imag(M[i,j])))
-            end
-        end
-        return M_round
-    else 
-        return M
-    end
-    
-end
+round_complex_values(M::Array{Complex{Float64},2}; atol=1e-6) =
+    complex.(
+      QCO.round_real_value.(real.(M); atol=atol),
+      QCO.round_real_value.(imag.(M); atol=atol)
+    )
 
 """
     round_real_value(x::T) where T <: Number
 
 Given a real-valued number, this function returns a real-value which rounds the values closest to 0, 1 and -1. 
 """
-function round_real_value(x::T) where T <: Number
-    if QCO.is_zero(abs(x))
-        x = 0
-    elseif isapprox(x,  1, atol=1E-6)
-        x = 1
-    elseif isapprox(x, -1, atol=1E-6)
-        x = -1
-    end  
-
+function round_real_value(x::T; atol=1e-6) where T <: Number
+    QCO.is_zero(abs(x)) && return zero(T)
+    isapprox(x, 1, atol = atol) && return one(T)
+    isapprox(x, -1, atol = atol) && return -one(T)
     return x
 end
 
@@ -330,17 +265,8 @@ This function returns the indices of unique elements in a given array of scalar 
 this function computes faster than Julia's built-in `findfirst` command. 
 """
 function unique_idx(x::AbstractArray{T}) where T
-    uniqueset = Set{T}()
-    ex = eachindex(x)
-    idxs = Vector{eltype(ex)}()
-    for i in ex
-        xi = x[i]
-        if !(xi in uniqueset)
-            push!(idxs, i)
-            push!(uniqueset, xi)
-        end
-    end
-    idxs
+    seen = Set{eltype(x)}()
+    [i for i in eachindex(x) if !in(x[i], seen) && (push!(seen, x[i]); true)]
 end
 
 """
@@ -352,11 +278,7 @@ of unique matrices from the given set of matrices.
 function unique_matrices(M::Array{Float64, 3})
     M[isapprox.(M, 0, atol=1E-6)] .= 0
 
-    M_reshape = [];
-    for i=1:size(M)[3]
-        push!(M_reshape, round.(reshape(M[:,:,i], size(M)[1]*size(M)[2]), digits=5))
-    end
-
+    M_reshape = [round.(reshape(M[:,:,i], size(M)[1]*size(M)[2]), digits=5) for i in 1:size(M)[3]]
     idx = QCO.unique_idx(M_reshape)
 
     return M[:,:,idx], idx
@@ -370,32 +292,19 @@ this function returns a full-sized gate after applying appropriate kronecker pro
 integer-valued qubits.  
 """
 function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
+    size(M)[1] != 2 && Memento.error(_LOGGER, "Input should be an one-qubit gate")
     
-    if size(M)[1] != 2
-        Memento.error(_LOGGER, "Input should be an one-qubit gate")
-    end
-
     qubit = parse(Int, qubit_loc[2:end])
-
-    if !(qubit in 1:num_qubits)
-        Memento.error(_LOGGER, "Specified qubit location, $qubit, has to be ∈ [q1,...,q$num_qubits]")
-    end
-
+    
+    !(qubit in 1:num_qubits) && Memento.error(_LOGGER, "Specified qubit location, $qubit, has to be ∈ [q1,...,q$num_qubits]")
+    
     I = QCO.IGate(1)
-    M_kron = 1
-
-    for i = 1:num_qubits
-        M_iter = I
-        if i == qubit 
-            M_iter = M
-        end
-        M_kron = kron(M_kron, M_iter)
-    end
-
+    gates = [i == qubit ? M : I for i in 1:num_qubits]
+    M_kron = reduce(kron, gates)
+    
     QCO._catch_kron_dimension_errors(num_qubits, size(M_kron)[1])
     return QCO.round_complex_values(M_kron)
 end
-
 
 """
     kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit_loc::String, t_qubit_loc::String)
@@ -404,7 +313,12 @@ Given number of qubits of the circuit, the complex-valued two-qubit gate and the
 target qubit locations ("q1","q2',"q3",...), this function returns a full-sized gate after applying 
 appropriate kronecker products. This function supports any number of integer-valued qubits.  
 """
-function kron_two_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, c_qubit_loc::String, t_qubit_loc::String)
+function kron_two_qubit_gate(
+    num_qubits::Int64, 
+    M::Array{Complex{Float64},2}, 
+    c_qubit_loc::String, 
+    t_qubit_loc::String
+    )
     
     if size(M)[1] != 4
         Memento.error(_LOGGER, "Input should be a two-qubit gate")

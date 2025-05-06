@@ -323,7 +323,6 @@ function GroverDiffusion_using_Clifford()
         )
 end
 
-
 function GroverDiffusion_using_U3()
 
     println(">>>>> Grover's Diffusion Operator using U3 gate <<<<<")
@@ -382,7 +381,7 @@ function qft2_using_HT()
     return Dict{String, Any}(
     
         "num_qubits" => 2, 
-        "maximum_depth" => 8,
+        "maximum_depth" => 10,
         "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.QFT2Gate(),
         "objective" => "minimize_depth",
@@ -447,3 +446,24 @@ function CNOT_using_GR()
     "R_ϕ_discretization" => [π/2],
     )
 end
+
+function minimize_T_gate()
+
+    println(">>>>> T Gate Minimization <<<<<")
+    target_gate = QCOpt.get_unitary("T_1", 2) * 
+                  QCOpt.get_unitary("CNot_1_2", 2) * 
+                  QCOpt.get_unitary("T_2", 2) * 
+                  QCOpt.get_unitary("CNot_1_2", 2) * 
+                  QCOpt.get_unitary("T_1", 2)
+
+    return Dict{String, Any}(
+    "num_qubits" => 2,
+    "maximum_depth" => 5,
+    # "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
+    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "S_1", "S_2", "CNot_1_2", "CNot_2_1", "Identity"],
+    "target_gate" => target_gate,
+    "objective" => "minimize_T",
+    "decomposition_type" => "exact_optimal",
+    )
+end
+

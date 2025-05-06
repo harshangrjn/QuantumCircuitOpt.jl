@@ -20,7 +20,6 @@ const MIP_SOLVER = HIGHS
 tol_0 = 1E-6
 
 @testset "QuantumCircuitOpt" begin
-
     include("utility_tests.jl")
     include("chull_tests.jl")
     include("gates_tests.jl")
@@ -28,5 +27,4 @@ tol_0 = 1E-6
     include("data_tests.jl")
     include("qc_model_tests.jl")
     include("relaxations_tests.jl")
-
 end

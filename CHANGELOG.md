@@ -1,6 +1,14 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.6.1
+- Added support for T-gate count minimization
+- Cleaned up `src/utility.jl`
+- Updated docs and unit tests to reflect above changes
+- Updated convex-hull algorithm in `src/chull.jl` from Graham's scan to Andrew's monotone chain algorithm
+- Added `minimize_T_gate` example to `2qubit_gates.jl`
+- Update `codecov/codecov-action`
+
 ### v0.6.0 
 - Minor clean up in global phase enforcing constraints 
 - Added 2-qubit Fermionic SWAP gate, that swaps adjacent fermionic modes
