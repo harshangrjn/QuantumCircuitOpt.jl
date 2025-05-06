@@ -22,6 +22,7 @@ decompose_gates = [
         "RX_on_q3",
         "X_using_GR",
         "CNOT_using_GR",
+        "minimize_T_gate",
         #-- 3-qubit gates --#
         "toffoli_using_2qubit_gates",
         "CNot_1_3",

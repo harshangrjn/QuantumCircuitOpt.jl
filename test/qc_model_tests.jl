@@ -29,6 +29,39 @@
     
 end
 
+@testset "QC_model Tests: Minimum depth T gate decomposition" begin
+    target_gate = QCO.get_unitary("T_1", 2) * 
+                  QCO.get_unitary("CNot_1_2", 2) * 
+                  QCO.get_unitary("T_2", 2) * 
+                  QCO.get_unitary("CNot_1_2", 2) * 
+                  QCO.get_unitary("T_1", 2)
+
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "maximum_depth" => 5,
+    "elementary_gates" => ["T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
+    "target_gate" => target_gate,
+    "objective" => "minimize_T",
+    "decomposition_type" => "optimal_global_phase"
+    )
+
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 3, atol=tol_0)
+
+    params["elementary_gates"] = ["T_1", "T_2", "S_1", "S_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"]
+    params["decomposition_type"] = "exact_optimal"
+
+    result_qc = QCO.run_QCModel(params, MIP_SOLVER)
+
+    @test result_qc["termination_status"] == MOI.OPTIMAL
+    @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
+    @test isapprox(result_qc["objective"], 1, atol=tol_0)
+end
+
+
 @testset "QC_model Tests: Minimum CNOT swap gate decomposition" begin
 
     params = Dict{String, Any}(
