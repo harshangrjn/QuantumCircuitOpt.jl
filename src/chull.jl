@@ -11,8 +11,8 @@ References
 """
 
 function convex_hull(ps::Vector{T}) where T<:Tuple{Number,Number}
-    isempty(ps) && error("At least one point is necessary for evaluating the convex hull")
-    pts = sort(ps)                  # lex sort by x then y
+    isempty(ps) && Memento.error(_LOGGER, "At least one point is necessary for evaluating the convex hull")
+    pts = sort(ps)
     length(pts) ≤ 2 && return pts   # trivial hulls
 
     # cross‐product: >0 ⇒ left turn
