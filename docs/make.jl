@@ -21,7 +21,7 @@ Documenter.makedocs(
     modules = [QuantumCircuitOpt],
     sitename = "QuantumCircuitOpt.jl",
     format = Documenter.HTML(mathengine = Documenter.MathJax(), 
-                             assets = [asset("https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&display=swap", class=:css),
+                             assets = [Documenter.asset("https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&display=swap", class=:css),
                                              "assets/extra_styles.css"],
                              prettyurls = get(ENV, "CI", nothing) == "true",
                              sidebar_sitename=false
