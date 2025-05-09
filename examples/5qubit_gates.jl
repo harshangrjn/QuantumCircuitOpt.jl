@@ -25,14 +25,14 @@ end
 #     num_qubits = 5
 
 #     function target_gate()
-#         CV_1_4 = QCOpt.get_unitary("CV_1_4", num_qubits);
-#         CVdagger_1_4 = QCOpt.get_unitary("CVdagger_1_4", num_qubits);
-#         CV_4_5 = QCOpt.get_unitary("CV_4_5", num_qubits);
-#         CVdagger_4_5 = QCOpt.get_unitary("CVdagger_4_5", num_qubits);
-#         CV_2_4 = QCOpt.get_unitary("CV_2_4", num_qubits);
-#         CVdagger_2_4 = QCOpt.get_unitary("CVdagger_2_4", num_qubits);
-#         CX_1_2 = QCOpt.get_unitary("CX_1_2", num_qubits);
-#         CX_3_4 = QCOpt.get_unitary("CX_3_4", num_qubits);
+#         CV_1_4 = QCOpt.unitary("CV_1_4", num_qubits);
+#         CVdagger_1_4 = QCOpt.unitary("CVdagger_1_4", num_qubits);
+#         CV_4_5 = QCOpt.unitary("CV_4_5", num_qubits);
+#         CVdagger_4_5 = QCOpt.unitary("CVdagger_4_5", num_qubits);
+#         CV_2_4 = QCOpt.unitary("CV_2_4", num_qubits);
+#         CVdagger_2_4 = QCOpt.unitary("CVdagger_2_4", num_qubits);
+#         CX_1_2 = QCOpt.unitary("CX_1_2", num_qubits);
+#         CX_3_4 = QCOpt.unitary("CX_3_4", num_qubits);
 
 #         return CV_4_5 * CX_3_4 * CVdagger_4_5 * CV_2_4 * CX_1_2 * CVdagger_2_4 * 
 #                CV_1_4 * CV_4_5 * CX_3_4 * CVdagger_4_5 * CVdagger_1_4 * 

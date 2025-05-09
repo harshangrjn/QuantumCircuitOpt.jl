@@ -11,7 +11,7 @@ include("optimizers.jl")
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-decompose_gates = ["minimize_T_gate"]
+decompose_gates = ["double_peres"]
 
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #

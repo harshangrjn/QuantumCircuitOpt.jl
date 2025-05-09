@@ -6,8 +6,8 @@ this function aids in visualizing the optimal circuit decomposition.
 """
 function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any}; gate_sequence = false)
 
-    _header_color = :cyan 
-    _main_color   = :White
+    global _header_color = :cyan 
+    global _main_color   = :White
 
     if !(results["primal_status"] in [MOI.FEASIBLE_POINT, MOI.NEARLY_FEASIBLE_POINT]) || 
         (results["termination_status"] == MOI.INFEASIBLE)
@@ -17,10 +17,27 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
          Memento.warn(_LOGGER, msg)
          return
      end
-     
-    gates_sol, gates_sol_compressed = QCO.get_postprocessed_circuit(results, data)
     
-    if !isempty(gates_sol_compressed)
+    id_sequence = QCO._gate_id_sequence(results["solution"]["z_bin_var"], data["maximum_depth"])
+    @show id_sequence
+    
+    cirq_precompress, cirq_postcompress = QCO.build_circuit_layers(id_sequence, data["gates_dict"])
+
+    QCO.print_circuit(cirq_precompress, data["num_qubits"])
+
+    QCO.print_circuit(cirq_postcompress, data["num_qubits"])
+
+    cirq_postcompress_depth = length(cirq_postcompress)
+
+    @show length(cirq_precompress), length(cirq_postcompress)
+    
+    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]) && 
+                                        QCO.validate_circuit(data, cirq_precompress, global_phase = false) && 
+                                        QCO.validate_circuit(data, cirq_postcompress, global_phase = false)
+
+    # gates_sol, gates_sol_compressed = QCO.get_postprocessed_circuit(results, data)
+    
+    if !isempty(cirq_postcompress)
 
         printstyled("\n","=============================================================================","\n"; color = _main_color)
         printstyled("QuantumCircuitOpt version: ", Pkg.TOML.parse(read(string(pkgdir(QCO), "/Project.toml"), String))["version"], "\n"; color = _header_color, bold = true)
@@ -46,22 +63,20 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("  ","MIP optimizer: ", results["optimizer"],"\n"; color = _main_color)
 
         printstyled("\n","Optimal Circuit Decomposition","\n"; color = _header_color, bold = true)
-        
-        print("  ")
-        
-        for i=1:length(gates_sol_compressed)
-            
-            if i != length(gates_sol_compressed)
-                printstyled(gates_sol_compressed[i], " * "; color = _main_color)
-            else    
-                if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
-                    printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = _main_color)
-                elseif data["decomposition_type"] == "approximate"
-                    printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = _main_color)
-                end
-            end
 
-        end
+        QCO.print_circuit(cirq_postcompress, data["num_qubits"])
+        
+        # for i=1:cirq_postcompress_depth
+        #     if i != cirq_postcompress_depth
+        #         printstyled(gates_sol_compressed[i], " * "; color = _main_color)
+        #     else    
+        #         if data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
+        #             printstyled(gates_sol_compressed[i], " = ", "Target gate","\n"; color = _main_color)
+        #         elseif data["decomposition_type"] == "approximate"
+        #             printstyled(gates_sol_compressed[i], " ≈ ", "Target gate","\n"; color = _main_color)
+        #         end
+        #     end
+        # end
 
         if data["decomposition_type"] == "approximate"
             printstyled("  ","||Decomposition error||₂: ", round(LA.norm(results["solution"]["slack_var"]), digits = 10),"\n"; color = _main_color)
@@ -70,9 +85,9 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         if data["objective"] == "minimize_depth"
 
             if length(data["identity_idx"]) >= 1 && (data["decomposition_type"] !== "exact_feasible") && !(results["termination_status"] == MOI.TIME_LIMIT)
-                printstyled("  ","Minimum optimal depth: ", length(gates_sol_compressed),"\n"; color = _main_color)
+                printstyled("  ","Minimum optimal depth: ", cirq_postcompress_depth,"\n"; color = _main_color)
             else 
-                printstyled("  ","Decomposition depth: ", length(gates_sol_compressed),"\n"; color = _main_color)
+                printstyled("  ","Decomposition depth: ", cirq_postcompress_depth,"\n"; color = _main_color)
             end
 
         elseif data["objective"] in ["minimize_cnot", "minimize_T"]
@@ -109,11 +124,30 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
 
 end
 
-function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String, Any})
+"""
+    print_circuit(circuit_layers::Vector{Vector{Gate}}, num_qubits::Int)
+
+Print a quantum circuit in a human-readable format, showing each layer of gates.
+"""
+function print_circuit(
+    circuit_layers::Vector{Vector{Gate}}, 
+    num_qubits::Int
+    )    
+    if isempty(circuit_layers)
+        printstyled("  Empty circuit\n"; color = _main_color)
+        return
+    end    
+    for (d, layer) in enumerate(circuit_layers)
+        printstyled("  ", "depth $d : ", QCO.kron_layer(layer, num_qubits), "\n"; color = _main_color)
+    end
+end
+
+
+function get_postprocessed_circuit_old(results::Dict{String, Any}, data::Dict{String, Any})
 
     gates_sol = Array{String,1}()
     id_sequence = QCO._gate_id_sequence(results["solution"]["z_bin_var"], data["maximum_depth"])
-    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]) && QCO.validate_circuit_decomposition(data, id_sequence)
+    (data["decomposition_type"] in ["exact_optimal", "exact_feasible", "optimal_global_phase"]) && QCO.validate_circuit(data, id_sequence)
 
     for d = 1:data["maximum_depth"]
         
@@ -124,20 +158,10 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
             s1 = gate_id["type"][1]
 
             if occursin(kron_symbol, s1)
-                push!(gates_sol, s1) 
-
+                push!(gates_sol, s1)
             elseif !(QCO._parse_gate_string(s1, type = true) in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS, QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS))
                 push!(gates_sol, s1) 
-
             else
-                
-                # s2 = String[]          
-                # for i_qu = 1:data["num_qubits"]
-                #     if gate_id["qubit_loc"] == "qubit_$i_qu"    
-                #         s2 = "$i_qu"
-                #     end
-                # end
-
                 if "angle" in keys(gate_id)
 
                     if length(keys(gate_id["angle"])) == 1 
@@ -158,11 +182,12 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
                         s3 = string("(","$(θ)",",","$(ϕ)", ",","$(λ)",")")
                         push!(gates_sol, string(s1, s3))
                     end
-
                 end
             end
         end
     end
+
+    @show gates_sol
 
     gates_sol_compressed = QCO.get_depth_compressed_circuit(data["num_qubits"], gates_sol)
 
@@ -170,33 +195,33 @@ function get_postprocessed_circuit(results::Dict{String, Any}, data::Dict{String
 end
 
 """
-    validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Array{Int64,1})
+    validate_circuit(data::Dict{String, Any}, id_sequence::Array{Int64,1})
 
 This function validates the circuit decomposition if it is indeed exact with respect to the specified target gate. 
 """
-function validate_circuit_decomposition(data::Dict{String, Any}, id_sequence::Array{Int64,1}; error_message = true)
-    valid_status = false
-
-    M_sol = Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["num_qubits"]), 2^(data["num_qubits"])))
+function validate_circuit_old(
+    data::Dict{String, Any}, 
+    id_sequence::Array{Int64,1}; 
+    error_message = true
+    )
+    # Multiply all gates in sequence
+    M_sol = reduce(*, [data["gates_dict"]["$i"]["matrix"] for i in id_sequence], 
+                  init=Array{Complex{Float64},2}(Matrix(LA.I, 2^(data["num_qubits"]), 2^(data["num_qubits"]))))
     
-    for i in id_sequence
-        M_sol *= data["gates_dict"]["$i"]["matrix"]
-    end
-
-    # This tolerance is very important for the final feasiblity check
-    if data["are_gates_real"]
-        target_gate = real(data["target_gate"])
-    else
-        target_gate = QCO.real_to_complex_gate(data["target_gate"])
-    end
+    target_gate = data["are_gates_real"] ? real(data["target_gate"]) : 
+                                          QCO.real_to_complex_gate(data["target_gate"])
+    target_gate = convert(Array{Complex{Float64},2}, target_gate)
     
-    if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
-        (QCO.isapprox(M_sol, convert(Array{Complex{Float64},2}, target_gate), atol = 1E-4)) && (valid_status = true)
+    # Check if solution matches target
+    valid_status = if data["decomposition_type"] in ["exact_optimal", "exact_feasible"]
+        QCO.isapprox(M_sol, target_gate, atol = 1E-4)
     elseif data["decomposition_type"] in ["optimal_global_phase"]
-        (QCO.isapprox_global_phase(M_sol, convert(Array{Complex{Float64},2}, target_gate))) && (valid_status = true)
+        QCO.isapprox_global_phase(M_sol, target_gate)
+    else
+        false
     end
-    
-    (!(valid_status) && error_message) && Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
+
+    (!valid_status && error_message) && Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
     
     return valid_status
 end
@@ -262,3 +287,210 @@ end
 
 _gate_id_sequence(z_val::Matrix{<:Number}, maximum_depth::Int64) = 
 [findall(isone.(round.(abs.(z_val[:,d]), digits=3)))[1] for d = 1:maximum_depth]
+
+# function kron_layer(
+#     layer::Vector{Gate}, 
+#     n::Int
+#     )::String
+
+#     sorted = sort(layer; by = g -> minimum(g.qubits))
+#     facs, qptr = String[], 1 # tensor factors, next qubit index
+
+#     for g in sorted
+#         firstq, lastq = minimum(g.qubits), maximum(g.qubits)
+#         for _ in qptr:firstq-1
+#             push!(facs, "I")
+#         end
+#         if length(g.qubits) == 1
+#             push!(facs, g.label)
+#         else
+#             sub  = join(sort(collect(g.qubits)), ",")      
+#             push!(facs, string(g.label, "_{", sub, "}"))   # CNot_{2,3}
+#         end
+#         qptr = lastq + 1
+#     end
+#     for _ in qptr:n
+#         push!(facs,"I")
+#     end
+
+#     return join(facs, " ⊗ ")
+# end
+# function kron_layer(
+#     layer::Vector{Gate}, 
+#     n::Int
+#     )::String
+
+#     # one factor per qubit, qubit 1 on the left
+#     ops = fill("I", n)                          
+
+#     # union of all multi-qubit gate names known to QCO
+#     multiset = union(QCO.TWO_QUBIT_GATES, QCO.MULTI_QUBIT_GATES)
+
+#     for g in layer
+#         qs   = sort(collect(g.qubits))          # e.g. [1,2]
+#         base = match(r"^[A-Za-z]+", g.label).match   # strip "_…" or "(…"
+        
+#         if length(qs) == 1                          # 1-qubit gate
+#             ops[qs[1]] = g.label
+
+#         elseif base in multiset                     # true multi-qubit gate
+#             ops[qs[1]] = string(base, "_{", join(qs, ","), "}")
+#             # leave remaining qubits as "I"
+
+#         else                                        # identical 1-qubit gates
+#             for q in qs
+#                 ops[q] = g.label
+#             end
+#         end
+#     end
+
+#     return join(ops, " ⊗ ")
+# end
+
+
+function kron_layer(
+    layer::Vector{Gate}, 
+    n::Int
+    )::String
+
+    # sort by left-most qubit so we can scan left → right
+    gates   = sort(layer; by = g -> minimum(g.qubits))
+    facs    = String[]          # tensor factors we’ll return
+    idxgate = 1                 # position inside `gates`
+    q       = 1                 # current wire we are printing
+
+    while q ≤ n
+        if idxgate > length(gates) || minimum(gates[idxgate].qubits) > q
+            # no gate starts on this wire → identity here
+            push!(facs, "I")
+            q += 1
+            continue
+        end
+
+        g  = gates[idxgate]
+        qs = sort(collect(g.qubits))
+        firstq, lastq = qs[1], qs[end]
+
+        if length(qs) == 1
+            push!(facs, g.label)            # ordinary 1-qubit gate
+        else
+            push!(facs, string(g.label, "_{", join(qs, ","), "}"))
+        end
+
+        q = lastq + 1                       # skip wires the gate already covers
+        idxgate += 1
+    end
+
+    return join(facs, " ⊗ ")
+end
+
+
+function circuit_unitary(layers::Vector{Vector{Gate}})
+    dim = size(layers[1][1].mat,1)        # 2^n
+    U = Matrix{ComplexF64}(LA.I, dim, dim)
+    for layer in layers
+        G = Matrix{ComplexF64}(LA.I, dim, dim)
+        for g in layer
+            G = g.mat * G                 # gates in same layer commute (disjoint qubits)
+        end
+        U = G * U
+    end
+    U
+end
+
+read_int_prefix(s::AbstractString) = parse(Int, match(r"^\d+", s).match)
+
+function build_circuit_layers(
+    id_seq::Vector{Int}, 
+    gates_dict::Dict{String,Any}
+    )
+
+    gates = Gate[]
+    for id in id_seq
+        info   = gates_dict[string(id)]
+        typestr = info["type"][1]
+        typestr == "Identity" && continue          # skip
+
+        head, params = occursin('(', typestr) ? split(typestr,'(',limit=2) : (typestr,"")
+        parts = split(head, '_'); op = parts[1]
+        qs    = BitSet(QCO.read_int_prefix.(parts[2:end]))
+        mat   = convert(Array{ComplexF64,2}, info["matrix"])
+
+        # round angles if present
+        label = op
+        if haskey(info,"angle")
+            a = info["angle"]; order = ["θ","ϕ","λ"]
+            vals = [round(rad2deg(a[k]), digits=3) for k in order if haskey(a,k)]
+            label *= "(" * join(vals,",") * ")"
+        elseif params!=""; label *= "(" * params; end
+
+        push!(gates, Gate(label, qs, mat))
+    end
+
+    num_qubits = round(Int, log2(size(gates[1].mat,1)))
+    layers_before = [[g] for g in gates]
+    layers_after  = QCO.compress_circuit(gates, num_qubits)
+    return layers_before, layers_after
+end
+
+function compress_circuit(gates::Vector{Gate}, num_qubits::Int)
+    layers, masks = Vector{Vector{Gate}}(), BitSet[]
+    full = BitSet(1:num_qubits)
+
+    for g in gates
+        (g.qubits ⊆ full) || Memento.error(_LOGGER, "Gate $(g.label) uses invalid qubit (n=$num_qubits)")
+
+        pos = length(layers)+1
+        for l = length(layers):-1:1
+            if !isempty(intersect(g.qubits, masks[l])); break; end
+            pos = l
+        end
+        if pos > length(layers)
+            push!(layers, [g]); push!(masks, copy(g.qubits))
+        else
+            push!(layers[pos], g); union!(masks[pos], g.qubits)
+        end
+    end
+    return layers
+end
+
+function validate_circuit(
+    data::Dict{String,Any},
+    layers::Vector{Vector{Gate}};
+    atol = 1e-4,
+    error_message = true,
+    global_phase = false
+    )
+
+    U_sol = QCO.circuit_unitary(layers)
+
+    tgt = data["are_gates_real"] ?
+            real(data["target_gate"]) :
+            QCO.real_to_complex_gate(data["target_gate"])
+
+    target_gate = convert(Array{ComplexF64,2}, tgt)
+
+    valid = if (data["decomposition_type"] in ["exact_optimal", "exact_feasible"]) 
+        QCO.isapprox(U_sol, target_gate; atol = atol)
+    elseif (data["decomposition_type"] == "optimal_global_phase") || global_phase
+        QCO.isapprox_global_phase(U_sol, target_gate; atol = atol)
+    else
+        false
+    end
+
+    if !valid && error_message
+        Memento.error(_LOGGER, "Decomposition is not valid: Problem may be infeasible")
+    end
+    return valid
+end
+
+function _parse_gate(s::AbstractString)::Gate
+    head, params = occursin('(', s) ? split(s, '(', limit = 2) : (s,"")
+    parts = split(head, '_')
+    op    = parts[1]
+    qs    = BitSet(parse.(Int, parts[2:end]))
+    label = params=="" ? op : op * "(" * params
+    Gate(label, qs, Matrix{ComplexF64}(I,1,1))   # matrix overwritten later
+end
+
+_explode_kron(seq::Vector{String}) = [QCO._parse_gate(term) for item in seq for term in split(item,'x')]

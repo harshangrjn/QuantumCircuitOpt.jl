@@ -112,7 +112,7 @@ mutable struct GateData
     "Constructor for struct `GateData`"
     function GateData(gate_type::String, num_qubits::Int64)
         type    = gate_type
-        complex = QCO.get_unitary(type, num_qubits)
+        complex = QCO.unitary(type, num_qubits)
         real    = QCO.complex_to_real_gate(complex)
         inverse = inv(real)
         isreal  = iszero(imag(complex))
@@ -121,5 +121,15 @@ mutable struct GateData
 
         return gate
     end
+end
 
+"""
+    Gate
+The struct, `Gate`, holds the label, the qubits and the matrix form of the gate, 
+    primarily for post-optimization. 
+"""
+struct Gate
+    label  :: String                       
+    qubits :: BitSet                       
+    mat    :: Matrix{ComplexF64}  # 2^n × 2^n unitary
 end
