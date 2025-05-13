@@ -478,21 +478,6 @@ function _get_constraint_slope_intercept(vertex1::Tuple{<:Number, <:Number}, ver
     return m, c
 end
 
-"""
-    is_multi_qubit_gate(gate::String)
-
-Given the input gate string, this function returns a boolean if the input gate is a multi qubit gate or not. 
-For example, for a 2-qubit gate `CRZ_1_2`, output is `true`. 
-"""
-function is_multi_qubit_gate(gate::String)
-    occursin(QCO.kron_symbol, gate) || (gate in QCO.MULTI_QUBIT_GATES) && return true
-    
-    qubit_loc = QCO._parse_gate_string(gate, qubits = true)
-    
-    length(qubit_loc) == 0 && Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
-    return length(qubit_loc) > 1
-end
-
 function _verify_angle_bounds(angle::Number)
     if !(-2*π <= angle <= 2*π)
         Memento.error(_LOGGER, "Input angle is not within valid bounds in [-2π, 2π]")
@@ -734,5 +719,19 @@ function multi_controlled_gate(target_gate::Array{Complex{Float64},2},
     return MCT + QCO.IGate(num_qubits)
 end
 
-
 is_zero(x; tol = 1E-6) = isapprox(x, 0, atol = tol)
+
+# """
+#     is_multi_qubit_gate(gate::String)
+
+# Given the input gate string, this function returns a boolean if the input gate is a multi qubit gate or not. 
+# For example, for a 2-qubit gate `CRZ_1_2`, output is `true`. 
+# """
+# function is_multi_qubit_gate(gate::String)
+#     occursin(QCO.kron_symbol, gate) || (gate in QCO.MULTI_QUBIT_GATES) && return true
+    
+#     qubit_loc = QCO._parse_gate_string(gate, qubits = true)
+    
+#     length(qubit_loc) == 0 && Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
+#     return length(qubit_loc) > 1
+# end

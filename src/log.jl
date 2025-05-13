@@ -61,7 +61,8 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("\n","Optimal Circuit","\n"; color = _header_color, bold = true)
 
         QCO.print_circuit(cirq_postcompress_depth < cirq_precompress_depth ? cirq_postcompress : cirq_precompress, data["num_qubits"])
-
+        printstyled("\n")
+        
         if data["decomposition_type"] == "approximate"
             printstyled("  ","||Decomposition error||₂: ", round(LA.norm(results["solution"]["slack_var"]), digits = 10),"\n"; color = _main_color)
         end

@@ -94,6 +94,7 @@ function CNot_1_3()
     "elementary_gates" => ["H_1", "H_3", "H_2", "CNot_2_1", "CNot_3_2", "Identity"],
     "target_gate" => QCOpt.unitary("CNot_1_3", 3),
     "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal",
     )
 end
 
