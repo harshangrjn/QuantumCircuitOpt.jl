@@ -113,7 +113,7 @@ end
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][4,:]), 1, atol = tol_0) 
-    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1"
+    @test data["gates_dict"]["4"]["qubit_loc"] == [1]
 end
 
 @testset "QC_model Tests: Minimum depth CU3(0,0,π/4) gate" begin
@@ -140,7 +140,7 @@ end
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][4,:]), 1, atol = tol_0) 
-    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_1_2"
+    @test data["gates_dict"]["4"]["qubit_loc"] == [1,2]
 end
 
 @testset "QC_model Tests: Minimum depth Rev CU3(0,0,π/4) gate" begin
@@ -167,7 +167,7 @@ end
     @test "Identity" in data["gates_dict"]["3"]["type"]
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][3,:]), 1, atol = tol_0)
     @test isapprox(sum(result_qc["solution"]["z_bin_var"][4,:]), 1, atol = tol_0) 
-    @test data["gates_dict"]["4"]["qubit_loc"] == "qubit_3_1"
+    @test data["gates_dict"]["4"]["qubit_loc"] == [3,1]
 end
 
 @testset "QC_model Tests: Minimum depth RX, RY, RZ gate decomposition" begin
@@ -274,7 +274,7 @@ end
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     if isapprox(sum(result_qc["solution"]["z_bin_var"][14,:]), 1, atol=tol_0)
-        @test data["gates_dict"]["14"]["qubit_loc"] == "qubit_3"
+        @test data["gates_dict"]["14"]["qubit_loc"] == [3]
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["θ"]),  45, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["ϕ"]), -90, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["14"]["angle"]["λ"]),  90, atol=tol_0)
@@ -307,7 +307,7 @@ end
     @test result_qc["primal_status"]      == MOI.FEASIBLE_POINT
     @test isapprox(result_qc["objective"], 1, atol = tol_0)
     if isapprox(sum(result_qc["solution"]["z_bin_var"][18,:]), 1, atol=tol_0)
-        @test data["gates_dict"]["18"]["qubit_loc"] == "qubit_1_3"
+        @test data["gates_dict"]["18"]["qubit_loc"] == [1,3]
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["θ"]),  45, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["ϕ"]), -90, atol=tol_0)
         @test isapprox(rad2deg(data["gates_dict"]["18"]["angle"]["λ"]),  90, atol=tol_0)

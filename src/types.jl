@@ -130,6 +130,6 @@ The struct, `Gate`, holds the label, the qubits and the matrix form of the gate,
 """
 struct Gate
     label  :: String                       
-    qubits :: BitSet                       
-    mat    :: Matrix{ComplexF64}  # 2^n × 2^n unitary
+    qubits :: Vector{Int}                       
+    matrix :: Matrix{ComplexF64}  # 2^n × 2^n unitary
 end
