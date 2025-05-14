@@ -153,7 +153,8 @@ Print a quantum circuit in a human-readable format, showing each layer of gates.
 """
 function print_circuit(
     circuit_layers::Vector{Vector{Gate}}, 
-    num_qubits::Int
+    num_qubits::Int,
+    _main_color::Symbol = :White
     )    
     if isempty(circuit_layers)
         printstyled("  Empty circuit\n"; color = _main_color)
@@ -228,7 +229,7 @@ function circuit_unitary(layers::Vector{Vector{Gate}})
         end
         U *= G
     end
-    U
+    return U
 end
 
 function build_circuit_layers(
@@ -255,7 +256,7 @@ function build_circuit_layers(
             order = ["θ", "ϕ", "λ"]
             vals = [round(rad2deg(angle[k]), digits=3) for k in order if haskey(angle, k)]
             label *= "(" * join(vals,",") * ")"
-        elseif params!=""
+        elseif params != ""
             label *= "(" * params
         end
 

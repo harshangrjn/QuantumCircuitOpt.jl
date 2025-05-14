@@ -244,3 +244,9 @@ end
         end
     end
 end
+
+@testset "Tests: empty circuit layer" begin
+    # Test that the circuit layers are empty
+    circuit_layers = Vector{Vector{QCO.Gate}}()
+    @test isnothing(QCO.print_circuit(circuit_layers, 2))
+end
