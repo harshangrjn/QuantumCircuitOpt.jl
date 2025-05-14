@@ -430,26 +430,7 @@ end
 Given a string with gates separated by kronecker symbols `x`, this function parses and returns the vector of gates. For 
 example, if the input string is `H_1xCNot_2_3xT_4`, the output will be `Vector{String}(["H_1", "CNot_2_3", "T_4"])`.
 """
-function _parse_gates_with_kron_symbol(s::String)
-
-    gates = Vector{String}()
-    gate_id = string()
- 
-    for i = 1:length(s)
-       if s[i] != QCO.kron_symbol
-          gate_id = gate_id * s[i]
-       else
-          push!(gates, gate_id)
-          (i != length(s)) && (gate_id = string())
-       end
- 
-       if i == length(s) 
-          push!(gates, gate_id)
-       end
-    end
- 
-    return gates
- end
+_parse_gates_with_kron_symbol(s::String) = String.(filter(!isempty, split(s, QCO.kron_symbol)))
 
 """
     _parse_gate_string(s::String)
@@ -459,49 +440,23 @@ function parses and returns the vector of qubits on which the input gate is loca
 if the input string is `CRX_2_3`, the output will be `Vector{Int64}([2,3])`.
 """
 function _parse_gate_string(s::String; type=false, qubits=false)
-    
-    gates = Vector{String}()
-    gate_id = string()
- 
-    for i = 1:length(s)
-       if s[i] != QCO.qubit_separator
-          gate_id = gate_id * s[i]
-       else
-          push!(gates, gate_id)
-          (i != length(s)) && (gate_id = string())
-       end
- 
-       if (i == length(s)) && (s[i] != qubit_separator)
-          push!(gates, gate_id)
-       end
-    end
+    parts = split(s, QCO.qubit_separator)
     
     if type && qubits
-        return gates[1], parse.(Int, gates[2:end]) # Assuming 1st element is the gate type/name
+        return String(parts[1]), parse.(Int, parts[2:end])
     elseif type 
-        return gates[1]
+        return String(parts[1])
     elseif qubits 
-        return parse.(Int, gates[2:end])
+        return parse.(Int, parts[2:end])
     end
-
- end
+end
  
 """
     is_gate_real(M::Array{Complex{Float64},2})
 
 Given a complex-valued quantum gate, M, this function returns if M has purely real parts or not as it's elements. 
 """
-function is_gate_real(M::Array{Complex{Float64},2})
-    M_imag = imag(M)
-    n_r = size(M_imag)[1]
-    n_c = size(M_imag)[2]
-
-    if sum(isapprox.(M_imag, zeros(n_r, n_c), atol=1E-6)) == n_r*n_c
-        return true
-    else
-        return false
-    end
- end
+is_gate_real(M::Array{Complex{Float64},2}) = all(isapprox.(imag(M), 0, atol=1E-6))
 
 """
     _get_constraint_slope_intercept(vertex1::Vector{<:Number}, vertex2::Vector{<:Number})
@@ -510,45 +465,17 @@ Given co-ordinates of two points in a plane, this function returns the slope (m)
 line joining these two points. 
 """
 function _get_constraint_slope_intercept(vertex1::Tuple{<:Number, <:Number}, vertex2::Tuple{<:Number, <:Number})
-    
     if isapprox.(vertex1, vertex2, atol=1E-6) == [true, true]
         Memento.warn(_LOGGER, "Invalid slope and intercept for two identical vertices")
         return
     end
 
-    if isapprox(vertex1[1], vertex2[1], atol = 1E-6)
-        return Inf, Inf 
-    else
-        m = QCO.round_real_value((vertex2[2] - vertex1[2]) / (vertex2[1] - vertex1[1]))
-        c = QCO.round_real_value(vertex1[2] - (m * vertex1[1]))
-
-        return m,c
-    end
-
- end
-
-"""
-    is_multi_qubit_gate(gate::String)
-
-Given the input gate string, this function returns a boolean if the input gate is a multi qubit gate or not. 
-For example, for a 2-qubit gate `CRZ_1_2`, output is `true`. 
-"""
- function is_multi_qubit_gate(gate::String)
+    isapprox(vertex1[1], vertex2[1], atol=1E-6) && return Inf, Inf
     
-    if occursin(kron_symbol, gate) || (gate in QCO.MULTI_QUBIT_GATES)
-        return true
-    end
-
-    qubit_loc = QCO._parse_gate_string(gate, qubits = true)
+    m = QCO.round_real_value((vertex2[2] - vertex1[2]) / (vertex2[1] - vertex1[1]))
+    c = QCO.round_real_value(vertex1[2] - m * vertex1[1])
     
-    if length(qubit_loc) > 1 
-        return true
-    elseif length(qubit_loc) == 1 
-        return false 
-    else 
-        Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
-    end
-
+    return m, c
 end
 
 function _verify_angle_bounds(angle::Number)
@@ -635,7 +562,11 @@ end
 Given two complex matrices, `M1` and `M2`, this function returns a boolean if these matrices are 
 equivalent up to a global phase. 
 """
-function isapprox_global_phase(M1::Array{Complex{Float64},2}, M2::Array{Complex{Float64},2}; tol_0 = 1E-4)
+function isapprox_global_phase(
+    M1::Array{Complex{Float64},2}, 
+    M2::Array{Complex{Float64},2}; 
+    tol_0 = 1E-4
+    )
     ref_nonzero_r, ref_nonzero_c = QCO._get_nonzero_idx_of_complex_matrix(M1)
     global_phase = M2[ref_nonzero_r, ref_nonzero_c] / M1[ref_nonzero_r, ref_nonzero_c] # exp(-im*ϕ)
     return isapprox(M2, global_phase * M1, atol = tol_0)
@@ -788,5 +719,19 @@ function multi_controlled_gate(target_gate::Array{Complex{Float64},2},
     return MCT + QCO.IGate(num_qubits)
 end
 
-
 is_zero(x; tol = 1E-6) = isapprox(x, 0, atol = tol)
+
+# """
+#     is_multi_qubit_gate(gate::String)
+
+# Given the input gate string, this function returns a boolean if the input gate is a multi qubit gate or not. 
+# For example, for a 2-qubit gate `CRZ_1_2`, output is `true`. 
+# """
+# function is_multi_qubit_gate(gate::String)
+#     occursin(QCO.kron_symbol, gate) || (gate in QCO.MULTI_QUBIT_GATES) && return true
+    
+#     qubit_loc = QCO._parse_gate_string(gate, qubits = true)
+    
+#     length(qubit_loc) == 0 && Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
+#     return length(qubit_loc) > 1
+# end

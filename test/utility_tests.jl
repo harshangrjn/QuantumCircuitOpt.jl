@@ -199,8 +199,8 @@ end
 @testset "Tests: U_var fixed indices" begin
     num_qubits = 2
     maximum_depth = 3
-    H1 = QCO.complex_to_real_gate(QCO.get_unitary("H_1", num_qubits))
-    CNot_1_2 = QCO.complex_to_real_gate(QCO.get_unitary("CNot_1_2", num_qubits))
+    H1 = QCO.complex_to_real_gate(QCO.unitary("H_1", num_qubits))
+    CNot_1_2 = QCO.complex_to_real_gate(QCO.unitary("CNot_1_2", num_qubits))
     Id = QCO.complex_to_real_gate(QCO.IGate(num_qubits))
 
     # Assuming only H1 in elementary gates
@@ -243,4 +243,10 @@ end
             @test isapprox(U_fixed_idx[2][idx]["value"], prod_mat_2[idx[1], idx[2]], atol=tol_0)
         end
     end
+end
+
+@testset "Tests: empty circuit layer" begin
+    # Test that the circuit layers are empty
+    circuit_layers = Vector{Vector{QCO.Gate}}()
+    @test isnothing(QCO.print_circuit(circuit_layers, 2))
 end

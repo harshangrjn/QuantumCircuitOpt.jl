@@ -201,11 +201,11 @@ function double_toffoli()
     num_qubits = 4
 
     function target_gate()
-        CV_3_4 = QCOpt.get_unitary("CV_3_4", num_qubits);
-        CV_2_4 = QCOpt.get_unitary("CV_2_4", num_qubits);
-        CVdagger_2_4 = QCOpt.get_unitary("CVdagger_2_4", num_qubits);        
-        CNot_1_3 = QCOpt.get_unitary("CNot_1_3", num_qubits);
-        CNot_3_2 = QCOpt.get_unitary("CNot_3_2", num_qubits);
+        CV_3_4 = QCOpt.unitary("CV_3_4", num_qubits);
+        CV_2_4 = QCOpt.unitary("CV_2_4", num_qubits);
+        CVdagger_2_4 = QCOpt.unitary("CVdagger_2_4", num_qubits);        
+        CNot_1_3 = QCOpt.unitary("CNot_1_3", num_qubits);
+        CNot_3_2 = QCOpt.unitary("CNot_3_2", num_qubits);
 
         return CV_2_4 * CNot_1_3 * CNot_3_2 * CV_3_4 * CVdagger_2_4 * CNot_3_2 * CNot_1_3
     end
@@ -229,13 +229,13 @@ function quantum_fulladder()
 
     function target_gate()
 
-        CV_1_2 = QCOpt.get_unitary("CV_1_2", num_qubits);
-        CV_4_2 = QCOpt.get_unitary("CV_4_2", num_qubits);
-        CVdagger_1_2 = QCOpt.get_unitary("CVdagger_1_2", num_qubits);
-        CVdagger_3_2 = QCOpt.get_unitary("CVdagger_3_2", num_qubits);
-        CNot_3_1 = QCOpt.get_unitary("CNot_3_1", num_qubits);
-        CNot_4_3 = QCOpt.get_unitary("CNot_4_3", num_qubits);
-        CNot_2_4 = QCOpt.get_unitary("CNot_2_4", num_qubits);
+        CV_1_2 = QCOpt.unitary("CV_1_2", num_qubits);
+        CV_4_2 = QCOpt.unitary("CV_4_2", num_qubits);
+        CVdagger_1_2 = QCOpt.unitary("CVdagger_1_2", num_qubits);
+        CVdagger_3_2 = QCOpt.unitary("CVdagger_3_2", num_qubits);
+        CNot_3_1 = QCOpt.unitary("CNot_3_1", num_qubits);
+        CNot_4_3 = QCOpt.unitary("CNot_4_3", num_qubits);
+        CNot_2_4 = QCOpt.unitary("CNot_2_4", num_qubits);
 
         return CNot_2_4 * CV_4_2 * CVdagger_1_2 * CVdagger_3_2 * CNot_4_3 * CNot_3_1 * CV_1_2
     end

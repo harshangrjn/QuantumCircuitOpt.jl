@@ -7,7 +7,7 @@ function hadamard()
     "num_qubits" => 2, 
     "maximum_depth" => 3,    
     "elementary_gates" => ["U3_1", "CNot_1_2", "Identity"], 
-    "target_gate" => QCOpt.get_unitary("H_1", 2),
+    "target_gate" => QCOpt.unitary("H_1", 2),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact_optimal",
        
@@ -167,7 +167,7 @@ function S_using_U3()
         "num_qubits" => 2, 
         "maximum_depth" => 3,
         "elementary_gates" => ["U3_1", "U3_2", "CNot_1_2", "Identity"], 
-        "target_gate" => QCOpt.get_unitary("S_1", 2),
+        "target_gate" => QCOpt.unitary("S_1", 2),
         "objective" => "minimize_depth", 
         "decomposition_type" => "exact_optimal",
            
@@ -300,8 +300,8 @@ function GroverDiffusion_using_HX()
 
         "num_qubits" => 2, 
         "maximum_depth" => 10,
-        "elementary_gates" => ["X_1", "X_1xX_2", "H_1xH_2", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
-        # "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
+        # "elementary_gates" => ["X_1", "X_1xX_2", "H_1xH_2", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
+        "elementary_gates" => ["X_1", "X_2", "H_1", "H_2", "CNot_1_2", "Identity"],
         "target_gate" => QCOpt.GroverDiffusionGate(),          
         "objective" => "minimize_depth",
         "decomposition_type" => "optimal_global_phase",
@@ -380,7 +380,7 @@ function qft2_using_HT()
 
     return Dict{String, Any}(
     
-        "num_qubits" => 2, 
+        "num_qubits" => 2,
         "maximum_depth" => 10,
         "elementary_gates" => ["H_1", "H_2", "T_1", "T_2", "Tdagger_1", "Tdagger_2", "CNot_1_2", "CNot_2_1", "Identity"],
         "target_gate" => QCOpt.QFT2Gate(),
@@ -392,9 +392,9 @@ end
 function GR_using_R()
     println(">>>>> GRGate testing <<<<<")
 
-    GR1 = QCOpt.get_unitary("GR", 2; angle = [π/6, π/3])
-    # GR2 = QCOpt.get_unitary("GR", 2; angle = [π/3, π/6])
-    CNot_1_2 = QCOpt.get_unitary("CNot_1_2", 2)
+    GR1 = QCOpt.unitary("GR", 2; angle = [π/6, π/3])
+    # GR2 = QCOpt.unitary("GR", 2; angle = [π/3, π/6])
+    CNot_1_2 = QCOpt.unitary("CNot_1_2", 2)
     T = QCOpt.round_complex_values(GR1 * CNot_1_2)
 
     return Dict{String, Any}(
@@ -419,7 +419,7 @@ function X_using_GR()
     "num_qubits" => 2,
     "maximum_depth" => 5, 
     "elementary_gates" => ["GR", "R_1", "R_2", "CZ_1_2", "Identity"], 
-    "target_gate" => QCOpt.get_unitary("X_1", 2),
+    "target_gate" => QCOpt.unitary("X_1", 2),
     "objective" => "minimize_depth",
     "decomposition_type" => "exact_optimal",
     "GR_θ_discretization" => [-π, -π/2, 0, π/2, π],
@@ -450,11 +450,11 @@ end
 function minimize_T_gate()
 
     println(">>>>> T Gate Minimization <<<<<")
-    target_gate = QCOpt.get_unitary("T_1", 2) * 
-                  QCOpt.get_unitary("CNot_1_2", 2) * 
-                  QCOpt.get_unitary("T_2", 2) * 
-                  QCOpt.get_unitary("CNot_1_2", 2) * 
-                  QCOpt.get_unitary("T_1", 2)
+    target_gate = QCOpt.unitary("T_1", 2) * 
+                  QCOpt.unitary("CNot_1_2", 2) * 
+                  QCOpt.unitary("T_2", 2) * 
+                  QCOpt.unitary("CNot_1_2", 2) * 
+                  QCOpt.unitary("T_1", 2)
 
     return Dict{String, Any}(
     "num_qubits" => 2,

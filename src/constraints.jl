@@ -57,10 +57,12 @@ function constraint_target_gate_condition(qcm::QuantumCircuitModel)
     decomposition_type = qcm.data["decomposition_type"]
     
     if decomposition_type in ["exact_optimal", "exact_feasible"]
-        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,max_depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"])
+        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,max_depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) 
+                                    .== qcm.data["target_gate"])
     
     elseif decomposition_type == "approximate"
-        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,max_depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) .== qcm.data["target_gate"][:,:] + qcm.variables[:slack_var][:,:])  
+        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,max_depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) 
+                                    .== qcm.data["target_gate"] + qcm.variables[:slack_var][:,:])
 
     end
 

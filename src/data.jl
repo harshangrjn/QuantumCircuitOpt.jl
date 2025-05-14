@@ -261,20 +261,23 @@ function get_elementary_gates_dictionary(params::Dict{String, Any}, elementary_g
             num_angles = i in one_angle_gates ? 1 : i in two_angle_gates ? 2 : i in three_angle_gates ? 3 : 0
             
             for k in keys(M_elementary_dict) # Angle
-                for l in keys(M_elementary_dict[k]["$(num_qubits)qubit_rep"]) # qubits (which will now be 1)
-
-                    gates_dict["$counter"] = Dict{String, Any}("type"      => [elementary_gates[i]],
-                                                               "angle"     => Dict(key => M_elementary_dict[k][key] for key in angle_keys[num_angles]),
-                                                               "qubit_loc" => l,
-                                                               "matrix"    => M_elementary_dict[k]["$(num_qubits)qubit_rep"][l])
-                    counter += 1
-                end
+                gates_dict["$counter"] = Dict{String, Any}(
+                    "type"      => [elementary_gates[i]],
+                    "angle"     => Dict(key => M_elementary_dict[k][key] for key in angle_keys[num_angles]),
+                    "matrix"    => M_elementary_dict[k]["$(num_qubits)qubit_rep"]["matrix"],
+                    "qubit_loc" => M_elementary_dict[k]["$(num_qubits)qubit_rep"]["qubit_loc"]
+                )
+                counter += 1
             end
         
         else 
-            M = QCO.get_unitary(elementary_gates[i], num_qubits)
+            M = QCO.unitary(elementary_gates[i], num_qubits)
             gates_dict["$counter"] = Dict{String, Any}("type"   => [elementary_gates[i]],
                                                        "matrix" => M)
+            if !occursin(QCO.kron_symbol, elementary_gates[i])
+                gates_dict["$counter"]["qubit_loc"] = QCO._parse_gate_string(elementary_gates[i], type = false, qubits=true)
+            end
+
             counter += 1
         end
 
@@ -323,13 +326,12 @@ function get_discretized_angle_gates(gate_type::String,
         angle_dict["$(num_qubits)qubit_rep"] = Dict{String, Any}()
 
         qubit_loc = QCO._parse_gate_string(gate_type, qubits=true)
-        qubit_loc_str = join(qubit_loc, QCO.qubit_separator)
-
-        if !(gate_type in QCO.MULTI_QUBIT_GATES)
-            angle_dict["$(num_qubits)qubit_rep"]["qubit_$(qubit_loc_str)"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
-        else
-            angle_dict["$(num_qubits)qubit_rep"]["multi_qubits"] = QCO.get_unitary(gate_type, num_qubits, angle = angles)
+        if gate_type in QCO.MULTI_QUBIT_GATES && gate_type == "GR"
+            qubit_loc = Vector(1:num_qubits)
         end
+        
+        angle_dict["$(num_qubits)qubit_rep"]["matrix"] = QCO.unitary(gate_type, num_qubits, angle = angles)
+        angle_dict["$(num_qubits)qubit_rep"]["qubit_loc"] = qubit_loc
 
         M["angle_$(counter)"] = angle_dict
         counter += 1
@@ -339,7 +341,7 @@ function get_discretized_angle_gates(gate_type::String,
 end
 
 """
-    get_unitary(input::String, num_qubits::Int64; angle = nothing)
+    unitary(input::String, num_qubits::Int64; angle = nothing)
 
 Given an input string representing the gate and number of qubits of the circuit, this function returns a full-sized 
 gate with respect to the input number of qubits. For example, if `num_qubits = 3` and the input gate in `H_3` 
@@ -347,7 +349,11 @@ gate with respect to the input number of qubits. For example, if `num_qubits = 3
 qubit Identity and Hadamard gates, respectively. Note that `angle` vector is an optional input which is 
 necessary when the input gate is parametrized by Euler angles.
 """
-function get_unitary(input::String, num_qubits::Int64; angle = nothing)
+function unitary(
+    input::String, 
+    num_qubits::Int64; 
+    angle = nothing
+    )
 
     if num_qubits > 10
         Memento.error(_LOGGER, "Greater than 10 qubits is currently not supported")
@@ -502,9 +508,9 @@ function get_full_sized_kron_gate(input::String, num_qubits::Int64)
                 end
             else
                 if (qubit_loc[1] < qubit_loc[2]) || (gate_type in QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC)
-                    kron_gate = QCO.get_unitary(string(gate_type, qubit_separator, 1, qubit_separator, Int(gate_width + 1)), (gate_width + 1))
+                    kron_gate = QCO.unitary(string(gate_type, qubit_separator, 1, qubit_separator, Int(gate_width + 1)), (gate_width + 1))
                 else 
-                    kron_gate = QCO.get_unitary(string(gate_type, qubit_separator, Int(gate_width + 1), qubit_separator, 1), (gate_width + 1))
+                    kron_gate = QCO.unitary(string(gate_type, qubit_separator, Int(gate_width + 1), qubit_separator, 1), (gate_width + 1))
                 end
                 M = kron(M, kron_gate)
             end
