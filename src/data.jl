@@ -448,6 +448,22 @@ function unitary(
         else
             Memento.error(_LOGGER, "Enter a valid angle parameter for the input $input gate")
         end
+    # Support multi-controlled (>=3 qubit) elementary gates like Toffoli/CCZ
+    elseif length(qubit_loc) >= 3
+        if gate_type in QCO.MULTI_CONTROLLED_GATES
+            # Interpret last qubit as target, preceding as controls
+            control_qubits = qubit_loc[1:end-1]
+            target_qubit = qubit_loc[end]
+
+            # Map gate_type to a single-qubit target gate for multi_controlled_gate
+            if gate_type in ["Tof", "Too", "Toffoli", "CCX"]
+                return QCO.multi_controlled_gate(QCO.XGate(), control_qubits, target_qubit, num_qubits)
+            elseif gate_type == "CCZ"
+                return QCO.multi_controlled_gate(QCO.ZGate(), control_qubits, target_qubit, num_qubits)
+            else
+                Memento.error(_LOGGER, "Unsupported multi-controlled elementary gate: $gate_type")
+            end
+        end
     end
 
 end
@@ -594,7 +610,7 @@ function _catch_input_gate_errors(
     elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
         Memento.error(_LOGGER, "Specified $input_gate gate cannot have identical control and target qubits") 
 
-    elseif length(qubit_loc) > 2 
+    elseif length(qubit_loc) > 2 && !(gate_type in QCO.MULTI_CONTROLLED_GATES)
         Memento.error(_LOGGER, "Only 1- and 2-qubit elementary gates are currently supported")
     end
 

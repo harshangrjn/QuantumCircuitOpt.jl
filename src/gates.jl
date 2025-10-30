@@ -16,7 +16,9 @@ const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", 
 const MULTI_QUBIT_GATES_ANGLE_PARAMETERS   = ["GR"]
 
 # >= 2 qubit gates
-const MULTI_CONTROLLED_GATES   = ["MC_gates"]
+# MULTI_CONTROLLED_GATES lists gate types that represent multi-controlled gates
+# Add common 3-qubit controlled gates so they can be used as elementary gates
+const MULTI_CONTROLLED_GATES   = ["MC_gates", "Tof", "Too", "Toffoli", "CCX", "CCZ"]
 
 # Gates invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "SSwap", "iSwap", "Sycamore", "DCX", "W", "M", "CZ",

@@ -53,6 +53,10 @@
     CV_13       = QCO.unitary("CV_1_3", 3)
     @test isapprox(QCO.ToffoliGate(), CV_23 * CNot_1_2 * CVdagger_23 * CNot_1_2 * CV_13, atol=tol_0)
 
+    # Ensure Toffoli can be used as an elementary gate string
+    @test isapprox(QCO.unitary("Tof_1_2_3", 3), QCO.ToffoliGate(), atol=tol_0)
+    @test isapprox(QCO.unitary("Toffoli_1_2_3", 3), QCO.ToffoliGate(), atol=tol_0)
+
     CVdagger_12 = QCO.unitary("CVdagger_1_2", 3)
     CVdagger_31 = QCO.unitary("CVdagger_3_1", 3)
     @test isapprox(QCO.IGate(3), CVdagger_12^4 * CVdagger_31^4, atol=tol_0)
