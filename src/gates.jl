@@ -7,7 +7,8 @@ IMPORTANT: a) Update the lists below whenever a 1 or 2 qubit gate is added to th
 const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "R", "RX", "RY", "RZ", "Phase"]
 
 const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z", "S", 
-                                              "Sdagger", "T", "Tdagger", "SX", "SXdagger", 
+                                              "Sdagger", "T", "Tdagger", "SX", "SXdagger",
+                                              "Fib1", "Fib2", "Fib1dagger", "Fib2dagger", 
                                               "Fib1", "Fib2", "Fib1dagger", "Fib2dagger",
                                               "Fibweave1", "Fibweave2", "Fibweave1dagger", "Fibweave2dagger"]
 
@@ -23,7 +24,7 @@ const MULTI_CONTROLLED_GATES   = ["MC_gates"]
 # Gates invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "SSwap", "iSwap", "Sycamore", "DCX", "W", "M", "CZ",
                                               "QFT2", "HCoin", "GroverDiffusion", "CS", "CSdagger", 
-                                              "CT", "CTdagger", "Fib3", "Fib3dagger"]
+                                              "CT", "CTdagger", "Fib3", "Fib3dagger", "Fib3", "Fib3dagger"]
 
 # Gates non-invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = ["CNot", "CNotRev", "CX", "CXRev", "CY", "CYRev", 

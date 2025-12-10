@@ -11,33 +11,28 @@ include("optimizers.jl")
 include("parametrized_gates.jl")
 include("decompose_all_gates.jl")
 
-decompose_gates = [   
-       # "controlled_V",
-       # "controlled_H",
-        "magic",       
-        "iSwap",
-        "W_using_U3",
-
-        #-- 3-qubit gates --#
+decompose_gates = [         
+       
+       #-- 3-qubit gates --#
         "toffoli_using_2qubit_gates",
+        "CNot_1_3",
         "CNot_1_3_full",
         "fredkin",
+        "toffoli_left",
+        "toffoli_right",
         "miller",
         "relative_toffoli",
         "margolus",
-        "QFT3",
-        "CiSwap",
-
+     #  "CiSwap", # up to 1000s
         #-- 4-qubit gates --#
         "CNot_41",
         "double_peres",
         "quantum_fulladder",
         "double_toffoli",
+       
         ]
 
-#ecompose_gates = ["Hadamard_Fib_weave", "X_Fib_weave", "T_Fib_weave"]         
-decompose_gates = ["CNot_41"]         
-         
+decompose_gates = [ "toffoli_using_2qubit_gates"]    
 #----------------------------------------------#
 #      Quantum Circuit Optimization model      #
 #----------------------------------------------#

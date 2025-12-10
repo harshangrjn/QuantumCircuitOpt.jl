@@ -221,3 +221,4 @@ function variable_approximate_c(qcm::QuantumCircuitModel)
 
     return
 end
+

@@ -172,6 +172,75 @@ function constraint_target_gate_condition(qcm::QuantumCircuitModel)
 
     end
 
+                                        
+    return
+end
+
+function constraint_layer_assigments(qcm::QuantumCircuitModel)
+
+    max_depth      = qcm.data["maximum_depth"]
+    maximum_layers = qcm.data["maximum_layers"]
+    
+    #Some elements have to be 0: layer number <= depth number
+    for d = 1:(maximum_layers-1)
+        JuMP.@constraint(qcm.model, [l=(d+1):maximum_layers], qcm.variables[:layer_bin_var][d,l] == 0)
+    end
+
+    #The first element is 1
+    JuMP.@constraint(qcm.model, qcm.variables[:layer_bin_var][1, 1] == 1)
+    
+    #Each position assigned o exactly one layer
+    JuMP.@constraint(qcm.model, [d=1:max_depth], sum(qcm.variables[:layer_bin_var][d,l] for l=1:maximum_layers) == 1)
+
+    #Layers stepwise monotonic increase
+    JuMP.@constraint(qcm.model, [d=1:max_depth-1], sum(qcm.variables[:layer_bin_var][d,l]*l for l=1:maximum_layers) <= sum(qcm.variables[:layer_bin_var][d+1,l]*l for l=1:maximum_layers))
+    JuMP.@constraint(qcm.model, [d=1:max_depth-1], sum(qcm.variables[:layer_bin_var][d+1,l]*l for l=1:maximum_layers) <= 1 + sum(qcm.variables[:layer_bin_var][d,l]*l for l=1:maximum_layers))
+
+    return
+end
+
+function constraint_single_gate_per_qubit_per_layer(qcm::QuantumCircuitModel)
+
+    max_depth      = qcm.data["maximum_depth"]
+    maximum_layers = qcm.data["maximum_layers"]
+    num_gates      = size(qcm.data["gates_real"])[3]
+    num_qubits     = qcm.data["num_qubits"]
+    gates_dict     = qcm.data["gates_dict"]
+    
+    #Some elements have to be 0: layer number <= depth number
+    for d = 1:(maximum_layers-1)
+        JuMP.@constraint(qcm.model, [n=1:num_gates, l=(d+1):maximum_layers], qcm.variables[:delta_bin_var][n,d,l] == 0)
+    end
+    
+    #auxiliary variable multiplication constraints 
+    JuMP.@constraint(qcm.model, [n=1:num_gates, d=1:max_depth, l=1:maximum_layers], qcm.variables[:delta_bin_var][n,d,l] <= qcm.variables[:z_bin_var][n,d])
+    JuMP.@constraint(qcm.model, [n=1:num_gates, d=1:max_depth, l=1:maximum_layers], qcm.variables[:delta_bin_var][n,d,l] <= qcm.variables[:layer_bin_var][d,l])
+    JuMP.@constraint(qcm.model, [n=1:num_gates, d=1:max_depth, l=1:maximum_layers], qcm.variables[:delta_bin_var][n,d,l] >= qcm.variables[:z_bin_var][n,d] + qcm.variables[:layer_bin_var][d,l] -1)
+
+    #each qubit used only once per layer
+    JuMP.@constraint(qcm.model, [q=1:num_qubits, l=1:maximum_layers], sum(sum(qcm.variables[:delta_bin_var][n,d,l] for d=1:max_depth) for n in _get_all_gates_for_qubit(gates_dict, q)) <= 1)
+    
+    return
+end
+
+###################################   TARGET CONSTRAINTS   ###################################
+
+function constraint_target_gate_condition(qcm::QuantumCircuitModel)
+
+    max_depth          = qcm.data["maximum_depth"]
+    num_gates          = size(qcm.data["gates_real"])[3]
+    decomposition_type = qcm.data["decomposition_type"]
+    
+    if decomposition_type in ["exact_optimal", "exact_feasible"]
+        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,max_depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) 
+                                    .== qcm.data["target_gate"])
+    
+    elseif decomposition_type == "approximate"
+        JuMP.@constraint(qcm.model, sum(qcm.variables[:V_var][:,:,n,max_depth] * qcm.data["gates_real"][:,:,n] for n=1:num_gates) 
+                                    .== qcm.data["target_gate"] + qcm.variables[:slack_var][:,:])
+
+    end
+
     return
 end
 
@@ -211,6 +280,85 @@ function _complex_phase_differences(U_var, target_gate, ref_r, ref_c, i, j, dept
               U_var[ref_r, ref_c+1, depth] * target_gate[i, j]
 
     return realLHS, realRHS, imagLHS, imagRHS
+end
+
+function constraint_target_gate_condition_glphase1_cs(qcm::QuantumCircuitModel)
+
+    max_depth      = qcm.data["maximum_depth"]
+    n_r            = size(qcm.data["gates_real"])[1]
+    n_c            = size(qcm.data["gates_real"])[2]
+    target_gate    = qcm.data["target_gate"]
+    U_var          = qcm.variables[:U_var]
+    phase_real_var = qcm.variables[:phase_real_var]
+    phase_complex_var = qcm.variables[:phase_complex_var]
+
+    if qcm.data["are_gates_real"]
+
+        JuMP.@constraint(qcm.model, phase_complex_var == 0)
+
+        for i in 1:n_r, j in 1:n_c
+            JuMP.@constraint(qcm.model,  U_var[i,j,max_depth] == target_gate[i,j] * phase_real_var)
+        end
+
+    else
+        for i in 1:2:n_r, j in 1:2:n_c
+            JuMP.@constraint(qcm.model, U_var[i,j,max_depth] == phase_real_var * target_gate[i,j] - phase_complex_var * target_gate[i+1,j])
+            JuMP.@constraint(qcm.model, U_var[i,j+1,max_depth] == - phase_complex_var * target_gate[i,j] - phase_real_var * target_gate[i+1,j])
+            JuMP.@constraint(qcm.model, U_var[i+1,j,max_depth] == phase_complex_var * target_gate[i,j] + phase_real_var * target_gate[i+1,j])
+            JuMP.@constraint(qcm.model, U_var[i+1,j+1,max_depth] == phase_real_var * target_gate[i,j] - phase_complex_var * target_gate[i+1,j])
+
+        end
+
+    end
+
+    return
+end
+
+function constraint_target_gate_condition_glphase2_cs(qcm::QuantumCircuitModel)
+
+    max_depth      = qcm.data["maximum_depth"]
+    n_r            = size(qcm.data["gates_real"])[1]
+    n_c            = size(qcm.data["gates_real"])[2]
+    target_gate    = qcm.data["target_gate"]
+    U_var          = qcm.variables[:U_var]
+    phase_real_var = qcm.variables[:phase_real_var]
+    phase_complex_var = qcm.variables[:phase_complex_var]
+
+    if qcm.data["are_gates_real"]
+
+        JuMP.@constraint(qcm.model, phase_complex_var == 0)
+        
+        for i in 1:n_r, j in 1:n_c
+            if !(i==j)
+                JuMP.@constraint(qcm.model, sum( U_var[i,k,max_depth] * target_gate[j,k] for k=1:n_r) == 0)
+            end    
+        end
+
+        for i in 1:n_r
+            JuMP.@constraint(qcm.model, sum( U_var[i,k,max_depth] * target_gate[i,k] for k=1:n_r) == phase_real_var)
+        end
+
+
+    else
+        for i in 1:2:n_r, j in 1:2:n_c
+            if !(i==j)
+                JuMP.@constraint(qcm.model, sum( U_var[i,k,max_depth] * target_gate[j,k] for k=1:n_r) == 0)
+                JuMP.@constraint(qcm.model, sum( U_var[i,k,max_depth] * target_gate[j+1,k] for k=1:n_r) == 0)
+                JuMP.@constraint(qcm.model, sum( U_var[i+1,k,max_depth] * target_gate[j,k] for k=1:n_r) == 0)
+                JuMP.@constraint(qcm.model, sum( U_var[i+1,k,max_depth] * target_gate[j+1,k] for k=1:n_r) == 0)
+            end
+        end
+
+        for i in 1:2:n_r
+                JuMP.@constraint(qcm.model, sum( U_var[i,k,max_depth] * target_gate[i,k] for k=1:n_r) == phase_real_var)
+                JuMP.@constraint(qcm.model, sum( U_var[i,k,max_depth] * target_gate[i+1,k] for k=1:n_r) == -phase_complex_var)
+                JuMP.@constraint(qcm.model, sum( U_var[i+1,k,max_depth] * target_gate[i,k] for k=1:n_r) == phase_complex_var)
+                JuMP.@constraint(qcm.model, sum( U_var[i+1,k,max_depth] * target_gate[i+1,k] for k=1:n_r) == phase_real_var)
+        end
+            
+    end
+
+    return
 end
 
 function constraint_target_gate_condition_glphase1_cs(qcm::QuantumCircuitModel)
@@ -705,12 +853,15 @@ function constraint_idempotent_gates(qcm::QuantumCircuitModel)
 
         for i = 1:length(idempotent_gates)
             JuMP.@constraint(qcm.model, [d=1:(max_depth-1)], z_bin_var[idempotent_gates[i], d] + z_bin_var[idempotent_gates[i], d+1] <= 1)
+        for i = 1:length(idempotent_gates)
+            JuMP.@constraint(qcm.model, [d=1:(max_depth-1)], z_bin_var[idempotent_gates[i], d] + z_bin_var[idempotent_gates[i], d+1] <= 1)
         end
     end
 
     return
 end
 
+function constraint_redundant_gate_products(qcm::QuantumCircuitModel)
 function constraint_redundant_gate_products(qcm::QuantumCircuitModel)
 
     gates_dict = qcm.data["gates_dict"]
@@ -729,12 +880,42 @@ function constraint_redundant_gate_products(qcm::QuantumCircuitModel)
         end
     end
 
+    redundant_pairs, redundant_triplets, redundant_quadruplets, redundant_quintuplets = QCO.get_redundant_gate_products(gates_dict, qcm.data["decomposition_type"])
+    
+    if !isempty(redundant_pairs)
+        (length(redundant_pairs) == 1) && (Memento.info(_LOGGER, "Detected $(length(redundant_pairs)) redundant input elementary gate pair"))
+        (length(redundant_pairs) > 1)  && (Memento.info(_LOGGER, "Detected $(length(redundant_pairs)) redundant input elementary gate pairs"))
+
+        for i = 1:length(redundant_pairs)
+            JuMP.@constraint(qcm.model, [d=1:(max_depth-1)], z_bin_var[redundant_pairs[i][1], d] + z_bin_var[redundant_pairs[i][2], d+1] <= 1)
+        end
+    end
+
     if !isempty(redundant_triplets)
+        (length(redundant_triplets) == 1) && (Memento.info(_LOGGER, "Detected $(length(redundant_triplets)) redundant input elementary gate triplet"))
         (length(redundant_triplets) == 1) && (Memento.info(_LOGGER, "Detected $(length(redundant_triplets)) redundant input elementary gate triplet"))
         (length(redundant_triplets) > 1)  && (Memento.info(_LOGGER, "Detected $(length(redundant_triplets)) redundant input elementary gate triplets"))
 
         for i = 1:length(redundant_triplets)
             JuMP.@constraint(qcm.model, [d=1:(max_depth-2)], z_bin_var[redundant_triplets[i][1], d] + z_bin_var[redundant_triplets[i][2], d+1] + z_bin_var[redundant_triplets[i][3], d+2]<= 2)
+        end
+    end
+
+    if !isempty(redundant_quadruplets) && max_depth >= 4
+        (length(redundant_quadruplets) == 1) && (Memento.info(_LOGGER, "Detected $(length(redundant_quadruplets)) redundant input elementary gate quadruplet"))
+        (length(redundant_quadruplets) > 1)  && (Memento.info(_LOGGER, "Detected $(length(redundant_quadruplets)) redundant input elementary gate quadruplets"))
+
+        for i = 1:length(redundant_quadruplets)
+            JuMP.@constraint(qcm.model, [d=1:(max_depth-3)], z_bin_var[redundant_quadruplets[i][1], d] + z_bin_var[redundant_quadruplets[i][2], d+1] + z_bin_var[redundant_quadruplets[i][3], d+2] + z_bin_var[redundant_quadruplets[i][4], d+3] <= 3)
+        end
+    end
+
+    if !isempty(redundant_quintuplets) && max_depth >= 5
+        (length(redundant_quintuplets) == 1) && (Memento.info(_LOGGER, "Detected $(length(redundant_quintuplets)) redundant input elementary gate quintuplet"))
+        (length(redundant_quintuplets) > 1)  && (Memento.info(_LOGGER, "Detected $(length(redundant_quintuplets)) redundant input elementary gate quintuplets"))
+
+        for i = 1:length(redundant_quintuplets)
+            JuMP.@constraint(qcm.model, [d=1:(max_depth-4)], z_bin_var[redundant_quintuplets[i][1], d] + z_bin_var[redundant_quintuplets[i][2], d+1] + z_bin_var[redundant_quintuplets[i][3], d+2] + z_bin_var[redundant_quintuplets[i][4], d+3] + z_bin_var[redundant_quintuplets[i][5], d+4] <= 4)
         end
     end
 

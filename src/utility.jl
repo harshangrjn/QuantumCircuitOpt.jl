@@ -54,6 +54,367 @@ function gate_element_bounds(M::Array{Float64,3})
     return M_l, M_u
 end
 
+function get_redundant_gate_products(M::Dict{String,Any}, decomposition_type::String)
+
+    num_gates = length(keys(M))
+    redundant_pairs_prod_id_idx = Array{Tuple{Int64,Int64},1}()
+    redundant_pairs_idx = Array{Tuple{Int64,Int64},1}()
+    redundant_triplets_idx = Array{Tuple{Int64,Int64,Int64},1}()
+    redundant_quadruplets_idx = Array{Tuple{Int64,Int64,Int64,Int64},1}()
+    redundant_quintuplets_idx = Array{Tuple{Int64,Int64,Int64,Int64,Int64},1}()
+
+    equivalent_pair_idx = Array{Tuple{Int64,Int64},1}()
+    equivalent_pair_idx = get_equivalent_gate_pairs(M, decomposition_type)
+    commuting_pair_idx, commuting_pair_prod_id_idx = get_commutative_gate_pairs(M, decomposition_type)
+    equivalent_pair_idx = append!(equivalent_pair_idx, commuting_pair_idx)
+
+
+    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
+
+    # Check if we're using global phase comparison
+    use_global_phase = decomposition_type in ["optimal_global_phase"]
+    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
+
+    # Redundant pairs
+    for i = 1:num_gates
+        for j = 1:num_gates
+            M_i   = M["$i"]["matrix"]
+            M_j   = M["$j"]["matrix"]
+
+            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
+                continue
+            end
+
+            if ((i,j) in equivalent_pair_idx) 
+                continue
+            end
+
+            M_lhs = M_i * M_j
+
+            if _compare_func(M_lhs, Id)
+                push!(redundant_pairs_prod_id_idx, (i,j))
+                continue
+            end
+
+            for prd = 1:num_gates                
+                M_prd = M["$prd"]["matrix"]
+
+                if ("Identity" in M["$prd"]["type"]) 
+                    continue
+                    #actually it never gets here
+                end
+
+                if _compare_func(M_lhs, M_prd)
+                    push!(redundant_pairs_idx, (i,j))
+                    break # break out of prd, go to next j
+                end
+            end
+
+        end
+    end
+
+    #println("redundant pairs:", redundant_pairs_idx)
+
+    # Redundant triplets
+    for i = 1:num_gates, j = 1:num_gates
+        for k = 1:num_gates 
+            M_i   = M["$i"]["matrix"]
+            M_j   = M["$j"]["matrix"]
+            M_k   = M["$k"]["matrix"]
+
+            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"]) || ("Identity" in M["$k"]["type"])
+                continue
+            end
+
+            if ((i,j) in equivalent_pair_idx) || ((j,k) in equivalent_pair_idx)
+                continue
+            end
+
+            if ((i,j) in redundant_pairs_idx) || ((j,k) in redundant_pairs_idx)
+                continue
+            end
+
+            if ((i,j) in redundant_pairs_prod_id_idx) || ((j,k) in redundant_pairs_prod_id_idx)
+                continue
+            end
+
+            M_lhs = M_i * M_j * M_k
+
+            for prd = 1:num_gates
+                
+                M_prd = M["$prd"]["matrix"]
+   
+                if _compare_func(M_lhs, M_prd)
+                    push!(redundant_triplets_idx, (i,j,k))
+                    break  # skip the rest of the prd loop 
+                end
+            end
+
+        end
+    end
+
+    #println("redundant triplets:", redundant_triplets_idx)
+
+    # Redundant quadruplets
+    for i = 1:num_gates, j = 1:num_gates, k=1:num_gates
+        for l = 1:num_gates 
+            M_i   = M["$i"]["matrix"]
+            M_j   = M["$j"]["matrix"]
+            M_k   = M["$k"]["matrix"]
+            M_l   = M["$l"]["matrix"]
+
+            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"]) || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"])
+                continue
+            end
+
+            if ((i,j) in equivalent_pair_idx) || ((j,k) in equivalent_pair_idx) || ((k,l) in equivalent_pair_idx)
+                continue
+            end
+
+            if ((i,j) in redundant_pairs_idx) || ((j,k) in redundant_pairs_idx) || ((k,l) in redundant_pairs_idx)
+                continue
+            end
+
+            if ((i,j) in redundant_pairs_prod_id_idx) || ((j,k) in redundant_pairs_prod_id_idx) || ((k,l) in redundant_pairs_prod_id_idx)
+                continue
+            end
+
+            if ((i,j,k) in redundant_triplets_idx) || ((j,k,l) in redundant_triplets_idx) 
+                continue
+            end
+
+            M_lhs = M_i * M_j * M_k *M_l
+
+            for prd = 1:num_gates
+            
+                M_prd = M["$prd"]["matrix"]
+
+                if _compare_func(M_lhs, M_prd)
+                    push!(redundant_quadruplets_idx, (i,j,k,l))
+                    break  # skip the rest of the prd loop 
+                end
+            end
+
+        end
+    end
+
+    #println("redundant quadruplets:", redundant_quadruplets_idx)
+
+    # Redundant quintuplets
+    for i = 1:num_gates, j = 1:num_gates, k=1:num_gates, l = 1:num_gates 
+        for m = 1:num_gates 
+            M_i   = M["$i"]["matrix"]
+            M_j   = M["$j"]["matrix"]
+            M_k   = M["$k"]["matrix"]
+            M_l   = M["$l"]["matrix"]
+            M_m   = M["$m"]["matrix"]
+
+            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"]) || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"]) || ("Identity" in M["$m"]["type"])
+                continue
+            end
+
+            if ((i,j) in equivalent_pair_idx) || ((j,k) in equivalent_pair_idx) || ((k,l) in equivalent_pair_idx) || ((l,m) in equivalent_pair_idx) 
+                continue
+            end
+
+            if ((i,j) in redundant_pairs_idx) || ((j,k) in redundant_pairs_idx) || ((k,l) in redundant_pairs_idx) || ((l,m) in redundant_pairs_idx)
+                continue
+            end
+
+            if ((i,j) in redundant_pairs_prod_id_idx) || ((j,k) in redundant_pairs_prod_id_idx) || ((k,l) in redundant_pairs_prod_id_idx) || ((l,m) in redundant_pairs_prod_id_idx)
+                continue
+            end
+
+            if ((i,j,k) in redundant_triplets_idx) || ((j,k,l) in redundant_triplets_idx) || ((k,l,m) in redundant_triplets_idx) 
+                continue
+            end
+
+            if ((i,j,k,l) in redundant_quadruplets_idx) || ((j,k,l,m) in redundant_quadruplets_idx)
+                continue
+            end
+
+            M_lhs = M_i * M_j * M_k *M_l * M_m
+
+            for prd = 1:num_gates
+
+                M_prd = M["$prd"]["matrix"]
+            
+                if _compare_func(M_lhs, M_prd)
+                    push!(redundant_quintuplets_idx, (i,j,k,l,m))
+                    break  # skip the rest of the prd loop 
+                end
+            end
+
+        end
+    end
+
+    #println("redundant quintuplet:", redundant_quintuplets_idx)
+
+    return redundant_pairs_idx, redundant_triplets_idx, redundant_quadruplets_idx, redundant_quintuplets_idx
+end
+
+function get_equivalent_gate_pairs(M::Dict{String,Any}, decomposition_type::String)
+    num_gates = length(keys(M))
+    delete_pairs_idx = Array{Tuple{Int64,Int64},1}()
+    keep_pairs_idx = Array{Tuple{Int64,Int64},1}()
+
+    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
+
+    # Check if we're using global phase comparison
+    use_global_phase = decomposition_type in ["optimal_global_phase"]
+    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
+
+    # Non-Identity equivalent pairs
+    for i = 1:num_gates, j = 1:num_gates, k = 1:num_gates, l = 1:num_gates
+        M_i = M["$i"]["matrix"]
+        M_j = M["$j"]["matrix"]
+        M_k = M["$k"]["matrix"]
+        M_l = M["$l"]["matrix"]
+
+        if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])  || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"])
+            # covered by redundant pairs / in separate constraints
+            continue
+        end
+
+        if (i == k) && (j == l)
+            # they are the same thing
+            continue
+        end
+
+        if (i == l) && (j == k)
+            # covered by commuting pairs
+            continue
+        end
+        
+        
+        #somehow applying these constraints (=commneting this block out) twice would help a lot
+        if _compare_func(M_i*M_j, Id)
+            # covered by commuting prod Identity or by Involuntary
+            continue
+        end
+        
+
+        if _compare_func(M_i*M_j, M_k*M_l)
+            if (i, j) in keep_pairs_idx
+                if (k, l) in keep_pairs_idx
+                    idx = findfirst(x -> x == (k, l), keep_pairs_idx)
+                    deleteat!(keep_pairs_idx, idx)
+                elseif (k, l) in delete_pairs_idx
+                    nothing
+                else 
+                    push!(delete_pairs_idx, (k, l))
+                end
+            elseif (i, j) in delete_pairs_idx
+                if (k, l) in keep_pairs_idx
+                    nothing
+                elseif (k, l) in delete_pairs_idx
+                    nothing
+                else 
+                    push!(delete_pairs_idx, (k, l))
+                end
+            else 
+                if (k, l) in keep_pairs_idx
+                    push!(delete_pairs_idx, (i, j))
+                elseif (k, l) in delete_pairs_idx
+                    push!(delete_pairs_idx, (i, j))
+                else 
+                    push!(keep_pairs_idx, (i, j))
+                    push!(delete_pairs_idx, (k, l))
+                end
+            end
+        end
+           
+    end
+
+    #println("delete:", delete_pairs_idx)
+    #println("keep:", keep_pairs_idx)
+    return delete_pairs_idx
+end
+
+function get_equivalent_gate_triplets(M::Dict{String,Any}, decomposition_type::String)
+    num_gates = length(keys(M))
+    delete_triplets_idx = Array{Tuple{Int64,Int64,Int64},1}()
+    keep_triplets_idx = Array{Tuple{Int64,Int64,Int64},1}()
+
+    commuting_pair_idx, commuting_pair_prod_id_idx = get_commutative_gate_pairs(M, decomposition_type)
+    equivalent_pair_idx = get_equivalent_gate_pairs(M, decomposition_type)
+    commuting_pair_idx = append!(commuting_pair_idx, equivalent_pair_idx)
+
+    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
+
+    # Check if we're using global phase comparison
+    use_global_phase = decomposition_type in ["optimal_global_phase"]
+    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
+
+    # Non-Identity equivalent pairs
+    for i = 1:num_gates, j = 1:num_gates, k = 1:num_gates, l = 1:num_gates, m = 1:num_gates,  n = 1:num_gates
+        M_i = M["$i"]["matrix"]
+        M_j = M["$j"]["matrix"]
+        M_k = M["$k"]["matrix"]
+        M_l = M["$l"]["matrix"]
+        M_m = M["$m"]["matrix"]
+        M_n = M["$n"]["matrix"]
+
+        if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])  || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"]) || ("Identity" in M["$m"]["type"]) || ("Identity" in M["$n"]["type"])
+            # covered by redundant pairs / in separate constraints
+            continue
+        end
+
+        if (i == l) && (j == m) && (k == n)
+            # they are the same thing
+            continue
+        end
+
+        if ((i,j) in commuting_pair_idx) || ((j,k) in commuting_pair_idx) || ((l,m) in commuting_pair_idx) || ((m,n) in commuting_pair_idx)
+            continue
+        end
+
+        if ((i,j) in commuting_pair_prod_id_idx) || ((j,k) in commuting_pair_prod_id_idx) || ((l,m) in commuting_pair_prod_id_idx) || ((m,n) in commuting_pair_prod_id_idx)
+            continue
+        end
+
+        if ((j,i) in commuting_pair_prod_id_idx) || ((k,j) in commuting_pair_prod_id_idx) || ((m,l) in commuting_pair_prod_id_idx) || ((n,m) in commuting_pair_prod_id_idx)
+            continue
+        end
+              
+
+        if _compare_func(M_i*M_j*M_k, M_l*M_m*M_n)
+            if (i, j, k) in keep_triplets_idx
+                if (l, m, n) in keep_triplets_idx
+                    idx = findfirst(x -> x == (l, m, n), keep_triplets_idx)
+                    deleteat!(keep_triplets_idx, idx)
+                elseif (l, m, n) in delete_triplets_idx
+                    nothing
+                else 
+                    push!(delete_triplets_idx, (l, m, n))
+                end
+            elseif (i, j, k) in delete_triplets_idx
+                if (l, m, n) in keep_triplets_idx
+                    nothing
+                elseif (l, m, n) in delete_triplets_idx
+                    nothing
+                else 
+                    push!(delete_triplets_idx, (l, m, n))
+                end
+            else 
+                if (l, m, n) in keep_triplets_idx
+                    push!(delete_triplets_idx, (i, j, k))
+                elseif (l, m, n) in delete_triplets_idx
+                    push!(delete_triplets_idx, (i, j, k))
+                else 
+                    push!(keep_triplets_idx, (i, j, k))
+                    push!(delete_triplets_idx, (l, m, n))
+                end
+            end
+        end
+           
+    end
+
+    #println("delete:", delete_triplets_idx)
+    #println("keep:", keep_triplets_idx)
+    return delete_triplets_idx
+end
+
 """
     get_commutative_gate_pairs(M::Dict{String,Any}; decomposition_type::String; identity_in_pairs = true)
 
