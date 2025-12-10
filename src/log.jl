@@ -63,8 +63,29 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         QCO.print_circuit(cirq_postcompress_depth < cirq_precompress_depth ? cirq_postcompress : cirq_precompress, data["num_qubits"])
         printstyled("\n")
         
-        if data["decomposition_type"] == "approximate"
+        if data["decomposition_type"] in ["approximate", "infinity-approximate", "sum-approximate"]
+
+            max_depth    = data["maximum_depth"]
+            n_c          = size(data["gates_real"])[2]
+            n_blocks     = Int(n_c) ÷ 2
+            P            = [0 -1; 1 0]
+            Jc           = kron(Matrix{Float64}(I, n_blocks, n_blocks), P)
+            G_P          = results["solution"]["U_var"][:, :, max_depth]
+            Targ         = data["target_gate"]
+            re_tr        = sum(G_P .* Targ) * 1/ n_c
+            im_tr        = sum(G_P .* (Targ * (-Jc))) * 1/ n_c
+            F            = re_tr^2 + im_tr^2
+
             printstyled("  ","||Decomposition error||₂: ", round(LA.norm(results["solution"]["slack_var"]), digits = 10),"\n"; color = _main_color)
+            printstyled("  ","Fidelity                : ", F ,"\n"; color = _main_color)
+        end
+
+        if data["decomposition_type"] == "fidelity-approximate"
+            printstyled("  ","Fidelity: ", round(results["solution"]["w_fidelity_var"], digits = 10),"\n"; color = _main_color)
+        end
+
+        if data["decomposition_type"] == "fake-fidelity-approximate"
+            printstyled("  ","SQRT(Fidelity): ", round(results["solution"]["c_fidelity_var"], digits = 10),"\n"; color = _main_color)
         end
 
         if data["objective"] == "minimize_depth"

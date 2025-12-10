@@ -41,7 +41,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
 
     # Decomposition type
     decomposition_type = get(params, "decomposition_type", "exact_optimal")
-    !(decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase", "approximate"]) &&
+    !(decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase", "approximate", "fidelity-approximate", "fake-fidelity-approximate", "infinity-approximate", "sum-approximate"]) &&
         Memento.error(_LOGGER, "Decomposition type not supported")
 
     # Objective function

@@ -20,21 +20,22 @@ function toffoli()
 
     function toffoli_circuit()
         # [(depth, gate)]
-        return [(1, "T_1"),              
-                (2, "T_2"),                   
-                (3, "H_3"),              
-                (4, "CNot_2_3"),           
-                (5, "Tdagger_3"),        
-                (6, "CNot_1_3"),          
-                (7, "T_3"),               
-                (8, "CNot_2_3"),                 
+        return [                  
+                (15, "H_3"),              
+                (14, "CNot_2_3"),           
+                (13, "Tdagger_3"),        
+                (12, "CNot_1_3"),          
+                (11, "T_3"),               
+                (10, "CNot_2_3"),                 
                 (9, "Tdagger_3"),          
-                (10, "CNot_1_3"),           
-                (11, "T_3"),             
-                (12, "H_3"),             
-                (13, "CNot_1_2"),         
-                (14, "Tdagger_2"),       
-                (15, "CNot_1_2")          
+                (8, "CNot_1_3"), 
+                (7, "T_2"),          
+                (6, "T_3"),             
+                (5, "H_3"),             
+                (4, "CNot_1_2"), 
+                (3, "T_1"),        
+                (2, "Tdagger_2"),       
+                (1, "CNot_1_2")          
                 ] 
     end
 
@@ -43,7 +44,7 @@ function toffoli()
     return Dict{String, Any}(
     "num_qubits" => 3, 
     "maximum_depth" => 15,
-    "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "Identity"], 
+    "elementary_gates" => ["T_1", "T_2", "T_3", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_2", "Tdagger_3", "Identity"], 
     "target_gate" => QCOpt.ToffoliGate(),
     "objective" => "minimize_depth", 
     "decomposition_type" => "exact_optimal",
@@ -86,6 +87,7 @@ function toffoli_using_2qubit_gates()
 end
 
 function CNot_1_3()
+    println("CNot_1_3")
 
     return Dict{String, Any}(
     "num_qubits" => 3,
@@ -99,6 +101,7 @@ function CNot_1_3()
 end
 
 function CNot_1_3_full()
+    println("CNot_1_3_full")
 
     return Dict{String, Any}(
     "num_qubits" => 3,
@@ -107,11 +110,12 @@ function CNot_1_3_full()
     "elementary_gates" => ["H_1", "H_2", "H_3", "X_1", "X_2", "X_3", "Z_1", "Z_2", "Z_3", "CNot_1_2", "CNot_3_2", "CNot_2_1", "CNot_2_3", "Identity"],
     "target_gate" => QCOpt.unitary("CNot_1_3", 3),
     "objective" => "minimize_depth",
-    "decomposition_type" => "optimal_global_phase",
+    "decomposition_type" => "exact_optimal",
     )
 end
 
 function fredkin()
+    println("fredkin")
 
     return Dict{String, Any}(
     "num_qubits" => 3,
@@ -137,6 +141,7 @@ function fredkin_using_SSwap()
 end
 
 function toffoli_left()
+    println("toffoli_left")
 
     # Reference: https://arxiv.org/pdf/0803.2316.pdf 
 
@@ -147,13 +152,15 @@ function toffoli_left()
         cnot_23 = QCOpt.unitary("CNot_2_3", 3)
         CNot_1_3 = QCOpt.unitary("CNot_1_3", 3)
 
-        return H_3 * cnot_23 * Tdagger_3 * CNot_1_3 * T_3 * cnot_23 * Tdagger_3
+        #return H_3 * cnot_23 * Tdagger_3 * CNot_1_3 * T_3 * cnot_23 * Tdagger_3
+        return Tdagger_3 * CNot_1_3 * T_3 * cnot_23 * Tdagger_3
+
     end
 
     return Dict{String, Any}(
     "num_qubits" => 3,
     "maximum_depth" => 7,
-    "elementary_gates" => ["H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
+    "elementary_gates" => ["H_1", "H_2", "H_3", "T_1", "T_2", "T_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "CNot_1_2", "CNot_2_3", "CNot_1_3", "Identity"],
     "target_gate" => target_gate(),
     "objective" => "minimize_depth",
     "decomposition_type" => "exact_optimal"
@@ -161,6 +168,7 @@ function toffoli_left()
 end
 
 function toffoli_right()
+    println("toffoli_right")
 
     # Reference: https://arxiv.org/pdf/0803.2316.pdf 
     
@@ -187,6 +195,7 @@ function toffoli_right()
 end
 
 function miller()
+    println("miller")
     # Reference: https://doi.org/10.1109/TCAD.2005.858352
 
     function target_gate()
@@ -205,12 +214,13 @@ function miller()
     "maximum_depth" => 10,
     "elementary_gates" => ["CV_1_3", "CV_2_3", "CVdagger_2_3", "CNot_1_2", "CNot_3_1", "CNot_3_2", "Identity"],
     "target_gate" => target_gate(),
-    "decomposition_type" => "exact_optimal",
-    "objective" => "minimize_depth"
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal"
     )
 end
 
 function relative_toffoli()
+    println("relative_toffoli")
     #Reference: https://arxiv.org/pdf/1508.03273.pdf
 
     return Dict{String, Any}(
@@ -226,6 +236,7 @@ function relative_toffoli()
 end
 
 function margolus()
+    println("margolus")
     #Reference: https://arxiv.org/pdf/quant-ph/0312225.pdf
 
     return Dict{String, Any}(
@@ -257,17 +268,67 @@ end
 
 function QFT3()
 
+    println("QFT3")
     # QFT3 circuit using Controlled-Phase gates
     return Dict{String, Any}(
         "num_qubits" => 3,
         "maximum_depth" => 7,   
-        # "elementary_gates" => ["H_1", "H_2", "H_3", "CS_2_1", "CS_3_2", "CT_3_1", "Swap_1_3", "Identity"],
-        "elementary_gates" => ["H_1", "H_2", "H_3", "CU3_2_1", "CU3_3_2", "CU3_3_1", "Swap_1_3", "Identity"],
+        #"elementary_gates" => ["H_1", "H_2", "H_3", "CU3_1_2", "CU3_1_3", "CU3_2_3", "Identity"],
+        #"elementary_gates" => ["H_1", "H_2", "H_3", "CU3_2_1", "CU3_3_2", "CU3_3_1", "Swap_1_3", "Identity"],
+        "elementary_gates" => ["H_1", "H_2", "H_3", "CU3_1_2", "CU3_2_3", "CU3_1_3", "Swap_1_3", "Identity"],
         "CU3_θ_discretization" => [0],
         "CU3_ϕ_discretization" => [0],
         "CU3_λ_discretization" => 0:π/4:π,
-        "target_gate" => QCOpt.QFT3Gate(),
+        "target_gate" => QFT3Gate_szabo(),
         "objective" => "minimize_depth",
         "decomposition_type" => "exact_optimal",
         )
+end
+
+function QFT3Gate_szabo()
+    N = 8
+    a = 1/sqrt(N)
+    QFT = Array{ComplexF64}(undef, N, N)
+    for j in 0:N-1
+        for k in 0:N-1
+            QFT[j+1, k+1] = a * exp(2im * pi * j * k / N)
+        end
+    end
+    return QFT
+end
+
+
+function my_gate()
+    println("my_gate")
+
+    # Reference: https://arxiv.org/pdf/0803.2316.pdf 
+    
+    function target_gate()
+        T_1 = QCOpt.unitary("T_1", 3)
+        Tdagger_3 = QCOpt.unitary("Tdagger_3", 3)
+        CNot_1_3 = QCOpt.unitary("CNot_1_3", 3)
+        CNot_3_2 = QCOpt.unitary("CNot_3_2", 3)
+        CNot_2_1 = QCOpt.unitary("CNot_2_1", 3)
+
+        return T_1 * CNot_3_2 * CNot_1_3 * CNot_2_1 * Tdagger_3
+    end
+
+    return Dict{String, Any}(
+    "num_qubits" => 3,
+    "maximum_depth" => 5,
+    "elementary_gates" => ["H_1", "H_2", "H_3", #"H_4", "H_5", "H_6",
+                    "X_1", "X_2", "X_3", #"X_4", "X_5", "X_6",
+                    "T_1", "T_2", "T_3", #"T_4", "T_5", "T_6", 
+                    "Tdagger_1", "Tdagger_2", "Tdagger_3", #"Tdagger_4", "Tdagger_5", "Tdagger_6", 
+                    "CNot_1_2", "CNot_1_3", #"CNot_1_4",  "CNot_1_5", "CNot_1_6",
+                    "CNot_2_1", "CNot_2_3", #"CNot_2_4",  "CNot_2_5", "CNot_2_6",
+                    "CNot_3_2", "CNot_3_1", #"CNot_3_4",  "CNot_3_5", "CNot_3_6",
+                    #"CNot_4_2", "CNot_4_3", "CNot_4_1",  "CNot_4_5", "CNot_4_6",
+                    #"CNot_5_2", "CNot_5_3", "CNot_5_4",  "CNot_5_1", "CNot_5_6",
+                    #"CNot_6_2", "CNot_6_3", "CNot_6_4",  "CNot_6_5", "CNot_6_1",
+                    "Identity"],
+    "target_gate" => target_gate(), 
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal"
+    )
 end

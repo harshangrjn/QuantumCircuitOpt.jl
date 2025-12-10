@@ -82,12 +82,34 @@ function variable_QCModel_compact(qcm::QuantumCircuitModel)
         QCO.variable_slack_var_outer_approximation(qcm)
     end
 
+    if qcm.data["decomposition_type"] == "sum-approximate"
+        QCO.variable_slack_for_feasibility(qcm)
+        QCO.variable_slack_var_outer_approximation(qcm)
+    end
+
+    if qcm.data["decomposition_type"] == "infinity-approximate"
+        QCO.variable_slack_for_feasibility(qcm)
+        QCO.variable_slack_var_one_outer_approximation(qcm)
+    end
+
+    if qcm.data["decomposition_type"] == "fidelity-approximate"
+        QCO.variable_approximate_csw(qcm)
+    end
+
+    if qcm.data["decomposition_type"] == "fake-fidelity-approximate"
+        QCO.variable_approximate_c(qcm)
+    end
+
+    if qcm.data["decomposition_type"] == "optimal_global_phase"
+        QCO.variable_global_pase_cs(qcm)
+    end
+
     if qcm.data["objective"] == "minimize_layers"
         QCO.variable_layer_assignment(qcm)
         QCO.variable_gates_onoff_layers(qcm)
     end
 
-    QCO.variable_QCModel_valid(qcm)
+    #QCO.variable_QCModel_valid(qcm)
 
     return
 end
@@ -115,25 +137,80 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel)
     QCO.constraint_intermediate_products_compact(qcm)
     QCO.constraint_gate_product_linearization(qcm)
 
+    #####################################################################################################################
+
+    #Unitarity of U Constraints 
+
+    #QCO.constraint_unitarity_of_U(qcm,3)
+    #QCO.constraint_unitarity_of_U(qcm,5)
+
+    #QCO.constraint_unitarity_of_U(qcm,4)
+    
+    #QCO.constraint_unitarity_of_U_diag(qcm,3)
+    #QCO.constraint_unitarity_of_U_diag(qcm,5)
+
+    #QCO.constraint_unitarity_of_U_diag(qcm,4)
+
+    #QCO.constraint_unitary_complex_conjugate_at_depth(qcm,3)
+    #QCO.constraint_unitary_complex_conjugate_at_depth(qcm,5)
+
+    #QCO.constraint_unitary_complex_conjugate_at_depth(qcm,4)
+
+    #####################################################################################################################
+
     if qcm.data["decomposition_type"] == "optimal_global_phase"
-        QCO.constraint_target_gate_condition_glphase(qcm) 
-        QCO.constraint_target_gate_condition_glphase2(qcm)  
+        #QCO.constraint_target_gate_condition_glphase1_star(qcm) 
+        #QCO.constraint_target_gate_condition_glphase2_a2a(qcm)
+        #QCO.constraint_target_gate_condition_glphase2_star(qcm)  
+
+        QCO.constraint_target_gate_condition_glphase1_cs(qcm)
+        #QCO.constraint_target_gate_condition_glphase2_cs(qcm)
+
+        #QCO.constraint_target_gate_condition_glphase2_cs_only_diag(qcm)
+
     else 
         QCO.constraint_target_gate_condition_compact(qcm)
     end
     
     QCO.constraint_cnot_gate_bounds(qcm)
-    (qcm.data["decomposition_type"] == "approximate") && (QCO.constraint_slack_var_outer_approximation(qcm))
 
-    # (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm)) # seems to slow down MIP run times
+    if qcm.data["decomposition_type"] == "approximate"
+        QCO.constraint_slack_var_outer_approximation(qcm)
+        #QCO.constraint_slack_var_outer_approximation_quadratic(qcm)
 
-    QCO.constraint_QCModel_valid(qcm)
+    end
+
+    if qcm.data["decomposition_type"] == "sum-approximate"
+        QCO.constraint_slack_var_sum_approximation(qcm)
+
+    end
+
+    if qcm.data["decomposition_type"] == "infinity-approximate"
+        QCO.constraint_slack_var_infinity_approximation(qcm)
+        #QCO.constraint_slack_var_infinity_approximation_quadratic(qcm)
+
+    end
+
+    if qcm.data["decomposition_type"] == "fidelity-approximate"
+        QCO.constraint_trace_for_approximate(qcm)
+        QCO.constraint_fidelity(qcm)
+
+    end
+
+    if qcm.data["decomposition_type"] == "fake-fidelity-approximate"
+        QCO.constraint_real_trace_for_approximate(qcm)
+
+    end
 
     if qcm.data["objective"] == "minimize_layers"
         QCO.constraint_layer_assigments(qcm)  
         QCO.constraint_single_gate_per_qubit_per_layer(qcm)
 
     end
+
+    # (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm)) # seems to slow down MIP run times
+
+    QCO.constraint_QCModel_valid(qcm)
 
     return
 end
@@ -145,8 +222,15 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
         if qcm.options.all_valid_constraints == 1 
             QCO.constraint_commutative_gate_pairs(qcm)
             QCO.constraint_involutory_gates(qcm)
-            QCO.constraint_redundant_gate_product_pairs(qcm)
-            QCO.constraint_redundant_gate_product_triplets(qcm)
+
+            QCO.constraint_redundant_gate_products(qcm)
+
+            #QCO.constraint_redundant_gate_product_pairs(qcm)
+            #QCO.constraint_redundant_gate_product_triplets(qcm)
+
+            QCO.constraint_equivalent_gate_pairs(qcm)
+            #QCO.constraint_equivalent_gate_triplets(qcm) # only use this for anyons
+
             QCO.constraint_idempotent_gates(qcm)
             QCO.constraint_identity_gate_symmetry(qcm)
             QCO.constraint_convex_hull_complex_gates(qcm)
@@ -156,8 +240,15 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
         elseif qcm.options.all_valid_constraints == 0 
             qcm.options.commute_gate_constraints            && QCO.constraint_commutative_gate_pairs(qcm)
             qcm.options.involutory_gate_constraints         && QCO.constraint_involutory_gates(qcm)
-            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_pairs(qcm)
-            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_triplets(qcm)
+
+            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_products(qcm)
+
+            #qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_pairs(qcm)
+            #qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_triplets(qcm)
+            
+            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_equivalent_gate_pairs(qcm)
+            #qcm.options.redundant_gate_pair_constraints     && QCO.constraint_equivalent_gate_triplets(qcm)  # only use this for anyons
+
             qcm.options.idempotent_gate_constraints         && QCO.constraint_idempotent_gates(qcm)
             qcm.options.identity_gate_symmetry_constraints  && QCO.constraint_identity_gate_symmetry(qcm)
             qcm.options.convex_hull_gate_constraints        && QCO.constraint_convex_hull_complex_gates(qcm)

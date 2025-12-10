@@ -18,8 +18,22 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
             QCO.objective_feasibility(qcm)
 
         elseif decomposition_type == "approximate"
+            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var_oa]))
+            #=
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n = 1:num_gates, d=1:max_depth if !(n in identity_idx)) 
             + qcm.options.objective_slack_penalty * sum(qcm.variables[:slack_var_oa]))
+            =#
+        elseif decomposition_type == "sum-approximate"
+            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var_oa]))
+        
+        elseif decomposition_type == "infinity-approximate"
+            JuMP.@objective(qcm.model, Min, qcm.variables[:slack_var_oa_one])
+
+        elseif decomposition_type == "fidelity-approximate"
+            JuMP.@objective(qcm.model, Max, qcm.variables[:w_fidelity_var])
+
+        elseif decomposition_type == "fake-fidelity-approximate"
+            JuMP.@objective(qcm.model, Max, qcm.variables[:c_fidelity_var])
         end
     else
         QCO.objective_feasibility(qcm)
@@ -92,7 +106,7 @@ function objective_minimize_total_layers(qcm::QuantumCircuitModel)
         elseif decomposition_type == "exact_feasible"
             Memento.error(_LOGGER, "`exact_feasible` decomposition is not supported for this objective")
             
-        elseif decomposition_type == "approximate"
+        elseif decomposition_type in ["approximate", "fidelity-approximate"]
             Memento.error(_LOGGER, "`approximate` decomposition is not supported for this objective")
             
         end
