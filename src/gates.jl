@@ -53,7 +53,7 @@ function _catch_gate_name_error()
     all_gates = union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES, QCO.MULTI_QUBIT_GATES)
     
     if length(findall(x -> occursin(QCO.kron_symbol, x), all_gates)) > 0
-        Memento.error(_LOGGER, "Avoid the character `$(QCO.kron_symbol)` in the elemetary gate name")
+        @_error("Avoid the character `$(QCO.kron_symbol)` in the elemetary gate name")
     end
 end
 QCO._catch_gate_name_error()

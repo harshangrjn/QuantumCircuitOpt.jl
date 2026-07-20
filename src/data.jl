@@ -11,21 +11,21 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     # Number of qubits
     num_qubits = haskey(params, "num_qubits") ?
         params["num_qubits"] :
-        Memento.error(_LOGGER, "Number of qubits has to be specified by the user")
-    num_qubits < 2 && Memento.error(_LOGGER, "Minimum of 2 qubits is necessary")
+        @_error("Number of qubits has to be specified by the user")
+    num_qubits < 2 && @_error("Minimum of 2 qubits is necessary")
 
     # Max number of gates
     maximum_depth = haskey(params, "maximum_depth") ?
         params["maximum_depth"] :
-        Memento.error(_LOGGER, "Maximum depth of the decomposition has to be specified by the user")
-    maximum_depth < 2 && Memento.error(_LOGGER, "Minimum depth of 2 is necessary")
+        @_error("Maximum depth of the decomposition has to be specified by the user")
+    maximum_depth < 2 && @_error("Minimum depth of 2 is necessary")
 
     # Max number of layers
     maximum_layers = get(params, "maximum_layers", maximum_depth)
 
     # Elementary gates
     (!haskey(params, "elementary_gates") || isempty(params["elementary_gates"])) &&
-        Memento.error(_LOGGER, "Specify at least two unique unitary elementary gates")
+        @_error("Specify at least two unique unitary elementary gates")
 
     # Input circuit
     input_circuit = get(params, "input_circuit", [])
@@ -35,14 +35,14 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
         if length(input_circuit) <= maximum_depth
             input_circuit_dict = QCO.get_input_circuit_dict(input_circuit, params)
         else
-            Memento.warn(_LOGGER, "Neglecting the input circuit: its depth exceeds the allowable depth")
+            @_warn("Neglecting the input circuit: its depth exceeds the allowable depth")
         end
     end
 
     # Decomposition type
     decomposition_type = get(params, "decomposition_type", "exact_optimal")
-    !(decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase", "approximate", "fidelity-approximate", "fake-fidelity-approximate", "infinity-approximate", "sum-approximate"]) &&
-        Memento.error(_LOGGER, "Decomposition type not supported")
+    !(decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase", "approximate", "fidelity-approximate", "linear-fidelity-approximate", "infinity-approximate", "sum-approximate"]) &&
+        @_error("Decomposition type not supported")
 
     # Objective function
     objective = get(params, "objective", "minimize_depth")
@@ -50,7 +50,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     elementary_gates = unique(params["elementary_gates"])
     
     if length(elementary_gates) < length(params["elementary_gates"])
-        Memento.warn(_LOGGER, "Eliminating non-unique gates in the input elementary gates")
+        @_warn("Eliminating non-unique gates in the input elementary gates")
     end
 
     gates_dict, are_elementary_gates_real = QCO.get_elementary_gates_dictionary(params, elementary_gates)
@@ -63,7 +63,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
     # Pick "Identity" if user didn't specify
     initial_gate_str = get(params, "initial_gate", "Identity")
     initial_gate_str == "Identity" ||
-        Memento.error(_LOGGER, "Currently, only \"Identity\" is supported as an initial gate")
+        @_error("Currently, only \"Identity\" is supported as an initial gate")
 
     # Build the initial gate
     if are_elementary_gates_real && is_target_real
@@ -89,7 +89,7 @@ function get_data(params::Dict{String, Any}; eliminate_identical_gates = true)
                              )
 
     if data["are_gates_real"]
-        Memento.info(_LOGGER, "Detected all-real elementary and target gates")
+        @_info("Detected all-real elementary and target gates")
     end
     
     # Rotation and Universal gate angle discretizations
@@ -143,7 +143,7 @@ function eliminate_nonunique_gates(gates_dict::Dict{String, Any}, are_elementary
 
     if size(M_real_unique)[3] < size(M_real)[3]
 
-        Memento.info(_LOGGER, "Detected $(size(M_real)[3]-size(M_real_unique)[3]) non-unique gates (after discretization)")
+        @_info("Detected $(size(M_real)[3]-size(M_real_unique)[3]) non-unique gates (after discretization)")
 
         for i = 1:length(M_real_idx)
             gates_dict_unique["$i"] = gates_dict["$(M_real_idx[i])"]
@@ -173,7 +173,7 @@ function _populate_data_angle_discretization!(data::Dict{String, Any}, params::D
 
     if !isempty(union(one_angle_gates, two_angle_gates, three_angle_gates)) 
         if length(findall(x -> occursin("discretization", x), collect(keys(params)))) == 0
-            Memento.error(_LOGGER, "Enter valid discretization angles in the input params")
+            @_error("Enter valid discretization angles in the input params")
         end
 
         data["discretization"] = Dict{String, Any}()
@@ -205,11 +205,11 @@ this function returns the corresponding real version of the target gate.
 function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::Bool, decomposition_type::String)
 
     if !("target_gate" in keys(params)) || isempty(params["target_gate"])
-        Memento.error(_LOGGER, "Target gate not found in the input data")
+        @_error("Target gate not found in the input data")
     end 
 
     if (size(params["target_gate"])[1] != size(params["target_gate"])[2]) || (size(params["target_gate"])[1] != 2^params["num_qubits"])
-        Memento.error(_LOGGER, "Dimensions of target gate do not match the input num_qubits")
+        @_error("Dimensions of target gate do not match the input num_qubits")
     end
     
     # Identify if the target gate has only real entries or if it is real up to a global phase and returns a compact matrix
@@ -229,7 +229,7 @@ function get_target_gate(params::Dict{String, Any}, are_elementary_gates_real::B
         if is_target_real_up_to_phase
             return real(exp(-im*global_phase)*params["target_gate"]), is_target_real_up_to_phase
         else    
-            Memento.error(_LOGGER, "Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real for exact decomposition or not real up to a global phase for optimal_global_phase decomposition.")
+            @_error("Infeasible decomposition: all elementary gates have zero imaginary parts and target is not real for exact decomposition or not real up to a global phase for optimal_global_phase decomposition.")
         end
         
     else
@@ -306,7 +306,7 @@ function get_all_angle_gates(params::Dict{String, Any},
         disc_angles = [Float64.(params["$(gate_name)_$(num_angles == 1 ? "" : "$(angle)_")discretization"]) for angle in angles]
 
         if any(isempty, disc_angles)
-            Memento.error(_LOGGER, "Empty discretization angle for $input_gate gate. Input a valid angle")
+            @_error("Empty discretization angle for $input_gate gate. Input a valid angle")
         end
 
         gates_complex[input_gate] = QCO.get_discretized_angle_gates(input_gate, Dict{String, Any}(), disc_angles, params["num_qubits"])
@@ -360,7 +360,7 @@ function unitary(
     )
 
     if num_qubits > 10
-        Memento.error(_LOGGER, "Greater than 10 qubits is currently not supported")
+        @_error("Greater than 10 qubits is currently not supported")
     end
 
     if occursin(QCO.kron_symbol, input)
@@ -374,7 +374,7 @@ function unitary(
     gate_type, qubit_loc = QCO._parse_gate_string(input, type = true, qubits = true)
 
     if !(gate_type in union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES, QCO.MULTI_QUBIT_GATES))
-        Memento.error(_LOGGER, "Specified $input gate does not exist in the predefined set of gates")
+        @_error("Specified $input gate does not exist in the predefined set of gates")
     end
 
     QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input; angle = angle)
@@ -401,7 +401,7 @@ function unitary(
                 end
 
             else 
-                Memento.error(_LOGGER, "Enter a valid angle parameter for the input $input gate")
+                @_error("Enter a valid angle parameter for the input $input gate")
             end
 
         end
@@ -438,7 +438,7 @@ function unitary(
                 end
 
             else 
-                Memento.error(_LOGGER, "Enter a valid angle parameter for the input $input gate")
+                @_error("Enter a valid angle parameter for the input $input gate")
             end
 
         end
@@ -450,7 +450,7 @@ function unitary(
         if (angle !== nothing) && (length(angle) == 2)
             return getfield(QCO, Symbol(gate_type, "Gate"))(num_qubits, angle[1], angle[2])
         else
-            Memento.error(_LOGGER, "Enter a valid angle parameter for the input $input gate")
+            @_error("Enter a valid angle parameter for the input $input gate")
         end
     end
 
@@ -471,7 +471,7 @@ function get_full_sized_kron_gate(input::String, num_qubits::Int64)
     kron_gates = QCO._parse_gates_with_kron_symbol(input)
     
     if length(unique(kron_gates)) !== length(kron_gates)
-        Memento.error(_LOGGER, "Specify only a single gate per qubit within kron symbol gate $input")
+        @_error("Specify only a single gate per qubit within kron symbol gate $input")
     end
 
     M = 1
@@ -481,13 +481,13 @@ function get_full_sized_kron_gate(input::String, num_qubits::Int64)
         gate_type, qubit_loc = QCO._parse_gate_string(kron_gates[i], type = true, qubits = true)
 
         if !(gate_type in union(QCO.ONE_QUBIT_GATES_CONSTANTS, QCO.TWO_QUBIT_GATES_CONSTANTS))
-            Memento.error(_LOGGER, "Specified $input gate is not supported in conjunction with the Kronecker product operation")
+            @_error("Specified $input gate is not supported in conjunction with the Kronecker product operation")
         end
 
         QCO._catch_input_gate_errors(gate_type, qubit_loc, num_qubits, input)
         
         if issubset(qubit_loc, gate_qubit_locs)
-            Memento.error(_LOGGER, "Specified qubit(s) for $input gate is incorrect")
+            @_error("Specified qubit(s) for $input gate is incorrect")
         else
             append!(gate_qubit_locs, range(qubit_loc[1], qubit_loc[end]))
         end
@@ -542,7 +542,7 @@ function get_input_circuit_dict(
     # Check if all gates are in elementary gates
     invalid_gate = findfirst(g -> !(g[2] in params["elementary_gates"]), input_circuit)
     if invalid_gate !== nothing
-        Memento.warn(_LOGGER, "Neglecting the input circuit as gate $(input_circuit[invalid_gate][2]) is not in input elementary gates")
+        @_warn("Neglecting the input circuit as gate $(input_circuit[invalid_gate][2]) is not in input elementary gates")
         return input_circuit_dict
     end
     
@@ -552,7 +552,7 @@ function get_input_circuit_dict(
             input_circuit_dict["$i"] = Dict{String, Any}("depth" => input_circuit[i][1], "gate" => input_circuit[i][2])
             # Later: add support for universal and rotation gates here
         else
-            Memento.warn(_LOGGER, "Neglecting the input circuit as multiple gates cannot be input at the same depth")
+            @_warn("Neglecting the input circuit as multiple gates cannot be input at the same depth")
             return Dict{String, Any}()
         end
     end
@@ -575,36 +575,36 @@ function _catch_input_gate_errors(
     )
 
     if num_qubits <= 0
-        Memento.error(_LOGGER, "Specified number of qubits has to be >= 1")
+        @_error("Specified number of qubits has to be >= 1")
     end
     
     if (gate_type in QCO.TWO_QUBIT_GATES) && (length(qubit_loc) != 2)
-        Memento.error(_LOGGER, "Specify two qubits for 2-qubit gate $gate_type in elementary gates")
+        @_error("Specify two qubits for 2-qubit gate $gate_type in elementary gates")
     elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) == 0)
-        Memento.error(_LOGGER, "Specify a qubit for the 1-qubit gate $gate_type in elementary gates")
+        @_error("Specify a qubit for the 1-qubit gate $gate_type in elementary gates")
     elseif (gate_type in QCO.ONE_QUBIT_GATES) && (length(qubit_loc) >= 2)
-        Memento.error(_LOGGER, "Specify only one qubit for the 1-qubit gate $gate_type in elementary gates")
+        @_error("Specify only one qubit for the 1-qubit gate $gate_type in elementary gates")
     end
 
     if isempty(qubit_loc) && (gate_type !== "GR")
-        Memento.error(_LOGGER, "Specify a valid qubit location(s) for the input $input_gate gate")
+        @_error("Specify a valid qubit location(s) for the input $input_gate gate")
 
     elseif (gate_type == "GR") && (!isempty(qubit_loc))
-        Memento.error(_LOGGER, "Qubit locations are not necessary for Global-R gate as it is simultaneously applied on all qubits at a depth")
+        @_error("Qubit locations are not necessary for Global-R gate as it is simultaneously applied on all qubits at a depth")
             
     elseif !issubset(qubit_loc, 1:num_qubits)
-        Memento.error(_LOGGER, "Specified qubit(s) for $input_gate gate ∉ {1,...,$num_qubits}")
+        @_error("Specified qubit(s) for $input_gate gate ∉ {1,...,$num_qubits}")
 
     elseif (length(qubit_loc) == 2) && (isapprox(qubit_loc[1], qubit_loc[2]))
-        Memento.error(_LOGGER, "Specified $input_gate gate cannot have identical control and target qubits") 
+        @_error("Specified $input_gate gate cannot have identical control and target qubits") 
 
     elseif length(qubit_loc) > 2 
-        Memento.error(_LOGGER, "Only 1- and 2-qubit elementary gates are currently supported")
+        @_error("Only 1- and 2-qubit elementary gates are currently supported")
     end
 
     if !(gate_type in union(QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS, 
          QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS)) && (angle !== nothing)
-        Memento.warn(_LOGGER, "Neglecting the angle input for gate $(gate_type) with constant parameters")
+        @_warn("Neglecting the angle input for gate $(gate_type) with constant parameters")
     end
 
 end
@@ -649,7 +649,7 @@ function _get_gate_idx(gates_dict::Dict{String, Any}, gate_type::String)
     elseif gate_type == "T_gate"
         is_gate_type = t -> (gt = QCO._parse_gate_string(t, type=true)) == "T" || gt == "Tdagger"
     else
-        Memento.error(_LOGGER, "Unsupported gate type: $gate_type")
+        @_error("Unsupported gate type: $gate_type")
     end
 
     [ parse(Int, idx_str) 
@@ -691,7 +691,7 @@ function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
     max_depth = data["maximum_depth"]
 
     if cnot_lb > max_depth
-        Memento.error(_LOGGER, "Invalid lower bound on the number of CNOT gates given the maximum depth")
+        @_error("Invalid lower bound on the number of CNOT gates given the maximum depth")
     elseif cnot_lb < cnot_ub
         cnot_lb > 0 && (data["cnot_lower_bound"] = cnot_lb)
         cnot_ub < max_depth && (data["cnot_upper_bound"] = cnot_ub)
@@ -699,7 +699,7 @@ function _get_cnot_bounds!(data::Dict{String, Any}, params::Dict{String, Any})
         data["cnot_lower_bound"] = cnot_lb
         data["cnot_upper_bound"] = cnot_ub
     else
-        Memento.warn(_LOGGER, "Invalid CNot-gate lower/upper bound")
+        @_warn("Invalid CNot-gate lower/upper bound")
     end
 
     return data

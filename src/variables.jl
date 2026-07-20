@@ -25,7 +25,7 @@ function variable_gates_per_depth(qcm::QuantumCircuitModel)
     end
 
     if num_vars_fixed > 0
-        Memento.info(_LOGGER, "$num_vars_fixed of $(n_r * n_c) entries are constants in the given set of gates.")
+        @_info("$num_vars_fixed of $(n_r * n_c) entries are constants in the given set of gates.")
     end
     
     return
@@ -140,26 +140,33 @@ function variable_slack_for_feasibility(qcm::QuantumCircuitModel)
     U_var = qcm.variables[:U_var]
 
     qcm.variables[:slack_var] = JuMP.@variable(qcm.model, slack_var[1:n_r, 1:n_c])
+
+    # the norm-based decomposition types use the tighter deviation bound; the original
+    # "approximate" type keeps its upstream bounds
+    tight = qcm.data["decomposition_type"] in ["sum-approximate", "infinity-approximate"]
     eps = 1.0/8.0
 
     # Set bounds for slack variables
     for i in 1:n_r, j in 1:n_c
         lb, ub = JuMP.lower_bound(U_var[i, j, max_depth - 1]), JuMP.upper_bound(U_var[i, j, max_depth - 1])
-        bounds = (QCO.is_zero(lb) && QCO.is_zero(ub)) ? (0, 0) : (-1, 1)
-        #JuMP.set_lower_bound(slack_var[i, j], bounds[1])
-        #JuMP.set_upper_bound(slack_var[i, j], bounds[2])
-        JuMP.set_lower_bound(slack_var[i, j], -eps)
-        JuMP.set_upper_bound(slack_var[i, j], eps)
+        bounds = tight ? (-eps, eps) :
+                 ((QCO.is_zero(lb) && QCO.is_zero(ub)) ? (0, 0) : (-1, 1))
+        JuMP.set_lower_bound(slack_var[i, j], bounds[1])
+        JuMP.set_upper_bound(slack_var[i, j], bounds[2])
     end
 end
 
 function variable_slack_var_outer_approximation(qcm::QuantumCircuitModel)
     n_r     = size(qcm.data["gates_real"])[1]
     n_c     = size(qcm.data["gates_real"])[2]
-    eps = 1.0/8.0
 
-    #qcm.variables[:slack_var_oa] = JuMP.@variable(qcm.model, -1 <= slack_var_oa[1:n_r, 1:n_c] <= 1)
-    qcm.variables[:slack_var_oa] = JuMP.@variable(qcm.model, 0 <= slack_var_oa[1:n_r, 1:n_c] <= eps^2)
+    if qcm.data["decomposition_type"] == "sum-approximate"
+        # nonnegative squared-deviation variables for the norm objective
+        eps = 1.0/8.0
+        qcm.variables[:slack_var_oa] = JuMP.@variable(qcm.model, 0 <= slack_var_oa[1:n_r, 1:n_c] <= eps^2)
+    else
+        qcm.variables[:slack_var_oa] = JuMP.@variable(qcm.model, -1 <= slack_var_oa[1:n_r, 1:n_c] <= 1)
+    end
     return
 end
 
@@ -198,7 +205,7 @@ function variable_gates_onoff_layers(qcm::QuantumCircuitModel)
     return
 end
 
-function variable_global_pase_cs(qcm::QuantumCircuitModel)
+function variable_global_phase_cs(qcm::QuantumCircuitModel)
     
     qcm.variables[:phase_real_var] = JuMP.@variable(qcm.model, -1<=phase_real_var<=1)
     qcm.variables[:phase_complex_var] = JuMP.@variable(qcm.model, -1<=phase_complex_var<=1)

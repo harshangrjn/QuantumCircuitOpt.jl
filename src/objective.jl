@@ -18,11 +18,9 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
             QCO.objective_feasibility(qcm)
 
         elseif decomposition_type == "approximate"
-            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var_oa]))
-            #=
-            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n = 1:num_gates, d=1:max_depth if !(n in identity_idx)) 
+            JuMP.@objective(qcm.model, Min, sum(qcm.variables[:z_bin_var][n,d] for n = 1:num_gates, d=1:max_depth if !(n in identity_idx))
             + qcm.options.objective_slack_penalty * sum(qcm.variables[:slack_var_oa]))
-            =#
+
         elseif decomposition_type == "sum-approximate"
             JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var_oa]))
         
@@ -32,7 +30,7 @@ function objective_minimize_total_depth(qcm::QuantumCircuitModel)
         elseif decomposition_type == "fidelity-approximate"
             JuMP.@objective(qcm.model, Max, qcm.variables[:w_fidelity_var])
 
-        elseif decomposition_type == "fake-fidelity-approximate"
+        elseif decomposition_type == "linear-fidelity-approximate"
             JuMP.@objective(qcm.model, Max, qcm.variables[:c_fidelity_var])
         end
     else
@@ -48,7 +46,7 @@ function objective_feasibility(qcm::QuantumCircuitModel)
 
     if decomposition_type in ["exact_optimal", "exact_feasible", "optimal_global_phase"]
         # Feasibility objective
-        Memento.warn(_LOGGER, "Switching to a feasibility problem")
+        @_warn("Switching to a feasibility problem")
         
     elseif decomposition_type == "approximate"
         JuMP.@objective(qcm.model, Min, sum(qcm.variables[:slack_var_oa]))
@@ -72,7 +70,7 @@ function objective_minimize_specific_gates(
         gate_idx = qcm.data["T_idx"]
         gate_name = "T"
     else
-        Memento.error(_LOGGER, "Unsupported gate type: $gate_type")
+        @_error("Unsupported gate type: $gate_type")
     end
     
     if !isempty(gate_idx)
@@ -84,7 +82,7 @@ function objective_minimize_specific_gates(
             + (qcm.options.objective_slack_penalty * sum(qcm.variables[:slack_var_oa])))
         end
     else
-        Memento.error(_LOGGER, "$gate_name gate not found in input elementary gates")
+        @_error("$gate_name gate not found in input elementary gates")
     end
 
     return
@@ -104,10 +102,10 @@ function objective_minimize_total_layers(qcm::QuantumCircuitModel)
             JuMP.@objective(qcm.model, Min, sum(l*qcm.variables[:layer_bin_var][max_depth,l] for l=1:maximum_layers ))
 
         elseif decomposition_type == "exact_feasible"
-            Memento.error(_LOGGER, "`exact_feasible` decomposition is not supported for this objective")
+            @_error("`exact_feasible` decomposition is not supported for this objective")
             
         elseif decomposition_type in ["approximate", "fidelity-approximate"]
-            Memento.error(_LOGGER, "`approximate` decomposition is not supported for this objective")
+            @_error("`approximate` decomposition is not supported for this objective")
             
         end
     else

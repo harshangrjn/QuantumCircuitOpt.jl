@@ -45,374 +45,13 @@ function gate_element_bounds(M::Array{Float64,3})
         M_u[i,j] = maximum(M[i,j,:])
 
         if M_l[i,j] > M_u[i,j]
-            Memento.error(_LOGGER, "Lower and upper bound conflict in the elements of input elementary gates")
+            @_error("Lower and upper bound conflict in the elements of input elementary gates")
         elseif (M_l[i,j] in [-Inf, Inf]) || (M_u[i,j] in [-Inf, Inf])
-            Memento.error(_LOGGER, "Unbounded entry detected in the input elementary gates")
+            @_error("Unbounded entry detected in the input elementary gates")
         end
     end
 
     return M_l, M_u
-end
-
-function get_redundant_gate_products(M::Dict{String,Any}, decomposition_type::String)
-
-    num_gates = length(keys(M))
-    redundant_pairs_prod_id_idx = Array{Tuple{Int64,Int64},1}()
-    redundant_pairs_idx = Array{Tuple{Int64,Int64},1}()
-    redundant_triplets_idx = Array{Tuple{Int64,Int64,Int64},1}()
-    redundant_quadruplets_idx = Array{Tuple{Int64,Int64,Int64,Int64},1}()
-    redundant_quintuplets_idx = Array{Tuple{Int64,Int64,Int64,Int64,Int64},1}()
-
-    equivalent_pair_idx = Array{Tuple{Int64,Int64},1}()
-    equivalent_pair_idx = get_equivalent_gate_pairs(M, decomposition_type)
-    commuting_pair_idx, commuting_pair_prod_id_idx = get_commutative_gate_pairs(M, decomposition_type)
-    equivalent_pair_idx = append!(equivalent_pair_idx, commuting_pair_idx)
-
-
-    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
-
-    # Check if we're using global phase comparison
-    use_global_phase = decomposition_type in ["optimal_global_phase"]
-    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
-
-    # Redundant pairs
-    for i = 1:num_gates
-        for j = 1:num_gates
-            M_i   = M["$i"]["matrix"]
-            M_j   = M["$j"]["matrix"]
-
-            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
-                continue
-            end
-
-            if ((i,j) in equivalent_pair_idx) 
-                continue
-            end
-
-            M_lhs = M_i * M_j
-
-            if _compare_func(M_lhs, Id)
-                push!(redundant_pairs_prod_id_idx, (i,j))
-                continue
-            end
-
-            for prd = 1:num_gates                
-                M_prd = M["$prd"]["matrix"]
-
-                if ("Identity" in M["$prd"]["type"]) 
-                    continue
-                    #actually it never gets here
-                end
-
-                if _compare_func(M_lhs, M_prd)
-                    push!(redundant_pairs_idx, (i,j))
-                    break # break out of prd, go to next j
-                end
-            end
-
-        end
-    end
-
-    #println("redundant pairs:", redundant_pairs_idx)
-
-    # Redundant triplets
-    for i = 1:num_gates, j = 1:num_gates
-        for k = 1:num_gates 
-            M_i   = M["$i"]["matrix"]
-            M_j   = M["$j"]["matrix"]
-            M_k   = M["$k"]["matrix"]
-
-            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"]) || ("Identity" in M["$k"]["type"])
-                continue
-            end
-
-            if ((i,j) in equivalent_pair_idx) || ((j,k) in equivalent_pair_idx)
-                continue
-            end
-
-            if ((i,j) in redundant_pairs_idx) || ((j,k) in redundant_pairs_idx)
-                continue
-            end
-
-            if ((i,j) in redundant_pairs_prod_id_idx) || ((j,k) in redundant_pairs_prod_id_idx)
-                continue
-            end
-
-            M_lhs = M_i * M_j * M_k
-
-            for prd = 1:num_gates
-                
-                M_prd = M["$prd"]["matrix"]
-   
-                if _compare_func(M_lhs, M_prd)
-                    push!(redundant_triplets_idx, (i,j,k))
-                    break  # skip the rest of the prd loop 
-                end
-            end
-
-        end
-    end
-
-    #println("redundant triplets:", redundant_triplets_idx)
-
-    # Redundant quadruplets
-    for i = 1:num_gates, j = 1:num_gates, k=1:num_gates
-        for l = 1:num_gates 
-            M_i   = M["$i"]["matrix"]
-            M_j   = M["$j"]["matrix"]
-            M_k   = M["$k"]["matrix"]
-            M_l   = M["$l"]["matrix"]
-
-            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"]) || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"])
-                continue
-            end
-
-            if ((i,j) in equivalent_pair_idx) || ((j,k) in equivalent_pair_idx) || ((k,l) in equivalent_pair_idx)
-                continue
-            end
-
-            if ((i,j) in redundant_pairs_idx) || ((j,k) in redundant_pairs_idx) || ((k,l) in redundant_pairs_idx)
-                continue
-            end
-
-            if ((i,j) in redundant_pairs_prod_id_idx) || ((j,k) in redundant_pairs_prod_id_idx) || ((k,l) in redundant_pairs_prod_id_idx)
-                continue
-            end
-
-            if ((i,j,k) in redundant_triplets_idx) || ((j,k,l) in redundant_triplets_idx) 
-                continue
-            end
-
-            M_lhs = M_i * M_j * M_k *M_l
-
-            for prd = 1:num_gates
-            
-                M_prd = M["$prd"]["matrix"]
-
-                if _compare_func(M_lhs, M_prd)
-                    push!(redundant_quadruplets_idx, (i,j,k,l))
-                    break  # skip the rest of the prd loop 
-                end
-            end
-
-        end
-    end
-
-    #println("redundant quadruplets:", redundant_quadruplets_idx)
-
-    # Redundant quintuplets
-    for i = 1:num_gates, j = 1:num_gates, k=1:num_gates, l = 1:num_gates 
-        for m = 1:num_gates 
-            M_i   = M["$i"]["matrix"]
-            M_j   = M["$j"]["matrix"]
-            M_k   = M["$k"]["matrix"]
-            M_l   = M["$l"]["matrix"]
-            M_m   = M["$m"]["matrix"]
-
-            if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"]) || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"]) || ("Identity" in M["$m"]["type"])
-                continue
-            end
-
-            if ((i,j) in equivalent_pair_idx) || ((j,k) in equivalent_pair_idx) || ((k,l) in equivalent_pair_idx) || ((l,m) in equivalent_pair_idx) 
-                continue
-            end
-
-            if ((i,j) in redundant_pairs_idx) || ((j,k) in redundant_pairs_idx) || ((k,l) in redundant_pairs_idx) || ((l,m) in redundant_pairs_idx)
-                continue
-            end
-
-            if ((i,j) in redundant_pairs_prod_id_idx) || ((j,k) in redundant_pairs_prod_id_idx) || ((k,l) in redundant_pairs_prod_id_idx) || ((l,m) in redundant_pairs_prod_id_idx)
-                continue
-            end
-
-            if ((i,j,k) in redundant_triplets_idx) || ((j,k,l) in redundant_triplets_idx) || ((k,l,m) in redundant_triplets_idx) 
-                continue
-            end
-
-            if ((i,j,k,l) in redundant_quadruplets_idx) || ((j,k,l,m) in redundant_quadruplets_idx)
-                continue
-            end
-
-            M_lhs = M_i * M_j * M_k *M_l * M_m
-
-            for prd = 1:num_gates
-
-                M_prd = M["$prd"]["matrix"]
-            
-                if _compare_func(M_lhs, M_prd)
-                    push!(redundant_quintuplets_idx, (i,j,k,l,m))
-                    break  # skip the rest of the prd loop 
-                end
-            end
-
-        end
-    end
-
-    #println("redundant quintuplet:", redundant_quintuplets_idx)
-
-    return redundant_pairs_idx, redundant_triplets_idx, redundant_quadruplets_idx, redundant_quintuplets_idx
-end
-
-function get_equivalent_gate_pairs(M::Dict{String,Any}, decomposition_type::String)
-    num_gates = length(keys(M))
-    delete_pairs_idx = Array{Tuple{Int64,Int64},1}()
-    keep_pairs_idx = Array{Tuple{Int64,Int64},1}()
-
-    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
-
-    # Check if we're using global phase comparison
-    use_global_phase = decomposition_type in ["optimal_global_phase"]
-    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
-
-    # Non-Identity equivalent pairs
-    for i = 1:num_gates, j = 1:num_gates, k = 1:num_gates, l = 1:num_gates
-        M_i = M["$i"]["matrix"]
-        M_j = M["$j"]["matrix"]
-        M_k = M["$k"]["matrix"]
-        M_l = M["$l"]["matrix"]
-
-        if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])  || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"])
-            # covered by redundant pairs / in separate constraints
-            continue
-        end
-
-        if (i == k) && (j == l)
-            # they are the same thing
-            continue
-        end
-
-        if (i == l) && (j == k)
-            # covered by commuting pairs
-            continue
-        end
-        
-        
-        #somehow applying these constraints (=commneting this block out) twice would help a lot
-        if _compare_func(M_i*M_j, Id)
-            # covered by commuting prod Identity or by Involuntary
-            continue
-        end
-        
-
-        if _compare_func(M_i*M_j, M_k*M_l)
-            if (i, j) in keep_pairs_idx
-                if (k, l) in keep_pairs_idx
-                    idx = findfirst(x -> x == (k, l), keep_pairs_idx)
-                    deleteat!(keep_pairs_idx, idx)
-                elseif (k, l) in delete_pairs_idx
-                    nothing
-                else 
-                    push!(delete_pairs_idx, (k, l))
-                end
-            elseif (i, j) in delete_pairs_idx
-                if (k, l) in keep_pairs_idx
-                    nothing
-                elseif (k, l) in delete_pairs_idx
-                    nothing
-                else 
-                    push!(delete_pairs_idx, (k, l))
-                end
-            else 
-                if (k, l) in keep_pairs_idx
-                    push!(delete_pairs_idx, (i, j))
-                elseif (k, l) in delete_pairs_idx
-                    push!(delete_pairs_idx, (i, j))
-                else 
-                    push!(keep_pairs_idx, (i, j))
-                    push!(delete_pairs_idx, (k, l))
-                end
-            end
-        end
-           
-    end
-
-    #println("delete:", delete_pairs_idx)
-    #println("keep:", keep_pairs_idx)
-    return delete_pairs_idx
-end
-
-function get_equivalent_gate_triplets(M::Dict{String,Any}, decomposition_type::String)
-    num_gates = length(keys(M))
-    delete_triplets_idx = Array{Tuple{Int64,Int64,Int64},1}()
-    keep_triplets_idx = Array{Tuple{Int64,Int64,Int64},1}()
-
-    commuting_pair_idx, commuting_pair_prod_id_idx = get_commutative_gate_pairs(M, decomposition_type)
-    equivalent_pair_idx = get_equivalent_gate_pairs(M, decomposition_type)
-    commuting_pair_idx = append!(commuting_pair_idx, equivalent_pair_idx)
-
-    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
-
-    # Check if we're using global phase comparison
-    use_global_phase = decomposition_type in ["optimal_global_phase"]
-    _compare_func = use_global_phase ? QCO.isapprox_global_phase : (a, b) -> isapprox(a, b, atol = 1E-4)
-
-    # Non-Identity equivalent pairs
-    for i = 1:num_gates, j = 1:num_gates, k = 1:num_gates, l = 1:num_gates, m = 1:num_gates,  n = 1:num_gates
-        M_i = M["$i"]["matrix"]
-        M_j = M["$j"]["matrix"]
-        M_k = M["$k"]["matrix"]
-        M_l = M["$l"]["matrix"]
-        M_m = M["$m"]["matrix"]
-        M_n = M["$n"]["matrix"]
-
-        if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])  || ("Identity" in M["$k"]["type"]) || ("Identity" in M["$l"]["type"]) || ("Identity" in M["$m"]["type"]) || ("Identity" in M["$n"]["type"])
-            # covered by redundant pairs / in separate constraints
-            continue
-        end
-
-        if (i == l) && (j == m) && (k == n)
-            # they are the same thing
-            continue
-        end
-
-        if ((i,j) in commuting_pair_idx) || ((j,k) in commuting_pair_idx) || ((l,m) in commuting_pair_idx) || ((m,n) in commuting_pair_idx)
-            continue
-        end
-
-        if ((i,j) in commuting_pair_prod_id_idx) || ((j,k) in commuting_pair_prod_id_idx) || ((l,m) in commuting_pair_prod_id_idx) || ((m,n) in commuting_pair_prod_id_idx)
-            continue
-        end
-
-        if ((j,i) in commuting_pair_prod_id_idx) || ((k,j) in commuting_pair_prod_id_idx) || ((m,l) in commuting_pair_prod_id_idx) || ((n,m) in commuting_pair_prod_id_idx)
-            continue
-        end
-              
-
-        if _compare_func(M_i*M_j*M_k, M_l*M_m*M_n)
-            if (i, j, k) in keep_triplets_idx
-                if (l, m, n) in keep_triplets_idx
-                    idx = findfirst(x -> x == (l, m, n), keep_triplets_idx)
-                    deleteat!(keep_triplets_idx, idx)
-                elseif (l, m, n) in delete_triplets_idx
-                    nothing
-                else 
-                    push!(delete_triplets_idx, (l, m, n))
-                end
-            elseif (i, j, k) in delete_triplets_idx
-                if (l, m, n) in keep_triplets_idx
-                    nothing
-                elseif (l, m, n) in delete_triplets_idx
-                    nothing
-                else 
-                    push!(delete_triplets_idx, (l, m, n))
-                end
-            else 
-                if (l, m, n) in keep_triplets_idx
-                    push!(delete_triplets_idx, (i, j, k))
-                elseif (l, m, n) in delete_triplets_idx
-                    push!(delete_triplets_idx, (i, j, k))
-                else 
-                    push!(keep_triplets_idx, (i, j, k))
-                    push!(delete_triplets_idx, (l, m, n))
-                end
-            end
-        end
-           
-    end
-
-    #println("delete:", delete_triplets_idx)
-    #println("keep:", keep_triplets_idx)
-    return delete_triplets_idx
 end
 
 """
@@ -456,8 +95,6 @@ function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::Str
         end
     end
     
-    #println("commute:", commute_pairs)
-    #println("prod id:", commute_pairs_prodIdentity)
 
     return commute_pairs, commute_pairs_prodIdentity
 end
@@ -569,8 +206,6 @@ function get_equivalent_gate_pairs(M::Dict{String,Any}, decomposition_type::Stri
            
     end
 
-    println("delete:", delete_pairs_idx)
-    println("keep:", keep_pairs_idx)
     return delete_pairs_idx
 end
 
@@ -651,8 +286,6 @@ function get_equivalent_gate_triplets(M::Dict{String,Any}, decomposition_type::S
            
     end
 
-    println("delete:", delete_triplets_idx)
-    println("keep:", keep_triplets_idx)
     return delete_triplets_idx
 end
 
@@ -721,8 +354,6 @@ function get_equivalent_gate_pairs_layers(M::Dict{String,Any}, decomposition_typ
            
     end
 
-    println("delete:", delete_pairs_idx)
-    println("keep:", keep_pairs_idx)
     return delete_pairs_idx
 end
 
@@ -793,7 +424,6 @@ function get_redundant_gate_products(M::Dict{String,Any}, decomposition_type::St
         end
     end
 
-    println("redundant pairs:", redundant_pairs_idx)
 
     # Redundant triplets
     for i = 1:num_gates, j = 1:num_gates
@@ -833,7 +463,6 @@ function get_redundant_gate_products(M::Dict{String,Any}, decomposition_type::St
         end
     end
 
-    println("redundant triplets:", redundant_triplets_idx)
 
     # Redundant quadruplets
     for i = 1:num_gates, j = 1:num_gates, k=1:num_gates
@@ -878,7 +507,6 @@ function get_redundant_gate_products(M::Dict{String,Any}, decomposition_type::St
         end
     end
 
-    println("redundant quadruplets:", redundant_quadruplets_idx)
 
     # Redundant quintuplets
     for i = 1:num_gates, j = 1:num_gates, k=1:num_gates, l = 1:num_gates 
@@ -928,7 +556,6 @@ function get_redundant_gate_products(M::Dict{String,Any}, decomposition_type::St
         end
     end
 
-    println("redundant quintuplet:", redundant_quintuplets_idx)
 
     return redundant_pairs_idx, redundant_triplets_idx, redundant_quadruplets_idx, redundant_quintuplets_idx
 end
@@ -1077,7 +704,7 @@ of size NxN, if the input gate is in a valid complex form.
 """
 function real_to_complex_gate(M::Array{Float64,2})
     n = size(M, 1)
-    iseven(n) || Memento.error(_LOGGER, "Specified gate can admit only even dimensions")
+    iseven(n) || @_error("Specified gate can admit only even dimensions")
     
     half_n = div(n, 2)
     M_complex = zeros(ComplexF64, half_n, half_n)
@@ -1086,7 +713,7 @@ function real_to_complex_gate(M::Array{Float64,2})
         i, j = 2ii-1, 2jj-1
         
         isapprox(M[i,j], M[i+1,j+1], atol=1e-5) && 
-        isapprox(M[i+1,j], -M[i,j+1], atol=1e-5) || Memento.error(_LOGGER, "Invalid complex form")
+        isapprox(M[i+1,j], -M[i,j+1], atol=1e-5) || @_error("Invalid complex form")
         
         M_complex[ii,jj] = complex(
             QCO.is_zero(M[i,j]) ? 0.0 : M[i,j],
@@ -1155,11 +782,11 @@ this function returns a full-sized gate after applying appropriate kronecker pro
 integer-valued qubits.  
 """
 function kron_single_qubit_gate(num_qubits::Int64, M::Array{Complex{Float64},2}, qubit_loc::String)
-    size(M)[1] != 2 && Memento.error(_LOGGER, "Input should be an one-qubit gate")
+    size(M)[1] != 2 && @_error("Input should be an one-qubit gate")
     
     qubit = parse(Int, qubit_loc[2:end])
     
-    !(qubit in 1:num_qubits) && Memento.error(_LOGGER, "Specified qubit location, $qubit, has to be ∈ [q1,...,q$num_qubits]")
+    !(qubit in 1:num_qubits) && @_error("Specified qubit location, $qubit, has to be ∈ [q1,...,q$num_qubits]")
     
     I = QCO.IGate(1)
     gates = [i == qubit ? M : I for i in 1:num_qubits]
@@ -1184,16 +811,16 @@ function kron_two_qubit_gate(
     )
     
     if size(M)[1] != 4
-        Memento.error(_LOGGER, "Input should be a two-qubit gate")
+        @_error("Input should be a two-qubit gate")
     end
 
     c_qubit = parse(Int, c_qubit_loc[2:end])
     t_qubit = parse(Int, t_qubit_loc[2:end])
 
     if !(c_qubit in 1:num_qubits) || !(t_qubit in 1:num_qubits)
-        Memento.error(_LOGGER, "Specified control and target qubit locations have to be ∈ [q1,...,q$num_qubits]")
+        @_error("Specified control and target qubit locations have to be ∈ [q1,...,q$num_qubits]")
     elseif isapprox(c_qubit, t_qubit, atol = 1E-6)
-        Memento.error(_LOGGER, "Control and target qubits cannot be identical for a multi-qubit elementary gate")
+        @_error("Control and target qubits cannot be identical for a multi-qubit elementary gate")
     end
 
     I = QCO.IGate(1)
@@ -1275,7 +902,7 @@ For example, given `G` and `num_qubits = 3`, this function returns `G⨂G⨂G`.
 """
 function multi_qubit_global_gate(num_qubits::Int64, M::Array{Complex{Float64},2})
     if size(M)[1] != 2
-        Memento.error(_LOGGER, "Input should be an one-qubit gate")
+        @_error("Input should be an one-qubit gate")
     end
 
     M_kron = 1
@@ -1329,7 +956,7 @@ line joining these two points.
 """
 function _get_constraint_slope_intercept(vertex1::Tuple{<:Number, <:Number}, vertex2::Tuple{<:Number, <:Number})
     if isapprox.(vertex1, vertex2, atol=1E-6) == [true, true]
-        Memento.warn(_LOGGER, "Invalid slope and intercept for two identical vertices")
+        @_warn("Invalid slope and intercept for two identical vertices")
         return
     end
 
@@ -1343,13 +970,13 @@ end
 
 function _verify_angle_bounds(angle::Number)
     if !(-2*π <= angle <= 2*π)
-        Memento.error(_LOGGER, "Input angle is not within valid bounds in [-2π, 2π]")
+        @_error("Input angle is not within valid bounds in [-2π, 2π]")
     end
 end
 
 function _catch_kron_dimension_errors(num_qubits::Int64, M_dim::Int64)
     if M_dim !== 2^(num_qubits)
-        Memento.error(_LOGGER, "Dimensions mismatch in evaluation of Kronecker product")
+        @_error("Dimensions mismatch in evaluation of Kronecker product")
     end
 end
 
@@ -1374,8 +1001,7 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
 
             if isapprox(sum_det, length(data["gates_dict"]), atol=1e-6) &&
                 data["decomposition_type"] == "exact_optimal"
-                Memento.error(_LOGGER, 
-                    "Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
+                @_error("Infeasible decomposition: det.(elementary_gates) = 1, while det(target_gate) = -1")
             end
         end
     else
@@ -1385,8 +1011,7 @@ function _determinant_test_for_infeasibility(data::Dict{String,Any})
         )
 
         if det_gates_real && data["decomposition_type"] == "exact_optimal"
-            Memento.error(_LOGGER, 
-                "Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
+            @_error("Infeasible decomposition: det.(elementary_gates) = real, while det(target_gate) = complex")
         end
     end
 end
@@ -1557,11 +1182,11 @@ function multi_controlled_gate(target_gate::Array{Complex{Float64},2},
                                target_qubit::Int64, 
                                num_qubits::Int64)
 
-    (maximum(vcat(control_qubits, target_qubit)) > num_qubits) && (Memento.error(_LOGGER, "Control and target qubits have to be lesser than num_qubits"))
+    (maximum(vcat(control_qubits, target_qubit)) > num_qubits) && (@_error("Control and target qubits have to be lesser than num_qubits"))
 
-    (target_qubit in control_qubits) && (Memento.error(_LOGGER, "Same qubit cannot serve as both target and a control qubit"))
+    (target_qubit in control_qubits) && (@_error("Same qubit cannot serve as both target and a control qubit"))
 
-    (Int(log2(size(target_gate)[1])) > 1) && (Memento.error(_LOGGER, "Target gate cannot be on multiple qubits"))
+    (Int(log2(size(target_gate)[1])) > 1) && (@_error("Target gate cannot be on multiple qubits"))
 
     M_1 = Array{Complex{Float64},2}([0 0; 0 1]) # |1⟩⟨1|
 
@@ -1595,7 +1220,7 @@ is_zero(x; tol = 1E-6) = isapprox(x, 0, atol = tol)
     
 #     qubit_loc = QCO._parse_gate_string(gate, qubits = true)
     
-#     length(qubit_loc) == 0 && Memento.error(_LOGGER, "Atleast one qubit has to be specified for an input gate")
+#     length(qubit_loc) == 0 && @_error("Atleast one qubit has to be specified for an input gate")
 #     return length(qubit_loc) > 1
 # end
 

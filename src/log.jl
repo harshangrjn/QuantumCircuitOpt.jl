@@ -14,7 +14,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
          msg = results["termination_status"] == MOI.TIME_LIMIT ? 
                "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate" : 
                "Infeasible primal status. Gate decomposition may be inaccurate"
-         Memento.warn(_LOGGER, msg)
+         @_warn(msg)
          return
      end
     
@@ -84,7 +84,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
             printstyled("  ","Fidelity: ", round(results["solution"]["w_fidelity_var"], digits = 10),"\n"; color = _main_color)
         end
 
-        if data["decomposition_type"] == "fake-fidelity-approximate"
+        if data["decomposition_type"] == "linear-fidelity-approximate"
             printstyled("  ","SQRT(Fidelity): ", round(results["solution"]["c_fidelity_var"], digits = 10),"\n"; color = _main_color)
         end
 
@@ -122,7 +122,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("=============================================================================","\n"; color = _main_color)      
 
     else
-        Memento.warn(_LOGGER, "Valid integral feasible solutions could not be found to visualize the solution")
+        @_warn("Valid integral feasible solutions could not be found to visualize the solution")
     end
 
     if gate_sequence
@@ -293,7 +293,7 @@ function compress_circuit(gates::Vector{Gate}, num_qubits::Int)
     full = collect(1:num_qubits)
 
     for g in gates
-        (all(q -> q in full, g.qubits)) || Memento.error(_LOGGER, "Gate $(g.label) uses invalid qubit (n=$num_qubits)")
+        (all(q -> q in full, g.qubits)) || @_error("Gate $(g.label) uses invalid qubit (n=$num_qubits)")
 
         pos = length(layers)+1
         for l = length(layers):-1:1
@@ -338,7 +338,7 @@ function validate_circuit(
     if !valid && error_message
         msg = "Decomposition is not valid: Problem may be infeasible"
         circuit_type !== nothing && (msg = "Decomposition is not valid: Circuit may be infeasible for $circuit_type")
-        Memento.error(_LOGGER, msg)
+        @_error(msg)
     end
     
     return valid

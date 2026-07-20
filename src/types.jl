@@ -20,6 +20,11 @@ mutable struct QCModelOptions
     unitary_constraints                :: Bool
     unitary_complex_conjugate          :: Int64
 
+    redundant_gate_product_constraints :: Bool
+    equivalent_gate_pair_constraints   :: Bool
+    equivalent_gate_triplet_constraints :: Bool
+    global_phase_formulation           :: String
+
     time_limit                         :: Float64
     relax_integrality                  :: Bool
     optimizer_log                      :: Bool
@@ -46,6 +51,15 @@ function get_default_options()
     unitary_constraints                = false # true, false
     unitary_complex_conjugate          = 1     # 0, 1 (linear), 2 (linear + quadratic)
 
+    # symmetry-breaking families up to gate quintuplets; larger gate sets can make the
+    # enumeration expensive
+    redundant_gate_product_constraints = false # true, false
+    equivalent_gate_pair_constraints   = false # true, false
+    # restricted gate sets only (validated on anyon sets); see constraints.jl
+    equivalent_gate_triplet_constraints = false # true, false
+    # "glphase" (default) or "linear_cs" (global phase in rectangular r + is form)
+    global_phase_formulation           = "glphase"
+
     time_limit                         = 10800 # float value
     relax_integrality                  = false # true, false
     optimizer_log                      = true  # true, false
@@ -63,6 +77,10 @@ function get_default_options()
                           convex_hull_gate_constraints,
                           unitary_constraints,
                           unitary_complex_conjugate,
+                          redundant_gate_product_constraints,
+                          equivalent_gate_pair_constraints,
+                          equivalent_gate_triplet_constraints,
+                          global_phase_formulation,
                           time_limit,
                           relax_integrality,
                           optimizer_log,

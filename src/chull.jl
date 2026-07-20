@@ -11,7 +11,7 @@ References
 """
 
 function convex_hull(ps::Vector{T}) where T<:Tuple{Number,Number}
-    isempty(ps) && Memento.error(_LOGGER, "At least one point is necessary for evaluating the convex hull")
+    isempty(ps) && @_error("At least one point is necessary for evaluating the convex hull")
     pts = sort(ps)
     length(pts) ≤ 2 && return pts   # trivial hulls
 
@@ -78,7 +78,7 @@ end
 #     num_points = size(points)[1]
 
 #     if num_points == 0
-#         Memento.error(_LOGGER, "Atleast one point is necessary for evaluating the convex hull")
+#         @_error("Atleast one point is necessary for evaluating the convex hull")
 #     elseif num_points <= 2 
 #         return points
 #     end

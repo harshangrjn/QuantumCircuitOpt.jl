@@ -6,11 +6,8 @@
 function get_gurobi(; solver_log = false)
     return JuMP.optimizer_with_attributes(Gurobi.Optimizer, 
                                           MOI.Silent() => !solver_log, 
-                                         # "MIPFocus" => 3,  # Focus on optimality over feasibility 
-                                          "Presolve" => 1, 
-                                         # "Nonconvex" => 2, # For quadratic fidelity
-                                         # "Threads" => 1    #
-                                          ) 
+                                        #   "MIPFocus" => 3, # Focus on optimality over feasibility 
+                                          "Presolve" => 1) 
 end
 
 # https://github.com/jump-dev/CPLEX.jl

@@ -5,7 +5,7 @@ function build_QCModel_result(qcm::QuantumCircuitModel, solve_time::Number)
     try
         result_count = JuMP.result_count(qcm.model)
     catch
-        Memento.warn(_LOGGER, "the given optimizer does not provide the ResultCount() attribute, assuming the solver returned a solution which may be incorrect.");
+        @_warn("the given optimizer does not provide the ResultCount() attribute, assuming the solver returned a solution which may be incorrect.");
     end
 
     solution = Dict{String,Any}()
@@ -13,7 +13,7 @@ function build_QCModel_result(qcm::QuantumCircuitModel, solve_time::Number)
     if result_count > 0
         solution = QCO.build_QCModel_solution(qcm)
     else
-        Memento.warn(_LOGGER, "Quantum circuit model has no results, solution cannot be built")
+        @_warn("Quantum circuit model has no results, solution cannot be built")
     end
 
     result = Dict{String,Any}(
@@ -41,7 +41,7 @@ function get_objective_value(model::JuMP.Model)
     try
         obj_val = JuMP.objective_value(model)
     catch
-        Memento.warn(_LOGGER, "Objective value is unbounded. Problem may be infeasible or not constrained properly");
+        @_warn("Objective value is unbounded. Problem may be infeasible or not constrained properly");
     end
 
     return obj_val

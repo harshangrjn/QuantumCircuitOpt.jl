@@ -96,12 +96,13 @@ function variable_QCModel_compact(qcm::QuantumCircuitModel)
         QCO.variable_approximate_csw(qcm)
     end
 
-    if qcm.data["decomposition_type"] == "fake-fidelity-approximate"
+    if qcm.data["decomposition_type"] == "linear-fidelity-approximate"
         QCO.variable_approximate_c(qcm)
     end
 
-    if qcm.data["decomposition_type"] == "optimal_global_phase"
-        QCO.variable_global_pase_cs(qcm)
+    if qcm.data["decomposition_type"] == "optimal_global_phase" &&
+       qcm.options.global_phase_formulation == "linear_cs"
+        QCO.variable_global_phase_cs(qcm)
     end
 
     if qcm.data["objective"] == "minimize_layers"
@@ -109,7 +110,7 @@ function variable_QCModel_compact(qcm::QuantumCircuitModel)
         QCO.variable_gates_onoff_layers(qcm)
     end
 
-    #QCO.variable_QCModel_valid(qcm)
+    QCO.variable_QCModel_valid(qcm)
 
     return
 end
@@ -137,58 +138,28 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel)
     QCO.constraint_intermediate_products_compact(qcm)
     QCO.constraint_gate_product_linearization(qcm)
 
-    #####################################################################################################################
-
-    #Unitarity of U Constraints 
-
-    #QCO.constraint_unitarity_of_U(qcm,3)
-    #QCO.constraint_unitarity_of_U(qcm,5)
-
-    #QCO.constraint_unitarity_of_U(qcm,4)
-    
-    #QCO.constraint_unitarity_of_U_diag(qcm,3)
-    #QCO.constraint_unitarity_of_U_diag(qcm,5)
-
-    #QCO.constraint_unitarity_of_U_diag(qcm,4)
-
-    #QCO.constraint_unitary_complex_conjugate_at_depth(qcm,3)
-    #QCO.constraint_unitary_complex_conjugate_at_depth(qcm,5)
-
-    #QCO.constraint_unitary_complex_conjugate_at_depth(qcm,4)
-
-    #####################################################################################################################
-
     if qcm.data["decomposition_type"] == "optimal_global_phase"
-        #QCO.constraint_target_gate_condition_glphase1_star(qcm) 
-        #QCO.constraint_target_gate_condition_glphase2_a2a(qcm)
-        #QCO.constraint_target_gate_condition_glphase2_star(qcm)  
-
-        QCO.constraint_target_gate_condition_glphase1_cs(qcm)
-        #QCO.constraint_target_gate_condition_glphase2_cs(qcm)
-
-        #QCO.constraint_target_gate_condition_glphase2_cs_only_diag(qcm)
-
-    else 
+        if qcm.options.global_phase_formulation == "linear_cs"
+            QCO.constraint_target_gate_condition_glphase1_cs(qcm)
+        else
+            QCO.constraint_target_gate_condition_glphase(qcm)
+        end
+    else
         QCO.constraint_target_gate_condition_compact(qcm)
     end
-    
+
     QCO.constraint_cnot_gate_bounds(qcm)
 
     if qcm.data["decomposition_type"] == "approximate"
         QCO.constraint_slack_var_outer_approximation(qcm)
-        #QCO.constraint_slack_var_outer_approximation_quadratic(qcm)
-
     end
 
     if qcm.data["decomposition_type"] == "sum-approximate"
         QCO.constraint_slack_var_sum_approximation(qcm)
-
     end
 
     if qcm.data["decomposition_type"] == "infinity-approximate"
         QCO.constraint_slack_var_infinity_approximation(qcm)
-        #QCO.constraint_slack_var_infinity_approximation_quadratic(qcm)
-
     end
 
     if qcm.data["decomposition_type"] == "fidelity-approximate"
@@ -197,13 +168,13 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel)
 
     end
 
-    if qcm.data["decomposition_type"] == "fake-fidelity-approximate"
+    if qcm.data["decomposition_type"] == "linear-fidelity-approximate"
         QCO.constraint_real_trace_for_approximate(qcm)
 
     end
 
     if qcm.data["objective"] == "minimize_layers"
-        QCO.constraint_layer_assigments(qcm)  
+        QCO.constraint_layer_assignments(qcm)  
         QCO.constraint_single_gate_per_qubit_per_layer(qcm)
 
     end
@@ -219,41 +190,32 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
 
     if qcm.options.all_valid_constraints != -1
 
-        if qcm.options.all_valid_constraints == 1 
+        if qcm.options.all_valid_constraints == 1
             QCO.constraint_commutative_gate_pairs(qcm)
             QCO.constraint_involutory_gates(qcm)
-
-            QCO.constraint_redundant_gate_products(qcm)
-
-            #QCO.constraint_redundant_gate_product_pairs(qcm)
-            #QCO.constraint_redundant_gate_product_triplets(qcm)
-
-            QCO.constraint_equivalent_gate_pairs(qcm)
-            #QCO.constraint_equivalent_gate_triplets(qcm) # only use this for anyons
-
+            QCO.constraint_redundant_gate_product_pairs(qcm)
             QCO.constraint_idempotent_gates(qcm)
             QCO.constraint_identity_gate_symmetry(qcm)
             QCO.constraint_convex_hull_complex_gates(qcm)
             QCO.constraint_unitary_property(qcm)
             QCO.constraint_unitary_complex_conjugate(qcm)
-            
-        elseif qcm.options.all_valid_constraints == 0 
+
+        elseif qcm.options.all_valid_constraints == 0
             qcm.options.commute_gate_constraints            && QCO.constraint_commutative_gate_pairs(qcm)
             qcm.options.involutory_gate_constraints         && QCO.constraint_involutory_gates(qcm)
-
-            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_products(qcm)
-
-            #qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_pairs(qcm)
-            #qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_triplets(qcm)
-            
-            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_equivalent_gate_pairs(qcm)
-            #qcm.options.redundant_gate_pair_constraints     && QCO.constraint_equivalent_gate_triplets(qcm)  # only use this for anyons
-
+            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_pairs(qcm)
             qcm.options.idempotent_gate_constraints         && QCO.constraint_idempotent_gates(qcm)
             qcm.options.identity_gate_symmetry_constraints  && QCO.constraint_identity_gate_symmetry(qcm)
             qcm.options.convex_hull_gate_constraints        && QCO.constraint_convex_hull_complex_gates(qcm)
             qcm.options.unitary_constraints                 && QCO.constraint_unitary_property(qcm)
             (qcm.options.unitary_complex_conjugate > 0)     && QCO.constraint_unitary_complex_conjugate(qcm)
+        end
+
+        # symmetry-breaking families from the depth-aware formulation; opt-in
+        if qcm.options.all_valid_constraints != 1
+            qcm.options.redundant_gate_product_constraints  && QCO.constraint_redundant_gate_products(qcm)
+            qcm.options.equivalent_gate_pair_constraints    && QCO.constraint_equivalent_gate_pairs(qcm)
+            qcm.options.equivalent_gate_triplet_constraints && QCO.constraint_equivalent_gate_triplets(qcm)
         end
 
     end
@@ -287,7 +249,7 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
         if JuMP.backend(qcm.model).optimizer === nothing
             JuMP.set_optimizer(qcm.model, optimizer)
         else
-            Memento.warn(_LOGGER, "Model already contains optimizer, cannot use optimizer specified in `optimize_QCModel!`")
+            @_warn("Model already contains optimizer, cannot use optimizer specified in `optimize_QCModel!`")
         end
     end
 
@@ -298,7 +260,7 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
     end
 
     if JuMP.mode(qcm.model) != JuMP.DIRECT && JuMP.backend(qcm.model).optimizer === nothing
-        Memento.error(_LOGGER, "No optimizer specified in `optimize_QCModel!` or the given JuMP model.")
+        @_error("No optimizer specified in `optimize_QCModel!` or the given JuMP model.")
     end
     
     start_time = time()
@@ -308,10 +270,10 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
     try
         solve_time = JuMP.solve_time(qcm.model)
     catch
-        Memento.warn(_LOGGER, "The given optimizer does not provide the SolveTime() attribute, falling back on @timed.  This is not a rigorous timing value.");
+        @_warn("The given optimizer does not provide the SolveTime() attribute, falling back on @timed.  This is not a rigorous timing value.");
     end
     
-    Memento.debug(_LOGGER, "JuMP model optimize time: $(time() - start_time)")
+    @_debug("JuMP model optimize time: $(time() - start_time)")
     
     qcm.result = QCO.build_QCModel_result(qcm, solve_time) 
 
@@ -330,9 +292,9 @@ function run_QCModel(params::Dict{String, Any},
 
     if model_qc.options.relax_integrality
         if result_qc["primal_status"] == MOI.FEASIBLE_POINT 
-            Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
+            @_info("Integrality-relaxed solutions can be found in the results dictionary")
         else
-            Memento.info(_LOGGER, "Infeasible primal status for the integrality-relaxed problem")
+            @_info("Infeasible primal status for the integrality-relaxed problem")
         end
     else 
         if model_qc.options.visualize_solution
@@ -350,12 +312,12 @@ end
 function _catch_options_errors(qcm::QuantumCircuitModel)
     
     if !(qcm.options.model_type in ["compact_formulation", "balas_formulation"])
-        Memento.warn(_LOGGER, "Invalid model_type. Setting it to default value (compact_formulation).")
+        @_warn("Invalid model_type. Setting it to default value (compact_formulation).")
         QCO.set_option(qcm, :model_type, "compact_formulation")
     end
 
     if !(qcm.options.all_valid_constraints in [-1,0,1])
-        Memento.warn(_LOGGER, "Invalid all_valid_constraints; choose a value ∈ [-1,0,1]. Setting it to default value of 0.")
+        @_warn("Invalid all_valid_constraints; choose a value ∈ [-1,0,1]. Setting it to default value of 0.")
         QCO.set_option(qcm, :all_valid_constraints, 0)
     end
 

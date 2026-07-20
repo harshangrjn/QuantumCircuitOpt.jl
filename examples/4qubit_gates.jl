@@ -1,6 +1,6 @@
 function CNot_41()
     # Reference: https://doi.org/10.1109/DSD.2018.00005
-    println("CNot_4_1")
+
     return Dict{String, Any}(
         
     "num_qubits" => 4,
@@ -15,7 +15,7 @@ end
 function quantum_fulladder()
     #Reference-1: https://doi.org/10.1109/DATE.2005.249
     #Reference-2: https://doi.org/10.1109/TCAD.2005.858352 
-    println("quantum_fulladder")
+    
     num_qubits = 4
 
     function target_gate_1()
@@ -45,7 +45,7 @@ end
 function double_toffoli()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352 
-    println("double_toffoli")
+    
     num_qubits = 4
 
     function target_gate()
@@ -72,7 +72,7 @@ end
 function double_peres()
 
     # Reference: https://doi.org/10.1109/TCAD.2005.858352 
-    println("double_peres")
+    
     num_qubits = 4
 
     function target_gate()
@@ -127,7 +127,6 @@ function qubit_routing_circuit()
     )
 end
 
-
 function QFT4()
 
     println("QFT4")
@@ -146,7 +145,17 @@ function QFT4()
         )
 end
 
-
+function QFT4Gate()
+    N = 16
+    a = 1/sqrt(N)
+    QFT = Array{ComplexF64}(undef, N, N)
+    for j in 0:N-1
+        for k in 0:N-1
+            QFT[j+1, k+1] = a * exp(2im * pi * j * k / N)
+        end
+    end
+    return QFT
+end
 
 function QFT4_v2()
 
@@ -175,16 +184,4 @@ function QFT4_v2()
         "objective" => "minimize_depth",
         "decomposition_type" => "exact_optimal",
         )
-end
-
-function QFT4Gate()
-    N = 16
-    a = 1/sqrt(N)
-    QFT = Array{ComplexF64}(undef, N, N)
-    for j in 0:N-1
-        for k in 0:N-1
-            QFT[j+1, k+1] = a * exp(2im * pi * j * k / N)
-        end
-    end
-    return QFT
 end
