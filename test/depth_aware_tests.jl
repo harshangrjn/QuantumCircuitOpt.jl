@@ -120,3 +120,45 @@ end
     @test base["termination_status"] == cs["termination_status"] == MOI.OPTIMAL
     @test isapprox(base["objective"], cs["objective"], atol = tol_0)
 end
+
+@testset "Depth-aware Tests: symmetry options fire on nonempty menus and preserve the optimum" begin
+
+    # T^4 = Z gives a nonempty redundant-quadruplet menu, so the constraint loop runs
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "maximum_depth" => 4,
+    "elementary_gates" => ["T_1", "Z_1", "Identity"],
+    "target_gate" => QCO.unitary("Z_1", 2),
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal"
+    )
+    base = QCO.run_QCModel(params, MIP_SOLVER)
+    cut = QCO.run_QCModel(params, MIP_SOLVER; options = Dict{Symbol, Any}(:redundant_gate_product_constraints => true))
+    @test base["termination_status"] == cut["termination_status"] == MOI.OPTIMAL
+    @test isapprox(base["objective"], cut["objective"], atol = tol_0)
+
+    # The RZ ladder gives seven equivalent pairs, so the pair-constraint loop runs
+    params["elementary_gates"] = ["RZ_1", "Identity"]
+    params["RZ_discretization"] = [45, 90, 135, 180] .* pi ./ 180
+    params["decomposition_type"] = "optimal_global_phase"
+    base = QCO.run_QCModel(params, MIP_SOLVER)
+    cut = QCO.run_QCModel(params, MIP_SOLVER; options = Dict{Symbol, Any}(:equivalent_gate_pair_constraints => true))
+    @test base["termination_status"] == cut["termination_status"] == MOI.OPTIMAL
+    @test isapprox(base["objective"], cut["objective"], atol = tol_0)
+end
+
+@testset "Depth-aware Tests: objective guards reject unsupported combinations" begin
+
+    params = Dict{String, Any}(
+    "num_qubits" => 2,
+    "maximum_depth" => 3,
+    "elementary_gates" => ["H_1", "H_2", "CNot_1_2", "Identity"],
+    "target_gate" => QCO.CNotRevGate(),
+    "objective" => "minimize_layers",
+    "decomposition_type" => "exact_feasible"
+    )
+    @test_throws ErrorException QCO.run_QCModel(params, MIP_SOLVER)
+
+    params["decomposition_type"] = "approximate"
+    @test_throws ErrorException QCO.run_QCModel(params, MIP_SOLVER)
+end
