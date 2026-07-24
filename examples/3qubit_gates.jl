@@ -314,15 +314,3 @@ function CNot_1_3_full()
     "decomposition_type" => "exact_optimal",
     )
 end
-
-function QFT3Gate_szabo()
-    N = 8
-    a = 1/sqrt(N)
-    QFT = Array{ComplexF64}(undef, N, N)
-    for j in 0:N-1
-        for k in 0:N-1
-            QFT[j+1, k+1] = a * exp(2im * pi * j * k / N)
-        end
-    end
-    return QFT
-end

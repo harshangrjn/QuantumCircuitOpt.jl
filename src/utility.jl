@@ -99,40 +99,6 @@ function get_commutative_gate_pairs(M::Dict{String,Any}, decomposition_type::Str
     return commute_pairs, commute_pairs_prodIdentity
 end
 
-function get_parallelizable_gate_pairs(M::Dict{String,Any}, decomposition_type::String; identity_in_pairs = true)
-    num_gates = length(keys(M))
-    parallelizable_pairs = Array{Tuple{Int64,Int64},1}()
-        
-    Id = Matrix{Complex{Float64}}(Matrix(LA.I, size(M["1"]["matrix"])))
-        
-    # Find parallelizable pairs
-    for i = 1:(num_gates-1), j = (i+1):num_gates
-        # Skip if either gate is Identity
-        if ("Identity" in M["$i"]["type"]) || ("Identity" in M["$j"]["type"])
-            continue
-        end
-        
-        q_i, q_j = M["$i"]["qubit_loc"], M["$j"]["qubit_loc"]
-            
-        # Check for parallelizable pairs
-        isempty(intersect(q_i, q_j)) && push!(parallelizable_pairs, (i,j))
-    end
-    
-    #=
-    # Add Identity pairs if requested 
-    # This slows down the search slightly
-    if identity_in_pairs
-        identity_idx = [parse(Int64, i) for i in keys(M) if "Identity" in M[i]["type"]]
-        
-        for id_idx in identity_idx, j = 1:num_gates
-            j != id_idx && push!(parallelizable_pairs, (j, id_idx))
-        end
-    end
-    =#
-    
-    return parallelizable_pairs
-end
-
 
 function get_equivalent_gate_pairs(M::Dict{String,Any}, decomposition_type::String)
     num_gates = length(keys(M))

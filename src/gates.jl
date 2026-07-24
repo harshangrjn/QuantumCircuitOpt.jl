@@ -8,7 +8,6 @@ const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "R", "RX", "RY",
 
 const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z", "S", 
                                               "Sdagger", "T", "Tdagger", "SX", "SXdagger",
-                                              "Fib1", "Fib2", "Fib1dagger", "Fib2dagger", 
                                               "Fib1", "Fib2", "Fib1dagger", "Fib2dagger",
                                               "Fibweave1", "Fibweave2", "Fibweave1dagger", "Fibweave2dagger"]
 
