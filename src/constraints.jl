@@ -120,7 +120,7 @@ function constraint_layer_assignments(qcm::QuantumCircuitModel)
     #The first element is 1
     JuMP.@constraint(qcm.model, qcm.variables[:layer_bin_var][1, 1] == 1)
     
-    #Each position assigned o exactly one layer
+    #Each position assigned to exactly one layer
     JuMP.@constraint(qcm.model, [d=1:max_depth], sum(qcm.variables[:layer_bin_var][d,l] for l=1:maximum_layers) == 1)
 
     #Layers stepwise monotonic increase

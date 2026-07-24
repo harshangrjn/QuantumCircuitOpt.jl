@@ -2,8 +2,8 @@ export QuantumCircuitModel
 
 """
     QCModelOptions
-The composite mutable struct, `QCModelOptions`, holds various optimization model options for enhancements 
-with defualt options set to the values provided by `get_default_options` function.
+The composite mutable struct, `QCModelOptions`, holds various optimization model options for enhancements
+with default options set to the values provided by `get_default_options` function.
 """
 mutable struct QCModelOptions
     model_type                         :: String
@@ -20,10 +20,10 @@ mutable struct QCModelOptions
     unitary_constraints                :: Bool
     unitary_complex_conjugate          :: Int64
 
-    redundant_gate_product_constraints :: Bool
-    equivalent_gate_pair_constraints   :: Bool
+    redundant_gate_product_constraints  :: Bool
+    equivalent_gate_pair_constraints    :: Bool
     equivalent_gate_triplet_constraints :: Bool
-    global_phase_formulation           :: String
+    global_phase_formulation            :: String
 
     time_limit                         :: Float64
     relax_integrality                  :: Bool
