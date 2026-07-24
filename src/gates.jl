@@ -7,7 +7,9 @@ IMPORTANT: a) Update the lists below whenever a 1 or 2 qubit gate is added to th
 const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "R", "RX", "RY", "RZ", "Phase"]
 
 const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z", "S", 
-                                              "Sdagger", "T", "Tdagger", "SX", "SXdagger"]
+                                              "Sdagger", "T", "Tdagger", "SX", "SXdagger",
+                                              "Fib1", "Fib2", "Fib1dagger", "Fib2dagger",
+                                              "Fibweave1", "Fibweave2", "Fibweave1dagger", "Fibweave2dagger"]
 
 const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", "CRZ", "CRZRev", 
                                               "CU3", "CU3Rev"]
@@ -21,7 +23,7 @@ const MULTI_CONTROLLED_GATES   = ["MC_gates"]
 # Gates invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "SSwap", "iSwap", "Sycamore", "DCX", "W", "M", "CZ",
                                               "QFT2", "HCoin", "GroverDiffusion", "CS", "CSdagger", 
-                                              "CT", "CTdagger"]
+                                              "CT", "CTdagger", "Fib3", "Fib3dagger", "Fib3", "Fib3dagger"]
 
 # Gates non-invariant to qubit flip
 const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = ["CNot", "CNotRev", "CX", "CXRev", "CY", "CYRev", 
@@ -50,7 +52,7 @@ function _catch_gate_name_error()
     all_gates = union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES, QCO.MULTI_QUBIT_GATES)
     
     if length(findall(x -> occursin(QCO.kron_symbol, x), all_gates)) > 0
-        Memento.error(_LOGGER, "Avoid the character `$(QCO.kron_symbol)` in the elemetary gate name")
+        @_error("Avoid the character `$(QCO.kron_symbol)` in the elementary gate name")
     end
 end
 QCO._catch_gate_name_error()
@@ -478,6 +480,104 @@ P(\lambda) = \begin{pmatrix}
 function PhaseGate(λ::Number)
     return QCO.U1Gate(λ)
 end
+
+function Fib1Gate()
+
+    return Array{Complex{Float64},2}(exp(1im * pi / 10) * [exp(-4im * pi  / 5) 0; 0 exp(3im * pi  / 5)])
+
+end
+
+function Fib1daggerGate()
+    
+    return Array{Complex{Float64},2}(exp(-1im * pi / 10) * [exp(4im * pi  / 5) 0; 0 exp(-3im * pi  / 5)])
+
+end
+
+function Fib2Gate()
+    phi = (1 + sqrt(5)) / 2
+    a = 1 / phi
+    b = sqrt(a)
+    r1 = exp(-4im * pi / 5)
+    rτ = exp(3im * pi / 5)
+    # F-matrix
+    F = [a b; b -a]
+    R = [r1 0; 0 rτ]
+    # σ2 = F * R * F
+    # For Fibonacci, F is its own inverse (since a^2 + b^2 = 1)
+
+    return Array{Complex{Float64},2}(exp(1im * pi / 10) * F * R * F)
+
+end
+
+function Fib2daggerGate()
+    phi = (1 + sqrt(5)) / 2
+    a = 1 / phi
+    b = sqrt(a)
+    r1 = exp(4im * pi / 5)    # conjugate of -4im*pi/5
+    rτ = exp(-3im * pi / 5)   # conjugate of 3im*pi/5
+    F = [a b; b -a]
+    R = [r1 0; 0 rτ]
+
+    return Array{Complex{Float64},2}(exp(-1im * pi / 10) * F * R * F)
+
+end
+
+# σ₁²
+function Fibweave1Gate()
+    return Array{ComplexF64,2}([
+        exp(1im * 3*pi/5)  0.0;
+        0.0                exp(-1im * 3*pi/5)
+    ])
+end
+
+# (σ₁²)†
+function Fibweave1daggerGate()
+    return Array{ComplexF64,2}([
+        exp(-1im * 3*pi/5)  0.0;
+        0.0                 exp(1im * 3*pi/5)
+    ])
+end
+
+# σ₂²  = F · diag(e^{i3π/5}, e^{-i3π/5}) · F
+function Fibweave2Gate()
+    phi = (1 + sqrt(5)) / 2
+    a = 1 / phi
+    b = sqrt(a)
+    F = [a b; b -a]                # F^2 = I, det(F) = -1
+    D = [exp(1im * 3*pi/5) 0.0;    # det(D) = 1
+         0.0 exp(-1im * 3*pi/5)]
+    return Array{ComplexF64,2}(F * D * F)  # det(F)² det(D) = 1
+end
+
+# (σ₂²)† = F · diag(e^{-i3π/5}, e^{i3π/5}) · F
+function Fibweave2daggerGate()
+    phi = (1 + sqrt(5)) / 2
+    a = 1 / phi
+    b = sqrt(a)
+    F = [a b; b -a]
+    D = [exp(-1im * 3*pi/5) 0.0;
+          0.0                exp(1im * 3*pi/5)]
+    return Array{ComplexF64,2}(F * D * F)
+end
+
+function Fib3Gate()::Array{ComplexF64,2}
+    return ComplexF64[
+        exp(1im*pi/10)  0                 0                 0;
+        0               exp(1im*pi/10)    0                 0;
+        0               0                 1im               0;
+        0               0                 0                 exp(1im*13*pi/10)
+    ]
+end
+
+function Fib3daggerGate()::Array{ComplexF64,2}
+    return ComplexF64[
+        exp(-1im*pi/10)   0                  0                  0;
+        0                 exp(-1im*pi/10)    0                  0;
+        0                 0                  -1im               0;
+        0                 0                  0                  exp(-1im*13*pi/10)
+    ]
+end
+
 
 #-------------------------------------#
 #            TWO-QUBIT GATES          #

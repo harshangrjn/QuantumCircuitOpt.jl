@@ -257,3 +257,60 @@ function QFT3()
         "decomposition_type" => "exact_optimal",
         )
 end
+
+function CCZ()
+
+    function ccz_circuit()
+        # [(depth, gate)]
+        return [(1, "T_1"),              
+                (2, "T_2"),                                 
+                (3, "CNot_2_3"),           
+                (4, "Tdagger_3"),        
+                (5, "CNot_1_3"),          
+                (6, "T_3"),               
+                (7, "CNot_2_3"),                 
+                (8, "Tdagger_3"),          
+                (9, "CNot_1_3"),           
+                (10, "T_3"),                          
+                (11, "CNot_1_2"),         
+                (12, "Tdagger_2"),       
+                (13, "CNot_1_2")          
+                ] 
+    end
+
+    function target_gate()
+        H_3 = QCOpt.unitary("H_3", 3)
+        CCX =  QCOpt.ToffoliGate()
+
+        return H_3 * CCX * H_3
+    end
+
+    println(">>>>> CCZ <<<<<")
+ 
+    return Dict{String, Any}(
+    "num_qubits" => 3, 
+    "maximum_depth" => 13,
+    "elementary_gates" => ["T_1", "T_2", "T_3", "H_1", "H_2", "H_3", "CNot_1_2", "CNot_1_3", "CNot_2_3", "Tdagger_1", "Tdagger_2", "Tdagger_3", "Identity"], 
+    "target_gate" => target_gate(),
+    "objective" => "minimize_depth", 
+    "decomposition_type" => "exact_optimal",
+
+    "input_circuit" => ccz_circuit(),
+    "set_cnot_lower_bound" => 6,
+    "set_cnot_upper_bound" => 6,
+    )
+end
+
+function CNot_1_3_full()
+    println("CNot_1_3_full")
+
+    return Dict{String, Any}(
+    "num_qubits" => 3,
+    "maximum_depth" => 8,
+    # "elementary_gates" => ["CNot_1_2", "CNot_2_3", "Identity"], 
+    "elementary_gates" => ["H_1", "H_2", "H_3", "X_1", "X_2", "X_3", "Z_1", "Z_2", "Z_3", "CNot_1_2", "CNot_3_2", "CNot_2_1", "CNot_2_3", "Identity"],
+    "target_gate" => QCOpt.unitary("CNot_1_3", 3),
+    "objective" => "minimize_depth",
+    "decomposition_type" => "exact_optimal",
+    )
+end

@@ -116,6 +116,24 @@ end
     @test length(redundant_pairs) == 0
 end
 
+@testset "Tests: get_redundant_gate_product_triplets" begin
+    params = Dict{String, Any}(
+        "num_qubits" => 2,
+        "maximum_depth" => 8,
+        "elementary_gates" => ["X_1", "X_2", "Z_1", "Z_2", "H_1", "H_2", "CNot_1_2", "CNot_2_1", "Identity"],
+        "target_gate" => QCO.CZGate()
+    )
+    data = QCO.get_data(params)
+    redundant_triplets = QCO.get_redundant_gate_product_triplets(data["gates_dict"], data["num_qubits"], data["decomposition_type"])
+    @test length(redundant_triplets) == 16
+
+    # With global phase equivalence
+    params["decomposition_type"] = "optimal_global_phase"
+    data = QCO.get_data(params)
+    redundant_triplets = QCO.get_redundant_gate_product_triplets(data["gates_dict"], data["num_qubits"], data["decomposition_type"])
+    @test length(redundant_triplets) == 20
+end
+
 @testset "Tests: get_idempotent_gates" begin
     params = Dict{String, Any}(
         "num_qubits" => 2,
@@ -249,4 +267,92 @@ end
     # Test that the circuit layers are empty
     circuit_layers = Vector{Vector{QCO.Gate}}()
     @test isnothing(QCO.print_circuit(circuit_layers, 2))
+end
+
+@testset "Tests: redundant gate products across arities" begin
+    function arity_data(gates; disc = nothing)
+        params = Dict{String, Any}(
+            "num_qubits" => 2,
+            "maximum_depth" => 5,
+            "elementary_gates" => gates,
+            "target_gate" => QCO.unitary("Z_1", 2),
+            "objective" => "minimize_depth",
+            "decomposition_type" => "exact_optimal"
+        )
+        disc !== nothing && (params["RZ_discretization"] = disc)
+        return QCO.get_data(params; eliminate_identical_gates = false)
+    end
+
+    # T*T = S and S*S = Z: two redundant pairs, nothing deeper
+    data = arity_data(["T_1", "S_1", "Z_1", "Identity"])
+    pairs, triplets, quads, quints = QCO.get_redundant_gate_products(data["gates_dict"], data["decomposition_type"])
+    @test length(pairs) == 2
+    @test isempty(triplets) && isempty(quads) && isempty(quints)
+
+    # Without S in the set the first redundancy is T^4 = Z: one quadruplet
+    data = arity_data(["T_1", "Z_1", "Identity"])
+    pairs, triplets, quads, quints = QCO.get_redundant_gate_products(data["gates_dict"], data["decomposition_type"])
+    @test isempty(pairs) && isempty(triplets) && isempty(quints)
+    @test length(quads) == 1
+
+    # RZ(60)^3 = RZ(180): triplet fires (plus one quadruplet from the mixed products)
+    data = arity_data(["RZ_1", "Identity"], disc = [60, 180] .* pi ./ 180)
+    pairs, triplets, quads, quints = QCO.get_redundant_gate_products(data["gates_dict"], data["decomposition_type"])
+    @test length(triplets) == 1
+    @test length(quads) == 1
+    @test isempty(pairs) && isempty(quints)
+
+    # RZ(36)^5 = RZ(180): quintuplet fires
+    data = arity_data(["RZ_1", "Identity"], disc = [36, 180] .* pi ./ 180)
+    pairs, triplets, quads, quints = QCO.get_redundant_gate_products(data["gates_dict"], data["decomposition_type"])
+    @test length(quints) == 1
+    @test length(quads) == 1
+    @test isempty(pairs) && isempty(triplets)
+end
+
+@testset "Tests: equivalent gate pairs and layer pairs on an RZ ladder" begin
+    params = Dict{String, Any}(
+        "num_qubits" => 2,
+        "maximum_depth" => 5,
+        "elementary_gates" => ["RZ_1", "Identity"],
+        "RZ_discretization" => [45, 90, 135, 180] .* pi ./ 180,
+        "target_gate" => QCO.unitary("Z_1", 2),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal"
+    )
+    data = QCO.get_data(params; eliminate_identical_gates = false)
+    equiv_pairs = QCO.get_equivalent_gate_pairs(data["gates_dict"], data["decomposition_type"])
+    layer_pairs = QCO.get_equivalent_gate_pairs_layers(data["gates_dict"], data["decomposition_type"])
+    @test length(equiv_pairs) == 7
+    @test length(layer_pairs) == 9
+    @test eltype(equiv_pairs) == Tuple{Int64, Int64}
+
+    # The additive angle structure is phase-clean, so global phase changes nothing here
+    params["decomposition_type"] = "optimal_global_phase"
+    data = QCO.get_data(params; eliminate_identical_gates = false)
+    @test length(QCO.get_equivalent_gate_pairs(data["gates_dict"], data["decomposition_type"])) == 7
+    @test length(QCO.get_equivalent_gate_pairs_layers(data["gates_dict"], data["decomposition_type"])) == 9
+end
+
+@testset "Tests: gate_element_bounds rejects unbounded entries" begin
+    M = zeros(Float64, 2, 2, 2)
+    M[1, 1, 1] = Inf
+    @test_throws ErrorException QCO.gate_element_bounds(M)
+end
+
+@testset "Tests: logger configuration and warning emission" begin
+    QCO.logger_config!("info")
+    params = Dict{String, Any}(
+        "num_qubits" => 2,
+        "maximum_depth" => 2,
+        "elementary_gates" => ["H_1", "H_1", "H_2", "Identity"],
+        "target_gate" => QCO.unitary("H_1", 2),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal"
+    )
+    data = QCO.get_data(params)   # duplicate H_1 triggers the non-unique-gates warning path
+    @test haskey(data, "gates_dict")
+    QCO.silence()
+    QCO.logger_config!("error")
+    @test true
 end

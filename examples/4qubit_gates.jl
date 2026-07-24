@@ -126,3 +126,62 @@ function qubit_routing_circuit()
     "decomposition_type" => "exact_optimal"
     )
 end
+
+function QFT4()
+
+    println("QFT4")
+
+    # QFT4 circuit using Controlled-Phase gates
+    return Dict{String, Any}(
+        "num_qubits" => 4,
+        "maximum_depth" => 12,   
+        "elementary_gates" => ["H_1", "H_2", "H_3", "H_4", "CU3_1_2", "CU3_1_3", "CU3_1_4", "CU3_2_3", "CU3_2_4", "CU3_3_4", "Swap_1_4", "Swap_2_3","Identity"],
+        "CU3_θ_discretization" => [0],
+        "CU3_ϕ_discretization" => [0],
+        "CU3_λ_discretization" => 0:π/8:π,
+        "target_gate" => QFT4Gate(),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal",
+        )
+end
+
+function QFT4Gate()
+    N = 16
+    a = 1/sqrt(N)
+    QFT = Array{ComplexF64}(undef, N, N)
+    for j in 0:N-1
+        for k in 0:N-1
+            QFT[j+1, k+1] = a * exp(2im * pi * j * k / N)
+        end
+    end
+    return QFT
+end
+
+function QFT4_v2()
+
+    println("QFT4 - no swaps")
+
+    num_qubits = 4
+
+    function target_gate()
+        # Gates which do not satisfy qubit connectivity
+        Swap_1_4 = QCOpt.unitary("Swap_1_4", num_qubits)
+        Swap_2_3 = QCOpt.unitary("Swap_2_3", num_qubits)
+        
+        
+        return QFT4Gate() * Swap_1_4 * Swap_2_3 
+    end
+
+    # QFT4 circuit using Controlled-Phase gates
+    return Dict{String, Any}(
+        "num_qubits" => 4,
+        "maximum_depth" => 10,   
+        "elementary_gates" => ["H_1", "H_2", "H_3", "H_4", "CU3_1_2", "CU3_1_3", "CU3_1_4", "CU3_2_3", "CU3_2_4", "CU3_3_4", "Identity"],
+        "CU3_θ_discretization" => [0],
+        "CU3_ϕ_discretization" => [0],
+        "CU3_λ_discretization" => 0:π/8:π,
+        "target_gate" => target_gate(),
+        "objective" => "minimize_depth",
+        "decomposition_type" => "exact_optimal",
+        )
+end

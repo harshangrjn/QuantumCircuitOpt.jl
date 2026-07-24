@@ -169,3 +169,37 @@ end
     data = QCO.get_data(params)
     @test !("input_circuit" in keys(data))
 end
+@testset "Data Tests: input validation errors" begin
+    function base_params()
+        return Dict{String, Any}(
+            "num_qubits" => 2,
+            "maximum_depth" => 2,
+            "elementary_gates" => ["H_1", "H_2", "Identity"],
+            "target_gate" => QCO.CNotRevGate(),
+            "objective" => "minimize_depth",
+            "decomposition_type" => "exact_optimal"
+        )
+    end
+
+    p = base_params(); p["elementary_gates"] = ["Foo_1", "Identity"]
+    @test_throws ErrorException QCO.get_data(p)              # unknown gate name
+
+    p = base_params(); p["elementary_gates"] = ["T_3", "Identity"]
+    @test_throws ErrorException QCO.get_data(p)              # qubit outside 1..num_qubits
+
+    p = base_params(); p["elementary_gates"] = ["CNot_1", "Identity"]
+    @test_throws ErrorException QCO.get_data(p)              # two-qubit gate needs two qubits
+
+    p = base_params(); p["elementary_gates"] = ["CNot_1_1", "Identity"]
+    @test_throws ErrorException QCO.get_data(p)              # identical control and target
+
+    p = base_params(); p["elementary_gates"] = ["RZ_1", "Identity"]
+    p["RZ_discretization"] = Float64[]
+    @test_throws ErrorException QCO.get_data(p)              # empty discretization for an angle gate
+
+    p = base_params(); p["target_gate"] = QCO.HGate()
+    @test_throws ErrorException QCO.get_data(p)              # target dimension mismatch
+
+    p = base_params(); delete!(p, "target_gate")
+    @test_throws ErrorException QCO.get_data(p)              # missing target
+end

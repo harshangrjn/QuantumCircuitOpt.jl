@@ -2,7 +2,6 @@ using JuMP
 using Test 
 
 import QuantumCircuitOpt as QCO
-import Memento
 import LinearAlgebra as LA
 import HiGHS
 
@@ -27,4 +26,5 @@ tol_0 = 1E-6
     include("data_tests.jl")
     include("qc_model_tests.jl")
     include("relaxations_tests.jl")
+    include("depth_aware_tests.jl")
 end

@@ -14,7 +14,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
          msg = results["termination_status"] == MOI.TIME_LIMIT ? 
                "Optimizer hits time limit with an infeasible primal status. Gate decomposition may be inaccurate" : 
                "Infeasible primal status. Gate decomposition may be inaccurate"
-         Memento.warn(_LOGGER, msg)
+         @_warn(msg)
          return
      end
     
@@ -63,8 +63,29 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         QCO.print_circuit(cirq_postcompress_depth < cirq_precompress_depth ? cirq_postcompress : cirq_precompress, data["num_qubits"])
         printstyled("\n")
         
-        if data["decomposition_type"] == "approximate"
+        if data["decomposition_type"] in ["approximate", "infinity-approximate", "sum-approximate"]
+
+            max_depth    = data["maximum_depth"]
+            n_c          = size(data["gates_real"])[2]
+            n_blocks     = Int(n_c) ÷ 2
+            P            = [0 -1; 1 0]
+            Jc           = kron(Matrix{Float64}(I, n_blocks, n_blocks), P)
+            G_P          = results["solution"]["U_var"][:, :, max_depth]
+            Targ         = data["target_gate"]
+            re_tr        = sum(G_P .* Targ) * 1/ n_c
+            im_tr        = sum(G_P .* (Targ * (-Jc))) * 1/ n_c
+            F            = re_tr^2 + im_tr^2
+
             printstyled("  ","||Decomposition error||₂: ", round(LA.norm(results["solution"]["slack_var"]), digits = 10),"\n"; color = _main_color)
+            printstyled("  ","Fidelity                : ", F ,"\n"; color = _main_color)
+        end
+
+        if data["decomposition_type"] == "fidelity-approximate"
+            printstyled("  ","Fidelity: ", round(results["solution"]["w_fidelity_var"], digits = 10),"\n"; color = _main_color)
+        end
+
+        if data["decomposition_type"] == "linear-fidelity-approximate"
+            printstyled("  ","SQRT(Fidelity): ", round(results["solution"]["c_fidelity_var"], digits = 10),"\n"; color = _main_color)
         end
 
         if data["objective"] == "minimize_depth"
@@ -101,7 +122,7 @@ function visualize_solution(results::Dict{String, Any}, data::Dict{String, Any};
         printstyled("=============================================================================","\n"; color = _main_color)      
 
     else
-        Memento.warn(_LOGGER, "Valid integral feasible solutions could not be found to visualize the solution")
+        @_warn("Valid integral feasible solutions could not be found to visualize the solution")
     end
 
     if gate_sequence
@@ -186,27 +207,17 @@ function kron_layer(
     qubit_idx = 1
     gate_idx  = 1
     
-    while qubit_idx ≤ num_qubits
-        if gate_idx > length(sorted_gates) ||
-           minimum(sorted_gates[gate_idx].qubits) > qubit_idx
-
-            push!(factors, "I")
-            qubit_idx += 1
-            continue
-        end
-
-        # Gate begins at this wire
+    while gate_idx ≤ length(sorted_gates)
+       
         current_gate   = sorted_gates[gate_idx]
         qubit_indices  = collect(current_gate.qubits)
 
         if length(qubit_indices) == 1
-            push!(factors, current_gate.label)
+            push!(factors, string(current_gate.label,"_", qubit_indices[1]))
         else
             push!(factors, string(current_gate.label, "_{", join(qubit_indices, ","), "}"))
         end
 
-        lastq = maximum(qubit_indices)   # largest wire index touched
-        qubit_idx = lastq + 1
         gate_idx  += 1
     end
     
@@ -282,7 +293,7 @@ function compress_circuit(gates::Vector{Gate}, num_qubits::Int)
     full = collect(1:num_qubits)
 
     for g in gates
-        (all(q -> q in full, g.qubits)) || Memento.error(_LOGGER, "Gate $(g.label) uses invalid qubit (n=$num_qubits)")
+        (all(q -> q in full, g.qubits)) || @_error("Gate $(g.label) uses invalid qubit (n=$num_qubits)")
 
         pos = length(layers)+1
         for l = length(layers):-1:1
@@ -327,7 +338,7 @@ function validate_circuit(
     if !valid && error_message
         msg = "Decomposition is not valid: Problem may be infeasible"
         circuit_type !== nothing && (msg = "Decomposition is not valid: Circuit may be infeasible for $circuit_type")
-        Memento.error(_LOGGER, msg)
+        @_error(msg)
     end
     
     return valid
