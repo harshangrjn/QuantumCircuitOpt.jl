@@ -9,6 +9,7 @@ QuantumCircuitOpt.jl Change Log
 - Updated usage, testing, examples, and result documentation.
 - Reduce the size and number of documentation assets.
 - Removed the SC21 reproduction scripts from the examples.
+- Added a research and publications page in docs with paper summaries.
 
 ### v0.6.2
 - Re-implemented post-optimization circuit compression algorithm - generalizes from `2` qubits to `n` qubits, and to gates with angle parameters. 

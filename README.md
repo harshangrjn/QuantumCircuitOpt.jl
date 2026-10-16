@@ -4,7 +4,7 @@
     <img alt="QuantumCircuitOpt.jl" src="docs/src/assets/logo_header_light.png" width="900">
   </picture>
   <br>
-  A Julia Package for Optimal Quantum Circuit Design
+  Hardware-Aware Optimal Quantum Circuit Compiler
 </h1>
 
 [![CI](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml)
@@ -12,9 +12,9 @@
 [![Codecov](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/master)
 [![Latest release](https://img.shields.io/github/v/release/harshangrjn/QuantumCircuitOpt.jl)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/releases/latest)
 
-**QuantumCircuitOpt** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of an architecture for quantum circuits. While programming quantum computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. Now, this package also supports multi-qubit gates in the elementary gates set, such as the [global rotation](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/multi_qubit_gates/#GRGate) gate. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to ten qubits_.
+**QuantumCircuitOpt.jl** is an open-source Julia/JuMP framework for hardware-aware, _provably optimal quantum circuit compilation_. Given a target quantum operation arising from a quantum algorithm or subroutine, specified by its unitary, and a user-defined set of elementary gates and allowed qubit interactions, the package synthesizes exact/optimal (including equivalence up to global phase) or approximate quantum circuit implementations. Using mixed-integer and discrete optimization, it can certify optimality for objectives such as circuit depth and resource counts, including CNOT and T gates.
 
-Overall, QuantumCircuitOpt can be a useful tool for researchers and developers working on quantum algorithms or quantum computing applications, as it can help to reduce the resource requirements of quantum computations, making them more practical and efficient.
+QuantumCircuitOpt supports single-, two-, and multi-qubit gates, including global rotations native to atomic quantum computing platforms. The framework enables researchers, quantum compiler developers, and hardware designers to evaluate native gate sets, benchmark heuristic circuit-synthesis algorithms, and explore resource-efficient implementations of quantum operations. Its mathematical optimality guarantees provide rigorous benchmarks for both near-term and fault-tolerant quantum computing.
 
 ## Installation
 
@@ -94,33 +94,8 @@ Research award. The primary developer is
 
 ## Citing QuantumCircuitOpt
 
-If you find QuantumCircuitOpt useful in your work, we request you to cite the following paper ([IEEE link](https://doi.org/10.1109/QCS54837.2021.00010), [arXiv link](https://arxiv.org/abs/2111.11674)):
-
-```bibtex
-@inproceedings{QCOpt_SC2021,
-  title={{QuantumCircuitOpt}: An Open-source Framework for Provably Optimal Quantum Circuit Design},
-  author={Nagarajan, Harsha and Lockwood, Owen and Coffrin, Carleton},
-  booktitle={SC21: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
-  series={Second Workshop on Quantum Computing Software},
-  pages={55--63},
-  year={2021},
-  doi={10.1109/QCS54837.2021.00010},
-  organization={IEEE Computer Society}
-}
-```
-
-A detailed version of the mixed-integer programming framework is
-available in this [paper](https://arxiv.org/abs/2510.00649):
-
-```bibtex
-@misc{nagarajan2025provably,
-  title={Provably Optimal Quantum Circuits with Mixed-Integer Programming},
-  author={Nagarajan, Harsha and Szabó, Zsolt},
-  year={2025},
-  eprint={2510.00649},
-  archivePrefix={arXiv},
-  url={https://arxiv.org/abs/2510.00649},
-}
-```
-
-Another publication which explores the potential of non-linear programming formulations in QuantumCircuitOpt is the following: [IEEE link](https://doi.org/10.1109/QCS56647.2022.00009), [arXiv link](https://arxiv.org/abs/2310.18281).
+If you find QuantumCircuitOpt useful in your work, please cite the publication(s)
+most relevant to your use of the package. Our
+[Research & Publications](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/research/)
+page provides a chronological overview of the research, brief descriptions,
+paper links, and copyable BibTeX citations.

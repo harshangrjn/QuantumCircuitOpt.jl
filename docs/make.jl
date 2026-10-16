@@ -7,7 +7,7 @@ makedocs(
     checkdocs = :exports,
     format = Documenter.HTML(
         mathengine = Documenter.MathJax(),
-        assets = ["assets/extra_styles.css"],
+        assets = ["assets/extra_styles.css", "assets/publications.js"],
         prettyurls = get(ENV, "CI", "false") == "true",
         sidebar_sitename = false,
     ),
@@ -22,6 +22,7 @@ makedocs(
             "Multi-qubit gates" => "multi_qubit_gates.md",
         ],
         "Function References" => "function_references.md",
+        "Research & Publications" => "research.md",
     ],
 )
 
