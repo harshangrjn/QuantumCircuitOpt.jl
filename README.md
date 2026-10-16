@@ -72,10 +72,11 @@ cd QuantumCircuitOpt.jl
 julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 ```
 
-## Video Links
+## Presentations
 
-For more technical details about the package, check out these video links:
+For more technical details about the package, see these presentations:
 
+- May 2024: [CPAIOR 2024 Master Class slide deck](https://github.com/astra-uu-se/cpaior2024-masterclass/blob/main/lecture-4-nagarajan.pdf) on how emerging quantum computing technology can impact Constraint Programming (CP), Artificial Intelligence (AI), and Operations Research (OR), and vice versa.
 - November 2022: Presentation [link](https://vimeo.com/771366943/01810daa4e) from the [Third Quantum Computing Software Workshop](https://sc22.supercomputing.org/session/?sess=sess423), held in conjunction with the International Conference on Super Computing ([SC22](https://sc22.supercomputing.org)).
 - July 2022: Presentation [link](https://www.youtube.com/watch?v=OeONXwD4JJY) from the [JuliaCon 2022](https://pretalx.com/juliacon-2022/talk/KJTGC3/) conference.
 - November 2021: Presentation [link](https://www.youtube.com/watch?v=sf1HJW5Vmio) from the [Second Quantum Computing Software Workshop](https://sc21.supercomputing.org/session/?sess=sess345), held in conjunction with the International Conference on Super Computing ([SC21](https://sc21.supercomputing.org)).

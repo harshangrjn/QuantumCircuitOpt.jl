@@ -23,7 +23,13 @@ depth, CNOT count, and T-gate count.
 <img width="550" class="display-dark-only" src="../assets/QCOpt_framework_dark.png" alt="QuantumCircuitOpt workflow"/>
 ```
 
-## Video tutorials
+## Presentations
+
+- May 2024: The
+  [CPAIOR 2024 Master Class slide deck](https://github.com/astra-uu-se/cpaior2024-masterclass/blob/main/lecture-4-nagarajan.pdf)
+  discusses how emerging quantum computing technology can impact Constraint
+  Programming (CP), Artificial Intelligence (AI), and Operations Research
+  (OR), and vice versa.
 
 - November 2022: Presentation [link](https://vimeo.com/771366943/01810daa4e)
   from the [Third Quantum Computing Software Workshop](https://sc22.supercomputing.org/session/?sess=sess423),
