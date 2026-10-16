@@ -73,44 +73,9 @@ Research award. The primary developer is
 ([@harshangrjn](https://github.com/harshangrjn)).
 
 ## Citing QuantumCircuitOpt
-If you find QuantumCircuitOpt useful in your work, we request you to cite the following publication ([IEEE link](https://doi.org/10.1109/QCS54837.2021.00010), [arXiv link](https://arxiv.org/abs/2111.11674)):  
-```bibtex
-@inproceedings{NagarajanLockwoodCoffrin2021,
-  title={{QuantumCircuitOpt}: An Open-source Framework for Provably Optimal Quantum Circuit Design},
-  author={Nagarajan, Harsha and Lockwood, Owen and Coffrin, Carleton},
-  booktitle={SC21: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
-  series={Second Workshop on Quantum Computing Software},
-  pages={55--63},
-  year={2021},
-  doi={10.1109/QCS54837.2021.00010},
-  organization={IEEE Computer Society}
-}
-```
-A detailed version of the mixed-integer programming framework is
-available in this [paper](https://arxiv.org/abs/2510.00649):
 
-```bibtex
-@misc{nagarajan2025provablyoptimalquantumcircuits,
-  title={Provably Optimal Quantum Circuits with Mixed-Integer Programming},
-  author={Harsha Nagarajan and Zsolt Szabó},
-  year={2025},
-  eprint={2510.00649},
-  archivePrefix={arXiv},
-  primaryClass={quant-ph},
-  url={https://arxiv.org/abs/2510.00649},
-}
-```
-
-Another publication which explores the potential of non-linear programming formulations in the QuantumCircuitOpt package is the following ([IEEE link](https://doi.org/10.1109/QCS56647.2022.00009), [arXiv link](https://arxiv.org/abs/2310.18281)): 
-```bibtex
-@inproceedings{HendersonNagarajanCoffrin2022,
-  title={Exploring Non-linear Programming Formulations in {QuantumCircuitOpt} for Optimal Circuit Design},
-  author={Henderson. R, Elena and Nagarajan, Harsha and Coffrin, Carleton},
-  booktitle={SC22: The International Conference for High Performance Computing, Networking, Storage, and Analysis},
-  series={Third Workshop on Quantum Computing Software},
-  pages={36--42},
-  year={2022},
-  doi={10.1109/QCS56647.2022.00009},
-  organization={IEEE Computer Society}
-}
-```
+If you find QuantumCircuitOpt useful in your work, please cite the publication(s)
+most relevant to your use of the package. The [Research & Publications](@ref)
+page presents the original software paper, subsequent nonlinear-programming
+research, and the detailed mixed-integer programming framework in chronological
+order, with paper links, and copyable BibTeX citations.
