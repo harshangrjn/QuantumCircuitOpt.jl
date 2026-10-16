@@ -95,7 +95,6 @@ Research award. The primary developer is
 ## Citing QuantumCircuitOpt
 
 If you find QuantumCircuitOpt useful in your work, please cite the publication(s)
-most relevant to your use of the package. Our
-[Research & Publications](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/research/)
-page provides a chronological overview of the research, brief descriptions,
-paper links, and copyable BibTeX citations.
+most relevant to your use of the package. [Research & Publications](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/research/)
+page provides a chronological overview of the research, paper links, 
+and copyable BibTeX citations.
