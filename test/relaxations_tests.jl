@@ -1,6 +1,6 @@
 @testset "Relaxation tests: relaxation_bilinear" begin
     QCO.silence()
-    
+
     m = JuMP.Model(MIP_SOLVER)
 
     LB = [-1, -2.5, 0, -3, 0]
@@ -18,8 +18,8 @@
     JuMP.@constraint(m, sum(x) >= 3.3)
     JuMP.@constraint(m, sum(x) <= 3.8)
 
-    coefficients =  [0.4852, -0.7795, 0.1788, 0.7778, 0.3418, -0.3407]
-    JuMP.set_objective_function(m, sum(coefficients[i] * z[i] for i=1:length(z)))
+    coefficients = [0.4852, -0.7795, 0.1788, 0.7778, 0.3418, -0.3407]
+    JuMP.set_objective_function(m, sum(coefficients[i] * z[i] for i = 1:length(z)))
 
     obj_vals = Vector{Float64}()
 
@@ -29,8 +29,8 @@
         @test JuMP.termination_status(m) == MOI.OPTIMAL
         push!(obj_vals, JuMP.objective_value(m))
     end
-    
+
     @test obj_vals[1] <= -9.922644 # global optimum value
-    @test obj_vals[2] >=  4.908516 # global optimum value
+    @test obj_vals[2] >= 4.908516 # global optimum value
 
 end

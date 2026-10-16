@@ -1,10 +1,17 @@
 #-----------------------------------------------------------#
-# Build optimization model for circuit decomsposition here  #
+# Build optimization model for circuit decomposition here   #
 #-----------------------------------------------------------#
 import JuMP: MOI
 
-function build_QCModel(data::Dict{String, Any}; options = nothing)
-    
+"""
+    build_QCModel(data::Dict{String,Any}; options = nothing)
+
+Build and return a [`QuantumCircuitModel`](@ref) from processed circuit `data`.
+Pass a `Dict{Symbol,Any}` as `options` to override values returned by
+[`get_default_options`](@ref).
+"""
+function build_QCModel(data::Dict{String,Any}; options = nothing)
+
     m_qc = QCO.QuantumCircuitModel(data)
 
     # Update defaults to user-defined options
@@ -17,13 +24,13 @@ function build_QCModel(data::Dict{String, Any}; options = nothing)
     QCO._catch_options_errors(m_qc)
 
     # convex-hull formulation per depth, but larger number of variables and constraints
-    if m_qc.options.model_type == "balas_formulation" 
+    if m_qc.options.model_type == "balas_formulation"
         QCO.variable_QCModel_balas(m_qc)
         QCO.constraint_QCModel_balas(m_qc)
-        
-    # minimal variables and constraints, but not a convex-hull formulation per depth
-    elseif m_qc.options.model_type == "compact_formulation" 
-        QCO.variable_QCModel_compact(m_qc)                                    
+
+        # minimal variables and constraints, but not a convex-hull formulation per depth
+    elseif m_qc.options.model_type == "compact_formulation"
+        QCO.variable_QCModel_compact(m_qc)
         QCO.constraint_QCModel_compact(m_qc)
     end
 
@@ -50,7 +57,7 @@ function variable_QCModel_balas(qcm::QuantumCircuitModel)
 end
 
 function constraint_QCModel_balas(qcm::QuantumCircuitModel)
-    
+
     QCO.constraint_single_gate_per_depth(qcm)
     QCO.constraint_gates_onoff_per_depth(qcm)
     QCO.constraint_initial_gate_condition(qcm)
@@ -58,7 +65,8 @@ function constraint_QCModel_balas(qcm::QuantumCircuitModel)
     QCO.constraint_gate_product_linearization(qcm)
     QCO.constraint_target_gate_condition(qcm)
     QCO.constraint_cnot_gate_bounds(qcm)
-    (qcm.data["decomposition_type"] == "approximate") && (QCO.constraint_slack_var_outer_approximation(qcm))
+    (qcm.data["decomposition_type"] == "approximate") &&
+        (QCO.constraint_slack_var_outer_approximation(qcm))
     (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm))
 
     QCO.constraint_QCModel_valid(qcm)
@@ -86,10 +94,10 @@ function variable_QCModel_valid(qcm::QuantumCircuitModel)
 
     if qcm.options.all_valid_constraints != -1
 
-        if qcm.options.all_valid_constraints == 1 
+        if qcm.options.all_valid_constraints == 1
             QCO.variable_binary_products(qcm)
-            
-        elseif qcm.options.all_valid_constraints == 0 
+
+        elseif qcm.options.all_valid_constraints == 0
             qcm.options.unitary_constraints && QCO.variable_binary_products(qcm)
         end
 
@@ -106,13 +114,14 @@ function constraint_QCModel_compact(qcm::QuantumCircuitModel)
     QCO.constraint_gate_product_linearization(qcm)
 
     if qcm.data["decomposition_type"] == "optimal_global_phase"
-        QCO.constraint_target_gate_condition_glphase(qcm)  
-    else 
+        QCO.constraint_target_gate_condition_glphase(qcm)
+    else
         QCO.constraint_target_gate_condition_compact(qcm)
     end
-    
+
     QCO.constraint_cnot_gate_bounds(qcm)
-    (qcm.data["decomposition_type"] == "approximate") && (QCO.constraint_slack_var_outer_approximation(qcm))
+    (qcm.data["decomposition_type"] == "approximate") &&
+        (QCO.constraint_slack_var_outer_approximation(qcm))
 
     # (!qcm.data["are_gates_real"]) && (QCO.constraint_complex_to_real_symmetry(qcm)) # seems to slow down MIP run times
 
@@ -125,7 +134,7 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
 
     if qcm.options.all_valid_constraints != -1
 
-        if qcm.options.all_valid_constraints == 1 
+        if qcm.options.all_valid_constraints == 1
             QCO.constraint_commutative_gate_pairs(qcm)
             QCO.constraint_involutory_gates(qcm)
             QCO.constraint_redundant_gate_product_pairs(qcm)
@@ -134,16 +143,21 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
             QCO.constraint_convex_hull_complex_gates(qcm)
             QCO.constraint_unitary_property(qcm)
             QCO.constraint_unitary_complex_conjugate(qcm)
-            
-        elseif qcm.options.all_valid_constraints == 0 
-            qcm.options.commute_gate_constraints            && QCO.constraint_commutative_gate_pairs(qcm)
-            qcm.options.involutory_gate_constraints         && QCO.constraint_involutory_gates(qcm)
-            qcm.options.redundant_gate_pair_constraints     && QCO.constraint_redundant_gate_product_pairs(qcm)
-            qcm.options.idempotent_gate_constraints         && QCO.constraint_idempotent_gates(qcm)
-            qcm.options.identity_gate_symmetry_constraints  && QCO.constraint_identity_gate_symmetry(qcm)
-            qcm.options.convex_hull_gate_constraints        && QCO.constraint_convex_hull_complex_gates(qcm)
-            qcm.options.unitary_constraints                 && QCO.constraint_unitary_property(qcm)
-            (qcm.options.unitary_complex_conjugate > 0)     && QCO.constraint_unitary_complex_conjugate(qcm)
+
+        elseif qcm.options.all_valid_constraints == 0
+            qcm.options.commute_gate_constraints &&
+                QCO.constraint_commutative_gate_pairs(qcm)
+            qcm.options.involutory_gate_constraints && QCO.constraint_involutory_gates(qcm)
+            qcm.options.redundant_gate_pair_constraints &&
+                QCO.constraint_redundant_gate_product_pairs(qcm)
+            qcm.options.idempotent_gate_constraints && QCO.constraint_idempotent_gates(qcm)
+            qcm.options.identity_gate_symmetry_constraints &&
+                QCO.constraint_identity_gate_symmetry(qcm)
+            qcm.options.convex_hull_gate_constraints &&
+                QCO.constraint_convex_hull_complex_gates(qcm)
+            qcm.options.unitary_constraints && QCO.constraint_unitary_property(qcm)
+            (qcm.options.unitary_complex_conjugate > 0) &&
+                QCO.constraint_unitary_complex_conjugate(qcm)
         end
 
     end
@@ -152,9 +166,9 @@ function constraint_QCModel_valid(qcm::QuantumCircuitModel)
 end
 
 function objective_QCModel(qcm::QuantumCircuitModel)
-    
+
     if qcm.data["objective"] == "minimize_depth"
-        QCO.objective_minimize_total_depth(qcm)        
+        QCO.objective_minimize_total_depth(qcm)
     elseif qcm.data["objective"] == "minimize_cnot"
         QCO.objective_minimize_specific_gates(qcm, "cnot_gate")
     elseif qcm.data["objective"] == "minimize_T"
@@ -164,9 +178,14 @@ function objective_QCModel(qcm::QuantumCircuitModel)
     return
 end
 
-""
-function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
-    
+"""
+    optimize_QCModel!(qcm::QuantumCircuitModel; optimizer = nothing)
+
+Optimize `qcm` with an optional JuMP optimizer and return the result dictionary.
+The optimizer may be omitted when the underlying JuMP model already has one.
+"""
+function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer = nothing)
+
     if qcm.options.relax_integrality
         JuMP.relax_integrality(qcm.model)
     end
@@ -175,7 +194,9 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
         if JuMP.backend(qcm.model).optimizer === nothing
             JuMP.set_optimizer(qcm.model, optimizer)
         else
-            Memento.warn(_LOGGER, "Model already contains optimizer, cannot use optimizer specified in `optimize_QCModel!`")
+            @_warn(
+                "Model already contains optimizer, cannot use optimizer specified in `optimize_QCModel!`",
+            )
         end
     end
 
@@ -186,9 +207,9 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
     end
 
     if JuMP.mode(qcm.model) != JuMP.DIRECT && JuMP.backend(qcm.model).optimizer === nothing
-        Memento.error(_LOGGER, "No optimizer specified in `optimize_QCModel!` or the given JuMP model.")
+        @_error("No optimizer specified in `optimize_QCModel!` or the given JuMP model.",)
     end
-    
+
     start_time = time()
 
     _, solve_time, solve_bytes_alloc, sec_in_gc = @timed JuMP.optimize!(qcm.model)
@@ -196,19 +217,30 @@ function optimize_QCModel!(qcm::QuantumCircuitModel; optimizer=nothing)
     try
         solve_time = JuMP.solve_time(qcm.model)
     catch
-        Memento.warn(_LOGGER, "The given optimizer does not provide the SolveTime() attribute, falling back on @timed.  This is not a rigorous timing value.");
+        @_warn(
+            "The given optimizer does not provide the SolveTime() attribute, falling back on @timed.  This is not a rigorous timing value.",
+        )
     end
-    
-    Memento.debug(_LOGGER, "JuMP model optimize time: $(time() - start_time)")
-    
-    qcm.result = QCO.build_QCModel_result(qcm, solve_time) 
+
+    @_debug("JuMP model optimize time: $(time() - start_time)")
+
+    qcm.result = QCO.build_QCModel_result(qcm, solve_time)
 
     return qcm.result
 end
 
-function run_QCModel(params::Dict{String, Any}, 
-                     qcm_optimizer::MOI.OptimizerWithAttributes; 
-                     options = nothing)
+"""
+    run_QCModel(params::Dict{String,Any}, optimizer::MOI.OptimizerWithAttributes;
+                options = nothing)
+
+Process circuit `params`, build and optimize the quantum-circuit model, and
+return its result dictionary. `options` overrides model defaults.
+"""
+function run_QCModel(
+    params::Dict{String,Any},
+    qcm_optimizer::MOI.OptimizerWithAttributes;
+    options = nothing,
+)
 
     data = QCO.get_data(params)
 
@@ -217,12 +249,12 @@ function run_QCModel(params::Dict{String, Any},
     result_qc = QCO.optimize_QCModel!(model_qc, optimizer = qcm_optimizer)
 
     if model_qc.options.relax_integrality
-        if result_qc["primal_status"] == MOI.FEASIBLE_POINT 
-            Memento.info(_LOGGER, "Integrality-relaxed solutions can be found in the results dictionary")
+        if result_qc["primal_status"] == MOI.FEASIBLE_POINT
+            @_info("Integrality-relaxed solutions can be found in the results dictionary",)
         else
-            Memento.info(_LOGGER, "Infeasible primal status for the integrality-relaxed problem")
+            @_info("Infeasible primal status for the integrality-relaxed problem",)
         end
-    else 
+    else
         if model_qc.options.visualize_solution
             QCO.visualize_solution(result_qc, data)
         end
@@ -236,14 +268,16 @@ function set_option(qcm::QuantumCircuitModel, s::Symbol, val)
 end
 
 function _catch_options_errors(qcm::QuantumCircuitModel)
-    
+
     if !(qcm.options.model_type in ["compact_formulation", "balas_formulation"])
-        Memento.warn(_LOGGER, "Invalid model_type. Setting it to default value (compact_formulation).")
+        @_warn("Invalid model_type. Setting it to default value (compact_formulation).",)
         QCO.set_option(qcm, :model_type, "compact_formulation")
     end
 
-    if !(qcm.options.all_valid_constraints in [-1,0,1])
-        Memento.warn(_LOGGER, "Invalid all_valid_constraints; choose a value ∈ [-1,0,1]. Setting it to default value of 0.")
+    if !(qcm.options.all_valid_constraints in [-1, 0, 1])
+        @_warn(
+            "Invalid all_valid_constraints; choose a value ∈ [-1,0,1]. Setting it to default value of 0.",
+        )
         QCO.set_option(qcm, :all_valid_constraints, 0)
     end
 

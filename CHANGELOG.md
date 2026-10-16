@@ -1,6 +1,15 @@
 QuantumCircuitOpt.jl Change Log
 ===============================
 
+### v0.6.3
+- Updated package compatibility bounds.
+- Replace Memento with standard-library julia logging.
+- Update GitHub Actions, CI, Codecov, documentation, and Pages deployment.
+- Fix broken Documenter setup.
+- Updated usage, testing, examples, and result documentation.
+- Reduce the size and number of documentation assets.
+- Removed the SC21 reproduction scripts from the examples.
+
 ### v0.6.2
 - Re-implemented post-optimization circuit compression algorithm - generalizes from `2` qubits to `n` qubits, and to gates with angle parameters. 
 - Re-implemented `kron_layer` with a left-to-right wire scanner. It prints minimal tensor expressions (`CNot_{1,2}`, `X ⊗ X`) with `⊗ I` factors for any register size.
@@ -42,7 +51,7 @@ QuantumCircuitOpt.jl Change Log
 - Updated arXiv link for SC22 paper
 
 ### v0.5.7
-- Clean up in log.jl to validate circuit decomposition upto global phase
+- Clean up in log.jl to validate circuit decomposition up to global phase
 - Added `parametrized_hermitian_gates` in examples
 
 ### v0.5.6
@@ -53,7 +62,7 @@ QuantumCircuitOpt.jl Change Log
 - Docs updated with the SC22 (IEEE) paper link
 - Added `isapprox_global_phase` utility to evaluate equivalences of any two complex gates up to a global phase
 - Updated docs and unit tests to reflect above changes
-- Removed compatability on Pkg
+- Removed compatibility with Pkg
 
 ### v0.5.4
 - Added a generalized function to obtain controlled gates (`controlled_gate()`) in any number of qubits
@@ -69,8 +78,8 @@ QuantumCircuitOpt.jl Change Log
 - Renamed gates in `src/examples` folder
 
 ### v0.5.1
-- New feature: Added support for compiling optimal circuits upto a global phase using linear constraints (`optimal_global_phase`)
-- Deactivated determinant feasiblity check for global phase model
+- New feature: Added support for compiling optimal circuits up to a global phase using linear constraints (`optimal_global_phase`)
+- Deactivated determinant feasibility check for global phase model
 - Bug fix in evaluation of kron-symboled elementary gates (#63)
 - `get_full_sized_gate` function now supports gates with kronecker operations
 - Updated docs and unit tests to reflect above changes
@@ -87,17 +96,17 @@ QuantumCircuitOpt.jl Change Log
 
 ### v0.4.1
 - Added support for returning exact feasible decomposition (without optimality certificate) using `exact_feasible`
-- Added support for unitary constraints using binary linearizations (speeds up feasiblity problems)
+- Added support for unitary constraints using binary linearizations (speeds up feasibility problems)
 - Added `W_using_HSTCnot` in examples
 - Added `CNOT_using_GR` in examples (for Rydberg atom array-based simulators)
 - Added support for `CSGate`, `CSdaggerGate`, `CTGate`, `CTdaggerGate` and `SSwapGate` (sqrt(`SwapGate`))
 - Dropped support for `CZRevGate` as it is invariant to qubit flip
-- Updated README and docs with the Youtube link for the JuliaCon's presentation
+- Updated README and docs with the YouTube link for the JuliaCon presentation
 - Updated `decomposition_type` to `exact_optimal` from `exact`
 - Updated docs and unit tests to reflect above changes
 
 ### v0.4.0
-- Added support for two angle param gates througout data and log
+- Added support for two-angle parameter gates throughout data and log
 - Added support for Rotation gate (`RGate`) with two angle params
 - Added support for multi-qubit gates with angle params
 - Added support for Global R gate (`GRGate`) with two angle params
@@ -115,7 +124,7 @@ QuantumCircuitOpt.jl Change Log
 - Dropped support for redundant `constraint_complex_to_real_symmetry_compact` function
 - Added unit magnitude (outer-approximation) constraints for unitary variables
 - Updated docs and unit tests to reflect above changes
-- Updated README.md and docs with the Youtube link for the SC21 presentation
+- Updated README.md and docs with the YouTube link for the SC21 presentation
 - Added support for JuMP v0.22+
 - Dropped explicit support for MathOptInterface
 
@@ -154,7 +163,7 @@ QuantumCircuitOpt.jl Change Log
 - Issue #37 fixed and more meaningful messages for input gate parsing
 - Updated unit tests to cover `convex_hull` function
 - Bug fix in `_get_cnot_idx` to account for gates with kronecker symbols
-- Inculded `CXGate` for evaluation of `_get_cnot_idx` in `data.jl`
+- Included `CXGate` for evaluation of `_get_cnot_idx` in `data.jl`
 - Separate files added in the `examples` folder for SC21 paper's results
 - Options to add lower and upper bounds on number of CNOT gates in user-defined `params`
 - User-specified "depth" changed to "maximum_depth"
@@ -165,7 +174,7 @@ QuantumCircuitOpt.jl Change Log
 - Major clean up in `data.jl` including generalized parsing in `get_full_sized_gate` and `get_full_sized_kron_gate` functions
 - Clean up of `log.jl` to make it generic and consistent with above changes 
 - Enabling support for convex hull-based cuts on complex variables at every depth (improved run times in CPLEX, default = turned off)
-- Added `constraint_convex_hull_complex_gates` function in support with depndency of QHull.jl 
+- Added `constraint_convex_hull_complex_gates` function with a dependency on QHull.jl
 - Added `round_real_value` function and cleaned up `round_complex_values` in `utility.jl`
 - Added toffoli-left block and toffoli-right block decompositions to `3qubit_gates.jl`
 - Update `is_multi_qubit_gate` function to make it generic to any gate type
@@ -191,7 +200,7 @@ QuantumCircuitOpt.jl Change Log
 - Updated unit tests on involutory gates
 
 ### v0.2.1
-- Framework updates which support upto *nine* qubit circuit decompositions
+- Framework updates which support up to *nine* qubit circuit decompositions
 - Generalizing and condensing `kron_single_qubit_gate` function to handle any number of integer-valued qubits in `src/utility.jl`
 - Generalizing and condensing `kron_two_qubit_gate` function to handle any number of integer-valued qubits without explicit enumeration in `src/utility.jl`. Also, computes slightly faster with lesser memory on larger qubits than the previous version
 - Docs updates for missing inputs options
@@ -200,8 +209,8 @@ QuantumCircuitOpt.jl Change Log
 - Minor clean ups and removal of redundant functions in `src/data.jl`
 
 ### v0.2.0
-- MAJOR framework updates which support gates upto *five* qubit gates. Framework is now flexible to generalize it to even larger qubit circuits, by updating functions `kron_single_qubit_gate` and `kron_two_qubit_gate`
-- Bug fixes and major re-factoring of `src/data.jl` to support any permutation of gates on qubits 
+- MAJOR framework updates which support gates up to *five* qubit gates. Framework is now flexible to generalize it to even larger qubit circuits, by updating functions `kron_single_qubit_gate` and `kron_two_qubit_gate`
+- Bug fixes and major refactoring of `src/data.jl` to support any permutation of gates on qubits
 - Enabling Controlled-R (CRX, CRY, CRZ) and Controlled-U3 (CU3) gates
 - Adding functions to data.jl that are the equivalent of the single-qubit ones (e.g. get_all_CR_gates)
 - Enabling this functionality in the log.jl
@@ -271,4 +280,4 @@ QuantumCircuitOpt.jl Change Log
 - Support for 2- and 3-qubit decompositions
 - Added preliminary documentation 
 - Added preliminary unit tests
-- Github Actions set-up
+- GitHub Actions set-up

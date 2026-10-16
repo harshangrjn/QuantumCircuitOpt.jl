@@ -10,15 +10,17 @@ References
 - https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
 """
 
-function convex_hull(ps::Vector{T}) where T<:Tuple{Number,Number}
-    isempty(ps) && Memento.error(_LOGGER, "At least one point is necessary for evaluating the convex hull")
+function convex_hull(ps::Vector{T}) where {T<:Tuple{Number,Number}}
+    isempty(ps) &&
+        @_error("At least one point is necessary for evaluating the convex hull",)
     pts = sort(ps)
     length(pts) ≤ 2 && return pts   # trivial hulls
 
     # cross‐product: >0 ⇒ left turn
     cross(a::T, b::T, c::T) = (b[1]-a[1])*(c[2]-a[2]) - (b[2]-a[2])*(c[1]-a[1])
 
-    lower = T[]; upper = T[]
+    lower = T[]
+    upper = T[]
     for p in pts
         while length(lower) ≥ 2 && cross(lower[end-1], lower[end], p) ≤ 0
             pop!(lower)
@@ -32,7 +34,8 @@ function convex_hull(ps::Vector{T}) where T<:Tuple{Number,Number}
         push!(upper, p)
     end
 
-    pop!(lower); pop!(upper)   # remove duplicate endpoints
+    pop!(lower)
+    pop!(upper)   # remove duplicate endpoints
     vcat(lower, upper)         # full CCW hull
 end
 
@@ -78,14 +81,14 @@ end
 #     num_points = size(points)[1]
 
 #     if num_points == 0
-#         Memento.error(_LOGGER, "Atleast one point is necessary for evaluating the convex hull")
+#         @_error("Atleast one point is necessary for evaluating the convex hull")
 #     elseif num_points <= 2 
 #         return points
 #     end
 
 #     min_y = points[1][2]
 #     min = 1
-    
+
 #     # Bottom-most or else the left-most point when tie
 #     for i in 2:num_points
 #         y = points[i][2]
@@ -94,7 +97,7 @@ end
 #             min = i
 #         end
 #     end
-    
+
 #     # Placing the bottom/left-most point at first position
 #     points[1], points[min] = points[min], points[1]
 
@@ -120,13 +123,13 @@ end
 #     append!(chull, [points[1]])
 #     append!(chull, [points[2]])
 #     append!(chull, [points[3]])
-    
+
 #     for i in 4:(arr_size-1)
 #         while (size(chull)[1] > 1) && (QCO._orientation(chull[end - 1], chull[end], points[i]) != 2)
 #             pop!(chull)
 #         end
 #         append!(chull, [points[i]])
 #     end
-    
+
 #     return chull
 # end

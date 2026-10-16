@@ -1,50 +1,60 @@
 name: CI
+
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.version == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
         version:
-          - '1'
           - '1.10'
+          - '1'
         os:
           - ubuntu-latest
-          - macOS-latest
+          - macos-15
           - windows-latest
-        arch:
-          - x64
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
+      - uses: actions/checkout@v7
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
-          arch: ${{ matrix.arch }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         env:
-          cache-name: cache-artifacts
+          cache-name: julia
         with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          path: |
+            ~/.julia/artifacts
+            ~/.julia/compiled
+            ~/.julia/packages
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}-${{ env.cache-name }}-${{ hashFiles('Project.toml') }}
           restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+            ${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}-${{ env.cache-name }}-
+            ${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}-
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
         with:
           depwarn: error
-      - uses: julia-actions/julia-buildpkg@latest
-        continue-on-error: ${{ matrix.version == 'nightly' }}
-      - uses: julia-actions/julia-runtest@latest
-        continue-on-error: ${{ matrix.version == 'nightly' }}
-      - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v5
+          coverage: ${{ matrix.version == '1' && matrix.os == 'ubuntu-latest' }}
+      - if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
+        uses: julia-actions/julia-processcoverage@v1
+      - if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v7
         with:
-          file: lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }}
+          disable_search: true
+          files: lcov.info
+          fail_ci_if_error: true
+          name: QuantumCircuitOpt
+          use_oidc: true
+
+# Coverage is uploaded only by the latest Julia job on Linux.

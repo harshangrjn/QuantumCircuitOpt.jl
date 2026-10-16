@@ -1,7 +1,6 @@
 ```@raw html
-<align="center"/>
-<img width="790px" class="display-light-only" src="assets/docs_header.png" alt="assets/docs_header.png"/>
-<img width="790px" class="display-dark-only" src="assets/docs_header_dark.png" alt="assets/docs_header.png"/>
+<img width="790" class="display-light-only" src="assets/logo_header_light.png" alt="QuantumCircuitOpt.jl"/>
+<img width="790" class="display-dark-only" src="assets/logo_header_dark.png" alt="QuantumCircuitOpt.jl"/>
 ```
 
 # Documentation
@@ -9,22 +8,48 @@
 ```@meta
 CurrentModule = QuantumCircuitOpt
 ```
+
 ## Overview
-**[QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl)** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of an architecture for Quantum circuits. While programming Quantum Computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. Now, this package also supports multi-qubit gates in the elementary gates set, such as the [global rotation](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/multi_qubit_gates/#GRGate) gate which is native to trapped ion quantum computers. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to ten qubits_.
 
-Overall, QuantumCircuitOpt can be a useful tool for researchers and developers working on quantum algorithms or quantum computing applications, as it can help to reduce the resource requirements of quantum computations, making them more practical and efficient.
+**[QuantumCircuitOpt](https://github.com/harshangrjn/QuantumCircuitOpt.jl)** is
+a Julia package that implements discrete optimization methods for provably
+optimal quantum circuit synthesis. Quantum processors expose restricted,
+architecture-dependent native gate sets, so a desired unitary operation must
+be compiled into a sequence of elementary gates that is both functionally
+correct and economical in scarce quantum resources.
 
-## Installation 
-To use QuantumCircuitOpt, first [download and install](https://julialang.org/downloads/) Julia. Note that the current version of QuantumCircuitOpt is compatible with Julia 1.0 and later. 
+Given a target unitary matrix and a set of available elementary gates,
+QuantumCircuitOpt formulates the synthesis problem as a mathematical
+optimization model. It can compute provably optimal exact decompositions (up
+to machine precision), optimal decompositions up to a global phase, or
+approximate decompositions. Supported objectives include minimizing circuit
+depth, CNOT count, and T-gate count.
 
-The latest stable release of QuantumCircuitOpt can be installed by entering the following in the Julia REPL-mode:
+The elementary gate library supports one- and two-qubit gates as well as
+multi-qubit operations such as the [global rotation gate](@ref GRGate), which
+is native to trapped-ion architectures. QuantumCircuitOpt currently supports
+circuit decompositions involving up to ten qubits. By providing optimality
+certificates, it is useful for benchmarking heuristic quantum compilers,
+studying hardware-aware gate sets, and identifying minimum-resource
+implementations of small but important quantum operations.
+
+## Installation
+
+QuantumCircuitOpt requires Julia 1.10 or later. Install the latest registered
+release from the Julia REPL:
 
 ```julia
 import Pkg
 Pkg.add("QuantumCircuitOpt")
 ```
 
-At least one mixed-integer programming (MIP) solver is required for running QuantumCircuitOpt. The well-known [Gurobi](https://github.com/jump-dev/Gurobi.jl) or IBM's [CPLEX](https://github.com/jump-dev/CPLEX.jl) solver is highly recommended, as it is fast, scaleable and can be used to solve on fairly large-scale circuits. However, the open-source MIP solver [HiGHS](https://github.com/jump-dev/HiGHS.jl) is also compatible with QuantumCircuitOpt. Gurobi (or any other MIP solver) can be installed via the package manager with
+At least one JuMP-compatible mixed-integer programming solver is also required.
+[Gurobi](https://github.com/jump-dev/Gurobi.jl) is recommended for difficult
+circuit-synthesis instances; IBM
+[CPLEX](https://github.com/jump-dev/CPLEX.jl) is also supported. The
+open-source [HiGHS](https://github.com/jump-dev/HiGHS.jl) solver is compatible
+with QuantumCircuitOpt, although commercial solvers may be faster on large
+instances. Install Gurobi from the Julia package manager with:
 
 ```julia
 import Pkg
@@ -32,7 +57,8 @@ Pkg.add("Gurobi")
 ```
 
 ## Unit Tests
-To run the tests in the package, run the following command after installing the QuantumCircuitOpt package.
+
+Run the registered package's tests with:
 
 ```julia
 import Pkg
@@ -40,7 +66,11 @@ Pkg.test("QuantumCircuitOpt")
 ```
 
 ## Acknowledgement
-This work was supported by Los Alamos National Laboratory's LDRD Early Career Research award. The primary developer of this package is [Harsha Nagarajan](http://harshanagarajan.com) ([@harshangrjn](https://github.com/harshangrjn)). 
+
+This work was supported by Los Alamos National Laboratory's LDRD Early Career
+Research award. The primary developer is
+[Harsha Nagarajan](https://harshanagarajan.com)
+([@harshangrjn](https://github.com/harshangrjn)).
 
 ## Citing QuantumCircuitOpt
 If you find QuantumCircuitOpt useful in your work, we request you to cite the following publication ([IEEE link](https://doi.org/10.1109/QCS54837.2021.00010), [arXiv link](https://arxiv.org/abs/2111.11674)):  
@@ -56,6 +86,21 @@ If you find QuantumCircuitOpt useful in your work, we request you to cite the fo
   organization={IEEE Computer Society}
 }
 ```
+A detailed version of the mixed-integer programming framework is
+available in this [paper](https://arxiv.org/abs/2510.00649):
+
+```bibtex
+@misc{nagarajan2025provablyoptimalquantumcircuits,
+  title={Provably Optimal Quantum Circuits with Mixed-Integer Programming},
+  author={Harsha Nagarajan and Zsolt Szabó},
+  year={2025},
+  eprint={2510.00649},
+  archivePrefix={arXiv},
+  primaryClass={quant-ph},
+  url={https://arxiv.org/abs/2510.00649},
+}
+```
+
 Another publication which explores the potential of non-linear programming formulations in the QuantumCircuitOpt package is the following ([IEEE link](https://doi.org/10.1109/QCS56647.2022.00009), [arXiv link](https://arxiv.org/abs/2310.18281)): 
 ```bibtex
 @inproceedings{HendersonNagarajanCoffrin2022,

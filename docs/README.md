@@ -1,18 +1,19 @@
 # Documentation for QuantumCircuitOpt
 
-## Installation
-QuantumCircuitOpt's documentation is generated using [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl). To install it, run the following command in a Julia session:
+The documentation is generated with
+[Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
 
-```julia
-Pkg.add("Documenter")
-Pkg.add("DocumenterTools")
+From the repository root, install the documentation dependencies and use the
+local QuantumCircuitOpt checkout:
+
+```sh
+julia --project=docs -e 'using Pkg; VERSION < v"1.11" && Pkg.develop(path="."); Pkg.instantiate()'
 ```
 
 ## Building the Docs
-To preview the `html` output of the documents, run the following command:
 
-```julia
-julia --color=yes make.jl
+```sh
+julia --color=yes --project=docs docs/make.jl
 ```
 
-You can then view the documents in `build/index.html`.
+Open `docs/build/index.html` to preview the result.

@@ -1,24 +1,40 @@
 name: Documentation
+
 on:
   push:
-    branches: [master]
-    tags: '*'
+    branches:
+      - master
+    tags:
+      - '*'
   pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   docs:
-    if: "!contains(github.event.head_commit.message, 'skip ci')"
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@latest
+      - uses: actions/checkout@v7
+      - uses: julia-actions/setup-julia@v3
         with:
           version: '1'
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.julia/artifacts
+            ~/.julia/compiled
+            ~/.julia/packages
+          key: ${{ runner.os }}-${{ runner.arch }}-docs-${{ hashFiles('Project.toml', 'docs/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-docs-
       - name: Install Dependencies
-        run: julia --project=docs -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: julia --project=docs -e 'using Pkg; VERSION < v"1.11" && Pkg.develop(path="."); Pkg.instantiate()'
       - name: Build and Deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-        run: julia --color=yes --project=docs/ docs/make.jl
+        run: julia --color=yes --project=docs docs/make.jl
+
+# Documenter deploys only trusted push and tag builds; pull requests are build-only.

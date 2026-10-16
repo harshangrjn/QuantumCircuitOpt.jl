@@ -1,8 +1,7 @@
 using JuMP
-using Test 
+using Test
 
 import QuantumCircuitOpt as QCO
-import Memento
 import LinearAlgebra as LA
 import HiGHS
 

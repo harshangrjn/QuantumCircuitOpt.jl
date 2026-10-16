@@ -4,42 +4,70 @@ IMPORTANT: a) Update the lists below whenever a 1 or 2 qubit gate is added to th
            added to this file.
 =#
 
-const ONE_QUBIT_GATES_ANGLE_PARAMETERS     = ["U3", "U2", "U1", "R", "RX", "RY", "RZ", "Phase"]
+const ONE_QUBIT_GATES_ANGLE_PARAMETERS = ["U3", "U2", "U1", "R", "RX", "RY", "RZ", "Phase"]
 
-const ONE_QUBIT_GATES_CONSTANTS            = ["Identity", "I", "H", "X", "Y", "Z", "S", 
-                                              "Sdagger", "T", "Tdagger", "SX", "SXdagger"]
+const ONE_QUBIT_GATES_CONSTANTS =
+    ["Identity", "I", "H", "X", "Y", "Z", "S", "Sdagger", "T", "Tdagger", "SX", "SXdagger"]
 
-const TWO_QUBIT_GATES_ANGLE_PARAMETERS     = ["CRX", "CRXRev", "CRY", "CRYRev", "CRZ", "CRZRev", 
-                                              "CU3", "CU3Rev"]
+const TWO_QUBIT_GATES_ANGLE_PARAMETERS =
+    ["CRX", "CRXRev", "CRY", "CRYRev", "CRZ", "CRZRev", "CU3", "CU3Rev"]
 
 # >= 3 qubit gates
-const MULTI_QUBIT_GATES_ANGLE_PARAMETERS   = ["GR"]
+const MULTI_QUBIT_GATES_ANGLE_PARAMETERS = ["GR"]
 
 # >= 2 qubit gates
-const MULTI_CONTROLLED_GATES   = ["MC_gates"]
+const MULTI_CONTROLLED_GATES = ["MC_gates"]
 
 # Gates invariant to qubit flip
-const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC  = ["Swap", "SSwap", "iSwap", "Sycamore", "DCX", "W", "M", "CZ",
-                                              "QFT2", "HCoin", "GroverDiffusion", "CS", "CSdagger", 
-                                              "CT", "CTdagger"]
+const TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC = [
+    "Swap",
+    "fSwap",
+    "SSwap",
+    "iSwap",
+    "Sycamore",
+    "DCX",
+    "W",
+    "M",
+    "CZ",
+    "QFT2",
+    "HCoin",
+    "GroverDiffusion",
+    "CS",
+    "CSdagger",
+    "CT",
+    "CTdagger",
+]
 
 # Gates non-invariant to qubit flip
-const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = ["CNot", "CNotRev", "CX", "CXRev", "CY", "CYRev", 
-                                              "CH", "CHRev", "CV", "CVRev", "CVdagger", 
-                                              "CVdaggerRev", "CSX", "CSXRev"]
+const TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC = [
+    "CNot",
+    "CNotRev",
+    "CX",
+    "CXRev",
+    "CY",
+    "CYRev",
+    "CH",
+    "CHRev",
+    "CV",
+    "CVRev",
+    "CVdagger",
+    "CVdaggerRev",
+    "CSX",
+    "CSXRev",
+]
 
-const ONE_QUBIT_GATES           = union(QCO.ONE_QUBIT_GATES_CONSTANTS, 
-                                        QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS)
+const ONE_QUBIT_GATES =
+    union(QCO.ONE_QUBIT_GATES_CONSTANTS, QCO.ONE_QUBIT_GATES_ANGLE_PARAMETERS)
 
-const TWO_QUBIT_GATES_CONSTANTS = union(QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC, 
-                                        QCO.TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC)
+const TWO_QUBIT_GATES_CONSTANTS =
+    union(QCO.TWO_QUBIT_GATES_CONSTANTS_SYMMETRIC, QCO.TWO_QUBIT_GATES_CONSTANTS_ASYMMETRIC)
 
-const TWO_QUBIT_GATES           = union(QCO.TWO_QUBIT_GATES_CONSTANTS, 
-                                        QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
+const TWO_QUBIT_GATES =
+    union(QCO.TWO_QUBIT_GATES_CONSTANTS, QCO.TWO_QUBIT_GATES_ANGLE_PARAMETERS)
 
 # >= 3 qubit gates
-const MULTI_QUBIT_GATES         = union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS, 
-                                        QCO.MULTI_CONTROLLED_GATES)
+const MULTI_QUBIT_GATES =
+    union(QCO.MULTI_QUBIT_GATES_ANGLE_PARAMETERS, QCO.MULTI_CONTROLLED_GATES)
 
 """
     _catch_gate_name_error()
@@ -48,9 +76,9 @@ Helper function to ensure that the kron_symbol `x` does not appear in any of the
 """
 function _catch_gate_name_error()
     all_gates = union(QCO.ONE_QUBIT_GATES, QCO.TWO_QUBIT_GATES, QCO.MULTI_QUBIT_GATES)
-    
+
     if length(findall(x -> occursin(QCO.kron_symbol, x), all_gates)) > 0
-        Memento.error(_LOGGER, "Avoid the character `$(QCO.kron_symbol)` in the elemetary gate name")
+        @_error("Avoid the character `$(QCO.kron_symbol)` in the elementary gate name",)
     end
 end
 QCO._catch_gate_name_error()
@@ -102,8 +130,12 @@ function U3Gate(θ::Number, ϕ::Number, λ::Number)
     QCO._verify_angle_bounds(ϕ)
     QCO._verify_angle_bounds(λ)
 
-    U3 = Array{Complex{Float64},2}([           cos(θ/2)               -(cos(λ) + (sin(λ))im)*sin(θ/2) 
-                                    (cos(ϕ) + (sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)])
+    U3 = Array{Complex{Float64},2}(
+        [
+            cos(θ/2) -(cos(λ) + (sin(λ))im)*sin(θ/2)
+            (cos(ϕ) + (sin(ϕ))im)*sin(θ/2) (cos(λ+ϕ) + (sin(λ+ϕ))im)*cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(U3)
 end
@@ -125,10 +157,10 @@ U2(\phi, \lambda) = \frac{1}{\sqrt{2}}
 ```
 """
 function U2Gate(ϕ::Number, λ::Number)
-    
+
     θ = π/2
 
-    U2 = QCO.U3Gate(θ, ϕ, λ)    
+    U2 = QCO.U3Gate(θ, ϕ, λ)
     return U2
 end
 
@@ -167,17 +199,21 @@ about the ``\cos(\phi)x + \sin(\phi)y`` axis.
 **Matrix Representation**
 
 ```math
-R(\theta, \phi) =  e^{-i \theta \left(\cos{\phi} x + \sin{\phi} y\right)} =
+R(\theta, \phi) = e^{-i \frac{\theta}{2} \left(\cos{\phi} X + \sin{\phi} Y\right)} =
 \begin{pmatrix}
-    \cos{\theta} & -i e^{-i \phi} \sin{\theta} \\
-    -i e^{i \phi} \sin{\theta} & \cos{\theta}
+    \cos{\frac{\theta}{2}} & -i e^{-i \phi} \sin{\frac{\theta}{2}} \\
+    -i e^{i \phi} \sin{\frac{\theta}{2}} & \cos{\frac{\theta}{2}}
 \end{pmatrix}
 ```
 """
 function RGate(θ::Number, ϕ::Number)
 
-    R = Array{Complex{Float64},2}([cos(θ/2)    -(sin(ϕ) + (cos(ϕ))im)*sin(θ/2) 
-                                  (sin(ϕ) - (cos(ϕ))im)*sin(θ/2)  cos(θ/2)])
+    R = Array{Complex{Float64},2}(
+        [
+            cos(θ/2) -(sin(ϕ) + (cos(ϕ))im)*sin(θ/2)
+            (sin(ϕ) - (cos(ϕ))im)*sin(θ/2) cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(R)
 end
@@ -203,7 +239,7 @@ function RXGate(θ::Number)
     QCO._verify_angle_bounds(θ)
 
     RX = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2))im; -(sin(θ/2))im cos(θ/2)])
-    
+
     return QCO.round_complex_values(RX)
 end
 
@@ -228,7 +264,7 @@ function RYGate(θ::Number)
     QCO._verify_angle_bounds(θ)
 
     RY = Array{Complex{Float64},2}([cos(θ/2) -(sin(θ/2)); (sin(θ/2)) cos(θ/2)])
-    
+
     return QCO.round_complex_values(RY)
 end
 
@@ -253,8 +289,10 @@ function RZGate(θ::Number)
 
     QCO._verify_angle_bounds(θ)
 
-    RZ = Array{Complex{Float64},2}([(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)])
-    
+    RZ = Array{Complex{Float64},2}(
+        [(cos(θ/2) - (sin(θ/2))im) 0; 0 (cos(θ/2) + (sin(θ/2))im)],
+    )
+
     return QCO.round_complex_values(RZ)
 end
 
@@ -536,7 +574,7 @@ CNotRev = \begin{pmatrix}
 ```
 """
 function CNotRevGate()
-    return QCO.multi_controlled_gate(QCO.XGate(), [2], 1, 2) 
+    return QCO.multi_controlled_gate(QCO.XGate(), [2], 1, 2)
 end
 
 @doc raw"""
@@ -565,7 +603,7 @@ DCX = \begin{pmatrix}
 ```
 """
 function DCXGate()
-    return Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 1 0 0; 0 0 1 0]) 
+    return Array{Complex{Float64},2}([1 0 0 0; 0 0 0 1; 0 1 0 0; 0 0 1 0])
 end
 
 @doc raw"""
@@ -593,7 +631,7 @@ CX = \begin{pmatrix}
 ```
 """
 function CXGate()
-    return QCO.multi_controlled_gate(QCO.XGate(), [1], 2, 2)  
+    return QCO.multi_controlled_gate(QCO.XGate(), [1], 2, 2)
 end
 
 @doc raw"""
@@ -622,7 +660,7 @@ CXRev = I \otimes |0 \rangle\langle 0| + X \otimes |1 \rangle\langle 1| = \begin
 ```
 """
 function CXRevGate()
-    return QCO.multi_controlled_gate(QCO.XGate(), [2], 1, 2)   
+    return QCO.multi_controlled_gate(QCO.XGate(), [2], 1, 2)
 end
 
 @doc raw"""
@@ -650,7 +688,7 @@ CY = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Y = \begin{pm
 ```
 """
 function CYGate()
-    return QCO.multi_controlled_gate(QCO.YGate(), [1], 2, 2)  
+    return QCO.multi_controlled_gate(QCO.YGate(), [1], 2, 2)
 end
 
 @doc raw"""
@@ -678,7 +716,7 @@ CYRev = I \otimes |0 \rangle\langle 0| + Y \otimes |1 \rangle\langle 1| = \begin
 ```
 """
 function CYRevGate()
-    return QCO.multi_controlled_gate(QCO.YGate(), [2], 1, 2)  
+    return QCO.multi_controlled_gate(QCO.YGate(), [2], 1, 2)
 end
 
 @doc raw"""
@@ -706,13 +744,13 @@ CZ = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes Z = \begin{pm
 ```
 """
 function CZGate()
-    return QCO.multi_controlled_gate(QCO.ZGate(), [1], 2, 2)  
+    return QCO.multi_controlled_gate(QCO.ZGate(), [1], 2, 2)
 end
 
 @doc raw"""
     CHGate()
 
-Two-qubit, symmetric, controlled Hadamard gate ([HGate](@ref)). 
+Two-qubit controlled Hadamard gate ([HGate](@ref)).
 
 **Circuit Representation**
 ```
@@ -734,7 +772,7 @@ CH = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes H = \begin{pmat
 ```
 """
 function CHGate()
-    return QCO.multi_controlled_gate(QCO.HGate(), [1], 2, 2)  
+    return QCO.multi_controlled_gate(QCO.HGate(), [1], 2, 2)
 end
 
 @doc raw"""
@@ -762,7 +800,7 @@ CHRev = I \otimes |0\rangle\langle 0| + H \otimes |1\rangle\langle 1| = \begin{p
 ```
 """
 function CHRevGate()
-    return QCO.multi_controlled_gate(QCO.HGate(), [2], 1, 2)  
+    return QCO.multi_controlled_gate(QCO.HGate(), [2], 1, 2)
 end
 
 @doc raw"""
@@ -819,7 +857,9 @@ CVRev = \begin{pmatrix}
 ```
 """
 function CVRevGate()
-    return Array{Complex{Float64},2}([1 0 0 0; 0 0.5+0.5im 0 0.5-0.5im; 0 0 1 0; 0 0.5-0.5im 0 0.5+0.5im])
+    return Array{Complex{Float64},2}(
+        [1 0 0 0; 0 0.5+0.5im 0 0.5-0.5im; 0 0 1 0; 0 0.5-0.5im 0 0.5+0.5im],
+    )
 end
 
 @doc raw"""
@@ -848,7 +888,9 @@ CVdagger = \begin{pmatrix}
 """
 function CVdaggerGate()
 
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1 0 0; 0 0 0.5-0.5im 0.5+0.5im; 0 0 0.5+0.5im 0.5-0.5im])
+    return Array{Complex{Float64},2}(
+        [1 0 0 0; 0 1 0 0; 0 0 0.5-0.5im 0.5+0.5im; 0 0 0.5+0.5im 0.5-0.5im],
+    )
 
 end
 
@@ -879,7 +921,9 @@ CVdaggerRev = \begin{pmatrix}
 """
 function CVdaggerRevGate()
 
-    return Array{Complex{Float64},2}([1 0 0 0; 0 0.5-0.5im 0 0.5+0.5im; 0 0 1 0; 0 0.5+0.5im 0 0.5-0.5im])
+    return Array{Complex{Float64},2}(
+        [1 0 0 0; 0 0.5-0.5im 0 0.5+0.5im; 0 0 1 0; 0 0.5+0.5im 0 0.5-0.5im],
+    )
 
 end
 
@@ -909,7 +953,7 @@ CS = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes S = \begin{pm
 ```
 """
 function CSGate()
-    return QCO.multi_controlled_gate(QCO.SGate(), [1], 2, 2)  
+    return QCO.multi_controlled_gate(QCO.SGate(), [1], 2, 2)
 end
 
 
@@ -938,7 +982,7 @@ CSdagger = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes S^{\dag
 ```
 """
 function CSdaggerGate()
-    return QCO.multi_controlled_gate(QCO.SdaggerGate(), [1], 2, 2)  
+    return QCO.multi_controlled_gate(QCO.SdaggerGate(), [1], 2, 2)
 end
 
 @doc raw"""
@@ -967,7 +1011,7 @@ CT = |0 \rangle\langle 0| \otimes I + |1 \rangle\langle 1| \otimes T = \begin{pm
 ```
 """
 function CTGate()
-    return QCO.multi_controlled_gate(QCO.TGate(), [1], 2, 2) 
+    return QCO.multi_controlled_gate(QCO.TGate(), [1], 2, 2)
 end
 
 @doc raw"""
@@ -1001,7 +1045,7 @@ end
 @doc raw"""
     WGate()
 
-Two-qubit, W hermitian gate, typically useful to diagonlize the ([SwapGate](@ref)).  
+Two-qubit Hermitian W gate, typically useful to diagonalize the [SwapGate](@ref).
 
 **Matrix Representation**
 
@@ -1016,7 +1060,9 @@ W = \begin{pmatrix}
 """
 function WGate()
 
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1])
+    return Array{Complex{Float64},2}(
+        [1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1],
+    )
 
 end
 
@@ -1050,10 +1096,14 @@ CRX(\theta)\ q_1, q_0 =
 """
 function CRXGate(θ::Number)
 
-    CRX = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 1 0 0       
-                                      0 0  cos(θ/2)  -(sin(θ/2))im 
-                                      0 0  -(sin(θ/2))im  cos(θ/2)])
+    CRX = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 1 0 0
+            0 0 cos(θ/2) -(sin(θ/2))im
+            0 0 -(sin(θ/2))im cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(CRX)
 end
@@ -1088,10 +1138,14 @@ CRXRev(\theta)\ q_1, q_0 =
 """
 function CRXRevGate(θ::Number)
 
-    CRXRev = Array{Complex{Float64},2}([1 0 0 0            
-                                        0 cos(θ/2) 0 -(sin(θ/2))im      
-                                        0 0 1 0
-                                        0 -(sin(θ/2))im 0 cos(θ/2)])
+    CRXRev = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 cos(θ/2) 0 -(sin(θ/2))im
+            0 0 1 0
+            0 -(sin(θ/2))im 0 cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(CRXRev)
 end
@@ -1125,13 +1179,17 @@ CRY(\theta)\ q_1, q_0 =
 ```
 """
 function CRYGate(θ::Number)
-    
+
     QCO._verify_angle_bounds(θ)
 
-    CRY = Array{Complex{Float64},2}([1 0 0 0            
-                                     0 1 0 0       
-                                     0 0  cos(θ/2)  -(sin(θ/2)) 
-                                     0 0  (sin(θ/2))  cos(θ/2)])
+    CRY = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 1 0 0
+            0 0 cos(θ/2) -(sin(θ/2))
+            0 0 (sin(θ/2)) cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(CRY)
 end
@@ -1165,13 +1223,17 @@ CRYRev(\theta)\ q_1, q_0 =
 ```
 """
 function CRYRevGate(θ::Number)
-    
+
     QCO._verify_angle_bounds(θ)
 
-    CRYRev = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 cos(θ/2) 0 -(sin(θ/2))      
-                                      0 0 1 0
-                                      0 (sin(θ/2)) 0 cos(θ/2)])
+    CRYRev = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 cos(θ/2) 0 -(sin(θ/2))
+            0 0 1 0
+            0 (sin(θ/2)) 0 cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(CRYRev)
 end
@@ -1205,13 +1267,17 @@ CRZ(\theta)\ q_1, q_0 =
 ```
 """
 function CRZGate(θ::Number)
-    
+
     QCO._verify_angle_bounds(θ)
 
-    CRZ = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 1 0 0       
-                                      0 0  (cos(θ/2) - (sin(θ/2))im)  0 
-                                      0 0  0  (cos(θ/2) + (sin(θ/2))im)])
+    CRZ = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 1 0 0
+            0 0 (cos(θ/2) - (sin(θ/2))im) 0
+            0 0 0 (cos(θ/2) + (sin(θ/2))im)
+        ],
+    )
 
     return QCO.round_complex_values(CRZ)
 end
@@ -1245,13 +1311,17 @@ CRZRev(\theta)\ q_1, q_0 =
 ```
 """
 function CRZRevGate(θ::Number)
-    
+
     QCO._verify_angle_bounds(θ)
 
-    CRZRev = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 (cos(θ/2) - (sin(θ/2))im) 0 0       
-                                      0 0 1 0 
-                                      0 0  0  (cos(θ/2) + (sin(θ/2))im)])
+    CRZRev = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 (cos(θ/2) - (sin(θ/2))im) 0 0
+            0 0 1 0
+            0 0 0 (cos(θ/2) + (sin(θ/2))im)
+        ],
+    )
 
     return QCO.round_complex_values(CRZRev)
 end
@@ -1291,10 +1361,14 @@ function CU3Gate(θ::Number, ϕ::Number, λ::Number)
     QCO._verify_angle_bounds(ϕ)
     QCO._verify_angle_bounds(λ)
 
-    CU3 = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 1 0 0       
-                                      0 0  cos(θ/2)  -(cos(λ)+(sin(λ))im)*sin(θ/2) 
-                                      0 0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2)  (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
+    CU3 = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 1 0 0
+            0 0 cos(θ/2) -(cos(λ)+(sin(λ))im)*sin(θ/2)
+            0 0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2) (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(CU3)
 end
@@ -1334,10 +1408,14 @@ function CU3RevGate(θ::Number, ϕ::Number, λ::Number)
     QCO._verify_angle_bounds(ϕ)
     QCO._verify_angle_bounds(λ)
 
-    CU3Rev = Array{Complex{Float64},2}([ 1 0 0 0            
-                                      0 cos(θ/2) 0 -(cos(λ)+(sin(λ))im)*sin(θ/2)    
-                                      0 0 1 0 
-                                      0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2) 0 (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)])
+    CU3Rev = Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 cos(θ/2) 0 -(cos(λ)+(sin(λ))im)*sin(θ/2)
+            0 0 1 0
+            0 (cos(ϕ)+(sin(ϕ))im)*sin(θ/2) 0 (cos(λ+ϕ)+(sin(λ+ϕ))im)*cos(θ/2)
+        ],
+    )
 
     return QCO.round_complex_values(CU3Rev)
 end
@@ -1357,7 +1435,7 @@ q_1: ─X─
 **Matrix Representation**
 
 ```math
-SWAP = \begin{pmatrix}
+\sqrt{\mathrm{SWAP}} = \begin{pmatrix}
 1 & 0 & 0 & 0 \\
 0 & 0 & 1 & 0 \\
 0 & 1 & 0 & 0 \\
@@ -1600,13 +1678,15 @@ HCoinGate = \begin{pmatrix}
 ```
 """
 function HCoinGate()
-    return Array{Complex{Float64},2}([1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1])
+    return Array{Complex{Float64},2}(
+        [1 0 0 0; 0 1/sqrt(2) 1/sqrt(2) 0; 0 1/sqrt(2) -1/sqrt(2) 0; 0 0 0 1],
+    )
 end
 
 @doc raw"""
     GroverDiffusionGate()
 
-Two-qubit, Grover's diffusion operator, a key building block of the Glover's algorithm used to find a specific
+Two-qubit Grover diffusion operator, a key building block of Grover's algorithm used to find a specific
 item (with probability > 0.5) within a randomly ordered database of N items in O(sqrt(N)) operations. 
 Reference: [https://arxiv.org/pdf/1804.03719.pdf](https://arxiv.org/pdf/1804.03719.pdf)
 
@@ -1623,7 +1703,7 @@ GroverDiffusionGate = \frac{1}{2}\begin{pmatrix}
 """
 function GroverDiffusionGate()
 
-    return Array{Complex{Float64},2}(0.5*[1 -1 -1 -1; -1 1 -1 -1; -1 -1 1 -1; -1 -1 -1 1]) 
+    return Array{Complex{Float64},2}(0.5*[1 -1 -1 -1; -1 1 -1 -1; -1 -1 1 -1; -1 -1 -1 1])
 
 end
 
@@ -1657,10 +1737,14 @@ SycamoreGate() = \begin{pmatrix}
 """
 function SycamoreGate()
 
-    return  Array{Complex{Float64},2}([1 0 0 0            
-                                      0 0 -im 0    
-                                      0 -im 0 0
-                                      0 0 0 cos(pi/6)-(sin(pi/6))im])
+    return Array{Complex{Float64},2}(
+        [
+            1 0 0 0
+            0 0 -im 0
+            0 -im 0 0
+            0 0 0 cos(pi/6)-(sin(pi/6))im
+        ],
+    )
 
 end
 
@@ -1701,7 +1785,7 @@ Toffoli     =
 ```
 """
 function ToffoliGate()
-    return QCO.multi_controlled_gate(QCO.XGate(), [1,2], 3, 3)
+    return QCO.multi_controlled_gate(QCO.XGate(), [1, 2], 3, 3)
 end
 
 @doc raw"""
@@ -1734,12 +1818,12 @@ CSwapGate =
         \end{pmatrix}
 ```
 """
-function CSwapGate() 
+function CSwapGate()
     M_0 = [1 0; 0 0]
     M_1 = [0 0; 0 1]
     control_0 = kron(M_0, QCO.IGate(2))   # |0⟩⟨0| ⊗ I
     control_1 = kron(M_1, QCO.SwapGate()) # |1⟩⟨1| ⊗ G
-    
+
     return control_0 + control_1
 end
 
@@ -1774,7 +1858,7 @@ CCZGate =
 ```
 """
 function CCZGate()
-    return QCO.multi_controlled_gate(QCO.ZGate(), [1,2], 3, 3)
+    return QCO.multi_controlled_gate(QCO.ZGate(), [1, 2], 3, 3)
 end
 
 @doc raw"""
@@ -1811,22 +1895,26 @@ PeresGate =
 """
 function PeresGate()
 
-    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                      0  1  0  0  0  0  0  0
-                                      0  0  1  0  0  0  0  0
-                                      0  0  0  1  0  0  0  0
-                                      0  0  0  0  0  0  1  0
-                                      0  0  0  0  0  0  0  1
-                                      0  0  0  0  0  1  0  0
-                                      0  0  0  0  1  0  0  0])
+    return Array{Complex{Float64},2}(
+        [
+            1 0 0 0 0 0 0 0
+            0 1 0 0 0 0 0 0
+            0 0 1 0 0 0 0 0
+            0 0 0 1 0 0 0 0
+            0 0 0 0 0 0 1 0
+            0 0 0 0 0 0 0 1
+            0 0 0 0 0 1 0 0
+            0 0 0 0 1 0 0 0
+        ],
+    )
 
 end
 
 @doc raw"""
     RCCXGate()
 
-Three-qubit relative (or simplified) Toffoli gate, or the CCX gate. This gate is equivalent to [ToffoliGate](@ref) upto relative phases. 
-The advantage of this gate is that it's implementation requires only three CNot (or CX) gates. 
+Three-qubit relative (or simplified) Toffoli gate, or the CCX gate. This gate is equivalent to [ToffoliGate](@ref) up to relative phases.
+The advantage of this gate is that its implementation requires only three CNot (or CX) gates.
 Reference: [https://arxiv.org/pdf/1508.03273.pdf](https://arxiv.org/pdf/1508.03273.pdf)
 
 **Matrix Representation**
@@ -1847,14 +1935,18 @@ RCCXGate =
 """
 function RCCXGate()
 
-    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                      0  1  0  0  0  0  0  0
-                                      0  0  1  0  0  0  0  0
-                                      0  0  0  1  0  0  0  0
-                                      0  0  0  0  1  0  0  0
-                                      0  0  0  0  0  -1  0  0
-                                      0  0  0  0  0  0  0  -im
-                                      0  0  0  0  0  0  im  0])
+    return Array{Complex{Float64},2}(
+        [
+            1 0 0 0 0 0 0 0
+            0 1 0 0 0 0 0 0
+            0 0 1 0 0 0 0 0
+            0 0 0 1 0 0 0 0
+            0 0 0 0 1 0 0 0
+            0 0 0 0 0 -1 0 0
+            0 0 0 0 0 0 0 -im
+            0 0 0 0 0 0 im 0
+        ],
+    )
 end
 
 @doc raw"""
@@ -1882,14 +1974,18 @@ MargolusGate =
 """
 function MargolusGate()
 
-    return Array{Complex{Float64},2}([1  0  0  0  0  0  0  0
-                                      0  1  0  0  0  0  0  0
-                                      0  0  1  0  0  0  0  0
-                                      0  0  0  1  0  0  0  0
-                                      0  0  0  0  1  0  0  0
-                                      0  0  0  0  0 -1  0  0
-                                      0  0  0  0  0  0  0  1
-                                      0  0  0  0  0  0  1  0])
+    return Array{Complex{Float64},2}(
+        [
+            1 0 0 0 0 0 0 0
+            0 1 0 0 0 0 0 0
+            0 0 1 0 0 0 0 0
+            0 0 0 1 0 0 0 0
+            0 0 0 0 1 0 0 0
+            0 0 0 0 0 -1 0 0
+            0 0 0 0 0 0 0 1
+            0 0 0 0 0 0 1 0
+        ],
+    )
 end
 
 @doc raw"""
@@ -1907,7 +2003,7 @@ q_0: ┤      ├
      │      │   
 q_1: ┤ QFT3 ├ 
      │      │   
-q_3: ┤      ├ 
+q_2: ┤      ├
      └──────┘ 
 ```
 
@@ -1929,14 +2025,18 @@ M = \frac{1}{2\sqrt{2}} \begin{pmatrix}
 function QFT3Gate()
     a = 1/sqrt(8)
     b = 1/sqrt(2)
-    return Array{Complex{Float64},2}(a*[1+0.0im   1+0.0im        1+0.0im        1+0.0im        1+0.0im   1+0.0im        1+0.0im     1+0.0im
-                                        1+0.0im   (b)+(b)im      0.0+1im      -(b)+(b)im      -1+0.0im  -(b)-(b)im      0.0-1im     (b)-(b)im
-                                        1+0.0im   0.0+1im       -1+0.0im        0.0-1im        1+0.0im    0.0+1im      -1+0.0im     0.0-1im
-                                        1+0.0im   -(b)+(b)im     0.0-1im       (b)+(b)im      -1+0.0im    (b)-(b)im     0.0+1im     -(b)-(b)im
-                                        1+0.0im  -1+0.0im        1+0.0im       -1+0.0im        1+0.0im   -1+0.0im       1+0.0im     -1+0.0im
-                                        1+0.0im   -(b)-(b)im     0.0+1im       (b)-(b)im      -1+0.0im    (b)+(b)im     0.0-1im     -(b)+(b)im
-                                        1+0.0im    0.0-1im      -1+0.0im        0.0+1im        1+0.0im     0.0-1im     -1+0.0im      0.0+1im
-                                        1+0.0im    (b)-(b)im     0.0-1im      -(b)-(b)im      -1+0.0im    -(b)+(b)im    0.0+1im      (b)+(b)im])
+    return Array{Complex{Float64},2}(
+        a*[
+            1+0.0im 1+0.0im 1+0.0im 1+0.0im 1+0.0im 1+0.0im 1+0.0im 1+0.0im
+            1+0.0im (b)+(b)im 0.0+1im -(b)+(b)im -1+0.0im -(b)-(b)im 0.0-1im (b)-(b)im
+            1+0.0im 0.0+1im -1+0.0im 0.0-1im 1+0.0im 0.0+1im -1+0.0im 0.0-1im
+            1+0.0im -(b)+(b)im 0.0-1im (b)+(b)im -1+0.0im (b)-(b)im 0.0+1im -(b)-(b)im
+            1+0.0im -1+0.0im 1+0.0im -1+0.0im 1+0.0im -1+0.0im 1+0.0im -1+0.0im
+            1+0.0im -(b)-(b)im 0.0+1im (b)-(b)im -1+0.0im (b)+(b)im 0.0-1im -(b)+(b)im
+            1+0.0im 0.0-1im -1+0.0im 0.0+1im 1+0.0im 0.0-1im -1+0.0im 0.0+1im
+            1+0.0im (b)-(b)im 0.0-1im -(b)-(b)im -1+0.0im -(b)+(b)im 0.0+1im (b)+(b)im
+        ],
+    )
 end
 
 @doc raw"""
@@ -1977,7 +2077,7 @@ function CiSwapGate()
     M_1 = [0 0; 0 1]
     control_0 = kron(M_0, QCO.IGate(2)) # |0⟩⟨0| ⊗ I
     control_1 = kron(M_1, QCO.iSwapGate())    # |1⟩⟨1| ⊗ G
-    
+
     return control_0 + control_1
 end
 
@@ -1993,7 +2093,7 @@ This gate can be applied to multiple qubits simultaneously, for a given depth.
 The global R gate is native to atomic systems. In the one-qubit case, this gate is 
 equivalent to the [RGate](@ref).
 
-Reference: [Qiskit's circuit library](https://qiskit.org/documentation/stubs/qiskit.circuit.library.GR.html)
+Reference: [IBM Quantum's Qiskit circuit library](https://quantum.cloud.ibm.com/docs/api/qiskit/qiskit.circuit.library.GR)
 
 **Circuit Representation (in 3 qubits)**
 ```
@@ -2014,5 +2114,7 @@ GR(\theta, \phi) = \exp \left(-i \sum_{i=1}^{3} (\cos(\phi)X_i + \sin(\phi)Y_i) 
 ```
 """
 function GRGate(num_qubits::Int64, θ::Number, ϕ::Number)
-    return QCO.round_complex_values(QCO.multi_qubit_global_gate(num_qubits, QCO.RGate(θ,ϕ)))
+    return QCO.round_complex_values(
+        QCO.multi_qubit_global_gate(num_qubits, QCO.RGate(θ, ϕ)),
+    )
 end
