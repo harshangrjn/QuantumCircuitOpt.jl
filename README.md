@@ -1,17 +1,16 @@
-<p align="center">
+<h1 align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/src/assets/logo_header_dark.png">
     <img alt="QuantumCircuitOpt.jl" src="docs/src/assets/logo_header_light.png" width="900">
   </picture>
   <br>
-  <strong>A Julia package for optimal quantum circuit design</strong>
-</p>
+  A Julia Package for Optimal Quantum Circuit Design
+</h1>
 
 [![CI](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/ci.yml)
 [![Documentation](https://github.com/harshangrjn/QuantumCircuitOpt.jl/actions/workflows/documentation.yml/badge.svg?branch=master)](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/)
 [![Codecov](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/harshangrjn/QuantumCircuitOpt.jl/branch/master)
 [![Latest release](https://img.shields.io/github/v/release/harshangrjn/QuantumCircuitOpt.jl)](https://github.com/harshangrjn/QuantumCircuitOpt.jl/releases/latest)
-[![Julia 1.10+](https://img.shields.io/badge/julia-1.10%2B-9558B2.svg)](https://julialang.org)
 
 **QuantumCircuitOpt** is a Julia package which implements discrete optimization-based methods for provably optimal synthesis of an architecture for quantum circuits. While programming quantum computers, a primary goal is to build useful and less-noisy quantum circuits from the basic building blocks, also termed as elementary gates which arise due to hardware constraints. Thus, given a desired quantum computation, as a target gate, and a set of elemental one- and two-qubit gates, this package provides a _provably optimal, exact_ (up to global phase and machine precision) or an approximate decomposition with minimum number of elemental gates and CNOT gates. Now, this package also supports multi-qubit gates in the elementary gates set, such as the [global rotation](https://harshangrjn.github.io/QuantumCircuitOpt.jl/dev/multi_qubit_gates/#GRGate) gate. _Note that QuantumCircuitOpt currently supports only decompositions of circuits up to ten qubits_.
 
@@ -63,7 +62,7 @@ for all circuit and model options, and the
 [`examples`](https://github.com/harshangrjn/QuantumCircuitOpt.jl/tree/master/examples)
 directory for additional decompositions.
 
-## Testing and documentation
+## Testing
 
 To test a development checkout:
 
@@ -72,15 +71,6 @@ git clone https://github.com/harshangrjn/QuantumCircuitOpt.jl.git
 cd QuantumCircuitOpt.jl
 julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 ```
-
-To build the documentation locally:
-
-```sh
-julia --project=docs -e 'using Pkg; VERSION < v"1.11" && Pkg.develop(path="."); Pkg.instantiate()'
-julia --project=docs docs/make.jl
-```
-
-Open `docs/build/index.html` after the build completes.
 
 ## Video Links
 

@@ -4,6 +4,7 @@ using Test
 import QuantumCircuitOpt as QCO
 import LinearAlgebra as LA
 import HiGHS
+import Logging
 
 # Suppress warnings during testing
 QCO.logger_config!("error")
@@ -22,6 +23,7 @@ tol_0 = 1E-6
     include("utility_tests.jl")
     include("chull_tests.jl")
     include("gates_tests.jl")
+    include("log_tests.jl")
     include("types_tests.jl")
     include("data_tests.jl")
     include("qc_model_tests.jl")
